@@ -45,15 +45,16 @@ The variant IDs are saved in `supabase/economy.sql` (`diamond_packs`): 10 → `2
 
 [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens) → **Generate new token** → name it `GitHub deploy`.
 
-## 5. GitHub secrets
+## 5. Secrets
 
-[Repo → Settings → Secrets and variables → Actions](https://github.com/ringh0st/prism/settings/secrets/actions) → **New repository secret**, three times:
+**In Supabase** ([Edge Functions → Secrets](https://supabase.com/dashboard/project/wapxwfpgrijxaclsbwkq/functions/secrets)) add:
 
 | Name | Value |
 | --- | --- |
-| `SUPABASE_ACCESS_TOKEN` | token from step 4 |
 | `LEMONSQUEEZY_API_KEY` | API key from step 3 |
 | `LEMONSQUEEZY_WEBHOOK_SECRET` | the signing secret you made up in step 3 |
+
+**In GitHub** ([Settings → Secrets → Actions](https://github.com/ringh0st/prism/settings/secrets/actions)) add `SUPABASE_ACCESS_TOKEN` with the token from step 4. It needs permission to deploy Edge Functions.
 
 ## 6. Deploy
 

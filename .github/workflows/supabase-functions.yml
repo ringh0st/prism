@@ -1,7 +1,7 @@
 name: Deploy Supabase functions
 
-# Deploys the payment functions in supabase/functions. Needs these repository secrets (see PAYMENTS.md):
-#   SUPABASE_ACCESS_TOKEN (required), LEMONSQUEEZY_API_KEY, LEMONSQUEEZY_WEBHOOK_SECRET
+# Deploys the payment functions in supabase/functions. Needs the SUPABASE_ACCESS_TOKEN repository secret.
+# The Lemon Squeezy keys are stored directly in Supabase (Edge Functions → Secrets), see PAYMENTS.md.
 on:
   push:
     branches: [main]
@@ -34,20 +34,6 @@ jobs:
         if: steps.token.outputs.missing != 'true'
         with:
           version: latest
-
-      - name: Store payment secrets in Supabase
-        if: steps.token.outputs.missing != 'true'
-        env:
-          LEMONSQUEEZY_API_KEY: ${{ secrets.LEMONSQUEEZY_API_KEY }}
-          LEMONSQUEEZY_WEBHOOK_SECRET: ${{ secrets.LEMONSQUEEZY_WEBHOOK_SECRET }}
-        run: |
-          args=()
-          for name in LEMONSQUEEZY_API_KEY LEMONSQUEEZY_WEBHOOK_SECRET; do
-            if [ -n "${!name}" ]; then args+=("$name=${!name}"); fi
-          done
-          if [ ${#args[@]} -gt 0 ]; then
-            supabase secrets set --project-ref "$PROJECT_REF" --yes "${args[@]}"
-          fi
 
       - name: Deploy functions
         if: steps.token.outputs.missing != 'true'
