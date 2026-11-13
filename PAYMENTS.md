@@ -34,7 +34,7 @@ The variant IDs are saved in `supabase/economy.sql` (`diamond_packs`): 10 → `2
 
 ## 3. Keys from Lemon Squeezy
 
-- **Store ID:** Settings → Stores. It's the number next to your store.
+- **Store ID:** `523117` (Ringhost games). Already in the code, nothing to do.
 - **API key:** Settings → API → **+**. Copy it once.
 - **Webhook:** Settings → Webhooks → **+**
   - Callback URL: `https://wapxwfpgrijxaclsbwkq.supabase.co/functions/v1/lemonsqueezy-webhook`
@@ -47,13 +47,12 @@ The variant IDs are saved in `supabase/economy.sql` (`diamond_packs`): 10 → `2
 
 ## 5. GitHub secrets
 
-[Repo → Settings → Secrets and variables → Actions](https://github.com/ringh0st/prism/settings/secrets/actions) → **New repository secret**, four times:
+[Repo → Settings → Secrets and variables → Actions](https://github.com/ringh0st/prism/settings/secrets/actions) → **New repository secret**, three times:
 
 | Name | Value |
 | --- | --- |
 | `SUPABASE_ACCESS_TOKEN` | token from step 4 |
 | `LEMONSQUEEZY_API_KEY` | API key from step 3 |
-| `LEMONSQUEEZY_STORE_ID` | store ID from step 3 |
 | `LEMONSQUEEZY_WEBHOOK_SECRET` | the signing secret you made up in step 3 |
 
 ## 6. Deploy

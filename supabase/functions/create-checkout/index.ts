@@ -3,6 +3,9 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { corsHeaders, json, requireEnv } from '../_shared/http.ts';
 
+// Lemon Squeezy store "Ringhost games" (ringhost.lemonsqueezy.com). Not a secret.
+const STORE_ID = '523117';
+
 // Players may only be sent back to the game's own site after paying.
 const ALLOWED_RETURN_PREFIX = 'https://ringh0st.github.io/prism/';
 const DEFAULT_RETURN_URL = `${ALLOWED_RETURN_PREFIX}play/#/store/thanks`;
@@ -43,7 +46,7 @@ Deno.serve(async (req) => {
             product_options: { redirect_url: redirectUrl, enabled_variants: [Number(pack.variant_id)] },
           },
           relationships: {
-            store: { data: { type: 'stores', id: requireEnv('LEMONSQUEEZY_STORE_ID') } },
+            store: { data: { type: 'stores', id: STORE_ID } },
             variant: { data: { type: 'variants', id: String(pack.variant_id) } },
           },
         },

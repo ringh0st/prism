@@ -1,7 +1,7 @@
 name: Deploy Supabase functions
 
 # Deploys the payment functions in supabase/functions. Needs these repository secrets (see PAYMENTS.md):
-#   SUPABASE_ACCESS_TOKEN (required), LEMONSQUEEZY_API_KEY, LEMONSQUEEZY_STORE_ID, LEMONSQUEEZY_WEBHOOK_SECRET
+#   SUPABASE_ACCESS_TOKEN (required), LEMONSQUEEZY_API_KEY, LEMONSQUEEZY_WEBHOOK_SECRET
 on:
   push:
     branches: [main]
@@ -39,11 +39,10 @@ jobs:
         if: steps.token.outputs.missing != 'true'
         env:
           LEMONSQUEEZY_API_KEY: ${{ secrets.LEMONSQUEEZY_API_KEY }}
-          LEMONSQUEEZY_STORE_ID: ${{ secrets.LEMONSQUEEZY_STORE_ID }}
           LEMONSQUEEZY_WEBHOOK_SECRET: ${{ secrets.LEMONSQUEEZY_WEBHOOK_SECRET }}
         run: |
           args=()
-          for name in LEMONSQUEEZY_API_KEY LEMONSQUEEZY_STORE_ID LEMONSQUEEZY_WEBHOOK_SECRET; do
+          for name in LEMONSQUEEZY_API_KEY LEMONSQUEEZY_WEBHOOK_SECRET; do
             if [ -n "${!name}" ]; then args+=("$name=${!name}"); fi
           done
           if [ ${#args[@]} -gt 0 ]; then
