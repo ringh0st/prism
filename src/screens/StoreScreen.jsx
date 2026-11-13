@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import TopBar from '../components/TopBar.jsx';
+import ScreenHeader from '../components/game/ScreenHeader.jsx';
+import BottomNav from '../components/game/BottomNav.jsx';
+import Panel from '../components/game/Panel.jsx';
+import Lumi from '../components/game/Lumi.jsx';
 import Button from '../components/Button.jsx';
 import Icon from '../components/Icon.jsx';
 import BuyButtons from '../components/BuyButtons.jsx';
@@ -18,31 +21,43 @@ const TABS = [
   { id: 'diamonds', label: 'Diamonds', icon: 'diamond' },
 ];
 
+function ShopSlot({ icon, tone, title, badge, tag, children }) {
+  return (
+    <Panel as="li" className={styles.slot}>
+      {tag && <span className={`game-title ${styles.tag}`}>{tag}</span>}
+      <div className={`${styles.art} ${styles[tone]}`} aria-hidden="true">
+        <span className={styles.burst} />
+        <span className={styles.artIcon}>
+          <Icon name={icon} size={40} />
+        </span>
+        {badge && <span className={`game-title ${styles.badge}`}>{badge}</span>}
+      </div>
+      <h3 className={`game-title ${styles.slotTitle}`}>{title}</h3>
+      {children}
+    </Panel>
+  );
+}
+
 function HelpersTab({ onBuy, busyItem }) {
   const { progress, isSignedIn } = usePlayer();
   const left = sparkPurchasesLeft(progress, todayKey());
   return (
     <>
       <p className={styles.intro}>
-        Stuck? Helpers get you moving. You can hold up to {INVENTORY_CAP} of each, and buy {left === 1 ? '1 more' : `${left} more`} with sparks
-        today.
+        Stuck? Helpers get you moving. Hold up to {INVENTORY_CAP} of each. Spark buys left today: <strong>{left}</strong>
       </p>
       <ul className={styles.grid}>
         {STORE_ITEMS.filter((item) => item.kind === 'helper').map((item) => {
           const helper = HELPERS[item.grants.helper];
           const owned = progress.helpers[helper.id] ?? 0;
           return (
-            <li key={item.id} className={styles.card}>
-              <div className={styles.cardIcon} aria-hidden="true">
-                <Icon name={helper.icon} size={28} />
-              </div>
-              <h3>{helper.name}</h3>
-              <p className={styles.cardText}>{helper.description}</p>
-              <p className={styles.owned}>
-                You have {owned}/{INVENTORY_CAP} · max {helper.starCap} ★ when used
+            <ShopSlot key={item.id} icon={helper.icon} tone="helper" title={helper.name} badge={`x${owned}`}>
+              <p className={styles.slotText}>{helper.description}</p>
+              <p className={styles.cap}>
+                <Icon name="star" size={13} /> max {helper.starCap} when used
               </p>
               <BuyButtons item={item} itemName={helper.name} progress={progress} isSignedIn={isSignedIn} isBusy={busyItem === item.id} onBuy={(currency) => onBuy(item.id, currency)} />
-            </li>
+            </ShopSlot>
           );
         })}
       </ul>
@@ -54,16 +69,13 @@ function SparksTab({ onBuy, busyItem }) {
   const { progress, isSignedIn } = usePlayer();
   return (
     <>
-      <p className={styles.intro}>Trade diamonds for sparks. You also earn sparks with every new star and daily puzzle.</p>
+      <p className={styles.intro}>Trade diamonds for sparks. You also earn sparks from new stars, chests and daily puzzles.</p>
       <ul className={styles.grid}>
-        {STORE_ITEMS.filter((item) => item.kind === 'sparks').map((item) => (
-          <li key={item.id} className={styles.card}>
-            <div className={`${styles.cardIcon} ${styles.sparkIcon}`} aria-hidden="true">
-              <Icon name="spark" size={28} />
-            </div>
-            <h3>{item.grants.sparks} sparks</h3>
+        {STORE_ITEMS.filter((item) => item.kind === 'sparks').map((item, i) => (
+          <ShopSlot key={item.id} icon="spark" tone={`sparks${i}`} title={`${item.grants.sparks}`} tag={i === 2 ? 'Best value' : null}>
+            <p className={styles.slotText}>sparks</p>
             <BuyButtons item={item} itemName={`${item.grants.sparks} sparks`} progress={progress} isSignedIn={isSignedIn} isBusy={busyItem === item.id} onBuy={(currency) => onBuy(item.id, currency)} />
-          </li>
+          </ShopSlot>
         ))}
       </ul>
       {!isSignedIn && <SignInNote />}
@@ -73,9 +85,12 @@ function SparksTab({ onBuy, busyItem }) {
 
 function SignInNote() {
   return (
-    <p className={styles.signIn}>
-      <Icon name="user" size={18} /> Diamonds are saved to your account. <a href="#/settings">Sign in with Google</a> to earn and use them.
-    </p>
+    <Panel className={styles.note}>
+      <Icon name="user" size={20} />
+      <p>
+        Diamonds live in your account. <a href="#/settings">Sign in with Google</a> to earn and use them.
+      </p>
+    </Panel>
   );
 }
 
@@ -95,47 +110,43 @@ function DiamondsTab({ onError }) {
 
   return (
     <>
-      <section className={styles.free} aria-labelledby="free-diamonds">
-        <h3 id="free-diamonds">Earn diamonds for free</h3>
+      <Panel className={styles.free}>
+        <h3 className="game-title">Free diamonds!</h3>
         <ul>
           <li>
-            <Icon name="check" size={18} /> Finish a world: +{DIAMOND_REWARDS.worldComplete}
+            <Icon name="check" size={18} /> Finish a world <strong>+{DIAMOND_REWARDS.worldComplete}</strong>
           </li>
           <li>
-            <Icon name="star" size={18} /> Get 3 stars on every level of a world: +{DIAMOND_REWARDS.worldPerfect}
+            <Icon name="star" size={18} /> 3★ a whole world <strong>+{DIAMOND_REWARDS.worldPerfect}</strong>
           </li>
           <li>
-            <Icon name="flame" size={18} /> Every 7 days of daily-puzzle streak: +{DIAMOND_REWARDS.streakWeek}
+            <Icon name="flame" size={18} /> 7-day daily streak <strong>+{DIAMOND_REWARDS.streakWeek}</strong>
           </li>
         </ul>
-      </section>
+      </Panel>
 
       {!isSignedIn && <SignInNote />}
 
       <ul className={styles.grid}>
-        {DIAMOND_PACKS.map((pack) => (
-          <li key={pack.id} className={`${styles.card} ${pack.tag ? styles.featured : ''}`}>
-            {pack.tag && <span className={styles.tag}>{pack.tag}</span>}
-            <div className={`${styles.cardIcon} ${styles.diamondIcon}`} aria-hidden="true">
-              <Icon name="diamond" size={28} />
-            </div>
-            <h3>{pack.diamonds + pack.bonus} diamonds</h3>
-            {pack.bonus > 0 && <p className={styles.bonus}>includes {pack.bonus} bonus</p>}
+        {DIAMOND_PACKS.map((pack, i) => (
+          <ShopSlot key={pack.id} icon="diamond" tone={`diamonds${i}`} title={`${pack.diamonds + pack.bonus}`} tag={pack.tag}>
+            <p className={styles.slotText}>{pack.bonus > 0 ? `diamonds (+${pack.bonus} bonus)` : 'diamonds'}</p>
             <Button
               size="sm"
+              variant="go"
               disabled={!PAYMENTS_ENABLED || !isSignedIn || busyPack !== null}
               onClick={() => buyPack(pack.id)}
               aria-label={`Buy ${pack.diamonds + pack.bonus} diamonds for ${pack.displayPrice}`}
             >
               {PAYMENTS_ENABLED ? (busyPack === pack.id ? 'Opening…' : pack.displayPrice) : 'Coming soon'}
             </Button>
-          </li>
+          </ShopSlot>
         ))}
       </ul>
 
       <p className={styles.legal}>
-        <strong>Under 18? Ask a parent or guardian before buying.</strong> Diamonds are a one-time purchase for this game, with no
-        subscriptions or random rewards. Payments are processed securely by our payment partner. See our <a href={TERMS_URL}>Terms & refunds</a>.
+        <strong>Under 18? Ask a parent or guardian before buying.</strong> One-time purchases, no subscriptions, no random rewards. Payments by our
+        partner Lemon Squeezy. <a href={TERMS_URL}>Terms & refunds</a>
       </p>
     </>
   );
@@ -145,8 +156,10 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
   const { buyItem, refresh } = usePlayer();
   const [tab, setTab] = useState(isReturningFromCheckout ? 'diamonds' : 'helpers');
   const [busyItem, setBusyItem] = useState(null);
-  const [message, setMessage] = useState(
-    isReturningFromCheckout ? 'Thank you! Your diamonds will appear in a few seconds.' : '',
+  const [lumi, setLumi] = useState(() =>
+    isReturningFromCheckout
+      ? { mood: 'dance', line: 'Thank you! Your diamonds are on their way!' }
+      : { mood: 'happy', line: 'Welcome to my shop! Everything is shiny.' },
   );
 
   // After checkout the payment webhook adds the diamonds; check back a couple of times.
@@ -158,13 +171,12 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
 
   const buy = async (itemId, currency) => {
     setBusyItem(itemId);
-    setMessage('');
     try {
       await buyItem(itemId, currency);
       sfx.sparkle();
-      setMessage('Added to your collection!');
+      setLumi({ mood: 'excited', line: 'Ka-ching! Pleasure doing business!' });
     } catch (error) {
-      setMessage(error.message);
+      setLumi({ mood: 'worried', line: error.message });
     } finally {
       setBusyItem(null);
     }
@@ -172,14 +184,13 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
 
   return (
     <div className={styles.page}>
-      <TopBar />
+      <ScreenHeader title="Shop" />
       <main className={styles.main}>
-        <div className={styles.titleRow}>
-          <Button as="a" href="#/" variant="secondary" icon="back" label="Back to map" />
-          <h1>Store</h1>
+        <div className={styles.keeper}>
+          <Lumi mood={lumi.mood} size={60} line={lumi.line} />
         </div>
 
-        <div className={styles.tabs} role="tablist" aria-label="Store sections">
+        <div className={styles.tabs} role="tablist" aria-label="Shop sections">
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -191,21 +202,19 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
               className={`${styles.tab} ${tab === t.id ? styles.tabActive : ''}`}
               onClick={() => setTab(t.id)}
             >
-              <Icon name={t.icon} size={18} /> {t.label}
+              <Icon name={t.icon} size={20} />
+              <span>{t.label}</span>
             </button>
           ))}
         </div>
 
-        <p className={styles.message} role="status" aria-live="polite">
-          {message}
-        </p>
-
         <section id="store-panel" role="tabpanel" aria-labelledby={`store-tab-${tab}`} className={styles.panel}>
           {tab === 'helpers' && <HelpersTab onBuy={buy} busyItem={busyItem} />}
           {tab === 'sparks' && <SparksTab onBuy={buy} busyItem={busyItem} />}
-          {tab === 'diamonds' && <DiamondsTab onError={setMessage} />}
+          {tab === 'diamonds' && <DiamondsTab onError={(message) => setLumi({ mood: 'worried', line: message })} />}
         </section>
       </main>
+      <BottomNav active="store" />
     </div>
   );
 }

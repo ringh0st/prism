@@ -24,6 +24,8 @@ export function createEmptyProgress() {
     sparkPurchases: { date: null, count: 0 },
     daily: { streak: 0, lastDate: null },
     beamTheme: 'sunbeam',
+    claimedChests: [],
+    hotStreak: 0,
   };
 }
 
@@ -46,7 +48,7 @@ export const isWorldComplete = (progress, worldLevels) =>
  * @returns {{ progress, stars, previousStars, sparksEarned, isNewBest }}
  */
 export function recordLevelResult(progress, level, { moves, starCap = 3, forcedStars = null }) {
-  const stars = forcedStars ?? Math.min(starsForMoves(moves, level.par), starCap);
+  const stars = forcedStars ?? Math.min(starsForMoves(moves, level.par, level.difficulty), starCap);
   const previous = progress.levels[level.id];
   const previousStars = previous?.stars ?? 0;
   const sparksEarned = sparksForNewStars(previousStars, stars, level.difficulty);
@@ -128,6 +130,26 @@ export function consumeHelperLocally(progress, helperId) {
   return { ...progress, helpers: { ...progress.helpers, [helperId]: progress.helpers[helperId] - 1 } };
 }
 
+/** Levels needed to open a chest: the first 10 or all 20 levels of the world. */
+export function isChestUnlocked(progress, worldLevelRefs, levelsNeeded) {
+  const needed = worldLevelRefs.slice(0, levelsNeeded);
+  return needed.length === levelsNeeded && needed.every((ref) => starsFor(progress, ref.id) > 0);
+}
+
+/** Guest chest opening. Mirrors public.claim_chest() in supabase/progression.sql. */
+export function claimChestLocally(progress, chestKey, reward) {
+  if (progress.claimedChests.includes(chestKey)) throw new EconomyError('You already opened this chest.');
+  return {
+    ...progress,
+    sparks: progress.sparks + reward.sparks,
+    helpers: { ...progress.helpers, [reward.helper]: Math.min(INVENTORY_CAP, (progress.helpers[reward.helper] ?? 0) + 1) },
+    claimedChests: [...progress.claimedChests, chestKey],
+  };
+}
+
+/** Consecutive levels solved with three stars and no helpers (just for fun and bragging). */
+export const nextHotStreak = (progress, { stars, usedHelpers }) => (stars === 3 && !usedHelpers ? progress.hotStreak + 1 : 0);
+
 /** Apply balances returned by the server (signed-in players). */
 export function withServerState(progress, state, today) {
   return {
@@ -137,5 +159,6 @@ export function withServerState(progress, state, today) {
     helpers: { ...STARTER_HELPERS, ...state.helpers },
     daily: { streak: state.dailyStreak, lastDate: state.lastDailyDate },
     sparkPurchases: { date: today, count: state.sparkPurchasesToday },
+    claimedChests: state.claimedChests ?? progress.claimedChests,
   };
 }

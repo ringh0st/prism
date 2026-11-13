@@ -89,6 +89,20 @@
   margin-bottom: var(--space-3);
 }
 
+.browse {
+  display: grid;
+  gap: 2px;
+  margin-bottom: var(--space-2);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.browse select {
+  min-height: 36px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+}
+
 .levelList {
   max-height: 70vh;
   overflow-y: auto;

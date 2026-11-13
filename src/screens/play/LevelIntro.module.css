@@ -1,0 +1,117 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: rgba(60, 25, 8, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  cursor: pointer;
+  animation: fade 250ms ease;
+}
+
+.card {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  width: min(400px, 100%);
+  animation: slam 600ms var(--ease-pop);
+}
+
+.subtitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+  -webkit-text-stroke: 4px var(--game-outline);
+  paint-order: stroke fill;
+}
+
+.sticker {
+  padding: 4px 16px 6px;
+  border: 3px solid var(--game-outline);
+  border-radius: 12px;
+  font-size: 22px;
+  transform: rotate(-6deg);
+  background: var(--color-mint);
+  box-shadow: 0 4px 0 var(--game-ledge);
+  animation: stamp 500ms var(--ease-pop) 250ms both;
+}
+
+.boss .sticker {
+  background: linear-gradient(180deg, #ff8a72, #e5333a);
+}
+
+.disco .sticker {
+  background: linear-gradient(90deg, #ff6b5b, #ffd23f, #2ec4b6, #ff9f1c);
+  background-size: 300% 100%;
+  animation:
+    stamp 500ms var(--ease-pop) 250ms both,
+    shimmer 1.2s linear infinite;
+}
+
+.night .sticker {
+  background: linear-gradient(180deg, #6b4a3a, #2b1d16);
+}
+
+.goal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 3px solid var(--game-outline);
+  border-radius: 18px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  color: var(--game-outline);
+  background: var(--panel);
+  box-shadow: 0 5px 0 var(--game-ledge);
+}
+
+.gems {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.lumi {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 110px;
+  padding-left: 16px;
+  align-items: flex-end;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes slam {
+  from {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-6deg) scale(2.4);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 300% 0;
+  }
+}
+

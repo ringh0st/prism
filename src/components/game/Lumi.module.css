@@ -1,0 +1,188 @@
+.lumi {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-end;
+}
+
+.body {
+  overflow: visible;
+  transform-origin: 50% 95%;
+  animation: idle 2.6s ease-in-out infinite;
+}
+
+.rays {
+  opacity: 0;
+  transform-origin: 50px 60px;
+}
+
+.excited .body {
+  animation: jump 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) infinite alternate;
+}
+
+.excited .rays,
+.dance .rays {
+  opacity: 1;
+  animation: rays 1.2s linear infinite;
+}
+
+.dance .body {
+  animation: dance 0.5s ease-in-out infinite alternate;
+}
+
+.worried .body {
+  animation: shiver 0.18s linear infinite;
+}
+
+.sad .body {
+  animation: droop 3s ease-in-out infinite;
+  filter: saturate(0.6);
+}
+
+.sleepy .body {
+  animation: breathe 3.4s ease-in-out infinite;
+}
+
+.zzz {
+  animation: floatUp 2.4s ease-in-out infinite;
+}
+
+.bubble {
+  position: absolute;
+  bottom: calc(var(--size) * 0.7);
+  max-width: min(240px, 60vw);
+  width: max-content;
+  padding: 8px 14px;
+  border: 3px solid var(--game-outline);
+  border-radius: 16px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.25;
+  color: var(--game-outline);
+  background: #fff;
+  box-shadow: 0 4px 0 var(--game-ledge);
+  animation: pop 380ms cubic-bezier(0.3, 1.6, 0.5, 1);
+  z-index: 3;
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-right: 3px solid var(--game-outline);
+  border-bottom: 3px solid var(--game-outline);
+  transform: rotate(45deg);
+}
+
+.right {
+  left: calc(var(--size) * 0.75);
+}
+
+.right::after {
+  left: 14px;
+}
+
+.left {
+  right: calc(var(--size) * 0.75);
+}
+
+.left::after {
+  right: 14px;
+}
+
+.top {
+  left: 50%;
+  bottom: calc(var(--size) * 1.15);
+  transform: translateX(-50%);
+  animation: popCentered 380ms cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.top::after {
+  left: calc(50% - 8px);
+}
+
+@keyframes idle {
+  50% {
+    transform: translateY(-4px) scale(1.02, 0.98);
+  }
+}
+
+@keyframes jump {
+  from {
+    transform: translateY(0) scale(1.06, 0.94);
+  }
+  to {
+    transform: translateY(-14px) scale(0.96, 1.05);
+  }
+}
+
+@keyframes dance {
+  from {
+    transform: rotate(-10deg) translateY(0);
+  }
+  to {
+    transform: rotate(10deg) translateY(-8px);
+  }
+}
+
+@keyframes shiver {
+  0%,
+  100% {
+    transform: translateX(-1.5px);
+  }
+  50% {
+    transform: translateX(1.5px);
+  }
+}
+
+@keyframes droop {
+  50% {
+    transform: scale(1.03, 0.95);
+  }
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(1.04, 0.97);
+  }
+}
+
+@keyframes rays {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 0;
+    transform: translate(0, 6px);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(6px, -10px);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes popCentered {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.6);
+  }
+}

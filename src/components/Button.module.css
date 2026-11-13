@@ -1,101 +1,154 @@
+/* Chunky game buttons: thick outline, solid ledge underneath, glossy top, outlined label. */
 .button {
-  --depth: 5px;
+  --depth: 6px;
+  --face-top: #ff9a86;
+  --face-bottom: var(--color-coral);
+  --ledge: #b8382b;
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 44px;
+  min-height: 48px;
   padding: 0 var(--space-5);
-  border: 0;
-  border-radius: var(--radius-pill);
+  border: 3px solid var(--game-outline);
+  border-radius: 18px;
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 17px;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
+  color: #fff;
   text-decoration: none;
+  background: linear-gradient(180deg, var(--face-top), var(--face-bottom));
+  box-shadow:
+    0 var(--depth) 0 var(--ledge),
+    0 calc(var(--depth) + 3px) 0 var(--game-outline),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.12);
   cursor: pointer;
   user-select: none;
+  isolation: isolate;
   transition:
-    transform var(--duration-fast) ease,
-    box-shadow var(--duration-fast) ease,
-    filter var(--duration-fast) ease;
+    transform 90ms ease,
+    box-shadow 90ms ease,
+    filter 120ms ease;
+}
+
+/* Glossy highlight across the top half. */
+.button::before {
+  content: '';
+  position: absolute;
+  inset: 3px 8px 52%;
+  border-radius: 12px 12px 30px 30px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.08));
+  pointer-events: none;
+  z-index: -1;
+}
+
+.button > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  -webkit-text-stroke: 4px var(--game-outline);
+  paint-order: stroke fill;
+}
+
+.button:hover:not(:disabled) {
+  filter: brightness(1.06);
 }
 
 .button:active:not(:disabled) {
   transform: translateY(var(--depth));
+  box-shadow:
+    0 0 0 var(--ledge),
+    0 3px 0 var(--game-outline),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.12);
 }
 
 .button:disabled,
 .button[aria-disabled='true'] {
   cursor: not-allowed;
-  filter: grayscale(1);
-  opacity: 0.45;
+  filter: grayscale(1) brightness(1.05);
+  opacity: 0.55;
 }
 
 .primary {
-  color: var(--text-on-accent);
-  background: linear-gradient(180deg, #ff8a72, var(--color-coral));
-  box-shadow:
-    0 var(--depth) 0 var(--color-coral-deep),
-    0 12px 22px -10px rgba(217, 72, 58, 0.6),
-    inset 0 2px 0 rgba(255, 255, 255, 0.35);
+  /* coral (defaults above) */
 }
 
-.primary:active:not(:disabled) {
-  box-shadow:
-    0 0 0 var(--color-coral-deep),
-    0 6px 12px -8px rgba(217, 72, 58, 0.6),
-    inset 0 2px 0 rgba(255, 255, 255, 0.35);
+.go {
+  --face-top: #6ff0b4;
+  --face-bottom: #20c07a;
+  --ledge: #138a55;
+}
+
+.gold {
+  --face-top: #fff19a;
+  --face-bottom: var(--color-sunshine-deep);
+  --ledge: #b78300;
 }
 
 .secondary {
-  color: var(--text-strong);
-  background: var(--surface-card);
-  box-shadow:
-    0 var(--depth) 0 var(--surface-cell-edge),
-    var(--shadow-md),
-    inset 0 0 0 1.5px var(--line);
+  --face-top: #ffffff;
+  --face-bottom: #ffe9cf;
+  --ledge: #e0b98e;
+  color: var(--game-outline);
 }
 
-.secondary:active:not(:disabled) {
-  box-shadow:
-    0 0 0 var(--surface-cell-edge),
-    var(--shadow-sm),
-    inset 0 0 0 1.5px var(--line);
+.secondary > span {
+  -webkit-text-stroke: 0;
 }
 
 .ghost {
   --depth: 0px;
-  color: var(--text-strong);
+  color: var(--game-outline);
   background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
-.ghost:hover {
-  background: var(--line);
+.ghost::before {
+  display: none;
+}
+
+.ghost > span {
+  -webkit-text-stroke: 0;
 }
 
 .sm {
-  min-height: 36px;
+  --depth: 4px;
+  min-height: 38px;
   padding: 0 var(--space-4);
-  font-size: 15px;
-  --depth: 3px;
+  font-size: 16px;
+  border-radius: 14px;
 }
 
 .lg {
-  min-height: 56px;
+  --depth: 7px;
+  min-height: 60px;
   padding: 0 var(--space-6);
-  font-size: 20px;
-  --depth: 6px;
+  font-size: 23px;
+  border-radius: 22px;
 }
 
 .iconOnly {
-  width: 44px;
+  width: 48px;
   padding: 0;
 }
 
 .iconOnly.sm {
-  width: 36px;
+  width: 38px;
 }
 
 .iconOnly.lg {
-  width: 56px;
+  width: 60px;
+}
+
+/* Icons get a dark outline too, so they read on every face color. */
+.button svg {
+  filter: drop-shadow(0 1.5px 0 var(--game-outline));
+}
+
+.secondary svg,
+.ghost svg {
+  filter: none;
 }

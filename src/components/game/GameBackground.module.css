@@ -1,0 +1,76 @@
+.background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--sky-top), var(--sky-mid) 55%, var(--sky-bottom));
+}
+
+.rays {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  width: 260vmax;
+  height: 260vmax;
+  margin: -130vmax 0 0 -130vmax;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.16) 0deg 9deg, transparent 9deg 22deg);
+  mask-image: radial-gradient(circle, #000 0%, transparent 38%);
+  -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 38%);
+  animation: spin 90s linear infinite;
+}
+
+.sun {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  width: 46vmin;
+  height: 46vmin;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 250, 220, 0.85), rgba(255, 220, 120, 0.25) 55%, transparent 70%);
+}
+
+.sparkle {
+  position: absolute;
+  background: #fff;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  opacity: 0;
+  animation: twinkle 6s ease-in-out infinite;
+}
+
+.hills {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -8vh;
+  height: 32vh;
+  background:
+    radial-gradient(60% 90% at 20% 100%, rgba(255, 140, 90, 0.55), transparent 70%),
+    radial-gradient(55% 80% at 80% 100%, rgba(255, 110, 90, 0.5), transparent 70%);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4) translateY(0);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1) translateY(-14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rays,
+  .sparkle {
+    animation: none;
+  }
+}

@@ -32,6 +32,16 @@
   --beam-lime: #7ccf3c;
   --beam-sky: #45b4ea;
 
+  /* Game UI: thick warm outlines and solid ledges, like a real mobile game. */
+  --game-outline: #5a2d12;
+  --game-outline-soft: rgba(90, 45, 18, 0.35);
+  --game-ledge: rgba(90, 45, 18, 0.45);
+  --sky-top: #ffcf6e;
+  --sky-mid: #ff9a5c;
+  --sky-bottom: #ff7a6a;
+  --panel: #fff7ea;
+  --panel-inner: #ffeed6;
+
   --font-display: 'Fredoka', ui-rounded, system-ui, sans-serif;
   --font-body: 'Nunito', ui-rounded, system-ui, sans-serif;
 
@@ -72,6 +82,11 @@
     --surface-locked: #4a3a2e;
     --pivot-fill: rgba(255, 255, 255, 0.08);
     --gem-unlit-opacity: 0.7;
+    --sky-top: #3a1f2b;
+    --sky-mid: #4a2618;
+    --sky-bottom: #231410;
+    --panel: #3a2a20;
+    --panel-inner: #2f2219;
     --text-strong: #fff4e8;
     --text-soft: #c9b5a5;
     --line: rgba(255, 255, 255, 0.1);
@@ -92,6 +107,11 @@
   --surface-locked: #4a3a2e;
   --pivot-fill: rgba(255, 255, 255, 0.08);
   --gem-unlit-opacity: 0.7;
+  --sky-top: #3a1f2b;
+  --sky-mid: #4a2618;
+  --sky-bottom: #231410;
+  --panel: #3a2a20;
+  --panel-inner: #2f2219;
   --text-strong: #fff4e8;
   --text-soft: #c9b5a5;
   --line: rgba(255, 255, 255, 0.1);

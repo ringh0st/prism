@@ -1,0 +1,102 @@
+.meter {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.movesLeft {
+  display: grid;
+  justify-items: center;
+  min-width: 64px;
+  line-height: 1;
+}
+
+.count {
+  font-size: 38px;
+  animation: tick 300ms var(--ease-pop);
+}
+
+.caption {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--game-outline);
+}
+
+.track {
+  position: relative;
+  height: 26px;
+  margin-top: 14px;
+  border: 3px solid var(--game-outline);
+  border-radius: 999px;
+  background: rgba(90, 45, 18, 0.25);
+  box-shadow: inset 0 3px 0 rgba(0, 0, 0, 0.15);
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  transition:
+    width 300ms var(--ease-out),
+    background 300ms ease;
+  box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.45);
+}
+
+.good {
+  background: linear-gradient(180deg, #7ef3bd, #22c47c);
+}
+
+.warn {
+  background: linear-gradient(180deg, #ffe17a, #ffad1c);
+}
+
+.danger {
+  background: linear-gradient(180deg, #ff9a86, #ff4a3a);
+  animation: blink 0.6s ease-in-out infinite alternate;
+}
+
+.marker {
+  position: absolute;
+  top: -20px;
+  display: flex;
+  transform: translateX(-50%);
+  color: var(--color-sunshine);
+  filter: drop-shadow(1.5px 1.5px 0 var(--game-outline)) drop-shadow(-1px -1px 0 var(--game-outline));
+  transition:
+    transform 400ms var(--ease-pop),
+    opacity 400ms ease;
+}
+
+.marker::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  width: 3px;
+  height: 30px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--game-outline);
+}
+
+.lost {
+  opacity: 0.25;
+  transform: translateX(-50%) translateY(10px) rotate(25deg) scale(0.8);
+  filter: grayscale(1);
+}
+
+@keyframes tick {
+  from {
+    transform: scale(1.4);
+  }
+}
+
+@keyframes blink {
+  to {
+    filter: brightness(1.25);
+  }
+}

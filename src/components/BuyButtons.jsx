@@ -18,24 +18,27 @@ export default function BuyButtons({ item, itemName, progress, isSignedIn, isBus
       {sparkPrice && (
         <Button
           size="sm"
-          variant="secondary"
+          variant="gold"
           className={styles.price}
           disabled={isBusy || progress.sparks < sparkPrice || dailyLimitReached}
           onClick={() => onBuy('sparks')}
           aria-label={`Buy ${itemName} for ${sparkPrice} sparks${dailyLimitReached ? ' (daily limit reached)' : ''}`}
         >
-          <Icon name="spark" size={16} className={styles.spark} /> {sparkPrice}
+          <Icon name="spark" size={16} />
+          <span>{sparkPrice}</span>
         </Button>
       )}
       {diamondPrice && (
         <Button
           size="sm"
+          variant="go"
           className={styles.price}
           disabled={isBusy || !isSignedIn || progress.diamonds < diamondPrice}
           onClick={() => onBuy('diamonds')}
           aria-label={`Buy ${itemName} for ${diamondPrice} diamonds${isSignedIn ? '' : ' (sign in required)'}`}
         >
-          <Icon name="diamond" size={16} /> {diamondPrice}
+          <Icon name="diamond" size={16} />
+          <span>{diamondPrice}</span>
         </Button>
       )}
     </div>

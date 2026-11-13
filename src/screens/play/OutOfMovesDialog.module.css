@@ -1,0 +1,19 @@
+.lumi {
+  display: flex;
+  justify-content: center;
+  min-height: 170px;
+  align-items: flex-end;
+  margin-bottom: var(--space-3);
+}
+
+.tip {
+  margin-bottom: var(--space-4);
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.actions {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+}

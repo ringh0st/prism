@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import seedLevels from '../data/seedLevels.json';
 import { supabase } from '../lib/supabase.js';
-import { WORLDS } from '../game/worlds.js';
+import { loadBuiltInWorld } from '../data/levelPack.js';
+import { WORLDS, WORLD_THEMES, STARS_PER_WORLD_TO_UNLOCK, builtInLevelRefs, parseLevelId } from '../game/worlds.js';
 
 const LevelsContext = createContext(null);
 
@@ -34,14 +34,12 @@ export function rowFromLevel(level, { isPublished }) {
   };
 }
 
-const byWorldThenIndex = (a, b) => a.world - b.world || a.index - b.index;
+const toRef = ({ id, world, index, difficulty }) => ({ id, world, index, difficulty });
 
-function mergeById(base, overrides) {
-  const map = new Map(base.map((level) => [level.id, level]));
-  overrides.forEach((level) => map.set(level.id, level));
-  return [...map.values()].sort(byWorldThenIndex);
-}
-
+/**
+ * Levels = the built-in pack (loaded per world on demand) plus anything published from the
+ * admin editor. Published levels with the same id replace the built-in version.
+ */
 export function LevelsProvider({ children }) {
   const [publishedLevels, setPublishedLevels] = useState([]);
   const [playtestLevel, setPlaytestLevel] = useState(null);
@@ -59,32 +57,45 @@ export function LevelsProvider({ children }) {
   }, [reload]);
 
   const value = useMemo(() => {
-    const levels = mergeById(seedLevels, publishedLevels);
-    const worldIds = [...new Set(levels.map((level) => level.world))].sort((a, b) => a - b);
-    const worlds = worldIds.map(
-      (id) =>
-        WORLDS.find((world) => world.id === id) ?? {
-          id,
-          name: `World ${id}`,
-          tagline: 'New challenges',
-          theme: 'sunshine',
-          starsToUnlock: (WORLDS.at(-1)?.starsToUnlock ?? 0) + (id - WORLDS.length) * 40,
-        },
-    );
-    const levelsInWorld = (worldId) => levels.filter((level) => level.world === worldId);
-    return {
-      levels,
-      worlds,
-      levelsInWorld,
-      levelById: (id) => levels.find((level) => level.id === id) ?? null,
-      nextLevelAfter: (id) => {
-        const position = levels.findIndex((level) => level.id === id);
-        return position >= 0 ? levels[position + 1] ?? null : null;
-      },
-      reload,
-      playtestLevel,
-      setPlaytestLevel,
+    const publishedById = new Map(publishedLevels.map((level) => [level.id, level]));
+    const extraWorldIds = [...new Set(publishedLevels.map((l) => l.world))].filter((id) => id > WORLDS.length).sort((a, b) => a - b);
+    const worlds = [
+      ...WORLDS,
+      ...extraWorldIds.map((id) => ({
+        id,
+        name: `World ${id}`,
+        tagline: 'Fresh from the lab',
+        theme: WORLD_THEMES[(id - 1) % WORLD_THEMES.length],
+        starsToUnlock: (id - 1) * STARS_PER_WORLD_TO_UNLOCK,
+      })),
+    ];
+
+    /** Lightweight list of a world's levels (no tile data needed). */
+    const levelRefsInWorld = (worldId) => {
+      const refs = new Map(builtInLevelRefs(worldId).map((ref) => [ref.id, ref]));
+      publishedLevels.filter((level) => level.world === worldId).forEach((level) => refs.set(level.id, toRef(level)));
+      return [...refs.values()].sort((a, b) => a.index - b.index);
     };
+
+    /** Full level data. Published edits win over built-in levels. */
+    const loadLevel = async (id) => {
+      if (publishedById.has(id)) return publishedById.get(id);
+      const parsed = parseLevelId(id);
+      if (!parsed) return null;
+      const levels = await loadBuiltInWorld(parsed.world);
+      return levels.find((level) => level.id === id) ?? null;
+    };
+
+    const nextLevelIdAfter = (id) => {
+      const parsed = parseLevelId(id);
+      if (!parsed) return null;
+      const refs = levelRefsInWorld(parsed.world);
+      const position = refs.findIndex((ref) => ref.id === id);
+      if (position >= 0 && position < refs.length - 1) return refs[position + 1].id;
+      return levelRefsInWorld(parsed.world + 1)[0]?.id ?? null;
+    };
+
+    return { worlds, levelRefsInWorld, loadLevel, nextLevelIdAfter, reload, playtestLevel, setPlaytestLevel };
   }, [publishedLevels, reload, playtestLevel]);
 
   return <LevelsContext.Provider value={value}>{children}</LevelsContext.Provider>;

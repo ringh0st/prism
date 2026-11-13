@@ -3,6 +3,7 @@ import { useAuth } from './AuthContext.jsx';
 import { readJson, removeKey, writeJson } from '../lib/storage.js';
 import {
   buyStoreItemOnServer,
+  claimChestOnServer,
   consumeHelperOnServer,
   fetchEconomyState,
   fetchRemoteLevels,
@@ -13,7 +14,9 @@ import {
 } from '../lib/economyApi.js';
 import {
   buyStoreItemLocally,
+  claimChestLocally,
   consumeHelperLocally,
+  nextHotStreak,
   createEmptyProgress,
   recordDailyResult,
   recordLevelResult,
@@ -21,6 +24,7 @@ import {
   withServerState,
 } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
+import { chestId, chestRewardFor } from '../game/surprises.js';
 import { sfx } from '../audio/sfx.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
@@ -89,6 +93,9 @@ export function PlayerProvider({ children }) {
       /** @returns Promise<{ stars, previousStars, sparksEarned, diamondsEarned, isNewBest }> */
       async finishLevel(level, result) {
         const local = recordLevelResult(progressRef.current, level, result);
+        const hotStreak = nextHotStreak(progressRef.current, { stars: local.stars, usedHelpers: result.usedHelpers });
+        local.progress = { ...local.progress, hotStreak };
+        local.hotStreak = hotStreak;
         setProgress(local.progress);
         if (!userId) return { ...local, diamondsEarned: 0 };
         try {
@@ -127,6 +134,18 @@ export function PlayerProvider({ children }) {
           return;
         }
         applyServerState(await buyStoreItemOnServer(itemId, currency));
+      },
+
+      /** Open a reward chest. @returns the reward. @throws EconomyError */
+      async claimChest(world, chestNumber) {
+        const reward = chestRewardFor(world, chestNumber);
+        if (!userId) {
+          setProgress(claimChestLocally(progressRef.current, chestId(world, chestNumber), reward));
+          return reward;
+        }
+        const state = await claimChestOnServer(world, chestNumber);
+        applyServerState(state);
+        return state.reward ?? reward;
       },
 
       /** @throws EconomyError when none are left */

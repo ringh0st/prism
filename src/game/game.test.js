@@ -4,9 +4,9 @@ import { readFileSync } from 'node:fs';
 import { traceBeams, reflect } from './beam.js';
 import { analyzeLevel, findHint } from './solver.js';
 import { generateLevel } from './generator.js';
-import { starsForMoves, sparksForNewStars } from './scoring.js';
+import { moveLimitFor, starsForMoves, sparksForNewStars } from './scoring.js';
 import { validateLevel } from './levelSchema.js';
-import { generatorPresetFor, levelId, LEVELS_PER_WORLD, WORLDS } from './worlds.js';
+import { generatorPresetFor, levelId, LEVELS_PER_WORLD, WORLD_COUNT } from './worlds.js';
 import { createRandom } from '../lib/random.js';
 
 // Emitter on the left shining right, a "\" mirror sends it down to a gem.
@@ -78,18 +78,29 @@ test('solver finds par and hints point to a wrong piece', () => {
 
 test('stars and sparks', () => {
   assert.equal(starsForMoves(3, 3), 3);
-  assert.equal(starsForMoves(5, 3), 2);
-  assert.equal(starsForMoves(9, 3), 1);
+  assert.equal(starsForMoves(4, 3), 2);
+  assert.equal(starsForMoves(5, 3), 1);
+  assert.equal(moveLimitFor(3), 5);
+  assert.equal(moveLimitFor(8, 'hard'), 11);
+  assert.equal(moveLimitFor(10, 'extra'), 13);
   assert.equal(sparksForNewStars(1, 3, 'hard'), 20);
   assert.equal(sparksForNewStars(3, 2), 0);
 });
 
-test('the built-in level pack is valid, solvable and scrambled', () => {
-  const levels = JSON.parse(readFileSync(new URL('../data/seedLevels.json', import.meta.url), 'utf8'));
-  assert.equal(levels.length, WORLDS.length * LEVELS_PER_WORLD);
+test('the 1000-level pack is valid, scrambled, and par is the true minimum', () => {
+  const levels = [];
+  for (let world = 1; world <= WORLD_COUNT; world++) {
+    const file = new URL(`../data/worlds/world-${String(world).padStart(3, '0')}.json`, import.meta.url);
+    levels.push(...JSON.parse(readFileSync(file, 'utf8')));
+  }
+  assert.equal(levels.length, WORLD_COUNT * LEVELS_PER_WORLD);
+  assert.equal(new Set(levels.map((l) => l.id)).size, levels.length, 'level ids are unique');
   for (const level of levels) {
     assert.deepEqual(validateLevel(level), [], level.id);
     assert.equal(traceBeams(level).isSolved, false, `${level.id} starts solved`);
+  }
+  // Full solver check on one level per world (all 1000 take a few minutes; the generator checks each one).
+  for (const level of levels.filter((l) => l.index === 1 + (l.world % LEVELS_PER_WORLD))) {
     const analysis = analyzeLevel(level);
     assert.equal(analysis.isSolvable, true, `${level.id} unsolvable`);
     assert.equal(analysis.par, level.par, `${level.id} par mismatch`);
@@ -108,7 +119,7 @@ test('progress: results, sparks, daily streak, helpers and guest store', async (
     await import('./progress.js');
   const level = { id: 'w1-01', par: 2, difficulty: 'normal' };
   let progress = createEmptyProgress();
-  const first = recordLevelResult(progress, level, { moves: 4 });
+  const first = recordLevelResult(progress, level, { moves: 3 });
   assert.equal(first.stars, 2);
   assert.equal(first.sparksEarned, 10);
   const second = recordLevelResult(first.progress, level, { moves: 2 });

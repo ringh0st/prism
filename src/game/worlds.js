@@ -1,74 +1,144 @@
 import { DIFFICULTY } from './constants.js';
 
-/**
- * Worlds group levels and introduce one new idea each.
- * Inside every world: mostly normal levels, a Hard level every 4th,
- * and an Extra Hard finale.
- */
-export const WORLDS = [
-  { id: 1, name: 'Sunrise', tagline: 'Bend the light', theme: 'sunshine', starsToUnlock: 0 },
-  { id: 2, name: 'Split', tagline: 'One beam, two paths', theme: 'tangerine', starsToUnlock: 20 },
-  { id: 3, name: 'Hues', tagline: 'Paint the light', theme: 'coral', starsToUnlock: 50 },
-  { id: 4, name: 'Shadows', tagline: 'Keep the dark ones dark', theme: 'mint', starsToUnlock: 85 },
-  { id: 5, name: 'Prism Peak', tagline: 'Experts only', theme: 'ember', starsToUnlock: 120 },
+export const WORLD_COUNT = 50;
+export const LEVELS_PER_WORLD = 20;
+export const STARS_PER_WORLD_TO_UNLOCK = 30;
+
+/** Warm color themes the map cycles through (no purple or blue). */
+export const WORLD_THEMES = ['sunshine', 'tangerine', 'coral', 'mint', 'ember', 'lime', 'peach', 'gold'];
+
+/** Fifty worlds, each with a (hopefully) funny name and tagline. */
+const WORLD_NAMES = [
+  ['Sunrise Sandbox', 'Bend the light'],
+  ['Split Personality', 'One beam, two paths'],
+  ['Paint Party', 'Light changes color'],
+  ['Shadow Puppets', 'Keep the dark ones dark'],
+  ['Mirror Mayhem', 'Everything at once'],
+  ['Photon Bakery', 'Fresh light, hot from the oven'],
+  ['Laser Lagoon', 'Splish, splash, flash'],
+  ['Glimmer Gulch', 'A wild west of reflections'],
+  ['Beam Me Up', 'Highly logical puzzles'],
+  ['Sparkle Swamp', 'Damp but dazzling'],
+  ['Dazzle Dunes', 'Hot sand, hotter beams'],
+  ['Prism Peaks', 'Thin air, bright ideas'],
+  ['Twinkle Town', 'Population: shiny'],
+  ['Radiant Ruins', 'Ancient light, new tricks'],
+  ['Lumen Lane', 'Mind the beams'],
+  ['Kaleido Cove', 'Colors everywhere'],
+  ['Flash Forest', 'The trees are mirrors now'],
+  ['Glow Grotto', 'Bring sunglasses'],
+  ['Shimmer Shores', 'Waves of light'],
+  ['Halo Hills', 'Angelic, but tricky'],
+  ['Spectrum City', 'Rush-hour photons'],
+  ['Gleam Gardens', 'Light grows here'],
+  ['Neon Noodle Bar', 'Light, slurped'],
+  ['Candle Canyon', 'Deep, dark, glowing'],
+  ['Refraction Ranch', 'Herding beams'],
+  ['Aurora Arcade', 'Insert coin, bend light'],
+  ['Crystal Carnival', 'Roll up, roll up'],
+  ['Beacon Bay', 'Ships need you'],
+  ['Shiny Summit', 'Halfway there!'],
+  ['Lantern Lake', 'Quiet, glowy, sneaky'],
+  ['Spotlight Studios', 'You are the star'],
+  ['Glitter Galaxy', 'Space, but sparkly'],
+  ['Photon Pharaoh', 'Pyramids of puzzles'],
+  ['Mirror Moon', 'One small step'],
+  ['Comet Corner', 'Fast and fiery'],
+  ['Solar Saloon', 'This board ain’t big enough'],
+  ['Rainbow Ravine', 'Mind the gap'],
+  ['Disco Depths', 'Everybody dance now'],
+  ['Brilliant Bazaar', 'Haggle with light'],
+  ['Luminous Labyrinth', 'Don’t get lost'],
+  ['Flicker Fortress', 'Guarded by shadows'],
+  ['Sunbeam Speedway', 'Vroom, but light'],
+  ['Opal Observatory', 'Watching the stars'],
+  ['Gemstone Jungle', 'Wild and precious'],
+  ['Starlight Stadium', 'The crowd goes wild'],
+  ['Eclipse Express', 'Next stop: darkness'],
+  ['Infinity Igloo', 'Cold logic, warm light'],
+  ['Phoenix Forge', 'Rise from the dark'],
+  ['Zenith Zone', 'Nearly the top'],
+  ['Prism Palace', 'The final glow'],
 ];
 
-export const LEVELS_PER_WORLD = 12;
+export const WORLDS = WORLD_NAMES.map(([name, tagline], i) => ({
+  id: i + 1,
+  name,
+  tagline,
+  theme: WORLD_THEMES[i % WORLD_THEMES.length],
+  starsToUnlock: i * STARS_PER_WORLD_TO_UNLOCK,
+}));
 
+/** Every 5th level is Hard; the last level of each world is the Extra Hard boss. */
 export function difficultyFor(index) {
-  if (index === LEVELS_PER_WORLD) return DIFFICULTY.EXTRA;
-  if (index % 4 === 0) return DIFFICULTY.HARD;
+  if (index % LEVELS_PER_WORLD === 0) return DIFFICULTY.EXTRA;
+  if (index % 5 === 0) return DIFFICULTY.HARD;
   return DIFFICULTY.NORMAL;
 }
 
 export const levelId = (world, index) => `w${world}-${String(index).padStart(2, '0')}`;
 
+export function parseLevelId(id) {
+  const match = /^w(\d+)-(\d+)$/.exec(id);
+  return match ? { world: Number(match[1]), index: Number(match[2]) } : null;
+}
+
+/** Lightweight description of every built-in level, available without loading level data. */
+export function builtInLevelRefs(worldId) {
+  if (worldId < 1 || worldId > WORLD_COUNT) return [];
+  return Array.from({ length: LEVELS_PER_WORLD }, (_, i) => ({
+    id: levelId(worldId, i + 1),
+    world: worldId,
+    index: i + 1,
+    difficulty: difficultyFor(i + 1),
+  }));
+}
+
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+
 /**
- * Generator settings for a world/level. Difficulty ramps inside each world,
- * with Hard and Extra Hard levels spiking above the curve.
+ * Generator settings for a world/level. The difficulty curve rises across all 50 worlds
+ * (bigger boards, longer solutions, more decoys), ramps inside each world, and spikes on
+ * Hard and boss levels. Worlds 1–4 each introduce one mechanic; later worlds mix them.
  */
 export function generatorPresetFor(world, index) {
   const difficulty = difficultyFor(index);
-  const ramp = (index - 1) / (LEVELS_PER_WORLD - 1); // 0 → 1 through the world
+  const ramp = (index - 1) / (LEVELS_PER_WORLD - 1);
   const spike = difficulty === DIFFICULTY.EXTRA ? 2 : difficulty === DIFFICULTY.HARD ? 1 : 0;
-  const size = Math.min(8, 5 + Math.round(ramp * 2) + (spike > 0 ? 1 : 0) + (world > 2 ? 1 : 0));
+  const tier = Math.floor((world - 1) / 4); // grows every 4 worlds
+  const size = clamp(5 + Math.min(4, tier) + Math.round(ramp) + (spike > 0 ? 1 : 0), 4, 10);
+  const parStart = Math.min(8, 2 + Math.floor((world - 1) / 3));
+  // Early worlds spike more gently so new players aren't flattened by the first boss.
+  const minPar = Math.min(13, parStart + Math.round(ramp * 2) + spike * (world <= 2 ? 1 : 2));
 
-  const base = {
+  const preset = {
     width: size,
     height: size,
-    emitters: spike === 2 ? 2 : 1,
-    turns: spike === 2 ? [2, 3] : [1 + Math.round(ramp) + spike, 2 + Math.round(ramp) + spike],
+    emitters: spike === 2 ? (world >= 20 ? 3 : 2) : spike === 1 && world >= 10 ? 2 : 1,
+    turns: [2 + Math.round(ramp), 3 + Math.round(ramp) + spike + Math.min(2, tier)],
     segment: [1, 3],
-    decoys: Math.round(ramp * 3) + spike * 2,
-    walls: Math.round(ramp * 2) + spike,
-    minPar: 1 + Math.round(ramp * 2) + (spike === 2 ? 3 : spike * 2),
-    lockedRatio: spike > 0 ? 0.05 : 0.15,
+    decoys: Math.min(5, 1 + Math.round(ramp * 2) + spike + Math.floor(tier / 2)),
+    walls: 1 + Math.round(ramp * 2) + spike,
+    minPar,
+    maxPar: minPar + 4,
+    lockedRatio: 0.1,
   };
 
-  if (world === 1 && index === 1) {
-    return { ...base, width: 4, height: 4, turns: [1, 1], decoys: 0, walls: 0, minPar: 1, maxPar: 1, lockedRatio: 0 };
+  // Tutorial: one mirror, then two, then three.
+  if (world === 1 && index <= 3) {
+    const tutorialSize = index === 1 ? 4 : 5;
+    return { ...preset, width: tutorialSize, height: tutorialSize, turns: [index, index], decoys: index - 1, walls: 0, minPar: index, maxPar: index, lockedRatio: 0 };
   }
-  if (world === 1 && index <= 3) return { ...base, turns: [1, 2], decoys: index - 1, walls: 0, minPar: index - 1 || 1 };
-  if (world === 2) return { ...base, splits: 1 + (spike > 0 ? 1 : 0), turns: [1, 2 + spike] };
-  if (world === 3) return { ...base, filters: 1 + (index > 6 ? 1 : 0), splits: index > 4 ? 1 : 0 };
-  if (world === 5) {
-    // Expert world: big boards, several light sources, every mechanic at once.
-    const expertSize = spike === 2 ? 10 : spike === 1 || index > 6 ? 9 : 8;
-    return {
-      width: expertSize,
-      height: expertSize,
-      emitters: spike === 2 ? 3 : index > 6 || spike === 1 ? 2 : 1,
-      turns: spike === 2 ? [2, 3] : [3, 4],
-      segment: [1, 3],
-      splits: spike > 0 ? 2 : 1,
-      filters: 1 + (index > 4 ? 1 : 0),
-      shades: 2 + spike,
-      decoys: 2 + spike,
-      walls: 2 + spike,
-      minPar: spike === 2 ? 10 : spike === 1 ? 8 : 5 + Math.round(ramp * 2),
-      lockedRatio: 0.2,
-    };
-  }
-  if (world === 4) return { ...base, shades: 1 + Math.round(ramp * 2) + spike, splits: index > 3 ? 1 : 0, filters: index > 6 ? 1 : 0 };
-  return base;
+
+  // Which mechanics this level uses. Early worlds introduce one at a time.
+  const variety = (world * 7 + index * 3) % 4;
+  if (world === 2) return { ...preset, splits: 1 + (spike > 0 ? 1 : 0) };
+  if (world === 3) return { ...preset, filters: 1 + (index > 10 ? 1 : 0), splits: index > 8 ? 1 : 0 };
+  if (world === 4) return { ...preset, shades: 1 + Math.round(ramp * 2) + spike, splits: index > 6 ? 1 : 0 };
+  return {
+    ...preset,
+    splits: variety === 0 || variety === 3 || spike > 0 ? 1 + (spike === 2 ? 1 : 0) : 0,
+    filters: variety === 1 || variety === 3 ? 1 + (spike > 0 ? 1 : 0) : 0,
+    shades: variety === 2 || variety === 3 || spike > 0 ? 1 + spike + Math.min(2, Math.floor(tier / 3)) : 0,
+  };
 }

@@ -8,6 +8,7 @@ Prism is a light-bending puzzle game: rotate mirrors and crystals to steer beams
 - **Colors:** warm and bright. **Purple and blue must not be the main colors.** Blue may appear only as a small in-game color (for example one beam color among several), never as the brand, UI or background color.
 - **Addictive, dopamine-rich loop:** satisfying solve moments, stars, streaks, rewards, unlocks and progress you can see.
 - **Levels with a difficulty rhythm:** mostly approachable levels, with a **Hard** level now and then and an occasional **Extra Hard** challenge level. These are clearly marked and give bigger rewards.
+- **Challenging and game-like, not a web page:** 1000+ levels (50 worlds × 20, `npm run levels`), move limits, an adventure map, chunky outlined game UI, a mascot (Lumi) with funny lines, and surprises (disco/night/boss levels, chests).
 - **Rewards:** 1–3 stars per level based on moves, world completion rewards, a daily puzzle with a streak, and cosmetic unlocks.
 - **Accounts:** play as a guest immediately with local progress. Signing in with Google is optional and syncs progress, using Supabase. Apple sign-in comes later, when the iOS app ships.
 - **Admin:** only the owner can use a level editor and publish levels. Levels are data in the database, so new levels appear without an app update.

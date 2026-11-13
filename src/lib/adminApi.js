@@ -28,10 +28,8 @@ export async function deleteLevel(id) {
   throwIfError(await supabase.from('levels').delete().eq('id', id));
 }
 
-/** Copy the built-in level pack into the database so it can be edited. */
-export async function importLevels(levels, { isPublished }) {
-  const rows = levels.map((level) => rowFromLevel(level, { isPublished }));
-  throwIfError(await supabase.from('levels').upsert(rows, { onConflict: 'id', ignoreDuplicates: true }));
+export async function deleteLevels(ids) {
+  throwIfError(await supabase.from('levels').delete().in('id', ids));
 }
 
 /** Completion stats per level, aggregated from everyone's progress (admins can read all rows). */

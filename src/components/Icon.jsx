@@ -73,6 +73,18 @@ const PATHS = {
       <path d="M9 10V7a3 3 0 0 1 6 0v3" />
     </>
   ),
+  plus: <path d="M12 5v14M5 12h14" />,
+  map: (
+    <>
+      <path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z" />
+      <path d="M9 4v14M15 6v14" />
+    </>
+  ),
+  pause: (
+    <>
+      <path d="M9 5v14M15 5v14" />
+    </>
+  ),
   edit: (
     <>
       <path d="M4 20h4L19 9l-4-4L4 16z" />
@@ -90,6 +102,13 @@ const FILLED = {
     <path d="M12.5 2c.6 3.2-1.4 5-3 6.8C8 10.5 7 12.2 7 14.5a5 5 0 0 0 10 0c0-1.8-.8-3.2-1.6-4.2-.2 1.3-.9 2.2-1.9 2.6.6-3.6-.2-7.6-1-10.9z" />
   ),
   crown: <path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" />,
+  chest: (
+    <>
+      <path d="M3 10.5C3 6.4 6.4 4 12 4s9 2.4 9 6.5V19a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19z" />
+      <path d="M3 10.5h18" stroke="rgba(0,0,0,.35)" strokeWidth="1.6" fill="none" />
+      <rect x="10" y="9" width="4" height="5" rx="1" fill="#fff6c9" />
+    </>
+  ),
   diamond: (
     <>
       <path d="M6.5 3.5h11l4 5.5L12 21 2.5 9z" />

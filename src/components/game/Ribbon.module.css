@@ -1,0 +1,82 @@
+.wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 0 22px;
+}
+
+.ribbon {
+  --face: var(--color-coral);
+  --shade: #b8382b;
+  position: relative;
+  margin: 0;
+  padding: 8px 28px 10px;
+  border: 3px solid var(--game-outline);
+  border-radius: 12px;
+  font-size: 22px;
+  line-height: 1.1;
+  text-align: center;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--face) 70%, #fff), var(--face) 60%);
+  box-shadow: 0 5px 0 var(--game-ledge);
+  z-index: 1;
+}
+
+/* Folded ends behind the ribbon. */
+.ribbon::before,
+.ribbon::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  width: 30px;
+  height: 100%;
+  border: 3px solid var(--game-outline);
+  background: var(--shade);
+  z-index: -1;
+}
+
+.ribbon::before {
+  left: -22px;
+  border-radius: 8px 0 0 8px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 34% 50%);
+}
+
+.ribbon::after {
+  right: -22px;
+  border-radius: 0 8px 8px 0;
+  clip-path: polygon(0 0, 100% 0, 66% 50%, 100% 100%, 0 100%);
+}
+
+.sm .ribbon {
+  padding: 5px 18px 7px;
+  font-size: 17px;
+}
+
+.lg .ribbon {
+  padding: 10px 34px 13px;
+  font-size: clamp(26px, 7vw, 34px);
+}
+
+.coral {
+  --face: var(--color-coral);
+  --shade: #b8382b;
+}
+
+.tangerine {
+  --face: var(--color-tangerine);
+  --shade: #b86a00;
+}
+
+.sunshine {
+  --face: var(--color-sunshine-deep);
+  --shade: #b78300;
+}
+
+.mint {
+  --face: var(--color-mint);
+  --shade: #10776d;
+}
+
+.gold {
+  --face: #ffb800;
+  --shade: #a96d00;
+}

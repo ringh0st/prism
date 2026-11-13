@@ -1,0 +1,127 @@
+.screen {
+  --board-reserved: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 600px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: max(var(--space-3), env(safe-area-inset-top)) var(--space-3) max(var(--space-3), env(safe-area-inset-bottom));
+}
+
+.header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.headerSpacer {
+  width: 48px;
+}
+
+.titleBlock {
+  display: grid;
+  justify-items: center;
+  min-width: 0;
+}
+
+.subtitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--game-outline);
+}
+
+.status {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 8px 14px 10px 8px;
+  border: 3px solid var(--game-outline);
+  border-radius: 22px;
+  background: linear-gradient(180deg, var(--panel), var(--panel-inner));
+  box-shadow:
+    0 5px 0 var(--game-ledge),
+    inset 0 3px 0 rgba(255, 255, 255, 0.7);
+}
+
+.gems {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+  max-width: 120px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gemOff {
+  opacity: 0.3;
+  filter: grayscale(0.8);
+  transition: all var(--duration-base) ease;
+}
+
+.gemOn {
+  animation: gemOn 500ms var(--ease-pop);
+}
+
+@keyframes gemOn {
+  50% {
+    transform: scale(1.6) rotate(12deg);
+  }
+}
+
+.boardArea {
+  flex: 1;
+  display: grid;
+  align-items: center;
+}
+
+.bottom {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  gap: var(--space-2);
+}
+
+.lumi {
+  position: relative;
+  z-index: 5;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--space-2);
+}
+
+.dialogText {
+  margin-bottom: var(--space-5);
+  color: var(--text-soft);
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+/* ---------- Surprise levels ---------- */
+.boss {
+  animation: rumble 0.5s ease-in-out 2;
+}
+
+@keyframes rumble {
+  25% {
+    transform: translateX(-4px) rotate(-0.4deg);
+  }
+  75% {
+    transform: translateX(4px) rotate(0.4deg);
+  }
+}

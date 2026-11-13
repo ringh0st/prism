@@ -6,7 +6,7 @@ import styles from './Admin.module.css';
 
 /** Which levels players finish, and where they drop off. */
 export default function StatsPanel() {
-  const { levels } = useLevels();
+  const { worlds, levelRefsInWorld } = useLevels();
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
 
@@ -19,6 +19,9 @@ export default function StatsPanel() {
   if (error) return <p role="alert">{error}</p>;
   if (!stats) return <p>Loading stats…</p>;
 
+  // Only worlds that someone has reached, so the table stays readable with 1000 levels.
+  const reachedWorlds = worlds.filter((world) => levelRefsInWorld(world.id).some((ref) => stats.byLevel.has(ref.id)));
+  const levels = reachedWorlds.flatMap((world) => levelRefsInWorld(world.id));
   let previousCompletions = null;
   return (
     <div className={styles.stats}>
@@ -31,7 +34,6 @@ export default function StatsPanel() {
           <thead>
             <tr>
               <th scope="col">Level</th>
-              <th scope="col">Par</th>
               <th scope="col">Completed</th>
               <th scope="col">Avg ★</th>
               <th scope="col">3★</th>
@@ -50,7 +52,6 @@ export default function StatsPanel() {
                   <th scope="row">
                     {level.world}-{level.index} <DifficultyBadge difficulty={level.difficulty} compact />
                   </th>
-                  <td>{level.par}</td>
                   <td>{completions}</td>
                   <td>{entry ? (entry.starTotal / completions).toFixed(1) : '–'}</td>
                   <td>{entry ? `${Math.round((entry.perfect / completions) * 100)}%` : '–'}</td>

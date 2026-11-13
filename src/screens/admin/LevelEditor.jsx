@@ -4,15 +4,15 @@ import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
 import DifficultyBadge from '../../components/DifficultyBadge.jsx';
 import ToolPalette from './ToolPalette.jsx';
-import seedLevels from '../../data/seedLevels.json';
+import { loadBuiltInWorld } from '../../data/levelPack.js';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { navigate } from '../../hooks/useHashRoute.js';
-import { deleteLevel, fetchAllLevels, importLevels, saveLevel } from '../../lib/adminApi.js';
+import { deleteLevel, deleteLevels, fetchAllLevels, saveLevel } from '../../lib/adminApi.js';
 import { traceBeams } from '../../game/beam.js';
 import { analyzeLevel } from '../../game/solver.js';
 import { validateLevel } from '../../game/levelSchema.js';
 import { generateLevel } from '../../game/generator.js';
-import { generatorPresetFor, levelId } from '../../game/worlds.js';
+import { generatorPresetFor, levelId, parseLevelId, WORLD_COUNT } from '../../game/worlds.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
 import {
   applyNearestSolution,
@@ -67,7 +67,10 @@ function LevelList({ entries, selectedId, onSelect }) {
 export default function LevelEditor() {
   const { reload: reloadGameLevels, setPlaytestLevel } = useLevels();
   const [dbLevels, setDbLevels] = useState([]);
-  const [draft, setDraft] = useState(() => ({ ...seedLevels[0] }));
+  const [draft, setDraft] = useState(() => createBlankLevel({ id: levelId(1, 1) }));
+  const [browseWorld, setBrowseWorld] = useState(1);
+  const [builtInLevels, setBuiltInLevels] = useState([]);
+  const [isConfirmingReset, setIsConfirmingReset] = useState(false);
   const [tool, setTool] = useState('cycle');
   const [color, setColor] = useState('sun');
   const [dir, setDir] = useState('right');
@@ -87,13 +90,32 @@ export default function LevelEditor() {
     refreshList();
   }, [refreshList]);
 
+  // Built-in levels of the world being browsed (loaded on demand).
+  useEffect(() => {
+    let isCurrent = true;
+    loadBuiltInWorld(browseWorld).then((levels) => {
+      if (!isCurrent) return;
+      setBuiltInLevels(levels);
+      setDraft((current) => (current.tiles.length ? current : { ...levels[0] }));
+    });
+    return () => {
+      isCurrent = false;
+    };
+  }, [browseWorld]);
+
+  /** Database copies of built-in levels (they override the newer built-in versions). */
+  const builtInCopies = dbLevels.filter((level) => {
+    const parsed = parseLevelId(level.id);
+    return parsed && parsed.world <= WORLD_COUNT && parsed.index <= 20;
+  });
+
   const entries = useMemo(() => {
     const inDb = new Set(dbLevels.map((l) => l.id));
     return [
       ...dbLevels.map((l) => ({ ...l, status: l.isPublished ? 'published' : 'draft' })),
-      ...seedLevels.filter((l) => !inDb.has(l.id)).map((l) => ({ ...l, status: 'built-in' })),
+      ...builtInLevels.filter((l) => !inDb.has(l.id)).map((l) => ({ ...l, status: 'built-in' })),
     ].sort((a, b) => a.world - b.world || a.index - b.index);
-  }, [dbLevels]);
+  }, [dbLevels, builtInLevels]);
 
   const dbEntry = dbLevels.find((l) => l.id === draft.id);
   const problems = useMemo(() => validateLevel(draft), [draft]);
@@ -171,15 +193,22 @@ export default function LevelEditor() {
           <Button size="sm" onClick={newLevel}>
             New level
           </Button>
-          <Button
-            size="sm"
-            variant="secondary"
-            disabled={isBusy}
-            onClick={() => run(() => importLevels(seedLevels, { isPublished: true }), 'Imported the built-in levels.')}
-          >
-            Import built-in
-          </Button>
+          {builtInCopies.length > 0 && (
+            <Button size="sm" variant="secondary" disabled={isBusy} onClick={() => setIsConfirmingReset(true)}>
+              Remove old copies ({builtInCopies.length})
+            </Button>
+          )}
         </div>
+        <label className={styles.browse}>
+          Built-in world
+          <select value={browseWorld} onChange={(e) => setBrowseWorld(Number(e.target.value))}>
+            {Array.from({ length: WORLD_COUNT }, (_, i) => (
+              <option key={i + 1} value={i + 1}>
+                World {i + 1}
+              </option>
+            ))}
+          </select>
+        </label>
         <LevelList entries={entries} selectedId={draft.id} onSelect={(entry) => setDraft({ ...entry })} />
       </aside>
 
@@ -296,6 +325,27 @@ export default function LevelEditor() {
         </p>
       </aside>
 
+      {isConfirmingReset && (
+        <Dialog title="Remove old copies?" onClose={() => setIsConfirmingReset(false)}>
+          <p className={styles.dialogText}>
+            {builtInCopies.length} levels in the database use built-in IDs (w1-01 … w50-20), so they replace the new built-in versions. Removing them
+            brings back the built-in levels. Any edits you made to those IDs are lost.
+          </p>
+          <div className={styles.actionsRow}>
+            <Button variant="secondary" onClick={() => setIsConfirmingReset(false)} data-autofocus>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                setIsConfirmingReset(false);
+                run(() => deleteLevels(builtInCopies.map((level) => level.id)), 'Old copies removed. Built-in levels are back.');
+              }}
+            >
+              Remove
+            </Button>
+          </div>
+        </Dialog>
+      )}
       {isConfirmingDelete && (
         <Dialog title={`Delete ${draft.id}?`} onClose={() => setIsConfirmingDelete(false)}>
           <p className={styles.dialogText}>This removes it from the database. Built-in levels with the same ID will show again.</p>

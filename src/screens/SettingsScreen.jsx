@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import TopBar from '../components/TopBar.jsx';
+import ScreenHeader from '../components/game/ScreenHeader.jsx';
+import BottomNav from '../components/game/BottomNav.jsx';
 import Button from '../components/Button.jsx';
 import Dialog from '../components/Dialog.jsx';
 import Icon from '../components/Icon.jsx';
@@ -132,12 +133,8 @@ export default function SettingsScreen() {
 
   return (
     <div className={styles.page}>
-      <TopBar />
+      <ScreenHeader title="Me & settings" />
       <main className={styles.main}>
-        <div className={styles.titleRow}>
-          <Button as="a" href="#/" variant="secondary" icon="back" label="Back to map" />
-          <h1>Settings</h1>
-        </div>
 
         <AccountCard />
 
@@ -193,6 +190,7 @@ export default function SettingsScreen() {
           </p>
         </section>
       </main>
+      <BottomNav active="settings" />
 
       {isConfirmingReset && (
         <Dialog title="Reset progress?" onClose={() => setIsConfirmingReset(false)}>

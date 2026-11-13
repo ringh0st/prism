@@ -17,6 +17,7 @@ import styles from './Board.module.css';
  * @param highlightTile tile index to pulse (hints)
  * @param isEditing    in the editor every cell is actionable
  * @param ghostSegments faint preview of the solved light path (Lens helper)
+ * @param mood         surprise look: normal | disco | night | boss
  */
 export default function Board({
   level,
@@ -28,6 +29,7 @@ export default function Board({
   isEditing = false,
   isLocked = false,
   ghostSegments = null,
+  mood = 'normal',
   label = 'Puzzle board',
 }) {
   const { width, height, tiles } = level;
@@ -68,7 +70,7 @@ export default function Board({
 
   return (
     <div
-      className={`${styles.board} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''}`}
+      className={`${styles.board} ${styles[mood] ?? ''} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''}`}
       style={{ '--cols': width, '--rows': height }}
     >
       <TileDefs />

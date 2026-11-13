@@ -1,14 +1,12 @@
 .row {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-2);
 }
 
 .price {
-  min-width: 74px;
+  min-width: 72px;
+  padding: 0 12px;
   font-variant-numeric: tabular-nums;
-}
-
-.spark {
-  color: var(--color-tangerine);
 }

@@ -32,6 +32,8 @@ export const buyStoreItemOnServer = (itemId, currency) => rpc('buy_store_item', 
 
 export const consumeHelperOnServer = (helperId) => rpc('use_helper', { p_helper: helperId });
 
+export const claimChestOnServer = (world, chestNumber) => rpc('claim_chest', { p_world: world, p_chest: chestNumber });
+
 export async function fetchRemoteLevels(userId) {
   const { data, error } = await supabase.from('progress').select('level_id, stars, best_moves').eq('user_id', userId);
   if (error) throw friendlyError(error);

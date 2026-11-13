@@ -3,11 +3,14 @@ import { AuthProvider } from './state/AuthContext.jsx';
 import { PlayerProvider, usePlayer } from './state/PlayerContext.jsx';
 import { LevelsProvider, useLevels } from './state/LevelsContext.jsx';
 import { useHashRoute } from './hooks/useHashRoute.js';
-import MapScreen from './screens/MapScreen.jsx';
-import PlayScreen from './screens/PlayScreen.jsx';
+import { useLevel } from './hooks/useLevel.js';
+import GameBackground from './components/game/GameBackground.jsx';
+import MapScreen from './screens/map/MapScreen.jsx';
+import PlayScreen from './screens/play/PlayScreen.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
 import StoreScreen from './screens/StoreScreen.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
+import LoadingScreen from './screens/LoadingScreen.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
 import { BEAM_THEMES } from './game/progress.js';
 import { sfx } from './audio/sfx.js';
@@ -25,19 +28,24 @@ function BeamThemeStyle() {
   return null;
 }
 
+function LevelRoute({ levelId }) {
+  const { level, isLoading } = useLevel(levelId);
+  const { nextLevelIdAfter } = useLevels();
+  if (isLoading) return <LoadingScreen />;
+  if (!level) return <NotFoundScreen />;
+  const nextId = nextLevelIdAfter(level.id);
+  return <PlayScreen key={level.id} level={level} nextLevel={nextId ? `#/play/${nextId}` : null} />;
+}
+
 function Routes() {
   const route = useHashRoute();
-  const { levelById, nextLevelAfter, playtestLevel } = useLevels();
+  const { playtestLevel } = useLevels();
 
   switch (route.name) {
     case 'map':
       return <MapScreen />;
-    case 'play': {
-      const level = levelById(route.params[0]);
-      if (!level) return <NotFoundScreen />;
-      const next = nextLevelAfter(level.id);
-      return <PlayScreen key={level.id} level={level} nextLevel={next ? `#/play/${next.id}` : null} />;
-    }
+    case 'play':
+      return <LevelRoute levelId={route.params[0]} />;
     case 'daily': {
       const dateKey = todayKey();
       const level = dailyLevelFor(dateKey);
@@ -55,7 +63,7 @@ function Routes() {
       return <StoreScreen isReturningFromCheckout={route.params[0] === 'thanks'} />;
     case 'admin':
       return (
-        <Suspense fallback={<p style={{ padding: 24 }}>Loading editor…</p>}>
+        <Suspense fallback={<LoadingScreen />}>
           <AdminScreen />
         </Suspense>
       );
@@ -76,6 +84,7 @@ export default function App() {
     <AuthProvider>
       <PlayerProvider>
         <LevelsProvider>
+          <GameBackground />
           <BeamThemeStyle />
           <Routes />
         </LevelsProvider>

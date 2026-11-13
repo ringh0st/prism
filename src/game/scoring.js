@@ -11,10 +11,23 @@ const DIFFICULTY_MULTIPLIER = {
   [DIFFICULTY.EXTRA]: 3,
 };
 
-/** 3 stars at par, 2 stars within a small margin, otherwise 1. Helpers can lower the cap (see catalog.js). */
-export function starsForMoves(moves, par) {
-  const margin = Math.max(2, Math.ceil(par * 0.5));
-  return moves <= par ? 3 : moves <= par + margin ? 2 : 1;
+/**
+ * Moves allowed before the level is lost. Spare moves shrink on harder levels.
+ * Normal: par + 50% (min 2) · Hard: par + 34% (min 2) · Extra Hard: par + 25% (min 1).
+ */
+export function moveLimitFor(par, difficulty = DIFFICULTY.NORMAL) {
+  if (difficulty === DIFFICULTY.EXTRA) return par + Math.max(1, Math.ceil(par * 0.25));
+  if (difficulty === DIFFICULTY.HARD) return par + Math.max(2, Math.ceil(par * 0.34));
+  return par + Math.max(2, Math.ceil(par * 0.5));
+}
+
+/**
+ * 3 stars at par, 2 stars in the first half of the spare moves, 1 star after that.
+ * Helpers can lower the cap further (see catalog.js).
+ */
+export function starsForMoves(moves, par, difficulty = DIFFICULTY.NORMAL) {
+  const twoStarLimit = par + Math.ceil((moveLimitFor(par, difficulty) - par) / 2);
+  return moves <= par ? 3 : moves <= twoStarLimit ? 2 : 1;
 }
 
 /** Sparks for improving a level's best result (only the newly earned stars pay out). */

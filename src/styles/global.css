@@ -16,10 +16,7 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: var(--text-strong);
-  background:
-    radial-gradient(900px 500px at 0% -10%, var(--surface-page-glow-1), transparent 60%),
-    radial-gradient(800px 500px at 110% 0%, var(--surface-page-glow-2), transparent 55%),
-    var(--surface-page);
+  background: linear-gradient(180deg, var(--sky-top), var(--sky-mid) 55%, var(--sky-bottom));
   background-attachment: fixed;
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
@@ -74,4 +71,21 @@ a {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Big outlined game titles: white letters with a chunky warm outline and drop. */
+.game-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.01em;
+  -webkit-text-stroke: 0.14em var(--game-outline);
+  paint-order: stroke fill;
+  text-shadow: 0 0.09em 0 var(--game-outline);
+}
+
+/* Icons inside flex/grid controls must not sit on the text baseline. */
+svg {
+  display: block;
+  flex: none;
 }

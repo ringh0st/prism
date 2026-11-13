@@ -1,0 +1,28 @@
+.panel {
+  position: relative;
+  padding: var(--space-4);
+  border: 3px solid var(--game-outline);
+  border-radius: 24px;
+  background: linear-gradient(180deg, var(--panel), var(--panel-inner));
+  box-shadow:
+    0 6px 0 var(--game-ledge),
+    inset 0 3px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -4px 0 rgba(90, 45, 18, 0.08);
+  color: var(--text-strong);
+}
+
+.glass {
+  border-color: rgba(90, 45, 18, 0.6);
+  background: rgba(255, 247, 234, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.dark {
+  color: #fff;
+  border-color: var(--game-outline);
+  background: linear-gradient(180deg, rgba(74, 38, 16, 0.78), rgba(58, 28, 12, 0.85));
+  box-shadow:
+    0 5px 0 rgba(0, 0, 0, 0.25),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15);
+}
