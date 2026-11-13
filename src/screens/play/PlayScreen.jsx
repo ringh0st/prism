@@ -20,6 +20,8 @@ import { sfx } from '../../audio/sfx.js';
 import { moveLimitFor, starsForMoves } from '../../game/scoring.js';
 import { HELPER_IDS, HELPERS, LENS_DURATION_MS, helpersAllowedFor } from '../../game/catalog.js';
 import { isWorldComplete } from '../../game/progress.js';
+import { dailyShareText } from '../../game/share.js';
+import { PUBLIC_GAME_URL } from '../../lib/config.js';
 import { levelNameFor } from '../../game/levelNames.js';
 import { levelModifierFor } from '../../game/surprises.js';
 import { quipFor } from '../../game/quips.js';
@@ -45,6 +47,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const [lumi, setLumi] = useState({ mood: 'happy', line: '' });
   const [buyingHelper, setBuyingHelper] = useState(null);
   const [isConfirmingSkip, setIsConfirmingSkip] = useState(false);
+  const [isHintAfterRetry, setIsHintAfterRetry] = useState(false);
   const lastLitCount = useRef(0);
   const lastShadeCount = useRef(0);
   const hasRecordedWin = useRef(false);
@@ -216,6 +219,14 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     [isOver, puzzle.usedHelpers.length, helpersAllowed, moves, moveLimit, progress.helpers, mode, spendHelper],
   );
 
+  // "Try again with a hint": once the board has reset, spend the hint.
+  useEffect(() => {
+    if (isHintAfterRetry && !isOver) {
+      setIsHintAfterRetry(false);
+      requestHelper('hint');
+    }
+  }, [isHintAfterRetry, isOver, requestHelper]);
+
   // Keyboard shortcuts: R restart, H hint.
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -238,7 +249,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         <Button as="a" href={backHref} variant="secondary" icon="back" label="Back to map" />
         <div className={styles.titleBlock}>
           <p className={styles.subtitle}>{subtitle}</p>
-          <Ribbon as="h1" size="sm" tone={modifier === 'boss' ? 'coral' : 'tangerine'}>
+          <Ribbon as="h1" size="sm" tone={modifier === 'boss' ? 'alert' : 'sage'}>
             {levelName}
           </Ribbon>
         </div>
@@ -320,7 +331,23 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           </div>
         </Dialog>
       )}
-      {isOutOfMoves && !result && <OutOfMovesDialog lumiLine={quipFor('outOfMoves')} onRetry={restart} onMap={() => navigate(backHref)} />}
+      {isOutOfMoves && !result && (
+        <OutOfMovesDialog
+          gemsLeft={gems.length - trace.litGems.size}
+          lumiLine={quipFor('outOfMoves')}
+          hintsOwned={progress.helpers.hint ?? 0}
+          onRetry={restart}
+          onRetryWithHint={
+            offeredHelpers.includes('hint') && helpersAllowed > 0
+              ? () => {
+                  restart();
+                  setIsHintAfterRetry(true);
+                }
+              : null
+          }
+          onMap={() => navigate(backHref)}
+        />
+      )}
       {showConfetti && <Confetti key={level.id + moves} />}
       {result && (
         <WinDialog
@@ -329,6 +356,11 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           difficulty={level.difficulty}
           hotStreak={progress.hotStreak}
           hasNext={Boolean(nextLevel)}
+          shareMessage={
+            mode === 'daily' && !result.isSkipped
+              ? dailyShareText({ dateKey, stars: result.stars, moves: result.moves, par: level.par, streak: result.streak ?? progress.daily.streak, url: PUBLIC_GAME_URL })
+              : null
+          }
           onNext={() => nextLevel && navigate(nextLevel)}
           onReplay={restart}
           onMap={() => navigate(backHref)}

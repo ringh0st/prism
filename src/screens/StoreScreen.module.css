@@ -52,11 +52,11 @@
 }
 
 .tabActive {
-  color: #fff;
-  background: linear-gradient(180deg, #ec5644, #dd4634);
+  color: var(--action-label);
+  background: linear-gradient(180deg, var(--action-top), var(--action-bottom));
   box-shadow:
     var(--highlight-on-color),
-    0 3px 0 #a8331f;
+    0 3px 0 var(--action-ledge);
 }
 
 .panel {
@@ -97,10 +97,10 @@
 
 /* Solid "app icon" artwork on a darker ledge, with slow light rays. */
 .art {
-  --from: #ffd84f;
-  --to: #ffc21a;
-  --ledge: #d99a00;
-  --icon: #5a3300;
+  --from: var(--reward-top);
+  --to: var(--reward-bottom);
+  --ledge: var(--reward-ledge);
+  --icon: var(--reward-label);
   --label: var(--icon);
   position: relative;
   display: grid;
@@ -136,10 +136,10 @@
 .sparks0,
 .sparks1,
 .sparks2 {
-  --from: #ffaa3d;
-  --to: #ff951a;
-  --ledge: #c86a00;
-  --icon: #3b2400;
+  --from: var(--warm-top);
+  --to: var(--warm-bottom);
+  --ledge: var(--warm-ledge);
+  --icon: var(--warm-label);
 }
 
 .sparks1 .artIcon,
@@ -155,10 +155,10 @@
 .diamonds0,
 .diamonds1,
 .diamonds2 {
-  --from: #3dd3c4;
-  --to: #26bdae;
-  --ledge: #158a7f;
-  --icon: #10312d;
+  --from: var(--calm-top);
+  --to: var(--calm-bottom);
+  --ledge: var(--calm-ledge);
+  --icon: var(--calm-label);
 }
 
 .badge {
@@ -176,7 +176,8 @@
   border-radius: var(--radius-pill);
   font-size: 12.5px;
   white-space: nowrap;
-  background: #dd4634;
+  --label: var(--action-label);
+  background: var(--action-bottom);
   box-shadow: var(--shadow-sm);
 }
 
@@ -199,7 +200,7 @@
   border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 700;
-  color: #8a5a00;
+  color: var(--reward-label);
   background: rgba(255, 210, 63, 0.3);
 }
 

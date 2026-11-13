@@ -5,10 +5,10 @@
 }
 
 .ribbon {
-  --fill-top: #ec5644;
-  --fill-bottom: #dd4634;
-  --ledge: #a8331f;
-  --label: #fff;
+  --fill-top: var(--action-top);
+  --fill-bottom: var(--action-bottom);
+  --ledge: var(--action-ledge);
+  --label: var(--action-label);
   margin: 0 0 4px;
   max-width: 100%;
   padding: 9px 26px 10px;
@@ -34,28 +34,35 @@
   border-radius: var(--radius-lg);
 }
 
-.coral {
+.sage {
   /* defaults */
 }
 
+.alert {
+  --fill-top: var(--alert-top);
+  --fill-bottom: var(--alert-bottom);
+  --ledge: var(--alert-ledge);
+  --label: var(--alert-label);
+}
+
 .tangerine {
-  --fill-top: #ffaa3d;
-  --fill-bottom: #ff9a1f;
-  --ledge: #c86a00;
-  --label: #3b2400;
+  --fill-top: var(--warm-top);
+  --fill-bottom: var(--warm-bottom);
+  --ledge: var(--warm-ledge);
+  --label: var(--warm-label);
 }
 
 .sunshine,
 .gold {
-  --fill-top: #ffd84f;
-  --fill-bottom: #ffc61f;
-  --ledge: #d99a00;
-  --label: #3b2400;
+  --fill-top: var(--reward-top);
+  --fill-bottom: var(--reward-bottom);
+  --ledge: var(--reward-ledge);
+  --label: var(--warm-label);
 }
 
 .mint {
-  --fill-top: #3dd3c4;
-  --fill-bottom: #26bdae;
-  --ledge: #158a7f;
-  --label: #10312d;
+  --fill-top: var(--calm-top);
+  --fill-bottom: var(--calm-bottom);
+  --ledge: var(--calm-ledge);
+  --label: var(--calm-label);
 }

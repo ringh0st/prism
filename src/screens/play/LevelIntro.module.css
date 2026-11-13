@@ -31,25 +31,25 @@
   padding: 6px 18px 8px;
   border-radius: var(--radius-md);
   font-size: 22px;
-  color: #10312d;
+  color: var(--calm-label);
   transform: rotate(-6deg);
-  background: linear-gradient(180deg, #3dd3c4, #26bdae);
+  background: linear-gradient(180deg, var(--calm-top), var(--calm-bottom));
   box-shadow:
     var(--highlight-on-color),
-    0 4px 0 #158a7f;
+    0 4px 0 var(--calm-ledge);
   animation: stamp 500ms var(--ease-pop) 250ms both;
 }
 
 .boss .sticker {
-  color: #fff;
-  background: linear-gradient(180deg, #e34a37, #c8402f);
+  color: var(--alert-label);
+  background: linear-gradient(180deg, var(--alert-top), var(--alert-bottom));
   box-shadow:
     var(--highlight-on-color),
-    0 4px 0 #8f2a1d;
+    0 4px 0 var(--alert-ledge);
 }
 
 .disco .sticker {
-  background: linear-gradient(90deg, #ff6b5b, #ffd23f, #2ec4b6, #ff9f1c);
+  background: linear-gradient(90deg, var(--color-peach), var(--color-honey), var(--color-mint), var(--color-sage));
   background-size: 300% 100%;
   animation:
     stamp 500ms var(--ease-pop) 250ms both,

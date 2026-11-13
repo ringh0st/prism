@@ -7,7 +7,7 @@ import styles from './Map.module.css';
 const DIFFICULTY_LABEL = { [DIFFICULTY.HARD]: 'hard', [DIFFICULTY.EXTRA]: 'boss' };
 
 /** One level bubble on the map. */
-export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef }) {
+export default function LevelNode({ stop, stars, isUnlocked, isCurrent, greeting = null, nodeRef }) {
   const { ref, x, y } = stop;
   const kindLabel = DIFFICULTY_LABEL[ref.difficulty];
   const label = `Level ${ref.world}-${ref.index}${kindLabel ? `, ${kindLabel}` : ''}, ${isUnlocked ? `${stars} of ${MAX_STARS} stars` : 'locked'}`;
@@ -39,7 +39,7 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef 
       {ref.difficulty === DIFFICULTY.EXTRA && <span className={`game-title on-color ${styles.bossPlate}`}>BOSS</span>}
       {isCurrent && (
         <span className={`${styles.lumiOnNode} ${x > 50 ? styles.lumiLeft : styles.lumiRight}`} aria-hidden="true">
-          <Lumi mood="excited" size={46} />
+          <Lumi mood="excited" size={46} line={greeting} bubbleSide="top" />
         </span>
       )}
     </>

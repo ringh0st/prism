@@ -5,11 +5,11 @@
   height: 64px;
   margin: 0 auto var(--space-3);
   border-radius: 24px;
-  color: #5a3300;
-  background: linear-gradient(180deg, #ffd84f, #ffc21a);
+  color: var(--reward-label);
+  background: linear-gradient(180deg, var(--reward-top), var(--reward-bottom));
   box-shadow:
     var(--highlight-on-color),
-    0 4px 0 #d99a00,
+    0 4px 0 var(--reward-ledge),
     var(--shadow-md);
 }
 

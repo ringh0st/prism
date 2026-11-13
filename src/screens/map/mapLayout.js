@@ -7,6 +7,7 @@ const WIGGLE = [50, 70, 82, 70, 50, 30, 18, 30];
 
 /**
  * Turn a world's levels into map stops: levels, with reward chests after levels 10 and 20.
+ * The road climbs: the first stop is at the bottom and later stops are higher up.
  * @returns [{ kind: 'level' | 'chest', ref?, chestNumber?, levelsNeeded?, x, y }]
  */
 export function buildWorldStops(levelRefs) {
@@ -16,7 +17,8 @@ export function buildWorldStops(levelRefs) {
     const chestNumber = CHEST_AFTER_LEVELS.indexOf(position + 1) + 1;
     if (chestNumber > 0) stops.push({ kind: 'chest', chestNumber, levelsNeeded: position + 1 });
   });
-  return stops.map((stop, i) => ({ ...stop, x: WIGGLE[i % WIGGLE.length], y: i * ROW_HEIGHT + ROW_HEIGHT / 2 }));
+  const bottomY = (stops.length - 1) * ROW_HEIGHT + ROW_HEIGHT / 2;
+  return stops.map((stop, i) => ({ ...stop, x: WIGGLE[i % WIGGLE.length], y: bottomY - i * ROW_HEIGHT }));
 }
 
 /** Smooth SVG path through the stops (coordinates: x in %, y in px). */

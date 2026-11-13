@@ -48,11 +48,11 @@
   width: 36px;
   height: 36px;
   border-radius: 13px;
-  color: #5a3300;
-  background: linear-gradient(180deg, #ffd84f, #ffc21a);
+  color: var(--reward-label);
+  background: linear-gradient(180deg, var(--reward-top), var(--reward-bottom));
   box-shadow:
     var(--highlight-on-color),
-    0 3px 0 #d99a00;
+    0 3px 0 var(--reward-ledge);
 }
 
 .empty .icon {
@@ -80,13 +80,13 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 12px;
-  color: #fff;
-  background: #dd4634;
+  color: var(--action-label);
+  background: var(--action-bottom);
   box-shadow: 0 0 0 2px var(--surface-raised);
 }
 
 .empty .count {
-  color: #10312d;
+  color: var(--calm-label);
   background: var(--color-mint);
   box-shadow: 0 0 0 2px var(--surface-raised);
 }

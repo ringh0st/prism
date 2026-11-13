@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import CurrencyHud from '../../components/game/CurrencyHud.jsx';
 import BottomNav from '../../components/game/BottomNav.jsx';
 import Ribbon from '../../components/game/Ribbon.jsx';
-import Lumi from '../../components/game/Lumi.jsx';
 import Icon from '../../components/Icon.jsx';
 import LevelNode from './LevelNode.jsx';
 import ChestNode from './ChestNode.jsx';
@@ -17,9 +16,12 @@ import { buildWorldStops, pathThrough, ROW_HEIGHT } from './mapLayout.js';
 import logoUrl from '../../assets/logo.png';
 import styles from './Map.module.css';
 
-const RIBBON_TONE = { sunshine: 'gold', tangerine: 'tangerine', coral: 'coral', mint: 'mint', ember: 'coral', lime: 'mint', peach: 'tangerine', gold: 'gold' };
+// Ribbon tone per world theme; "sage" is the calm default.
+const GREETING_MS = 6000;
 
-function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeRef, onOpenChest }) {
+const RIBBON_TONE = { sunshine: 'sage', tangerine: 'tangerine', coral: 'tangerine', mint: 'mint', ember: 'tangerine', lime: 'sage', peach: 'tangerine', gold: 'gold' };
+
+function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeRef, greeting, onOpenChest }) {
   const stops = useMemo(() => buildWorldStops(levelRefs), [levelRefs]);
   const height = stops.length * ROW_HEIGHT;
   const earned = levelRefs.reduce((sum, ref) => sum + starsFor(progress, ref.id), 0);
@@ -68,6 +70,7 @@ function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeR
                   stars={starsFor(progress, stop.ref.id)}
                   isUnlocked={isLevelUnlocked(position)}
                   isCurrent={isCurrent}
+                  greeting={isCurrent ? greeting : null}
                   nodeRef={isCurrent ? currentNodeRef : undefined}
                 />
               </li>
@@ -100,7 +103,7 @@ export default function MapScreen() {
   const [chestOpening, setChestOpening] = useState(null);
   const currentNodeRef = useRef(null);
   const stars = totalStars(progress);
-  const [greeting] = useState(() => quipFor('start'));
+  const [greeting, setGreeting] = useState(() => quipFor('start'));
 
   const unlockedWorlds = worlds.filter((world) => stars >= world.starsToUnlock);
   const nextLockedWorld = worlds.find((world) => stars < world.starsToUnlock);
@@ -111,15 +114,18 @@ export default function MapScreen() {
   const currentRef = [...refsByWorld.values()].flat().find((ref) => starsFor(progress, ref.id) === 0) ?? null;
   const worldsLeft = worlds.length - unlockedWorlds.length - (nextLockedWorld ? 1 : 0);
 
-  // Scroll just enough to show the current level above the PLAY button (see .currentNode scroll-margin).
+  // The current level is always the main view: centered in the space between the HUD and the PLAY button
+  // (see .currentNode scroll-margin). Lumi says hello there, then lets the player focus.
   useEffect(() => {
-    currentNodeRef.current?.scrollIntoView({ block: 'nearest' });
+    currentNodeRef.current?.scrollIntoView({ block: 'center' });
+    const timer = setTimeout(() => setGreeting(null), GREETING_MS);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
     <div className={styles.page}>
       <header className={styles.hud}>
-        <a href="#/" className={styles.logo} aria-label="Prism">
+        <a href="#/" className={styles.logo} aria-label="Rinny's Prism">
           <img src={logoUrl} alt="" width="44" height="44" />
         </a>
         {progress.hotStreak >= 2 && (
@@ -132,9 +138,6 @@ export default function MapScreen() {
       </header>
 
       <main className={styles.map}>
-        <div className={styles.welcome}>
-          <Lumi mood="happy" size={64} line={greeting} />
-        </div>
         {unlockedWorlds.map((world) => (
           <WorldSection
             key={world.id}
@@ -143,6 +146,7 @@ export default function MapScreen() {
             progress={progress}
             currentLevelId={currentRef?.id}
             currentNodeRef={currentNodeRef}
+            greeting={greeting}
             onOpenChest={(worldId, chestNumber) => setChestOpening(claimChest(worldId, chestNumber))}
           />
         ))}

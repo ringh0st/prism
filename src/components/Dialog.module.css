@@ -9,6 +9,10 @@
   animation: fadeIn var(--duration-base) ease;
 }
 
+.gentleBackdrop {
+  background: rgba(43, 33, 24, 0.12);
+}
+
 .dialog {
   position: relative;
   width: 100%;

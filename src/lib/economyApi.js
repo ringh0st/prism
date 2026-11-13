@@ -34,6 +34,12 @@ export const consumeHelperOnServer = (helperId) => rpc('use_helper', { p_helper:
 
 export const claimChestOnServer = (world, chestNumber) => rpc('claim_chest', { p_world: world, p_chest: chestNumber });
 
+/** This week's top players (nicknames only) and the caller's place. Works for guests too. */
+export const fetchWeeklyLeaderboard = () => rpc('weekly_leaderboard');
+
+/** Collects last week's top-10 reward, if any. The result's `reward` is null when there is none. */
+export const claimWeeklyRewardOnServer = () => rpc('claim_weekly_reward');
+
 export async function fetchRemoteLevels(userId) {
   const { data, error } = await supabase.from('progress').select('level_id, stars, best_moves').eq('user_id', userId);
   if (error) throw friendlyError(error);

@@ -191,3 +191,44 @@ test('store prices in the database match the game catalog', async () => {
     assert.match(sql, new RegExp(`\\('${pack.id}', ${pack.diamonds + pack.bonus}[,)]`), `${pack.id} diamonds`);
   }
 });
+
+test('streak shields cover missed days and are earned every 7 days', async () => {
+  const { nextDailyStreak, currentStreak, MAX_STREAK_SHIELDS } = await import('./progress.js');
+  // Played yesterday: the streak grows; the 7th day earns a shield.
+  assert.deepEqual(nextDailyStreak({ streak: 6, lastDate: '2026-03-06', shields: 0 }, '2026-03-07'), {
+    streak: 7,
+    shields: 1,
+    shieldsUsed: 0,
+    shieldEarned: true,
+  });
+  // One missed day with a shield: kept. Without one: back to 1.
+  assert.equal(nextDailyStreak({ streak: 9, lastDate: '2026-03-05', shields: 1 }, '2026-03-07').streak, 10);
+  assert.equal(nextDailyStreak({ streak: 9, lastDate: '2026-03-05', shields: 0 }, '2026-03-07').streak, 1);
+  // Shields never exceed the cap.
+  assert.equal(nextDailyStreak({ streak: 13, lastDate: '2026-03-06', shields: MAX_STREAK_SHIELDS }, '2026-03-07').shields, MAX_STREAK_SHIELDS);
+  // The streak shown on screen stays alive while shields can still cover the gap.
+  const progress = { daily: { streak: 5, lastDate: '2026-03-04', shields: 1 } };
+  assert.equal(currentStreak(progress, '2026-03-06'), 5);
+  assert.equal(currentStreak(progress, '2026-03-07'), 0);
+});
+
+test('daily share text is spoiler-free', async () => {
+  const { dailyShareText } = await import('./share.js');
+  const text = dailyShareText({ dateKey: '2026-01-05', stars: 2, moves: 6, par: 5, streak: 4, url: 'https://example.com/' });
+  assert.equal(text, "Rinny's Prism Daily #5 ★★☆\n🟩🟩🟩🟩🟩🟨 6/5\n🔥 4-day streak\nhttps://example.com/");
+});
+
+test('weekly rewards in the database match the game catalog', async () => {
+  const { WEEKLY_REWARDS } = await import('./catalog.js');
+  const sql = readFileSync(new URL('../../supabase/social.sql', import.meta.url), 'utf8');
+  const rewardInSql = (rank) => {
+    for (const [, from, to, diamonds, sparks] of sql.matchAll(/when p_rank (?:= (\d+)|between (\d+) and (\d+)) then '\{"diamonds": (\d+), "sparks": (\d+)\}'/g).map((m) => [m[0], m[1] ?? m[2], m[1] ?? m[3], m[4], m[5]])) {
+      if (rank >= Number(from) && rank <= Number(to)) return { diamonds: Number(diamonds), sparks: Number(sparks) };
+    }
+    return null;
+  };
+  for (const reward of WEEKLY_REWARDS) {
+    assert.deepEqual(rewardInSql(reward.rank), { diamonds: reward.diamonds, sparks: reward.sparks }, `rank ${reward.rank}`);
+  }
+  assert.equal(rewardInSql(11), null);
+});

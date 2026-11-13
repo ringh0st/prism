@@ -4,6 +4,7 @@ import styles from './Dialog.module.css';
 /**
  * Accessible modal: labelled, traps Tab focus, closes on Escape, restores focus on close.
  * The first element with [data-autofocus] (or the dialog itself) receives focus.
+ * tone: default | celebrate | gentle (a light scrim, so the board stays visible behind the sheet)
  */
 export default function Dialog({ title, onClose, children, tone = 'default' }) {
   const titleId = useId();
@@ -40,7 +41,7 @@ export default function Dialog({ title, onClose, children, tone = 'default' }) {
   }, [onClose]);
 
   return (
-    <div className={styles.backdrop} onClick={onClose ? () => onClose() : undefined}>
+    <div className={`${styles.backdrop} ${styles[`${tone}Backdrop`] ?? ''}`} onClick={onClose ? () => onClose() : undefined}>
       <div
         ref={dialogRef}
         className={`${styles.dialog} ${styles[tone] ?? ''}`}

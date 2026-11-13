@@ -4,6 +4,7 @@ import { readJson, removeKey, writeJson } from '../lib/storage.js';
 import {
   buyStoreItemOnServer,
   claimChestOnServer,
+  claimWeeklyRewardOnServer,
   consumeHelperOnServer,
   fetchEconomyState,
   fetchRemoteLevels,
@@ -44,6 +45,7 @@ export function PlayerProvider({ children }) {
   const [progress, setProgressState] = useState(() => upgradeProgress(readJson(PROGRESS_KEY, {})));
   const [settings, setSettings] = useState(() => ({ ...DEFAULT_SETTINGS, ...readJson(SETTINGS_KEY, {}) }));
   const [syncStatus, setSyncStatus] = useState('local'); // local | syncing | synced | error
+  const [weeklyReward, setWeeklyReward] = useState(null);
   const progressRef = useRef(progress);
 
   const setProgress = useCallback((next) => {
@@ -72,10 +74,16 @@ export function PlayerProvider({ children }) {
       const levels = await fetchRemoteLevels(userId);
       setProgress({ ...withServerState(progressRef.current, state, todayKey()), levels });
       setSyncStatus('synced');
+      // Finished last week in the top 10? Collect the reward (the server pays it only once).
+      const claimed = await claimWeeklyRewardOnServer().catch(() => null);
+      if (claimed?.reward) {
+        applyServerState(claimed);
+        setWeeklyReward(claimed.reward);
+      }
     } catch {
       setSyncStatus('error');
     }
-  }, [userId, setProgress]);
+  }, [userId, setProgress, applyServerState]);
 
   useEffect(() => {
     if (userId) syncWithServer();
@@ -89,6 +97,9 @@ export function PlayerProvider({ children }) {
       syncStatus,
       isSignedIn: Boolean(userId),
       refresh: syncWithServer,
+      /** Last week's top-10 reward that was just collected, shown once. */
+      weeklyReward,
+      dismissWeeklyReward: () => setWeeklyReward(null),
 
       /** @returns Promise<{ stars, previousStars, sparksEarned, diamondsEarned, isNewBest }> */
       async finishLevel(level, result) {
@@ -171,7 +182,7 @@ export function PlayerProvider({ children }) {
         setProgress(createEmptyProgress());
       },
     }),
-    [progress, settings, syncStatus, userId, setProgress, applyServerState, syncWithServer],
+    [progress, settings, syncStatus, userId, weeklyReward, setProgress, applyServerState, syncWithServer],
   );
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;

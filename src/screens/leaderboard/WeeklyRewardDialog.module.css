@@ -1,0 +1,42 @@
+.text {
+  margin-bottom: var(--space-3);
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.rewards {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.reward {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--reward-label);
+  background: linear-gradient(180deg, var(--reward-top), var(--reward-bottom));
+  box-shadow: var(--highlight-on-color), 0 4px 0 var(--reward-ledge);
+}
+
+.diamond {
+  color: var(--calm-label);
+  background: linear-gradient(180deg, var(--calm-top), var(--calm-bottom));
+  box-shadow: var(--highlight-on-color), 0 4px 0 var(--calm-ledge);
+}
+
+.lumi {
+  display: flex;
+  justify-content: flex-start;
+  min-height: 92px;
+  margin: 0 0 var(--space-3) var(--space-2);
+  align-items: flex-end;
+}

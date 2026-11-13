@@ -8,6 +8,19 @@ export function todayKey(date = new Date()) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+/** Whole days from one YYYY-MM-DD key to another (null when there is no earlier key). */
+export function daysBetween(fromKey, toKey) {
+  if (!fromKey) return null;
+  const from = new Date(`${fromKey}T12:00:00`);
+  const to = new Date(`${toKey}T12:00:00`);
+  return Math.round((to - from) / 86_400_000);
+}
+
+/** "Prism Daily #N": day 1 is the first day of 2026. */
+export function dailyNumber(dateKey) {
+  return daysBetween('2025-12-31', dateKey);
+}
+
 export function isYesterday(previousKey, todayDateKey = todayKey()) {
   if (!previousKey) return false;
   const day = new Date(`${todayDateKey}T12:00:00`);

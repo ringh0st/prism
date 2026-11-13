@@ -85,6 +85,20 @@ export const DIAMOND_REWARDS = {
   streakWeek: 1,
 };
 
+/**
+ * Weekly top players (worldwide, signed-in players). The week runs Monday to Sunday, UTC.
+ * Score: +1 per new star earned, +3 per daily puzzle. Must match supabase/social.sql.
+ */
+export const WEEKLY_POINTS = { perNewStar: 1, perDaily: 3 };
+export const WEEKLY_REWARDS = [
+  { rank: 1, diamonds: 5, sparks: 500 },
+  { rank: 2, diamonds: 3, sparks: 300 },
+  { rank: 3, diamonds: 2, sparks: 200 },
+  ...[4, 5, 6, 7, 8, 9, 10].map((rank) => ({ rank, diamonds: 0, sparks: 100 })),
+];
+
+export const weeklyRewardFor = (rank) => WEEKLY_REWARDS.find((reward) => reward.rank === rank) ?? null;
+
 export const storeItem = (id) => STORE_ITEMS.find((item) => item.id === id) ?? null;
 
 /** The strictest star cap among the helpers used this attempt (3 if none). */

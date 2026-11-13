@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import Stars from '../../components/Stars.jsx';
@@ -6,6 +6,7 @@ import Icon from '../../components/Icon.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { sfx } from '../../audio/sfx.js';
 import { DIFFICULTY } from '../../game/constants.js';
+import { shareText } from '../../lib/shareText.js';
 import styles from './WinDialog.module.css';
 
 function headlineFor({ stars, isSkipped, completesWorld }, difficulty) {
@@ -17,9 +18,27 @@ function headlineFor({ stars, isSkipped, completesWorld }, difficulty) {
   return 'Solved!';
 }
 
-export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasNext, onNext, onReplay, onMap }) {
+const SHARE_FEEDBACK = { shared: 'Shared!', copied: 'Copied! Paste it anywhere.', failed: 'Sharing isn’t available here.' };
+
+/** Share button for the daily result; says how it went. */
+function ShareResult({ text }) {
+  const [feedback, setFeedback] = useState('');
+  return (
+    <div className={styles.share}>
+      <Button variant="secondary" icon="share" onClick={async () => setFeedback(SHARE_FEEDBACK[await shareText(text)] ?? '')}>
+        Share result
+      </Button>
+      <p className={styles.shareFeedback} role="status">
+        {feedback}
+      </p>
+    </div>
+  );
+}
+
+export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasNext, shareMessage = null, onNext, onReplay, onMap }) {
   const { isSignedIn } = usePlayer();
-  const { stars, moves, sparksEarned = 0, diamondsEarned = 0, isNewBest, streak = 0, isSkipped, completesWorld } = result;
+  const { stars, moves, sparksEarned = 0, diamondsEarned = 0, isNewBest, streak = 0, shieldsUsed = 0, shieldEarned = false, isSkipped, completesWorld } =
+    result;
 
   useEffect(() => {
     const timers = Array.from({ length: stars }, (_, i) => setTimeout(() => sfx.star(i), 350 + i * 260));
@@ -61,7 +80,18 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
             <Icon name="flame" size={18} /> {streak}-day streak
           </span>
         )}
+        {shieldsUsed > 0 && (
+          <span className={`${styles.reward} ${styles.shield}`}>
+            <Icon name="shield" size={18} /> {shieldsUsed === 1 ? 'A shield saved your streak' : `${shieldsUsed} shields saved your streak`}
+          </span>
+        )}
+        {shieldEarned && (
+          <span className={`${styles.reward} ${styles.shield}`}>
+            <Icon name="shield" size={18} /> +1 streak shield
+          </span>
+        )}
       </div>
+      {shareMessage && <ShareResult text={shareMessage} />}
       {completesWorld && !isSignedIn && (
         <p className={styles.nudge}>
           <Icon name="diamond" size={16} /> Finishing a world earns a diamond. <a href="#/settings">Sign in</a> to collect it.

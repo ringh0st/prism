@@ -3,10 +3,10 @@
  * Pressing pushes the button down onto its lip. No outlines, no glows.
  */
 .button {
-  --fill-top: #ec5644;
-  --fill-bottom: #dd4634;
-  --ledge: #a8331f;
-  --label: #ffffff;
+  --fill-top: var(--action-top);
+  --fill-bottom: var(--action-bottom);
+  --ledge: var(--action-ledge);
+  --label: var(--action-label);
   --ledge-height: 4px;
   position: relative;
   display: inline-flex;
@@ -68,18 +68,18 @@
 
 /* Success / "go" moments */
 .go {
-  --fill-top: #3dd3c4;
-  --fill-bottom: #26bdae;
-  --ledge: #158a7f;
+  --fill-top: var(--calm-top);
+  --fill-bottom: var(--calm-bottom);
+  --ledge: var(--calm-ledge);
   --label: #2b2118;
 }
 
 /* Rewards and currency */
 .gold {
-  --fill-top: #ffd84f;
-  --fill-bottom: #ffc61f;
-  --ledge: #d99a00;
-  --label: #3b2400;
+  --fill-top: var(--reward-top);
+  --fill-bottom: var(--reward-bottom);
+  --ledge: var(--reward-ledge);
+  --label: var(--warm-label);
 }
 
 .secondary {

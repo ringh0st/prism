@@ -18,7 +18,7 @@ export default function Button({
   const isIconOnly = icon && !children;
   return (
     <Component
-      className={`${styles.button} ${styles[variant]} ${styles[size]} ${isIconOnly ? styles.iconOnly : ''} ${className}`}
+      className={`${styles.button} ${styles[variant]} ${styles[size] ?? ''} ${isIconOnly ? styles.iconOnly : ''} ${className}`}
       aria-label={isIconOnly ? label : undefined}
       type={Component === 'button' ? 'button' : undefined}
       {...rest}

@@ -1,7 +1,7 @@
 import styles from './Ribbon.module.css';
 
 /** A solid title pill on a darker ledge for screen and section titles. */
-export default function Ribbon({ as: Component = 'h2', tone = 'coral', size = 'md', className = '', children, ...rest }) {
+export default function Ribbon({ as: Component = 'h2', tone = 'sage', size = 'md', className = '', children, ...rest }) {
   return (
     <div className={`${styles.wrap} ${styles[size]} ${className}`}>
       <Component className={`${styles.ribbon} ${styles[tone] ?? ''}`} {...rest}>

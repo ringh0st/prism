@@ -1,32 +1,69 @@
 /*
- * Design tokens: "Sunlit Paper".
- * Warm palette (sunshine, tangerine, coral, mint), matte surfaces, warm layered shadows and solid
+ * Design tokens: "Sunlit Paper" style in the "Calm Meadow" palette.
+ * Relaxing palette (sage, honey, peach, terracotta), matte surfaces, warm layered shadows and solid
  * "ledge" buttons. Only light beams glow. No outlines, glass, mesh gradients or neon. No purple or blue as main colors.
  */
 :root {
-  --color-sunshine: #ffd23f;
-  --color-sunshine-deep: #f2b705;
-  --color-tangerine: #ff9f1c;
-  --color-tangerine-deep: #e07f00;
-  --color-coral: #ff6b5b;
-  --color-coral-deep: #d9483a;
-  --color-mint: #2ec4b6;
-  --color-mint-deep: #17988c;
+  /* Brand palette: "Calm Meadow". Soft sage, honey, peach and terracotta on cream. */
+  --color-sage: #58ac82;
+  --color-sage-deep: #3f8a64;
+  --color-honey: #f0c14e;
+  --color-honey-deep: #c99a2e;
+  --color-peach: #f2a67e;
+  --color-peach-deep: #c97a52;
+  --color-terracotta: #df7458;
+  --color-terracotta-deep: #b05a40;
+  --color-mint: #4fbfad;
+  --color-mint-deep: #2f8f80;
+  /* Older names, kept as aliases of the calm palette */
+  --color-sunshine: var(--color-honey);
+  --color-sunshine-deep: var(--color-honey-deep);
+  --color-tangerine: var(--color-peach);
+  --color-tangerine-deep: var(--color-peach-deep);
+  --color-coral: var(--color-terracotta);
+  --color-coral-deep: var(--color-terracotta-deep);
+
+  /*
+   * Solid "ledge" surfaces: fill (top to bottom), the darker lip under it and a label color
+   * with WCAG contrast on the fill.
+   * action = things you tap · reward = stars and loot · warm = sparks, hard levels
+   * alert = boss levels, danger · calm = diamonds
+   */
+  --action-top: #6cbd94;
+  --action-bottom: #58ac82;
+  --action-ledge: #3f8a64;
+  --action-label: #10291c;
+  --reward-top: #f7d06a;
+  --reward-bottom: #f0c14e;
+  --reward-ledge: #c99a2e;
+  --reward-label: #3b2a00;
+  --warm-top: #f8b991;
+  --warm-bottom: #f2a67e;
+  --warm-ledge: #c97a52;
+  --warm-label: #3b1d0e;
+  --alert-top: #e8866b;
+  --alert-bottom: #df7458;
+  --alert-ledge: #b05a40;
+  --alert-label: #2b1208;
+  --calm-top: #6fd0bf;
+  --calm-bottom: #4fbfad;
+  --calm-ledge: #2f8f80;
+  --calm-label: #0f2e29;
 
   /* Surfaces: matte, sunlit paper. Edges come from fill contrast and shadow, never from lines. */
-  --surface-page: #fff8ef;
+  --surface-page: #faf6ee;
   --surface-raised: #ffffff;
-  --surface-overlay: #fffcf7;
-  --surface-sunken: #f6ebdd;
-  --surface-board: #fff3e3;
-  --surface-cell: #fffaf3;
-  --surface-cell-edge: #f2dcc4;
-  --surface-locked: #ecd9c4;
+  --surface-overlay: #fffdf9;
+  --surface-sunken: #f1ebe0;
+  --surface-board: #f6f1e6;
+  --surface-cell: #fffdf8;
+  --surface-cell-edge: #e6dccb;
+  --surface-locked: #e4d8c6;
   --pivot-fill: rgba(255, 255, 255, 0.6);
   --gem-unlit-opacity: 0.45;
-  --scene-hill-near: #ffe2bf;
-  --scene-hill-far: #fff0dc;
-  --scene-sun: #ffe9a8;
+  --scene-hill-near: #dcebd9;
+  --scene-hill-far: #e9f1e3;
+  --scene-sun: #fbedc9;
 
   /* A faint top highlight on raised surfaces, and on colored buttons */
   --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
@@ -35,7 +72,7 @@
   /* Text */
   --text-strong: #2b2118;
   --text-soft: #7a6152;
-  --text-accent: #c8402f;
+  --text-accent: #3f8a64;
   --text-on-accent: #ffffff;
   --line: rgba(43, 33, 24, 0.08);
   --shadow-color: 165, 70, 25;
@@ -79,24 +116,24 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --surface-page: #1e1714;
-    --surface-raised: #2a211c;
-    --surface-overlay: #352a24;
+    --surface-page: #1c1a16;
+    --surface-raised: #282520;
+    --surface-overlay: #322e28;
     --surface-sunken: #171210;
-    --surface-board: #2a211c;
-    --surface-cell: #3a2e27;
+    --surface-board: #26231e;
+    --surface-cell: #36322b;
     --surface-cell-edge: #241913;
     --surface-locked: #4a3a2e;
     --pivot-fill: rgba(255, 255, 255, 0.08);
     --gem-unlit-opacity: 0.7;
-    --scene-hill-near: #2a1f19;
-    --scene-hill-far: #241b16;
-    --scene-sun: #3d2c18;
+    --scene-hill-near: #222a20;
+    --scene-hill-far: #1f241c;
+    --scene-sun: #33301f;
     --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
     --highlight-on-color: inset 0 2px 0 rgba(255, 255, 255, 0.2);
     --text-strong: #fff4e8;
     --text-soft: #cdb6a6;
-    --text-accent: #ff8a7a;
+    --text-accent: #8fd3ae;
     --line: rgba(255, 255, 255, 0.1);
     --shadow-hue: 0 0% 0%;
     --shadow-color: 0, 0, 0;
@@ -108,24 +145,24 @@
 }
 
 :root[data-theme='dark'] {
-  --surface-page: #1e1714;
-  --surface-raised: #2a211c;
-  --surface-overlay: #352a24;
+  --surface-page: #1c1a16;
+  --surface-raised: #282520;
+  --surface-overlay: #322e28;
   --surface-sunken: #171210;
-  --surface-board: #2a211c;
-  --surface-cell: #3a2e27;
+  --surface-board: #26231e;
+  --surface-cell: #36322b;
   --surface-cell-edge: #241913;
   --surface-locked: #4a3a2e;
   --pivot-fill: rgba(255, 255, 255, 0.08);
   --gem-unlit-opacity: 0.7;
-  --scene-hill-near: #2a1f19;
-  --scene-hill-far: #241b16;
-  --scene-sun: #3d2c18;
+  --scene-hill-near: #222a20;
+  --scene-hill-far: #1f241c;
+  --scene-sun: #33301f;
   --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   --highlight-on-color: inset 0 2px 0 rgba(255, 255, 255, 0.2);
   --text-strong: #fff4e8;
   --text-soft: #cdb6a6;
-  --text-accent: #ff8a7a;
+  --text-accent: #8fd3ae;
   --line: rgba(255, 255, 255, 0.1);
   --shadow-hue: 0 0% 0%;
   --shadow-color: 0, 0, 0;

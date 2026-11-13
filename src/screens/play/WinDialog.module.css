@@ -30,7 +30,7 @@
   border-radius: var(--radius-pill);
   font-family: var(--font-display);
   font-weight: 600;
-  color: #6b4500;
+  color: var(--reward-label);
   background: linear-gradient(180deg, #fff1b8, var(--color-sunshine));
   opacity: 0;
   animation: pop 500ms var(--ease-pop) 1.3s forwards;
@@ -41,17 +41,36 @@
 }
 
 .best {
-  color: #fff;
-  background: linear-gradient(180deg, #5ee0d3, var(--color-mint-deep));
+  color: var(--calm-label);
+  background: linear-gradient(180deg, var(--calm-top), var(--calm-bottom));
+}
+
+.shield {
+  color: var(--action-label);
+  background: linear-gradient(180deg, var(--action-top), var(--action-bottom));
+}
+
+.share {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin-bottom: var(--space-4);
+}
+
+.shareFeedback {
+  min-height: 1.3em;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-soft);
 }
 
 .streak {
-  color: #fff;
-  background: linear-gradient(180deg, #ffb547, var(--color-tangerine-deep));
+  color: var(--warm-label);
+  background: linear-gradient(180deg, var(--warm-top), var(--warm-bottom));
 }
 
 .streak svg {
-  color: #fff;
+  color: currentColor;
 }
 
 @keyframes pop {
@@ -77,12 +96,12 @@
 }
 
 .diamond {
-  color: #fff;
-  background: linear-gradient(180deg, #5ee0d3, var(--color-mint-deep));
+  color: var(--calm-label);
+  background: linear-gradient(180deg, var(--calm-top), var(--calm-bottom));
 }
 
 .diamond svg {
-  color: #fff;
+  color: currentColor;
 }
 
 .nudge {

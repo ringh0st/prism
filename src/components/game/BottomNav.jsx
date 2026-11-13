@@ -7,6 +7,7 @@ import styles from './BottomNav.module.css';
 const TABS = [
   { route: 'map', href: '#/', icon: 'map', label: 'Map' },
   { route: 'daily', href: '#/daily', icon: 'calendar', label: 'Daily' },
+  { route: 'top', href: '#/top', icon: 'trophy', label: 'Top' },
   { route: 'store', href: '#/store', icon: 'bag', label: 'Shop' },
   { route: 'settings', href: '#/settings', icon: 'settings', label: 'Me' },
 ];

@@ -1,5 +1,5 @@
 import { sparksForDaily, sparksForNewStars, starsForMoves, STARTING_SPARKS } from './scoring.js';
-import { isYesterday } from './daily.js';
+import { daysBetween } from './daily.js';
 import { DAILY_SPARK_PURCHASE_LIMIT, HELPER_IDS, INVENTORY_CAP, storeItem } from './catalog.js';
 
 export const BEAM_THEMES = [
@@ -8,6 +8,10 @@ export const BEAM_THEMES = [
   { id: 'mint', name: 'Mint', color: '#3FE0C5', starsToUnlock: 60 },
   { id: 'blossom', name: 'Blossom', color: '#FF7EA6', starsToUnlock: 100 },
 ];
+
+/** A streak shield covers one missed day. One is earned every 7-day streak, up to this many. */
+export const MAX_STREAK_SHIELDS = 2;
+export const STREAK_SHIELD_EVERY = 7;
 
 /** Every new player starts with one Hint and one Lens to discover helpers. */
 export const STARTER_HELPERS = { hint: 1, lens: 1, autoturn: 0, skip: 0 };
@@ -22,7 +26,7 @@ export function createEmptyProgress() {
     diamonds: 0,
     helpers: { ...STARTER_HELPERS },
     sparkPurchases: { date: null, count: 0 },
-    daily: { streak: 0, lastDate: null },
+    daily: { streak: 0, lastDate: null, shields: 0 },
     beamTheme: 'sunbeam',
     claimedChests: [],
     hotStreak: 0,
@@ -32,7 +36,7 @@ export function createEmptyProgress() {
 /** Fill in fields added after a player's progress was first saved. */
 export function upgradeProgress(saved) {
   const empty = createEmptyProgress();
-  return { ...empty, ...saved, helpers: { ...empty.helpers, ...saved?.helpers } };
+  return { ...empty, ...saved, helpers: { ...empty.helpers, ...saved?.helpers }, daily: { ...empty.daily, ...saved?.daily } };
 }
 
 export const totalStars = (progress) => Object.values(progress.levels).reduce((sum, entry) => sum + entry.stars, 0);
@@ -68,25 +72,46 @@ export function recordLevelResult(progress, level, { moves, starCap = 3, forcedS
   return { progress: next, stars, previousStars, sparksEarned, isNewBest };
 }
 
-/** Daily puzzle: extends the streak if yesterday was played, pays out once per day. */
+/**
+ * The forgiving daily streak. Mirrors public.record_daily() in supabase/social.sql.
+ * Missed days are covered by shields when there are enough; every 7th day earns a shield.
+ * @returns {{ streak, shields, shieldsUsed, shieldEarned }}
+ */
+export function nextDailyStreak(daily, dateKey) {
+  const gap = daysBetween(daily.lastDate, dateKey);
+  const shields = daily.shields ?? 0;
+  const missedDays = gap === null ? Infinity : gap - 1;
+  const keepsStreak = missedDays === 0 || (missedDays > 0 && missedDays <= shields);
+  const streak = keepsStreak ? daily.streak + 1 : 1;
+  const shieldsUsed = keepsStreak ? missedDays : 0;
+  const shieldEarned = streak % STREAK_SHIELD_EVERY === 0 && shields - shieldsUsed < MAX_STREAK_SHIELDS;
+  return { streak, shields: shields - shieldsUsed + (shieldEarned ? 1 : 0), shieldsUsed, shieldEarned };
+}
+
+/** Daily puzzle: extends the streak (shields cover missed days) and pays out once per day. */
 export function recordDailyResult(progress, dateKey) {
   const { daily } = progress;
-  if (daily.lastDate === dateKey) return { progress, sparksEarned: 0, diamondsEarned: 0, streak: daily.streak, isFirstToday: false };
-  const streak = isYesterday(daily.lastDate, dateKey) ? daily.streak + 1 : 1;
+  if (daily.lastDate === dateKey) {
+    return { progress, sparksEarned: 0, diamondsEarned: 0, streak: daily.streak, shieldsUsed: 0, shieldEarned: false, isFirstToday: false };
+  }
+  const { streak, shields, shieldsUsed, shieldEarned } = nextDailyStreak(daily, dateKey);
   const sparksEarned = sparksForDaily(streak);
   return {
-    progress: { ...progress, sparks: progress.sparks + sparksEarned, daily: { streak, lastDate: dateKey } },
+    progress: { ...progress, sparks: progress.sparks + sparksEarned, daily: { streak, lastDate: dateKey, shields } },
     sparksEarned,
     diamondsEarned: 0,
     streak,
+    shieldsUsed,
+    shieldEarned,
     isFirstToday: true,
   };
 }
 
-/** A streak is only "alive" if the last daily was today or yesterday. */
+/** A streak is "alive" while the missed days since the last daily can still be covered by shields. */
 export function currentStreak(progress, today) {
-  const { lastDate, streak } = progress.daily;
-  return lastDate === today || isYesterday(lastDate, today) ? streak : 0;
+  const { lastDate, streak, shields = 0 } = progress.daily;
+  const gap = daysBetween(lastDate, today);
+  return gap !== null && gap - 1 <= shields ? streak : 0;
 }
 
 export function sparkPurchasesLeft(progress, today) {
@@ -157,7 +182,7 @@ export function withServerState(progress, state, today) {
     sparks: state.sparks,
     diamonds: state.diamonds,
     helpers: { ...STARTER_HELPERS, ...state.helpers },
-    daily: { streak: state.dailyStreak, lastDate: state.lastDailyDate },
+    daily: { streak: state.dailyStreak, lastDate: state.lastDailyDate, shields: state.streakShields ?? 0 },
     sparkPurchases: { date: today, count: state.sparkPurchasesToday },
     claimedChests: state.claimedChests ?? progress.claimedChests,
   };

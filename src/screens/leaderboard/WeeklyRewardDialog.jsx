@@ -1,0 +1,38 @@
+import { useEffect } from 'react';
+import Dialog from '../../components/Dialog.jsx';
+import Button from '../../components/Button.jsx';
+import Icon from '../../components/Icon.jsx';
+import Confetti from '../../components/Confetti.jsx';
+import Lumi from '../../components/game/Lumi.jsx';
+import { sfx } from '../../audio/sfx.js';
+import styles from './WeeklyRewardDialog.module.css';
+
+const PLACE = { 1: '1st', 2: '2nd', 3: '3rd' };
+
+/** "You finished 2nd last week!" with the reward the server just paid out. */
+export default function WeeklyRewardDialog({ reward, onClose }) {
+  useEffect(() => sfx.win(), []);
+  const place = PLACE[reward.rank] ?? `${reward.rank}th`;
+  return (
+    <Dialog title={`You finished ${place}!`} tone="celebrate" onClose={onClose}>
+      <p className={styles.text}>Last week you were one of the brightest players in the world.</p>
+      <ul className={styles.rewards}>
+        {reward.diamonds > 0 && (
+          <li className={`${styles.reward} ${styles.diamond}`}>
+            <Icon name="diamond" size={24} /> +{reward.diamonds} diamonds
+          </li>
+        )}
+        <li className={styles.reward}>
+          <Icon name="spark" size={24} /> +{reward.sparks} sparks
+        </li>
+      </ul>
+      <div className={styles.lumi}>
+        <Lumi mood="dance" size={56} line="Champion vibes! Let’s do it again." bubbleSide="right" />
+      </div>
+      <Button size="lg" onClick={onClose} data-autofocus>
+        Yay!
+      </Button>
+      <Confetti />
+    </Dialog>
+  );
+}

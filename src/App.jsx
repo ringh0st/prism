@@ -9,6 +9,8 @@ import MapScreen from './screens/map/MapScreen.jsx';
 import PlayScreen from './screens/play/PlayScreen.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
 import StoreScreen from './screens/StoreScreen.jsx';
+import LeaderboardScreen from './screens/leaderboard/LeaderboardScreen.jsx';
+import WeeklyRewardDialog from './screens/leaderboard/WeeklyRewardDialog.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
 import LoadingScreen from './screens/LoadingScreen.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
@@ -26,6 +28,12 @@ function BeamThemeStyle() {
     document.documentElement.style.setProperty('--beam-sun', theme.color);
   }, [progress.beamTheme]);
   return null;
+}
+
+/** Pops up once when last week's top-10 reward has just been collected. */
+function WeeklyRewardNotice() {
+  const { weeklyReward, dismissWeeklyReward } = usePlayer();
+  return weeklyReward ? <WeeklyRewardDialog reward={weeklyReward} onClose={dismissWeeklyReward} /> : null;
 }
 
 function LevelRoute({ levelId }) {
@@ -57,6 +65,8 @@ function Routes() {
       ) : (
         <NotFoundScreen />
       );
+    case 'top':
+      return <LeaderboardScreen />;
     case 'settings':
       return <SettingsScreen />;
     case 'store':
@@ -87,6 +97,7 @@ export default function App() {
           <GameBackground />
           <BeamThemeStyle />
           <Routes />
+          <WeeklyRewardNotice />
         </LevelsProvider>
       </PlayerProvider>
     </AuthProvider>

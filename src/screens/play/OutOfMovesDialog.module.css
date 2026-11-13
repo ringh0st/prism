@@ -1,19 +1,17 @@
-.lumi {
-  display: flex;
-  justify-content: center;
-  min-height: 170px;
-  align-items: flex-end;
-  margin-bottom: var(--space-3);
-}
-
-.tip {
+.progress {
   margin-bottom: var(--space-4);
   font-weight: 700;
   color: var(--text-soft);
 }
 
+.quip {
+  display: block;
+  margin-top: 2px;
+  font-weight: 600;
+}
+
 .actions {
   display: grid;
   justify-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }

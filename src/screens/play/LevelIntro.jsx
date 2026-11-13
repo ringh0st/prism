@@ -13,10 +13,13 @@ const STICKERS = {
   night: { text: 'NIGHT LEVEL', className: 'night' },
 };
 
+/** How long the intro stays before the level starts by itself (any tap starts it sooner). */
+const INTRO_MS = 1600;
+
 /** "Level 7 · The Sneaky Pickle · Light 2 gems in 6 moves". Tap anywhere or wait to start. */
 export default function LevelIntro({ level, title, subtitle, modifier, lumiLine, onDone }) {
   useEffect(() => {
-    const timer = setTimeout(onDone, 2600);
+    const timer = setTimeout(onDone, modifier === 'normal' ? INTRO_MS : INTRO_MS * 1.6);
     return () => clearTimeout(timer);
   }, [onDone]);
 
@@ -29,7 +32,7 @@ export default function LevelIntro({ level, title, subtitle, modifier, lumiLine,
     <div className={`${styles.overlay} ${sticker ? styles[sticker.className] : ''}`} onClick={onDone} role="presentation">
       <div className={styles.card}>
         <p className={styles.subtitle}>{subtitle}</p>
-        <Ribbon as="h1" size="lg" tone={modifier === 'boss' ? 'coral' : 'tangerine'}>
+        <Ribbon as="h1" size="lg" tone={modifier === 'boss' ? 'alert' : 'sage'}>
           {title}
         </Ribbon>
         {sticker && <p className={`game-title ${styles.sticker}`}>{sticker.text}</p>}
