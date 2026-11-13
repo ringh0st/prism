@@ -24,9 +24,9 @@ Never paste API keys, secrets or tokens into a chat, an issue or a commit. They 
 
 | Variant name | Price | Pack id in the game |
 | --- | --- | --- |
-| 10 diamonds | $0.99 | `diamonds-10` |
-| 60 diamonds | $4.99 | `diamonds-60` |
-| 130 diamonds | $9.99 | `diamonds-130` |
+| 10 diamonds | €0.99 | `diamonds-10` |
+| 60 diamonds | €4.99 | `diamonds-60` |
+| 130 diamonds | €9.99 | `diamonds-130` |
 
 For each variant, copy its **variant ID** (a number) from the variant's menu.
 
