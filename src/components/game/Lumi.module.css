@@ -15,6 +15,49 @@
   transform-origin: 50px 60px;
 }
 
+/* Wings flutter gently, faster when Lumi is excited */
+.wingLeft,
+.wingRight {
+  transform-box: fill-box;
+  animation: flutter 1.6s ease-in-out infinite alternate;
+}
+
+.wingLeft {
+  transform-origin: 100% 60%;
+}
+
+.wingRight {
+  transform-origin: 0% 60%;
+  animation-name: flutterRight;
+  animation-delay: -0.8s;
+}
+
+.excited .wingLeft,
+.excited .wingRight,
+.dance .wingLeft,
+.dance .wingRight {
+  animation-duration: 0.35s;
+}
+
+/* The tail glows softly, slow enough to stay calm (no flashing) */
+.glow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: glow 2.8s ease-in-out infinite alternate;
+}
+
+.sad .glow,
+.sleepy .glow {
+  opacity: 0.15;
+  animation: none;
+}
+
+.blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 4.5s ease-in-out infinite;
+}
+
 .excited .body {
   animation: jump 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) infinite alternate;
 }
@@ -100,6 +143,36 @@
 
 .top::after {
   left: calc(50% - 8px);
+}
+
+@keyframes flutter {
+  to {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes flutterRight {
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes glow {
+  to {
+    transform: scale(1.25);
+    opacity: 0.25;
+  }
+}
+
+@keyframes blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  97% {
+    transform: scaleY(0.1);
+  }
 }
 
 @keyframes idle {

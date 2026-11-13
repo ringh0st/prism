@@ -42,7 +42,7 @@ const MOUTHS = {
 };
 
 /**
- * Lumi, Prism's mascot: a little drop of sunlight with opinions.
+ * Lumi, Prism's mascot: a little firefly whose glowing tail is the light you bend.
  * mood: happy | excited | worried | sad | sleepy | dance
  */
 export default function Lumi({ mood = 'happy', size = 72, line, bubbleSide = 'right', className = '' }) {
@@ -50,33 +50,38 @@ export default function Lumi({ mood = 'happy', size = 72, line, bubbleSide = 'ri
   return (
     <div className={`${styles.lumi} ${styles[mood] ?? ''} ${className}`} style={{ '--size': `${size}px` }}>
       <svg viewBox="0 0 100 110" width={size} height={size * 1.1} className={styles.body} aria-hidden="true">
-        <defs>
-          <radialGradient id="lumi-body" cx="0.38" cy="0.35" r="0.75">
-            <stop offset="0" stopColor="#fffbe0" />
-            <stop offset="0.45" stopColor="#ffd84a" />
-            <stop offset="1" stopColor="#ff9a1c" />
-          </radialGradient>
-        </defs>
-        <ellipse cx="50" cy="104" rx="24" ry="5" fill="rgba(165,70,25,.22)" className={styles.shadow} />
-        {/* little light rays */}
+        <ellipse cx="50" cy="105" rx="22" ry="4" fill="rgba(120,70,20,.2)" className={styles.shadow} />
+        {/* little light rays when excited */}
         <g className={styles.rays} stroke="#ffe27a" strokeWidth="5" strokeLinecap="round">
-          <path d="M50 4v8M14 22l6 6M86 22l-6 6M4 58h8M88 58h8" />
+          <path d="M14 30l6 6M86 30l-6 6M4 64h8M88 64h8" />
         </g>
-        <path
-          d="M50 14C72 30 88 46 88 64a38 38 0 0 1-76 0c0-18 16-34 38-50z"
-          fill="url(#lumi-body)"
-          stroke="#e8851a"
-          strokeOpacity=".55"
-          strokeWidth="2.5"
-          strokeLinejoin="round"
-        />
-        <ellipse cx="34" cy="38" rx="9" ry="5" fill="#fff" opacity=".75" transform="rotate(-35 34 38)" />
-        <ellipse cx="26" cy="68" rx="7" ry="4" fill="#ff7a6a" opacity=".55" />
-        <ellipse cx="74" cy="68" rx="7" ry="4" fill="#ff7a6a" opacity=".55" />
-        {EYES[face]}
+        {/* wings */}
+        <g className={styles.wingLeft}>
+          <ellipse cx="22" cy="44" rx="20" ry="12" fill="#cfe9e2" opacity=".95" transform="rotate(-28 22 44)" />
+          <ellipse cx="22" cy="44" rx="11" ry="5" fill="#fff" opacity=".7" transform="rotate(-28 22 44)" />
+        </g>
+        <g className={styles.wingRight}>
+          <ellipse cx="78" cy="44" rx="20" ry="12" fill="#cfe9e2" opacity=".95" transform="rotate(28 78 44)" />
+          <ellipse cx="78" cy="44" rx="11" ry="5" fill="#fff" opacity=".7" transform="rotate(28 78 44)" />
+        </g>
+        {/* antennae */}
+        <path d="M42 32Q36 16 28 12M58 32Q64 16 72 12" stroke="#7d6e63" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+        <circle cx="27" cy="11" r="5.5" fill="#ffd45e" />
+        <circle cx="73" cy="11" r="5.5" fill="#ffd45e" />
+        {/* the glowing tail */}
+        <circle cx="50" cy="92" r="20" fill="#ffe27a" opacity=".45" className={styles.glow} />
+        <ellipse cx="50" cy="92" rx="18" ry="12" fill="#ffd45e" />
+        <ellipse cx="44" cy="88" rx="6" ry="3" fill="#fff6c9" />
+        {/* head */}
+        <circle cx="50" cy="58" r="30" fill="#f2a67e" />
+        <path d="M24 50a30 30 0 0 1 34-21c-18 5-28 18-30 36z" fill="#f8b991" />
+        <ellipse cx="36" cy="38" rx="7" ry="4" fill="#fff" opacity=".55" transform="rotate(-30 36 38)" />
+        <ellipse cx="29" cy="68" rx="6.5" ry="4" fill="#ff7a6a" opacity=".55" />
+        <ellipse cx="71" cy="68" rx="6.5" ry="4" fill="#ff7a6a" opacity=".55" />
+        <g className={face === 'happy' ? styles.blink : undefined}>{EYES[face]}</g>
         {MOUTHS[face]}
         {mood === 'sleepy' && (
-          <text x="78" y="26" fontSize="20" fontWeight="800" fill="#7a6152" fontFamily="var(--font-display)" className={styles.zzz}>
+          <text x="80" y="30" fontSize="20" fontWeight="800" fill="#7a6152" fontFamily="var(--font-display)" className={styles.zzz}>
             z
           </text>
         )}
