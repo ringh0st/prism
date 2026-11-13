@@ -16,8 +16,7 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: var(--text-strong);
-  background: linear-gradient(180deg, var(--sky-top), var(--sky-mid) 55%, var(--sky-bottom));
-  background-attachment: fixed;
+  background: var(--mesh-base);
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
@@ -27,7 +26,8 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   line-height: 1.15;
   margin: 0;
 }
@@ -73,15 +73,18 @@ a {
   }
 }
 
-/* Big outlined game titles: white letters with a chunky warm outline and drop. */
+/* Display titles: big, bold and clean (no outlines), with a soft lift. */
 .game-title {
   font-family: var(--font-display);
   font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-strong);
+}
+
+/* Titles that sit on a colored, clay surface. */
+.on-color {
   color: #fff;
-  letter-spacing: 0.01em;
-  -webkit-text-stroke: 0.14em var(--game-outline);
-  paint-order: stroke fill;
-  text-shadow: 0 0.09em 0 var(--game-outline);
+  text-shadow: 0 1px 1px rgba(110, 35, 5, 0.25), 0 2px 10px rgba(110, 35, 5, 0.18);
 }
 
 /* Icons inside flex/grid controls must not sit on the text baseline. */

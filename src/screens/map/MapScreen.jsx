@@ -17,6 +17,8 @@ import { buildWorldStops, pathThrough, ROW_HEIGHT } from './mapLayout.js';
 import logoUrl from '../../assets/logo.png';
 import styles from './Map.module.css';
 
+const RIBBON_TONE = { sunshine: 'gold', tangerine: 'tangerine', coral: 'coral', mint: 'mint', ember: 'coral', lime: 'mint', peach: 'tangerine', gold: 'gold' };
+
 function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeRef, onOpenChest }) {
   const stops = useMemo(() => buildWorldStops(levelRefs), [levelRefs]);
   const height = stops.length * ROW_HEIGHT;
@@ -27,7 +29,7 @@ function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeR
     <section className={`${styles.world} ${styles[world.theme]}`} aria-labelledby={`world-${world.id}`}>
       <header className={styles.worldHeader}>
         <p className={styles.worldNumber}>World {world.id}</p>
-        <Ribbon as="h2" id={`world-${world.id}`} tone="tangerine">
+        <Ribbon as="h2" id={`world-${world.id}`} tone={RIBBON_TONE[world.theme] ?? 'tangerine'}>
           {world.name}
         </Ribbon>
         <p className={styles.worldTagline}>
@@ -109,8 +111,9 @@ export default function MapScreen() {
   const currentRef = [...refsByWorld.values()].flat().find((ref) => starsFor(progress, ref.id) === 0) ?? null;
   const worldsLeft = worlds.length - unlockedWorlds.length - (nextLockedWorld ? 1 : 0);
 
+  // Scroll just enough to show the current level above the PLAY button (see .currentNode scroll-margin).
   useEffect(() => {
-    currentNodeRef.current?.scrollIntoView({ block: 'center' });
+    currentNodeRef.current?.scrollIntoView({ block: 'nearest' });
   }, []);
 
   return (
@@ -122,7 +125,7 @@ export default function MapScreen() {
         {progress.hotStreak >= 2 && (
           <span className={styles.hotStreak} aria-label={`Hot streak: ${progress.hotStreak} perfect levels in a row`}>
             <Icon name="flame" size={18} />
-            <span className="game-title">{progress.hotStreak}</span>
+            <span className="game-title on-color">{progress.hotStreak}</span>
           </span>
         )}
         <CurrencyHud />
@@ -153,7 +156,7 @@ export default function MapScreen() {
 
       {currentRef && (
         <a href={`#/play/${currentRef.id}`} className={styles.playButton}>
-          <span className="game-title">PLAY</span>
+          <span className="game-title on-color">PLAY</span>
           <span className={styles.playLevel}>
             Level {currentRef.world}-{currentRef.index}
           </span>

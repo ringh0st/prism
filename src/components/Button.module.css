@@ -1,154 +1,140 @@
-/* Chunky game buttons: thick outline, solid ledge underneath, glossy top, outlined label. */
+/* Soft 3D "clay" pills: gradient fill, top highlight, colored glow. Springy press. */
 .button {
-  --depth: 6px;
-  --face-top: #ff9a86;
-  --face-bottom: var(--color-coral);
-  --ledge: #b8382b;
+  --from: #ff8e7a;
+  --to: var(--color-coral);
+  --glow: 255, 107, 91;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 48px;
+  min-height: 50px;
   padding: 0 var(--space-5);
-  border: 3px solid var(--game-outline);
-  border-radius: 18px;
+  border: 0;
+  border-radius: var(--radius-pill);
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 18px;
   line-height: 1;
   color: #fff;
   text-decoration: none;
-  background: linear-gradient(180deg, var(--face-top), var(--face-bottom));
+  background: linear-gradient(160deg, var(--from), var(--to));
   box-shadow:
-    0 var(--depth) 0 var(--ledge),
-    0 calc(var(--depth) + 3px) 0 var(--game-outline),
-    inset 0 -4px 0 rgba(0, 0, 0, 0.12);
+    var(--clay),
+    0 10px 22px -8px rgba(var(--glow), 0.65),
+    0 2px 4px rgba(var(--glow), 0.25);
   cursor: pointer;
   user-select: none;
-  isolation: isolate;
   transition:
-    transform 90ms ease,
-    box-shadow 90ms ease,
-    filter 120ms ease;
-}
-
-/* Glossy highlight across the top half. */
-.button::before {
-  content: '';
-  position: absolute;
-  inset: 3px 8px 52%;
-  border-radius: 12px 12px 30px 30px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.08));
-  pointer-events: none;
-  z-index: -1;
+    transform 180ms var(--ease-spring),
+    box-shadow 180ms ease,
+    filter 150ms ease;
 }
 
 .button > span {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  -webkit-text-stroke: 4px var(--game-outline);
-  paint-order: stroke fill;
+  text-shadow: 0 1px 2px rgba(110, 35, 5, 0.25);
 }
 
 .button:hover:not(:disabled) {
-  filter: brightness(1.06);
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+  box-shadow:
+    var(--clay),
+    0 14px 28px -8px rgba(var(--glow), 0.7),
+    0 2px 4px rgba(var(--glow), 0.25);
 }
 
 .button:active:not(:disabled) {
-  transform: translateY(var(--depth));
+  transform: translateY(1px) scale(0.96);
   box-shadow:
-    0 0 0 var(--ledge),
-    0 3px 0 var(--game-outline),
-    inset 0 -4px 0 rgba(0, 0, 0, 0.12);
+    inset 0 3px 8px rgba(110, 35, 5, 0.25),
+    0 4px 10px -6px rgba(var(--glow), 0.6);
 }
 
 .button:disabled,
 .button[aria-disabled='true'] {
   cursor: not-allowed;
-  filter: grayscale(1) brightness(1.05);
-  opacity: 0.55;
+  filter: grayscale(0.9);
+  opacity: 0.5;
+  box-shadow: var(--clay);
 }
 
 .primary {
-  /* coral (defaults above) */
+  /* coral, see defaults */
 }
 
 .go {
-  --face-top: #6ff0b4;
-  --face-bottom: #20c07a;
-  --ledge: #138a55;
+  --from: #5eeaa8;
+  --to: #17b874;
+  --glow: 23, 184, 116;
 }
 
 .gold {
-  --face-top: #fff19a;
-  --face-bottom: var(--color-sunshine-deep);
-  --ledge: #b78300;
+  --from: #ffe066;
+  --to: #ffad0d;
+  --glow: 255, 173, 13;
+  color: #5a3300;
+}
+
+.gold > span {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .secondary {
-  --face-top: #ffffff;
-  --face-bottom: #ffe9cf;
-  --ledge: #e0b98e;
-  color: var(--game-outline);
+  color: var(--text-strong);
+  background: var(--glass-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shine), var(--shadow-md);
 }
 
 .secondary > span {
-  -webkit-text-stroke: 0;
+  text-shadow: none;
+}
+
+.secondary:hover:not(:disabled) {
+  box-shadow: var(--glass-shine), var(--shadow-lg);
 }
 
 .ghost {
-  --depth: 0px;
-  color: var(--game-outline);
+  color: var(--text-strong);
   background: transparent;
-  border-color: transparent;
   box-shadow: none;
 }
 
-.ghost::before {
-  display: none;
+.ghost > span {
+  text-shadow: none;
 }
 
-.ghost > span {
-  -webkit-text-stroke: 0;
+.ghost:hover:not(:disabled) {
+  background: var(--glass);
+  box-shadow: none;
 }
 
 .sm {
-  --depth: 4px;
-  min-height: 38px;
+  min-height: 40px;
   padding: 0 var(--space-4);
   font-size: 16px;
-  border-radius: 14px;
 }
 
 .lg {
-  --depth: 7px;
-  min-height: 60px;
+  min-height: 62px;
   padding: 0 var(--space-6);
-  font-size: 23px;
-  border-radius: 22px;
+  font-size: 22px;
 }
 
 .iconOnly {
-  width: 48px;
+  width: 50px;
   padding: 0;
 }
 
 .iconOnly.sm {
-  width: 38px;
+  width: 40px;
 }
 
 .iconOnly.lg {
-  width: 60px;
-}
-
-/* Icons get a dark outline too, so they read on every face color. */
-.button svg {
-  filter: drop-shadow(0 1.5px 0 var(--game-outline));
-}
-
-.secondary svg,
-.ghost svg {
-  filter: none;
+  width: 62px;
 }

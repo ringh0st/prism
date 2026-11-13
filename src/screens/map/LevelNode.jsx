@@ -36,7 +36,7 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef 
           <Icon name="crown" size={22} />
         </span>
       )}
-      {ref.difficulty === DIFFICULTY.EXTRA && <span className={`game-title ${styles.bossPlate}`}>BOSS</span>}
+      {ref.difficulty === DIFFICULTY.EXTRA && <span className={`game-title on-color ${styles.bossPlate}`}>BOSS</span>}
       {isCurrent && (
         <span className={`${styles.lumiOnNode} ${x > 50 ? styles.lumiLeft : styles.lumiRight}`} aria-hidden="true">
           <Lumi mood="excited" size={46} />

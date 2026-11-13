@@ -30,9 +30,9 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 12px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--game-outline);
+  color: var(--text-soft);
 }
 
 .status {
@@ -40,13 +40,12 @@
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: var(--space-3);
-  padding: 8px 14px 10px 8px;
-  border: 3px solid var(--game-outline);
-  border-radius: 22px;
-  background: linear-gradient(180deg, var(--panel), var(--panel-inner));
-  box-shadow:
-    0 5px 0 var(--game-ledge),
-    inset 0 3px 0 rgba(255, 255, 255, 0.7);
+  padding: 10px 16px 12px 10px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shine), var(--shadow-md);
 }
 
 .gems {

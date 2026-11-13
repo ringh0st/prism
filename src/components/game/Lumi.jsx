@@ -57,7 +57,7 @@ export default function Lumi({ mood = 'happy', size = 72, line, bubbleSide = 'ri
             <stop offset="1" stopColor="#ff9a1c" />
           </radialGradient>
         </defs>
-        <ellipse cx="50" cy="104" rx="24" ry="5" fill="rgba(90,45,18,.25)" className={styles.shadow} />
+        <ellipse cx="50" cy="104" rx="24" ry="5" fill="rgba(165,70,25,.22)" className={styles.shadow} />
         {/* little light rays */}
         <g className={styles.rays} stroke="#ffe27a" strokeWidth="5" strokeLinecap="round">
           <path d="M50 4v8M14 22l6 6M86 22l-6 6M4 58h8M88 58h8" />
@@ -65,8 +65,9 @@ export default function Lumi({ mood = 'happy', size = 72, line, bubbleSide = 'ri
         <path
           d="M50 14C72 30 88 46 88 64a38 38 0 0 1-76 0c0-18 16-34 38-50z"
           fill="url(#lumi-body)"
-          stroke="#5a2d12"
-          strokeWidth="4"
+          stroke="#e8851a"
+          strokeOpacity=".55"
+          strokeWidth="2.5"
           strokeLinejoin="round"
         />
         <ellipse cx="34" cy="38" rx="9" ry="5" fill="#fff" opacity=".75" transform="rotate(-35 34 38)" />
@@ -75,7 +76,7 @@ export default function Lumi({ mood = 'happy', size = 72, line, bubbleSide = 'ri
         {EYES[face]}
         {MOUTHS[face]}
         {mood === 'sleepy' && (
-          <text x="78" y="26" fontSize="20" fontWeight="800" fill="#5a2d12" fontFamily="var(--font-display)" className={styles.zzz}>
+          <text x="78" y="26" fontSize="20" fontWeight="800" fill="#7a6152" fontFamily="var(--font-display)" className={styles.zzz}>
             z
           </text>
         )}

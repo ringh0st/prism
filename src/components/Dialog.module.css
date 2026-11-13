@@ -5,27 +5,60 @@
   display: grid;
   place-items: center;
   padding: var(--space-4);
-  background: rgba(60, 25, 8, 0.5);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(80, 30, 10, 0.32);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
   animation: fadeIn var(--duration-base) ease;
 }
 
 .dialog {
+  position: relative;
   width: 100%;
-  max-width: 380px;
+  max-width: 390px;
   max-height: calc(100dvh - 32px);
   overflow-y: auto;
-  padding: var(--space-5);
-  border: 3.5px solid var(--game-outline);
-  border-radius: 30px;
-  background: linear-gradient(180deg, var(--panel), var(--panel-inner));
-  box-shadow:
-    0 8px 0 var(--game-ledge),
-    inset 0 4px 0 rgba(255, 255, 255, 0.7),
-    var(--shadow-lg);
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--sheet);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shine), 0 -10px 40px -10px rgba(var(--shadow-color), 0.35), var(--shadow-lg);
   text-align: center;
-  animation: rise 420ms var(--ease-pop);
+  animation: rise 520ms var(--ease-spring);
+}
+
+/* On phones, dialogs become bottom sheets with a grab handle. */
+@media (max-width: 560px) {
+  .backdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .dialog {
+    max-width: none;
+    max-height: calc(100dvh - 40px);
+    padding-bottom: max(var(--space-5), env(safe-area-inset-bottom));
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    animation: sheetUp 520ms var(--ease-spring);
+  }
+
+  .dialog::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    width: 44px;
+    height: 5px;
+    margin-left: -22px;
+    border-radius: var(--radius-pill);
+    background: var(--line);
+  }
+}
+
+@keyframes sheetUp {
+  from {
+    transform: translateY(100%);
+  }
 }
 
 .dialog:focus {
@@ -36,15 +69,16 @@
   margin-bottom: var(--space-3);
   font-size: 30px;
   font-weight: 700;
-  color: #fff;
-  -webkit-text-stroke: 0.15em var(--game-outline);
-  paint-order: stroke fill;
-  text-shadow: 0 3px 0 var(--game-outline);
+  color: var(--text-strong);
 }
 
 .celebrate .title {
   font-size: 38px;
-  color: var(--color-sunshine);
+  background: linear-gradient(120deg, #ffad0d, var(--color-coral) 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 6px 14px rgba(255, 107, 91, 0.35));
   animation: titleBounce 700ms var(--ease-pop);
 }
 

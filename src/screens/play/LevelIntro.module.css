@@ -5,9 +5,9 @@
   display: grid;
   place-items: center;
   padding: var(--space-4);
-  background: rgba(60, 25, 8, 0.45);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(80, 30, 10, 0.3);
+  backdrop-filter: blur(14px) saturate(1.3);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
   cursor: pointer;
   animation: fade 250ms ease;
 }
@@ -22,28 +22,32 @@
 
 .subtitle {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 18px;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: #fff;
-  -webkit-text-stroke: 4px var(--game-outline);
-  paint-order: stroke fill;
+  text-shadow: 0 2px 10px rgba(110, 35, 5, 0.4);
 }
 
 .sticker {
-  padding: 4px 16px 6px;
-  border: 3px solid var(--game-outline);
-  border-radius: 12px;
+  padding: 6px 18px 8px;
+  border-radius: var(--radius-md);
   font-size: 22px;
+  color: #fff;
   transform: rotate(-6deg);
-  background: var(--color-mint);
-  box-shadow: 0 4px 0 var(--game-ledge);
+  background: linear-gradient(160deg, #5ee0d0, var(--color-mint-deep));
+  box-shadow:
+    var(--clay),
+    0 12px 24px -10px rgba(23, 152, 140, 0.8);
   animation: stamp 500ms var(--ease-pop) 250ms both;
 }
 
 .boss .sticker {
-  background: linear-gradient(180deg, #ff8a72, #e5333a);
+  background: linear-gradient(160deg, #ff8e7a, #e5333a);
+  box-shadow:
+    var(--clay),
+    0 12px 24px -10px rgba(229, 51, 58, 0.8);
 }
 
 .disco .sticker {
@@ -55,7 +59,7 @@
 }
 
 .night .sticker {
-  background: linear-gradient(180deg, #6b4a3a, #2b1d16);
+  background: linear-gradient(160deg, #6b4a3a, #2b1d16);
 }
 
 .goal {
@@ -64,15 +68,16 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 18px;
-  border: 3px solid var(--game-outline);
-  border-radius: 18px;
+  padding: 12px 20px;
+  border-radius: var(--radius-lg);
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 19px;
-  color: var(--game-outline);
-  background: var(--panel);
-  box-shadow: 0 5px 0 var(--game-ledge);
+  color: var(--text-strong);
+  background: var(--glass-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shine), var(--shadow-md);
 }
 
 .gems {

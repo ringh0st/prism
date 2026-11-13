@@ -1,32 +1,38 @@
+/* Floating liquid-glass dock. */
 .nav {
   position: fixed;
   left: 50%;
-  bottom: max(10px, env(safe-area-inset-bottom));
+  bottom: max(12px, env(safe-area-inset-bottom));
   z-index: 20;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 4px;
-  width: min(440px, calc(100% - 24px));
+  width: min(420px, calc(100% - 28px));
   padding: 6px;
   transform: translateX(-50%);
-  border: 3px solid var(--game-outline);
-  border-radius: 26px;
-  background: linear-gradient(180deg, #fff7ea, #ffe6c6);
-  box-shadow:
-    0 6px 0 var(--game-ledge),
-    0 16px 30px -10px rgba(90, 45, 18, 0.5),
-    inset 0 3px 0 #fff;
+  border-radius: 30px;
+  background: var(--glass-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shine), var(--shadow-lg);
 }
 
 .tab {
   display: grid;
   justify-items: center;
-  gap: 2px;
-  padding: 6px 0 4px;
-  border-radius: 18px;
+  gap: 3px;
+  padding: 7px 0 6px;
+  border-radius: 24px;
   text-decoration: none;
-  color: var(--game-outline);
-  transition: transform 120ms var(--ease-pop);
+  color: var(--text-soft);
+  transition:
+    transform 180ms var(--ease-spring),
+    color 150ms ease,
+    background 200ms ease;
+}
+
+.tab:hover {
+  color: var(--text-strong);
 }
 
 .tab:active {
@@ -37,66 +43,72 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 34px;
+  width: 40px;
+  height: 30px;
 }
 
 .label {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
+  font-weight: 600;
+  font-size: 12.5px;
   line-height: 1;
 }
 
 .active {
   color: #fff;
-  background: linear-gradient(180deg, #ff9a86, var(--color-coral));
+  background: linear-gradient(160deg, #ff8e7a, var(--color-coral));
   box-shadow:
-    inset 0 -3px 0 #b8382b,
-    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+    var(--clay),
+    0 8px 18px -8px rgba(255, 107, 91, 0.75);
 }
 
-.active .label {
-  -webkit-text-stroke: 3px var(--game-outline);
-  paint-order: stroke fill;
+.active:hover {
+  color: #fff;
 }
 
-.active svg {
-  filter: drop-shadow(0 1.5px 0 var(--game-outline));
+.active .icon {
+  animation: hop 420ms var(--ease-pop);
 }
 
 .dot {
   position: absolute;
   top: 0;
   right: 4px;
-  width: 12px;
-  height: 12px;
-  border: 2px solid var(--game-outline);
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: #22c97f;
-  animation: ping 1.4s ease-in-out infinite;
+  background: #17b874;
+  box-shadow:
+    0 0 10px rgba(23, 184, 116, 0.8);
+  animation: ping 1.6s ease-in-out infinite;
 }
 
 .streak {
   position: absolute;
   bottom: -2px;
-  right: -2px;
-  min-width: 20px;
-  height: 18px;
+  right: -4px;
+  min-width: 18px;
+  height: 17px;
   padding: 0 4px;
-  border: 2px solid var(--game-outline);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 11px;
-  line-height: 14px;
+  line-height: 17px;
   text-align: center;
   color: #fff;
-  background: var(--color-tangerine);
+  background: linear-gradient(160deg, #ffc163, #ff8a1c);
+  box-shadow: 0 3px 8px -2px rgba(255, 138, 28, 0.7);
+}
+
+@keyframes hop {
+  40% {
+    transform: translateY(-4px) scale(1.12);
+  }
 }
 
 @keyframes ping {
   50% {
-    transform: scale(1.25);
+    transform: scale(1.3);
   }
 }

@@ -10,8 +10,7 @@
 
 .chest svg {
   position: relative;
-  filter: drop-shadow(0 3px 0 var(--game-outline)) drop-shadow(0 -2px 0 var(--game-outline)) drop-shadow(2px 0 0 var(--game-outline))
-    drop-shadow(-2px 0 0 var(--game-outline));
+  filter: drop-shadow(0 10px 16px rgba(200, 110, 0, 0.45));
 }
 
 .shaking svg {
@@ -51,15 +50,16 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 8px 16px;
-  border: 3px solid var(--game-outline);
-  border-radius: 16px;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 20px;
-  color: var(--game-outline);
-  background: linear-gradient(180deg, #fff6c9, var(--color-sunshine));
-  box-shadow: 0 4px 0 var(--game-ledge);
+  color: #5a3300;
+  background: linear-gradient(160deg, #fff1a6, #ffc61a);
+  box-shadow:
+    var(--clay),
+    0 10px 20px -10px rgba(255, 173, 13, 0.8);
   animation: rise 500ms var(--ease-pop) both;
 }
 

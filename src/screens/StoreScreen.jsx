@@ -24,13 +24,13 @@ const TABS = [
 function ShopSlot({ icon, tone, title, badge, tag, children }) {
   return (
     <Panel as="li" className={styles.slot}>
-      {tag && <span className={`game-title ${styles.tag}`}>{tag}</span>}
+      {tag && <span className={`game-title on-color ${styles.tag}`}>{tag}</span>}
       <div className={`${styles.art} ${styles[tone]}`} aria-hidden="true">
         <span className={styles.burst} />
         <span className={styles.artIcon}>
           <Icon name={icon} size={40} />
         </span>
-        {badge && <span className={`game-title ${styles.badge}`}>{badge}</span>}
+        {badge && <span className={`game-title on-color ${styles.badge}`}>{badge}</span>}
       </div>
       <h3 className={`game-title ${styles.slotTitle}`}>{title}</h3>
       {children}

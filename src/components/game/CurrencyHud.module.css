@@ -1,53 +1,50 @@
 .hud {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-pill);
   text-decoration: none;
+  background: var(--glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shine), var(--shadow-md);
+  transition: transform 180ms var(--ease-spring);
+}
+
+.hud:hover {
+  transform: scale(1.03);
 }
 
 .counter {
-  position: relative;
   display: inline-flex;
   align-items: center;
-  height: 30px;
-  min-width: 58px;
-  margin-left: 14px;
-  padding: 0 10px 0 20px;
-  border: 2.5px solid var(--game-outline);
-  border-radius: 999px;
-  background: rgba(74, 34, 12, 0.72);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12);
+  gap: 5px;
+  height: 32px;
+  padding: 0 10px 0 4px;
+  border-radius: var(--radius-pill);
 }
 
 .badge {
-  position: absolute;
-  left: -16px;
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  border: 2.5px solid var(--game-outline);
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  box-shadow: 0 2px 0 var(--game-ledge), inset 0 2px 0 rgba(255, 255, 255, 0.55);
+  color: #fff;
+  box-shadow: var(--clay);
 }
 
 .star .badge {
-  color: #fff;
-  background: linear-gradient(180deg, #ffe680, var(--color-sunshine-deep));
+  background: linear-gradient(160deg, #ffe066, #ffad0d);
 }
 
 .spark .badge {
-  color: #fff;
-  background: linear-gradient(180deg, #ffc06b, var(--color-tangerine-deep));
+  background: linear-gradient(160deg, #ffc163, #ff8a1c);
 }
 
 .diamond .badge {
-  color: #fff;
-  background: linear-gradient(180deg, #7ff0e2, var(--color-mint-deep));
-}
-
-.badge svg {
-  filter: drop-shadow(0 1.5px 0 var(--game-outline));
+  background: linear-gradient(160deg, #6fe6d6, var(--color-mint-deep));
 }
 
 .value {
@@ -55,27 +52,22 @@
   font-weight: 700;
   font-size: 16px;
   line-height: 1;
-  color: #fff;
+  color: var(--text-strong);
   font-variant-numeric: tabular-nums;
-  -webkit-text-stroke: 3px var(--game-outline);
-  paint-order: stroke fill;
-  animation: bump 380ms var(--ease-pop);
+  animation: bump 420ms var(--ease-pop);
 }
 
 .plus {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  border: 2.5px solid var(--game-outline);
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   color: #fff;
-  background: linear-gradient(180deg, #6ff0b4, #20c07a);
-  box-shadow: 0 3px 0 var(--game-outline);
-}
-
-.hud:hover .plus {
-  transform: scale(1.08);
+  background: linear-gradient(160deg, #5eeaa8, #17b874);
+  box-shadow:
+    var(--clay),
+    0 6px 14px -6px rgba(23, 184, 116, 0.7);
 }
 
 @keyframes bump {
@@ -86,7 +78,6 @@
 
 @media (max-width: 380px) {
   .counter {
-    min-width: 50px;
     padding-right: 7px;
   }
   .value {
