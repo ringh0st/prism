@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import CurrencyHud from '../../components/game/CurrencyHud.jsx';
 import BottomNav from '../../components/game/BottomNav.jsx';
-import Ribbon from '../../components/game/Ribbon.jsx';
 import Icon from '../../components/Icon.jsx';
 import LevelNode from './LevelNode.jsx';
 import ChestNode from './ChestNode.jsx';
 import ChestDialog from './ChestDialog.jsx';
+import WorldScenery from './scenery/WorldScenery.jsx';
+import WorldSign from './scenery/WorldSign.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
@@ -16,10 +17,8 @@ import { buildWorldStops, pathThrough, ROW_HEIGHT } from './mapLayout.js';
 import logoUrl from '../../assets/logo.png';
 import styles from './Map.module.css';
 
-// Ribbon tone per world theme; "sage" is the calm default.
 const GREETING_MS = 6000;
 
-const RIBBON_TONE = { sunshine: 'sage', tangerine: 'tangerine', coral: 'tangerine', mint: 'mint', ember: 'tangerine', lime: 'sage', peach: 'tangerine', gold: 'gold' };
 
 function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeRef, greeting, onOpenChest }) {
   const stops = useMemo(() => buildWorldStops(levelRefs), [levelRefs]);
@@ -29,19 +28,15 @@ function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeR
 
   return (
     <section className={`${styles.world} ${styles[world.theme]}`} aria-labelledby={`world-${world.id}`}>
-      <header className={styles.worldHeader}>
-        <p className={styles.worldNumber}>World {world.id}</p>
-        <Ribbon as="h2" id={`world-${world.id}`} tone={RIBBON_TONE[world.theme] ?? 'tangerine'}>
-          {world.name}
-        </Ribbon>
-        <p className={styles.worldTagline}>
-          {world.tagline} ·{' '}
-          <span className={styles.worldStars}>
-            <Icon name="star" size={14} /> {earned}/{levelRefs.length * MAX_STARS}
-          </span>
-        </p>
-      </header>
+      <WorldSign
+        world={world}
+        headingId={`world-${world.id}`}
+        earned={earned}
+        total={levelRefs.length * MAX_STARS}
+        className={styles.worldSign}
+      />
       <div className={styles.trail} style={{ height }}>
+        <WorldScenery stops={stops} worldId={world.id} theme={world.theme} />
         <svg className={styles.path} viewBox={`0 0 100 ${height}`} preserveAspectRatio="none" aria-hidden="true">
           <path d={pathThrough(stops, 100)} className={styles.pathShadow} vectorEffect="non-scaling-stroke" />
           <path d={pathThrough(stops, 100)} className={styles.pathLine} vectorEffect="non-scaling-stroke" />
@@ -82,17 +77,20 @@ function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeR
   );
 }
 
+// A short, foggy stretch of the next world's landscape, so players can see what's coming.
+const LOCKED_PREVIEW_STOPS = buildWorldStops(Array.from({ length: 4 }, (_, i) => ({ id: `preview-${i}` })));
+
 function LockedWorld({ world, stars }) {
   return (
-    <section className={`${styles.world} ${styles.lockedWorld} ${styles[world.theme]}`} aria-label={`World ${world.id}, locked`}>
-      <p className={styles.worldNumber}>World {world.id}</p>
-      <Ribbon as="h2" tone="tangerine">
-        {world.name}
-      </Ribbon>
-      <div className={styles.gate}>
-        <Icon name="lock" size={40} strokeWidth={2.6} />
-        <p className="game-title">{world.starsToUnlock - stars} more ★ to unlock</p>
+    <section className={`${styles.world} ${styles.lockedWorld} ${styles[world.theme]}`} aria-labelledby={`world-${world.id}`}>
+      <div className={styles.lockedView} style={{ height: LOCKED_PREVIEW_STOPS.length * ROW_HEIGHT }}>
+        <WorldScenery stops={LOCKED_PREVIEW_STOPS} worldId={world.id} theme={world.theme} />
+        <div className={styles.gate}>
+          <Icon name="lock" size={40} strokeWidth={2.6} />
+          <p className="game-title">{world.starsToUnlock - stars} more ★ to unlock</p>
+        </div>
       </div>
+      <WorldSign world={world} headingId={`world-${world.id}`} isLocked className={styles.worldSign} />
     </section>
   );
 }
