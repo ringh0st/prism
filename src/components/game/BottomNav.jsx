@@ -9,7 +9,7 @@ const TABS = [
   { route: 'daily', href: '#/daily', icon: 'calendar', label: 'Daily' },
   { route: 'top', href: '#/top', icon: 'trophy', label: 'Top' },
   { route: 'store', href: '#/store', icon: 'bag', label: 'Shop' },
-  { route: 'settings', href: '#/settings', icon: 'settings', label: 'Me' },
+  { route: 'settings', href: '#/settings', icon: 'user', label: 'Me' },
 ];
 
 /** Big chunky game tab bar along the bottom of the screen. */

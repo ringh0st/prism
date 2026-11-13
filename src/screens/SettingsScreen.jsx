@@ -8,6 +8,7 @@ import { useAuth } from '../state/AuthContext.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
 import { BEAM_THEMES, totalStars } from '../game/progress.js';
 import { PRIVACY_URL, HOME_PAGE_URL, TERMS_URL } from '../lib/config.js';
+import PlayerCard from './me/PlayerCard.jsx';
 import styles from './SettingsScreen.module.css';
 
 const SYNC_LABELS = {
@@ -41,7 +42,7 @@ function Toggle({ id, label, description, checked, onChange }) {
 }
 
 function AccountCard() {
-  const { user, displayName, avatarUrl, isAdmin, signInWithGoogle, signOut, deleteAccount } = useAuth();
+  const { user, isAdmin, signInWithGoogle, signOut, deleteAccount } = useAuth();
   const { syncStatus } = usePlayer();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [error, setError] = useState('');
@@ -66,19 +67,7 @@ function AccountCard() {
       <h2 id="account-title">Account</h2>
       {user ? (
         <>
-          <div className={styles.profile}>
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="" width="48" height="48" referrerPolicy="no-referrer" />
-            ) : (
-              <span className={styles.avatarFallback}>
-                <Icon name="user" />
-              </span>
-            )}
-            <div>
-              <p className={styles.rowTitle}>{displayName}</p>
-              <p className={styles.rowHint}>{SYNC_LABELS[syncStatus]}</p>
-            </div>
-          </div>
+          <p className={styles.rowHint}>{SYNC_LABELS[syncStatus]}</p>
           <div className={styles.buttonRow}>
             {isAdmin && (
               <Button as="a" href="#/admin" icon="edit">
@@ -133,8 +122,9 @@ export default function SettingsScreen() {
 
   return (
     <div className={styles.page}>
-      <ScreenHeader title="Me & settings" />
+      <ScreenHeader title="Me" />
       <main className={styles.main}>
+        <PlayerCard />
 
         <AccountCard />
 

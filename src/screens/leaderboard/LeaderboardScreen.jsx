@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import ScreenHeader from '../../components/game/ScreenHeader.jsx';
 import BottomNav from '../../components/game/BottomNav.jsx';
-import Panel from '../../components/game/Panel.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
 import Icon from '../../components/Icon.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
 import { WEEKLY_POINTS, WEEKLY_REWARDS } from '../../game/catalog.js';
+import Podium from './Podium.jsx';
 import RankRow from './RankRow.jsx';
 import styles from './LeaderboardScreen.module.css';
 
-const PODIUM = WEEKLY_REWARDS.filter((reward) => reward.diamonds > 0);
 const SPARKS_FOR_TOP_TEN = WEEKLY_REWARDS.find((reward) => reward.rank === 4).sparks;
+const BUNTING = ['var(--color-sage)', 'var(--color-honey)', 'var(--color-peach)', 'var(--color-mint)'];
+const FLAGS = 12;
 
 /** "in 3 days" / "in 5 hours": when the week resets. */
 function timeUntil(endsAt) {
@@ -21,14 +22,28 @@ function timeUntil(endsAt) {
   return 'soon';
 }
 
-/** This week's top players worldwide, with the rewards for the top 10. */
+function Bunting() {
+  const width = 100 / FLAGS;
+  return (
+    <svg className={styles.bunting} viewBox="0 0 100 14" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <path d="M0 2Q50 8 100 2" className={styles.string} />
+      {Array.from({ length: FLAGS }, (_, i) => {
+        const x = i * width;
+        const sag = 2 + Math.sin((i / (FLAGS - 1)) * Math.PI) * 3;
+        return <path key={i} d={`M${x + 0.6} ${sag}h${width - 1.2}l${-(width - 1.2) / 2} 9z`} style={{ fill: BUNTING[i % BUNTING.length] }} />;
+      })}
+    </svg>
+  );
+}
+
+/** This week's top players worldwide: a winners' podium, then the rest of the board. */
 export default function LeaderboardScreen() {
   const { isSignedIn, progress } = usePlayer();
   const [board, setBoard] = useState(null);
   const [error, setError] = useState('');
 
-  // Reload when the player's stars change, so their own score is fresh.
-  const starCount = Object.keys(progress.levels).length;
+  // Reload when the player's progress changes, so their own score is fresh.
+  const solvedCount = Object.keys(progress.levels).length;
   useEffect(() => {
     let isCurrent = true;
     fetchWeeklyLeaderboard()
@@ -37,74 +52,75 @@ export default function LeaderboardScreen() {
     return () => {
       isCurrent = false;
     };
-  }, [isSignedIn, starCount]);
+  }, [isSignedIn, solvedCount]);
 
-  const isMeInTop = board?.top.some((row) => row.isMe);
+  const rest = board?.top.filter((row) => row.rank > 3) ?? [];
+  const isMeListed = board?.top.some((row) => row.isMe);
+  const lumiLine = board?.me ? `You’re #${board.me.rank} this week. Keep shining!` : 'Who will shine brightest this week?';
 
   return (
     <div className={styles.page}>
       <ScreenHeader title="Top players" />
-      <main className={styles.main}>
-        <div className={styles.keeper}>
-          <Lumi mood="excited" size={56} line="Who will shine brightest this week?" />
+      <main className={styles.arena}>
+        <Bunting />
+        <div className={styles.host}>
+          <Lumi mood="excited" size={52} line={lumiLine} />
         </div>
-
-        <Panel className={styles.rules}>
-          <h2 className="game-title">This week</h2>
-          <p>
-            Earn <strong>+{WEEKLY_POINTS.perNewStar}</strong> for every new star and <strong>+{WEEKLY_POINTS.perDaily}</strong> for each daily puzzle.
-            {board && <> The week resets {timeUntil(board.endsAt)} (Monday, 00:00 UTC).</>}
-          </p>
-          <ul className={styles.prizes} aria-label="Rewards">
-            {PODIUM.map((reward) => (
-              <li key={reward.rank} className={`${styles.prize} ${styles[`place${reward.rank}`]}`}>
-                <span className={`game-title ${styles.prizeRank}`}>#{reward.rank}</span>
-                <span>
-                  <Icon name="diamond" size={14} /> {reward.diamonds}
-                </span>
-                <span>
-                  <Icon name="spark" size={14} /> {reward.sparks}
-                </span>
-              </li>
-            ))}
-            <li className={styles.prize}>
-              <span className={`game-title ${styles.prizeRank}`}>#4–10</span>
-              <span>
-                <Icon name="spark" size={14} /> {SPARKS_FOR_TOP_TEN}
-              </span>
-            </li>
-          </ul>
-        </Panel>
-
-        {!isSignedIn && (
-          <Panel className={styles.join}>
-            <Icon name="user" size={20} />
-            <p>
-              <a href="#/settings">Sign in with Google</a> to join the board. You appear under a fun nickname, never your real name.
-            </p>
-          </Panel>
-        )}
 
         {error && <p className={styles.empty}>{error}</p>}
         {!board && !error && <p className={styles.empty}>Loading the board…</p>}
-        {board && board.top.length === 0 && <p className={styles.empty}>No one has scored yet this week. Be the first!</p>}
-        {board && board.top.length > 0 && (
-          <ol className={styles.list} aria-label="This week's top players">
-            {board.top.map((row) => (
-              <RankRow key={row.rank} row={row} />
-            ))}
-          </ol>
-        )}
-        {board?.me && !isMeInTop && (
-          <ol className={styles.list} aria-label="Your place">
-            <RankRow row={{ ...board.me, isMe: true }} />
-          </ol>
-        )}
-        {isSignedIn && board?.myNickname && !board.me && (
-          <p className={styles.empty}>
-            You’re <strong>{board.myNickname}</strong>. Earn a star to get on the board!
-          </p>
-        )}
+        {board && <Podium top={board.top} />}
+
+        <div className={styles.below}>
+          {rest.length > 0 && (
+            <ol className={styles.list} aria-label="Places 4 and below">
+              {rest.map((row) => (
+                <RankRow key={row.rank} row={row} />
+              ))}
+            </ol>
+          )}
+          {board?.me && !isMeListed && (
+            <ol className={styles.list} aria-label="Your place">
+              <RankRow row={{ ...board.me, isMe: true }} />
+            </ol>
+          )}
+          {isSignedIn && board?.myNickname && !board.me && (
+            <p className={styles.empty}>
+              You’re <strong>{board.myNickname}</strong>. Earn a star to get on the board!
+            </p>
+          )}
+
+          {!isSignedIn && (
+            <div className={styles.note}>
+              <p className={styles.noteRow}>
+                <Icon name="user" size={20} />
+                <span>
+                  <a href="#/settings">Sign in with Google</a> to join. You appear under a fun nickname, never your real name.
+                </span>
+              </p>
+            </div>
+          )}
+
+          <div className={styles.note}>
+            <h2 className="game-title">How points work</h2>
+            <ul className={styles.rules}>
+              <li>
+                <Icon name="star" size={16} /> +{WEEKLY_POINTS.perNewStar} for every new star
+              </li>
+              <li>
+                <Icon name="calendar" size={16} /> +{WEEKLY_POINTS.perDaily} for each daily puzzle
+              </li>
+              <li>
+                <Icon name="spark" size={16} /> Places 4–10 win {SPARKS_FOR_TOP_TEN} sparks
+              </li>
+              {board && (
+                <li>
+                  <Icon name="restart" size={16} /> New week {timeUntil(board.endsAt)} (Monday, 00:00 UTC)
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
       </main>
       <BottomNav active="top" />
     </div>

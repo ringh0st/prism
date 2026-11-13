@@ -232,3 +232,13 @@ test('weekly rewards in the database match the game catalog', async () => {
   }
   assert.equal(rewardInSql(11), null);
 });
+
+test('player titles and finished worlds', async () => {
+  const { titleFor, finishedWorldCount } = await import('./titles.js');
+  assert.equal(titleFor(0).current.name, 'Spark Scout');
+  assert.equal(titleFor(45).current.name, 'Beam Bender');
+  assert.equal(titleFor(75).progress, 0.5);
+  assert.equal(titleFor(3000).next, null);
+  const levels = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`w1-${String(i + 1).padStart(2, '0')}`, { stars: 1 }]));
+  assert.equal(finishedWorldCount({ ...levels, 'w2-01': { stars: 3 } }), 1);
+});

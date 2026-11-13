@@ -1,0 +1,169 @@
+/* A player card: a colored banner, a round avatar overlapping it, your title and your stats. */
+.card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  overflow: hidden;
+  padding: 0 var(--space-4) var(--space-5);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+}
+
+.banner {
+  justify-self: stretch;
+  height: 84px;
+  margin: 0 calc(-1 * var(--space-4));
+  background:
+    radial-gradient(circle at 18% 30%, rgba(255, 255, 255, 0.35) 0 14px, transparent 15px),
+    radial-gradient(circle at 82% 60%, rgba(255, 255, 255, 0.25) 0 22px, transparent 23px),
+    radial-gradient(circle at 60% 15%, rgba(255, 255, 255, 0.2) 0 8px, transparent 9px),
+    var(--color-sage);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  margin-top: -54px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--surface-tonal);
+  box-shadow: 0 0 0 5px var(--surface-raised), var(--shadow-md);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.name {
+  font-size: 26px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.nickname {
+  margin-top: -4px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.title {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.titleChip {
+  padding: 4px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 18px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: var(--shadow-sm);
+}
+
+.track {
+  width: 100%;
+  height: 12px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-honey);
+  transition: width 600ms var(--ease-out);
+}
+
+.nextTitle {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.nextTitle strong {
+  color: var(--text-strong);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  width: 100%;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  text-align: left;
+  background: var(--surface-tonal);
+}
+
+.statIcon {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+}
+
+.honey {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.sage {
+  color: var(--action-label);
+  background: var(--action-bottom);
+}
+
+.peach {
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+}
+
+.terracotta {
+  color: var(--alert-label);
+  background: var(--alert-bottom);
+}
+
+.statValue {
+  font-size: 22px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.statNote {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--text-calm);
+}
