@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
+<meta name="theme-color" content="#FFF8EF" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Prism – a light-bending puzzle game</title>
 <meta name="description" content="Prism is a free puzzle game for all ages. Rotate mirrors and crystals to bend beams of light and light up every gem." />
@@ -15,30 +16,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #fff7fb; --bg2: #f3edff; --ink: #24183f; --muted: #6c6186;
-    --card: rgba(255,255,255,.7); --line: rgba(255,255,255,.95); --shadow: rgba(90,40,140,.18);
-    --a: #ffb36b; --b: #ff5fa2; --c: #8a5cff;
+    --bg: #FFF8EF; --bg2: #FFEFDC; --ink: #2B2118; --muted: #74645A;
+    --card: rgba(255,255,255,.72); --line: rgba(255,255,255,.95); --shadow: rgba(140,70,20,.18);
+    --a: #FFB000; --b: #FF9F1C; --c: #FF6B5B;
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #140e22; --bg2: #1e1433; --ink: #f5efff; --muted: #b0a5c9;
-      --card: rgba(44,32,72,.6); --line: rgba(255,255,255,.12); --shadow: rgba(0,0,0,.5);
+      --bg: #1E1714; --bg2: #2A1E17; --ink: #FFF4E8; --muted: #C9B5A5;
+      --card: rgba(60,42,32,.6); --line: rgba(255,255,255,.12); --shadow: rgba(0,0,0,.5);
       color-scheme: dark;
     }
   }
   * { box-sizing: border-box; }
   body {
     margin: 0; color: var(--ink); font: 17px/1.6 'DM Sans', system-ui, sans-serif;
-    background: radial-gradient(1200px 700px at 10% -10%, #ffd9b8 0, transparent 60%),
-                radial-gradient(1000px 700px at 110% 10%, #ffc4e0 0, transparent 55%),
+    background: radial-gradient(1200px 700px at 10% -10%, #FFE08A 0, transparent 60%),
+                radial-gradient(1000px 700px at 110% 10%, #FFC9B8 0, transparent 55%),
                 linear-gradient(180deg, var(--bg), var(--bg2));
     min-height: 100vh;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) body {
-      background: radial-gradient(1200px 700px at 10% -10%, #4a2341 0, transparent 60%),
-                  radial-gradient(1000px 700px at 110% 10%, #3a1f5e 0, transparent 55%),
+      background: radial-gradient(1200px 700px at 10% -10%, #4A3010 0, transparent 60%),
+                  radial-gradient(1000px 700px at 110% 10%, #4A1F18 0, transparent 55%),
                   linear-gradient(180deg, var(--bg), var(--bg2));
     }
   }
@@ -56,7 +57,7 @@
   .lead { font-size: clamp(18px, 2.4vw, 21px); color: var(--muted); margin: 0 0 28px; max-width: 34ch; }
   .cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   .btn { display: inline-block; padding: 14px 28px; border-radius: 999px; font: 600 19px 'Fredoka', sans-serif; text-decoration: none;
-         color: #fff; background: linear-gradient(180deg, #a879ff, var(--c)); box-shadow: 0 6px 0 #6a3fd8, 0 14px 24px -10px rgba(106,63,216,.7); }
+         color: #fff; background: linear-gradient(180deg, #FF8A7A, var(--c)); box-shadow: 0 6px 0 #D9483A, 0 14px 24px -10px rgba(217,72,58,.6); }
   .btn.soon { opacity: .9; cursor: default; }
   .note { color: var(--muted); font-size: 14px; }
   .hero-art { display: grid; place-items: center; }
