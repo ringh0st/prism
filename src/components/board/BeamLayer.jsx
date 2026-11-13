@@ -3,7 +3,7 @@ import { beamColorVar } from '../GemShape.jsx';
 import styles from './Board.module.css';
 
 /** Glowing light beams drawn under the tiles. Coordinates are in cell units. */
-function BeamLayer({ width, height, segments }) {
+function BeamLayer({ width, height, segments, ghostSegments = null }) {
   return (
     <svg className={styles.beams} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" aria-hidden="true">
       <defs>
@@ -11,6 +11,21 @@ function BeamLayer({ width, height, segments }) {
           <feGaussianBlur stdDeviation="0.12" />
         </filter>
       </defs>
+      {ghostSegments?.map((segment, i) => (
+        <line
+          key={`ghost-${i}`}
+          className={styles.ghostBeam}
+          x1={segment.x1 + 0.5}
+          y1={segment.y1 + 0.5}
+          x2={segment.x2 + 0.5}
+          y2={segment.y2 + 0.5}
+          stroke="#fff"
+          strokeWidth="0.1"
+          strokeLinecap="round"
+          strokeDasharray="0.02 0.14"
+          style={{ '--ghost-color': beamColorVar(segment.color) }}
+        />
+      ))}
       {segments.map((segment, i) => {
         const points = {
           x1: segment.x1 + 0.5,

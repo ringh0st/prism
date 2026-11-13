@@ -1,14 +1,26 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from './AuthContext.jsx';
 import { readJson, removeKey, writeJson } from '../lib/storage.js';
-import { fetchRemoteProgress, saveRemoteProgress } from '../lib/remoteProgress.js';
 import {
+  buyStoreItemOnServer,
+  consumeHelperOnServer,
+  fetchEconomyState,
+  fetchRemoteLevels,
+  mergeGuestProgress,
+  recordDailyOnServer,
+  recordLevelResultOnServer,
+  saveBeamTheme,
+} from '../lib/economyApi.js';
+import {
+  buyStoreItemLocally,
+  consumeHelperLocally,
   createEmptyProgress,
-  mergeProgress,
   recordDailyResult,
   recordLevelResult,
-  spendSparks,
+  upgradeProgress,
+  withServerState,
 } from '../game/progress.js';
+import { todayKey } from '../game/daily.js';
 import { sfx } from '../audio/sfx.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
@@ -17,10 +29,15 @@ const DEFAULT_SETTINGS = { sound: true, haptics: true };
 
 const PlayerContext = createContext(null);
 
+/**
+ * Player progress and wallet.
+ * Guests: everything lives on the device. Signed in: the server is the source of truth for
+ * sparks, diamonds and helpers; the device keeps a copy for instant display and offline play.
+ */
 export function PlayerProvider({ children }) {
   const { user } = useAuth();
   const userId = user?.id ?? null;
-  const [progress, setProgressState] = useState(() => ({ ...createEmptyProgress(), ...readJson(PROGRESS_KEY, {}) }));
+  const [progress, setProgressState] = useState(() => upgradeProgress(readJson(PROGRESS_KEY, {})));
   const [settings, setSettings] = useState(() => ({ ...DEFAULT_SETTINGS, ...readJson(SETTINGS_KEY, {}) }));
   const [syncStatus, setSyncStatus] = useState('local'); // local | syncing | synced | error
   const progressRef = useRef(progress);
@@ -31,82 +48,111 @@ export function PlayerProvider({ children }) {
     writeJson(PROGRESS_KEY, next);
   }, []);
 
+  const applyServerState = useCallback(
+    (state) => setProgress(withServerState(progressRef.current, state, todayKey())),
+    [setProgress],
+  );
+
   useEffect(() => {
     writeJson(SETTINGS_KEY, settings);
     sfx.configure(settings);
   }, [settings]);
 
-  const pushRemote = useCallback(
-    (next, levelIds) => {
-      if (!userId) return;
-      saveRemoteProgress(userId, next, levelIds)
-        .then(() => setSyncStatus('synced'))
-        .catch(() => setSyncStatus('error'));
-    },
-    [userId],
-  );
-
-  // Signing in merges guest progress into the account, keeping the best of both.
-  useEffect(() => {
-    if (!userId) {
-      setSyncStatus('local');
-      return undefined;
-    }
-    let isCancelled = false;
+  // Signing in moves guest stars into the account, then loads the account.
+  const syncWithServer = useCallback(async () => {
+    if (!userId) return;
     setSyncStatus('syncing');
-    fetchRemoteProgress(userId)
-      .then((remote) => {
-        if (isCancelled) return;
-        const merged = mergeProgress(progressRef.current, remote);
-        setProgress(merged);
-        return saveRemoteProgress(userId, merged).then(() => !isCancelled && setSyncStatus('synced'));
-      })
-      .catch(() => !isCancelled && setSyncStatus('error'));
-    return () => {
-      isCancelled = true;
-    };
+    try {
+      const local = progressRef.current.levels;
+      const state = Object.keys(local).length ? await mergeGuestProgress(local) : await fetchEconomyState();
+      const levels = await fetchRemoteLevels(userId);
+      setProgress({ ...withServerState(progressRef.current, state, todayKey()), levels });
+      setSyncStatus('synced');
+    } catch {
+      setSyncStatus('error');
+    }
   }, [userId, setProgress]);
+
+  useEffect(() => {
+    if (userId) syncWithServer();
+    else setSyncStatus('local');
+  }, [userId, syncWithServer]);
 
   const value = useMemo(
     () => ({
       progress,
       settings,
       syncStatus,
-      finishLevel(level, result) {
-        const outcome = recordLevelResult(progressRef.current, level, result);
-        setProgress(outcome.progress);
-        pushRemote(outcome.progress, [level.id]);
-        return outcome;
-      },
-      finishDaily(dateKey) {
-        const outcome = recordDailyResult(progressRef.current, dateKey);
-        if (outcome.isFirstToday) {
-          setProgress(outcome.progress);
-          pushRemote(outcome.progress, []);
+      isSignedIn: Boolean(userId),
+      refresh: syncWithServer,
+
+      /** @returns Promise<{ stars, previousStars, sparksEarned, diamondsEarned, isNewBest }> */
+      async finishLevel(level, result) {
+        const local = recordLevelResult(progressRef.current, level, result);
+        setProgress(local.progress);
+        if (!userId) return { ...local, diamondsEarned: 0 };
+        try {
+          const state = await recordLevelResultOnServer(level.id, local.stars, result.moves);
+          applyServerState(state);
+          setSyncStatus('synced');
+          return { ...local, sparksEarned: state.sparksEarned, diamondsEarned: state.diamondsEarned };
+        } catch {
+          // Stars are kept on the device and sent again on the next sync.
+          setSyncStatus('error');
+          return { ...local, diamondsEarned: 0 };
         }
-        return outcome;
       },
-      trySpendSparks(amount) {
-        const next = spendSparks(progressRef.current, amount);
-        if (!next) return false;
-        setProgress(next);
-        pushRemote(next, []);
-        return true;
+
+      /** @returns Promise<{ sparksEarned, diamondsEarned, streak, isFirstToday }> */
+      async finishDaily(dateKey) {
+        if (!userId) {
+          const outcome = recordDailyResult(progressRef.current, dateKey);
+          if (outcome.isFirstToday) setProgress(outcome.progress);
+          return outcome;
+        }
+        try {
+          const state = await recordDailyOnServer(dateKey);
+          applyServerState(state);
+          return state;
+        } catch {
+          setSyncStatus('error');
+          return { sparksEarned: 0, diamondsEarned: 0, streak: progressRef.current.daily.streak, isFirstToday: false };
+        }
       },
+
+      /** @throws EconomyError with a player-facing message */
+      async buyItem(itemId, currency) {
+        if (!userId) {
+          setProgress(buyStoreItemLocally(progressRef.current, itemId, currency, todayKey()));
+          return;
+        }
+        applyServerState(await buyStoreItemOnServer(itemId, currency));
+      },
+
+      /** @throws EconomyError when none are left */
+      async consumeHelper(helperId) {
+        if (!userId) {
+          setProgress(consumeHelperLocally(progressRef.current, helperId));
+          return;
+        }
+        applyServerState(await consumeHelperOnServer(helperId));
+      },
+
       setBeamTheme(themeId) {
-        const next = { ...progressRef.current, beamTheme: themeId };
-        setProgress(next);
-        pushRemote(next, []);
+        setProgress({ ...progressRef.current, beamTheme: themeId });
+        if (userId) saveBeamTheme(userId, themeId).catch(() => setSyncStatus('error'));
       },
+
       updateSettings(patch) {
         setSettings((current) => ({ ...current, ...patch }));
       },
+
       resetLocalProgress() {
         removeKey(PROGRESS_KEY);
         setProgress(createEmptyProgress());
       },
     }),
-    [progress, settings, syncStatus, setProgress, pushRemote],
+    [progress, settings, syncStatus, userId, setProgress, applyServerState, syncWithServer],
   );
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;

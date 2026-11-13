@@ -1,0 +1,9 @@
+# Minimal Supabase CLI config, used by the "Deploy Supabase functions" workflow.
+project_id = "prism"
+
+[functions.create-checkout]
+verify_jwt = true
+
+# Payment providers can't send a Supabase login token; the function checks the webhook signature instead.
+[functions.lemonsqueezy-webhook]
+verify_jwt = false

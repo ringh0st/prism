@@ -6,7 +6,7 @@ import Icon from '../components/Icon.jsx';
 import { useAuth } from '../state/AuthContext.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
 import { BEAM_THEMES, totalStars } from '../game/progress.js';
-import { PRIVACY_URL, HOME_PAGE_URL } from '../lib/config.js';
+import { PRIVACY_URL, HOME_PAGE_URL, TERMS_URL } from '../lib/config.js';
 import styles from './SettingsScreen.module.css';
 
 const SYNC_LABELS = {
@@ -189,6 +189,7 @@ export default function SettingsScreen() {
           <p className={styles.links}>
             <a href={HOME_PAGE_URL}>About Prism</a>
             <a href={PRIVACY_URL}>Privacy Policy</a>
+            <a href={TERMS_URL}>Terms & refunds</a>
           </p>
         </section>
       </main>

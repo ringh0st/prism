@@ -1,14 +1,23 @@
 import { useCallback, useMemo, useState } from 'react';
 import { traceBeams } from '../game/beam.js';
-import { findHint } from '../game/solver.js';
+import { findHint, nearestSolution } from '../game/solver.js';
+import { starCapForHelpers } from '../game/catalog.js';
 
 const initialState = (level) => {
   const orients = level.tiles.map((tile) => tile.orient ?? 0);
-  return { orients, turns: orients.slice(), moves: 0, usedHint: false, hintTile: null };
+  return { orients, turns: orients.slice(), moves: 0, usedHelpers: [], hintTile: null, ghostSegments: null };
+};
+
+const rotated = (s, tileIndex) => {
+  const orients = s.orients.slice();
+  const turns = s.turns.slice();
+  orients[tileIndex] ^= 1;
+  turns[tileIndex] += 1;
+  return { ...s, orients, turns, moves: s.moves + 1, hintTile: s.hintTile === tileIndex ? null : s.hintTile };
 };
 
 /**
- * Play state for one level: orientations, move count, hints, and the live beam trace.
+ * Play state for one level: orientations, moves, helpers, and the live beam trace.
  * Re-keys itself when the level changes.
  */
 export function usePuzzle(level) {
@@ -18,24 +27,45 @@ export function usePuzzle(level) {
 
   const trace = useMemo(() => traceBeams(level, current.orients), [level, current.orients]);
 
-  const rotate = useCallback((tileIndex) => {
-    setState((s) => {
-      const orients = s.orients.slice();
-      const turns = s.turns.slice();
-      orients[tileIndex] ^= 1;
-      turns[tileIndex] += 1;
-      return { ...s, orients, turns, moves: s.moves + 1, hintTile: s.hintTile === tileIndex ? null : s.hintTile };
-    });
-  }, []);
+  const rotate = useCallback((tileIndex) => setState((s) => rotated(s, tileIndex)), []);
 
   const restart = useCallback(() => setState({ levelId: level.id, ...initialState(level) }), [level]);
 
-  /** Returns the hinted tile index, or null if no hint is available. */
-  const revealHint = useCallback(() => {
-    const tileIndex = findHint(level, current.orients);
-    if (tileIndex !== null) setState((s) => ({ ...s, usedHint: true, hintTile: tileIndex }));
-    return tileIndex;
-  }, [level, current.orients]);
+  /**
+   * Apply a helper's effect to the board. Skip is handled by the screen.
+   * @returns true if the helper did something
+   */
+  const applyHelper = useCallback(
+    (helperId) => {
+      const markUsed = (s, patch = {}) => ({ ...s, ...patch, usedHelpers: [...s.usedHelpers, helperId] });
+      if (helperId === 'skip') {
+        setState((s) => markUsed(s));
+        return true;
+      }
+      if (helperId === 'lens') {
+        const target = nearestSolution(level, current.orients);
+        if (!target) return false;
+        setState((s) => markUsed(s, { ghostSegments: traceBeams(level, target).segments }));
+        return true;
+      }
+      const tileIndex = findHint(level, current.orients);
+      if (tileIndex === null) return false;
+      if (helperId === 'hint') setState((s) => markUsed(s, { hintTile: tileIndex }));
+      if (helperId === 'autoturn') setState((s) => markUsed(rotated(s, tileIndex)));
+      return true;
+    },
+    [level, current.orients],
+  );
 
-  return { ...current, trace, rotate, restart, revealHint };
+  const clearGhost = useCallback(() => setState((s) => ({ ...s, ghostSegments: null })), []);
+
+  return {
+    ...current,
+    trace,
+    starCap: starCapForHelpers(current.usedHelpers),
+    rotate,
+    restart,
+    applyHelper,
+    clearGhost,
+  };
 }

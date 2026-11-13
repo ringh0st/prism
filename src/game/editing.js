@@ -1,5 +1,5 @@
 import { BEAM_COLOR_NAMES, DIRECTION_NAMES, DIFFICULTY, LEVEL_SCHEMA_VERSION, TILE } from './constants.js';
-import { analyzeLevel } from './solver.js';
+import { analyzeLevel, nearestSolution } from './solver.js';
 import { traceBeams } from './beam.js';
 
 const withTiles = (level, tiles) => ({ ...level, tiles });
@@ -77,16 +77,9 @@ export function resizeLevel(level, width, height) {
 
 /** Rotate pieces into the solution closest to the current position. */
 export function applyNearestSolution(level) {
-  const analysis = analyzeLevel(level);
-  if (!analysis.isSolvable) return level;
-  const start = analysis.rotatable.reduce((mask, i, bit) => mask | ((level.tiles[i].orient & 1) << bit), 0);
-  const popcount = (n) => n.toString(2).replace(/0/g, '').length;
-  const best = analysis.solutionMasks.reduce((a, b) => (popcount(a ^ start) <= popcount(b ^ start) ? a : b));
-  const tiles = level.tiles.map((t) => ({ ...t }));
-  analysis.rotatable.forEach((i, bit) => {
-    tiles[i].orient = (best >> bit) & 1;
-  });
-  return withTiles(level, tiles);
+  const target = nearestSolution(level, level.tiles.map((t) => t.orient ?? 0));
+  if (!target) return level;
+  return withTiles(level, level.tiles.map((tile, i) => (target[i] === (tile.orient ?? 0) ? tile : { ...tile, orient: target[i] })));
 }
 
 /**

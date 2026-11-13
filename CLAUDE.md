@@ -14,6 +14,13 @@ Prism is a light-bending puzzle game: rotate mirrors and crystals to steer beams
 - **Responsive and accessible:** phone-first, and works on tablet and desktop too. Full keyboard support, screen-reader labels, visible focus, good color contrast, reduced-motion support, and color is never the only signal (use shapes and symbols too).
 - **Code quality:** best practices, reusable components and modules, consistent naming, small focused files, no dead code.
 
+## Economy (see src/game/catalog.js and supabase/economy.sql)
+
+- **Sparks** are earned by playing. **Diamonds** are premium: earned by finishing a world, 3-starring a world or every 7-day streak, or bought with real money (Lemon Squeezy, see PAYMENTS.md). Diamonds always require an account.
+- **Helpers:** Hint, Lens, Auto-turn and Skip. They are capped so buying isn't a shortcut through the game: max 5 held per helper, 3 helpers bought with sparks per day, a per-attempt limit by difficulty (3/2/1), and star caps (Hint/Lens → 2★, Auto-turn/Skip → 1★). Sparks can never become diamonds.
+- For signed-in players the **server is the source of truth**: every currency change goes through a `security definer` function in `supabase/economy.sql`, never a direct table write. Prices exist in both `catalog.js` and `economy.sql`; a test keeps them in sync.
+- All-ages fairness: no loot boxes or random rewards, no fake timers or pressure tactics, clear prices, and an "ask a parent" note wherever money is involved.
+
 ## Brand palette
 
 | Token | Hex | Use |
@@ -33,4 +40,4 @@ Prism is a light-bending puzzle game: rotate mirrors and crystals to steer beams
 - Hooks: `useSomething.js`. Pure game logic (beam tracing, level validation, scoring) lives in `src/game/` with no React or DOM, so it can be unit tested.
 - Names describe intent: `traceBeam`, `isLevelSolved`, `starsForMoves`, not `doStuff` or `helper`.
 - Level data is versioned JSON validated by one schema shared by the game and the editor.
-- Never commit secrets. Only the Supabase URL and publishable (anon) key may appear in client code.
+- Never commit secrets. Only the Supabase URL and publishable (anon) key may appear in client code. Payment keys live in GitHub secrets and Supabase function secrets.

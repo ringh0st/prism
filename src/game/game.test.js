@@ -80,7 +80,6 @@ test('stars and sparks', () => {
   assert.equal(starsForMoves(3, 3), 3);
   assert.equal(starsForMoves(5, 3), 2);
   assert.equal(starsForMoves(9, 3), 1);
-  assert.equal(starsForMoves(3, 3, { usedHint: true }), 2);
   assert.equal(sparksForNewStars(1, 3, 'hard'), 20);
   assert.equal(sparksForNewStars(3, 2), 0);
 });
@@ -104,14 +103,15 @@ test('the generator produces a valid level for an easy preset', () => {
   assert.equal(levelId(1, 2), 'w1-02');
 });
 
-test('progress: results, sparks, daily streak and merging', async () => {
-  const { createEmptyProgress, recordLevelResult, recordDailyResult, mergeProgress, totalStars } = await import('./progress.js');
+test('progress: results, sparks, daily streak, helpers and guest store', async () => {
+  const { createEmptyProgress, recordLevelResult, recordDailyResult, totalStars, buyStoreItemLocally, consumeHelperLocally, EconomyError } =
+    await import('./progress.js');
   const level = { id: 'w1-01', par: 2, difficulty: 'normal' };
   let progress = createEmptyProgress();
-  const first = recordLevelResult(progress, level, { moves: 4, usedHint: false });
+  const first = recordLevelResult(progress, level, { moves: 4 });
   assert.equal(first.stars, 2);
   assert.equal(first.sparksEarned, 10);
-  const second = recordLevelResult(first.progress, level, { moves: 2, usedHint: false });
+  const second = recordLevelResult(first.progress, level, { moves: 2 });
   assert.equal(second.sparksEarned, 5);
   assert.equal(totalStars(second.progress), 3);
   progress = second.progress;
@@ -122,11 +122,24 @@ test('progress: results, sparks, daily streak and merging', async () => {
   assert.equal(recordDailyResult(day2.progress, '2026-11-13').sparksEarned, 0);
   assert.equal(recordDailyResult(day2.progress, '2026-11-15').streak, 1);
 
-  const remote = { ...createEmptyProgress(), sparks: 99, levels: { 'w1-01': { stars: 1, bestMoves: 1 }, 'w1-02': { stars: 2, bestMoves: 5 } } };
-  const merged = mergeProgress(progress, remote);
-  assert.deepEqual(merged.levels['w1-01'], { stars: 3, bestMoves: 1 });
-  assert.equal(merged.levels['w1-02'].stars, 2);
-  assert.equal(merged.sparks, 99);
+  // Helper star caps and Skip
+  assert.equal(recordLevelResult(createEmptyProgress(), level, { moves: 2, starCap: 1 }).stars, 1);
+  const skipped = recordLevelResult(createEmptyProgress(), level, { moves: null, forcedStars: 1 });
+  assert.equal(skipped.stars, 1);
+  assert.equal(skipped.progress.levels['w1-01'].bestMoves, null);
+
+  // Guest store rules: daily limit, inventory cap, diamonds need an account
+  let wallet = { ...createEmptyProgress(), sparks: 1000 };
+  const today = '2026-11-13';
+  for (let i = 0; i < 3; i++) wallet = buyStoreItemLocally(wallet, 'hint', 'sparks', today);
+  assert.equal(wallet.helpers.hint, 4);
+  assert.throws(() => buyStoreItemLocally(wallet, 'hint', 'sparks', today), EconomyError);
+  wallet = buyStoreItemLocally(wallet, 'hint', 'sparks', '2026-11-14');
+  assert.equal(wallet.helpers.hint, 5);
+  assert.throws(() => buyStoreItemLocally(wallet, 'hint', 'sparks', '2026-11-15'), /maximum/);
+  assert.throws(() => buyStoreItemLocally(wallet, 'skip', 'diamonds', today), /Sign in/);
+  assert.equal(consumeHelperLocally(wallet, 'hint').helpers.hint, 4);
+  assert.throws(() => consumeHelperLocally(createEmptyProgress(), 'skip'), EconomyError);
 });
 
 test('editor helpers place, cycle, lock, resize and scramble', async () => {
@@ -147,4 +160,23 @@ test('editor helpers place, cycle, lock, resize and scramble', async () => {
   assert.equal(traceBeams(applyNearestSolution(scrambled)).isSolved, true);
   assert.equal(resizeLevel(level, 3, 3).tiles.length, 2);
   assert.equal(removeTileAt(level, 2, 3).tiles.length, 2);
+});
+
+test('store prices in the database match the game catalog', async () => {
+  const { STORE_ITEMS, DIAMOND_PACKS } = await import('./catalog.js');
+  const sql = readFileSync(new URL('../../supabase/economy.sql', import.meta.url), 'utf8');
+  for (const item of STORE_ITEMS) {
+    const row = sql.match(new RegExp(`\\('${item.id}', '(\\w+)', (\\w+), (\\w+), (?:'(\\w+)'|null), (\\d+), (\\d+)\\)`));
+    assert.ok(row, `${item.id} missing from economy.sql`);
+    const [, kind, sparks, diamonds, helper, quantity, grantSparks] = row;
+    assert.equal(kind, item.kind, item.id);
+    assert.equal(sparks === 'null' ? undefined : Number(sparks), item.price.sparks, `${item.id} spark price`);
+    assert.equal(diamonds === 'null' ? undefined : Number(diamonds), item.price.diamonds, `${item.id} diamond price`);
+    assert.equal(helper, item.grants.helper, item.id);
+    assert.equal(Number(quantity), item.grants.quantity ?? 0, item.id);
+    assert.equal(Number(grantSparks), item.grants.sparks ?? 0, item.id);
+  }
+  for (const pack of DIAMOND_PACKS) {
+    assert.match(sql, new RegExp(`\\('${pack.id}', ${pack.diamonds + pack.bonus}\\)`), `${pack.id} diamonds`);
+  }
 });

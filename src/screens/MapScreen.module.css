@@ -175,6 +175,11 @@
   --world-b: var(--color-mint-deep);
 }
 
+.ember {
+  --world-a: var(--color-coral);
+  --world-b: #8a2a14;
+}
+
 .worldHeader {
   display: flex;
   align-items: flex-start;

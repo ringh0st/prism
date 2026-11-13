@@ -1,5 +1,5 @@
 .screen {
-  --board-reserved: 300px;
+  --board-reserved: 360px;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -117,18 +117,22 @@
 }
 
 .actions {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
   gap: var(--space-3);
+  padding-top: var(--space-1);
 }
 
-.cost {
-  margin-left: 2px;
-  padding: 1px 8px;
-  border-radius: var(--radius-pill);
-  font-size: 13px;
-  color: #6b4500;
-  background: var(--color-sunshine);
+.dialogText {
+  margin-bottom: var(--space-5);
+  color: var(--text-soft);
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
 }
 
 .message {

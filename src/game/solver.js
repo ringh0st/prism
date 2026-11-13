@@ -28,7 +28,7 @@ export function analyzeLevel(level, startOrients = level.tiles.map((t) => t.orie
 
   const cells = buildCellIndex(level);
   const orients = startOrients.slice();
-  const startMask = rotatable.reduce((mask, tileIndex, bit) => mask | ((startOrients[tileIndex] & 1) << bit), 0);
+  const startMask = maskOf(rotatable, startOrients);
   const solutionMasks = [];
   let par = Infinity;
 
@@ -52,20 +52,33 @@ export function analyzeLevel(level, startOrients = level.tiles.map((t) => t.orie
   };
 }
 
+function maskOf(rotatable, orients) {
+  return rotatable.reduce((mask, tileIndex, bit) => mask | ((orients[tileIndex] & 1) << bit), 0);
+}
+
+/**
+ * The solved orientations closest to the current position (fewest taps away).
+ * @returns orients array, or null if the level can't be solved
+ */
+export function nearestSolution(level, currentOrients) {
+  const { isSolvable, solutionMasks, rotatable } = analyzeLevel(level, currentOrients);
+  if (!isSolvable) return null;
+  const currentMask = maskOf(rotatable, currentOrients);
+  const best = solutionMasks.reduce((a, b) => (popcount(a ^ currentMask) <= popcount(b ^ currentMask) ? a : b));
+  const orients = currentOrients.slice();
+  rotatable.forEach((tileIndex, bit) => {
+    orients[tileIndex] = (best >> bit) & 1;
+  });
+  return orients;
+}
+
 /**
  * Suggest one tile to rotate that moves the player closer to the nearest solution.
  * @returns tile index, or null if already solved / unsolvable
  */
 export function findHint(level, currentOrients) {
-  const { isSolvable, solutionMasks, rotatable } = analyzeLevel(level, currentOrients);
-  if (!isSolvable) return null;
-  const currentMask = rotatable.reduce((mask, tileIndex, bit) => mask | ((currentOrients[tileIndex] & 1) << bit), 0);
-  let best = null;
-  for (const mask of solutionMasks) {
-    const diff = mask ^ currentMask;
-    if (diff === 0) return null;
-    if (best === null || popcount(diff) < popcount(best)) best = diff;
-  }
-  const bit = Math.log2(best & -best);
-  return rotatable[bit];
+  const target = nearestSolution(level, currentOrients);
+  if (!target) return null;
+  const tileIndex = target.findIndex((orient, i) => orient !== currentOrients[i]);
+  return tileIndex >= 0 ? tileIndex : null;
 }

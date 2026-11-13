@@ -6,6 +6,7 @@ import { useHashRoute } from './hooks/useHashRoute.js';
 import MapScreen from './screens/MapScreen.jsx';
 import PlayScreen from './screens/PlayScreen.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
+import StoreScreen from './screens/StoreScreen.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
 import { BEAM_THEMES } from './game/progress.js';
@@ -50,6 +51,8 @@ function Routes() {
       );
     case 'settings':
       return <SettingsScreen />;
+    case 'store':
+      return <StoreScreen isReturningFromCheckout={route.params[0] === 'thanks'} />;
     case 'admin':
       return (
         <Suspense fallback={<p style={{ padding: 24 }}>Loading editor…</p>}>

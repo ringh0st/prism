@@ -1,0 +1,14 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.price {
+  min-width: 74px;
+  font-variant-numeric: tabular-nums;
+}
+
+.spark {
+  color: var(--color-tangerine);
+}

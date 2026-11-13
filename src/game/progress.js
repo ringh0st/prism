@@ -1,5 +1,6 @@
 import { sparksForDaily, sparksForNewStars, starsForMoves, STARTING_SPARKS } from './scoring.js';
 import { isYesterday } from './daily.js';
+import { DAILY_SPARK_PURCHASE_LIMIT, HELPER_IDS, INVENTORY_CAP, storeItem } from './catalog.js';
 
 export const BEAM_THEMES = [
   { id: 'sunbeam', name: 'Sunbeam', color: '#FFD23F', starsToUnlock: 0 },
@@ -8,29 +9,49 @@ export const BEAM_THEMES = [
   { id: 'blossom', name: 'Blossom', color: '#FF7EA6', starsToUnlock: 100 },
 ];
 
+/** Every new player starts with one Hint and one Lens to discover helpers. */
+export const STARTER_HELPERS = { hint: 1, lens: 1, autoturn: 0, skip: 0 };
+
+/** A friendly, player-facing economy error (not enough sparks, limit reached…). */
+export class EconomyError extends Error {}
+
 export function createEmptyProgress() {
   return {
     levels: {},
     sparks: STARTING_SPARKS,
+    diamonds: 0,
+    helpers: { ...STARTER_HELPERS },
+    sparkPurchases: { date: null, count: 0 },
     daily: { streak: 0, lastDate: null },
     beamTheme: 'sunbeam',
   };
+}
+
+/** Fill in fields added after a player's progress was first saved. */
+export function upgradeProgress(saved) {
+  const empty = createEmptyProgress();
+  return { ...empty, ...saved, helpers: { ...empty.helpers, ...saved?.helpers } };
 }
 
 export const totalStars = (progress) => Object.values(progress.levels).reduce((sum, entry) => sum + entry.stars, 0);
 
 export const starsFor = (progress, levelId) => progress.levels[levelId]?.stars ?? 0;
 
+export const isWorldComplete = (progress, worldLevels) =>
+  worldLevels.length > 0 && worldLevels.every((level) => starsFor(progress, level.id) > 0);
+
 /**
  * Record a finished level.
+ * @param result { moves, starCap = 3, forcedStars } forcedStars is used by Skip.
  * @returns {{ progress, stars, previousStars, sparksEarned, isNewBest }}
  */
-export function recordLevelResult(progress, level, { moves, usedHint }) {
-  const stars = starsForMoves(moves, level.par, { usedHint });
+export function recordLevelResult(progress, level, { moves, starCap = 3, forcedStars = null }) {
+  const stars = forcedStars ?? Math.min(starsForMoves(moves, level.par), starCap);
   const previous = progress.levels[level.id];
   const previousStars = previous?.stars ?? 0;
   const sparksEarned = sparksForNewStars(previousStars, stars, level.difficulty);
-  const isNewBest = !previous || moves < previous.bestMoves;
+  const bestMoves = [previous?.bestMoves, moves].filter((m) => Number.isFinite(m));
+  const isNewBest = Number.isFinite(moves) && (!previous || !Number.isFinite(previous.bestMoves) || moves < previous.bestMoves);
   const next = {
     ...progress,
     sparks: progress.sparks + sparksEarned,
@@ -38,7 +59,7 @@ export function recordLevelResult(progress, level, { moves, usedHint }) {
       ...progress.levels,
       [level.id]: {
         stars: Math.max(stars, previousStars),
-        bestMoves: previous ? Math.min(previous.bestMoves, moves) : moves,
+        bestMoves: bestMoves.length ? Math.min(...bestMoves) : null,
       },
     },
   };
@@ -48,12 +69,13 @@ export function recordLevelResult(progress, level, { moves, usedHint }) {
 /** Daily puzzle: extends the streak if yesterday was played, pays out once per day. */
 export function recordDailyResult(progress, dateKey) {
   const { daily } = progress;
-  if (daily.lastDate === dateKey) return { progress, sparksEarned: 0, streak: daily.streak, isFirstToday: false };
+  if (daily.lastDate === dateKey) return { progress, sparksEarned: 0, diamondsEarned: 0, streak: daily.streak, isFirstToday: false };
   const streak = isYesterday(daily.lastDate, dateKey) ? daily.streak + 1 : 1;
   const sparksEarned = sparksForDaily(streak);
   return {
     progress: { ...progress, sparks: progress.sparks + sparksEarned, daily: { streak, lastDate: dateKey } },
     sparksEarned,
+    diamondsEarned: 0,
     streak,
     isFirstToday: true,
   };
@@ -65,25 +87,55 @@ export function currentStreak(progress, today) {
   return lastDate === today || isYesterday(lastDate, today) ? streak : 0;
 }
 
-export function spendSparks(progress, amount) {
-  if (progress.sparks < amount) return null;
-  return { ...progress, sparks: progress.sparks - amount };
+export function sparkPurchasesLeft(progress, today) {
+  const used = progress.sparkPurchases.date === today ? progress.sparkPurchases.count : 0;
+  return Math.max(0, DAILY_SPARK_PURCHASE_LIMIT - used);
 }
 
-/** Combine guest progress with an account's saved progress, keeping the best of both. */
-export function mergeProgress(local, remote) {
-  const levels = { ...remote.levels };
-  for (const [id, entry] of Object.entries(local.levels)) {
-    const other = levels[id];
-    levels[id] = other
-      ? { stars: Math.max(entry.stars, other.stars), bestMoves: Math.min(entry.bestMoves, other.bestMoves) }
-      : entry;
+/**
+ * Guest purchases (sparks only). Mirrors the server rules in supabase/economy.sql.
+ * @throws EconomyError with a player-facing message
+ */
+export function buyStoreItemLocally(progress, itemId, currency, today) {
+  const item = storeItem(itemId);
+  if (!item) throw new EconomyError('That item is not in the store.');
+  if (currency !== 'sparks') throw new EconomyError('Sign in to use diamonds.');
+  const price = item.price.sparks;
+  if (!price) throw new EconomyError('This item needs diamonds. Sign in to get diamonds.');
+  const helperId = item.grants.helper;
+  if (helperId && progress.helpers[helperId] + item.grants.quantity > INVENTORY_CAP) {
+    throw new EconomyError(`You already have the maximum of ${INVENTORY_CAP}.`);
   }
-  const newerDaily = (local.daily.lastDate ?? '') > (remote.daily.lastDate ?? '') ? local.daily : remote.daily;
+  if (item.kind === 'helper' && sparkPurchasesLeft(progress, today) === 0) {
+    throw new EconomyError('Daily limit reached: 3 helpers with sparks per day. Come back tomorrow!');
+  }
+  if (progress.sparks < price) throw new EconomyError('Not enough sparks.');
+
+  const usedToday = progress.sparkPurchases.date === today ? progress.sparkPurchases.count : 0;
   return {
-    levels,
-    sparks: Math.max(local.sparks, remote.sparks),
-    daily: newerDaily,
-    beamTheme: remote.beamTheme ?? local.beamTheme,
+    ...progress,
+    sparks: progress.sparks - price + (item.grants.sparks ?? 0),
+    helpers: helperId ? { ...progress.helpers, [helperId]: progress.helpers[helperId] + item.grants.quantity } : progress.helpers,
+    sparkPurchases: { date: today, count: usedToday + (item.kind === 'helper' ? 1 : 0) },
+  };
+}
+
+/** @throws EconomyError when the player has none left */
+export function consumeHelperLocally(progress, helperId) {
+  if (!HELPER_IDS.includes(helperId) || (progress.helpers[helperId] ?? 0) < 1) {
+    throw new EconomyError('You don’t have that helper.');
+  }
+  return { ...progress, helpers: { ...progress.helpers, [helperId]: progress.helpers[helperId] - 1 } };
+}
+
+/** Apply balances returned by the server (signed-in players). */
+export function withServerState(progress, state, today) {
+  return {
+    ...progress,
+    sparks: state.sparks,
+    diamonds: state.diamonds,
+    helpers: { ...STARTER_HELPERS, ...state.helpers },
+    daily: { streak: state.dailyStreak, lastDate: state.lastDailyDate },
+    sparkPurchases: { date: today, count: state.sparkPurchasesToday },
   };
 }

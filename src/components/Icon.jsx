@@ -47,6 +47,32 @@ const PATHS = {
       <path d="M4 21a8 8 0 0 1 16 0" />
     </>
   ),
+  lens: (
+    <>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m15.5 15.5 5 5" />
+      <path d="M7.5 9a3.5 3.5 0 0 1 3-2.5" />
+    </>
+  ),
+  wand: (
+    <>
+      <path d="m4 20 11-11" />
+      <path d="m13 7 4 4" />
+      <path d="M17 3v3M15.5 4.5h3M20 8v2M19 9h2" />
+    </>
+  ),
+  skip: (
+    <>
+      <path d="M5 5.5v13l9-6.5z" />
+      <path d="M18 5v14" />
+    </>
+  ),
+  bag: (
+    <>
+      <path d="M5 8h14l-1 12.5H6z" />
+      <path d="M9 10V7a3 3 0 0 1 6 0v3" />
+    </>
+  ),
   edit: (
     <>
       <path d="M4 20h4L19 9l-4-4L4 16z" />
@@ -64,6 +90,12 @@ const FILLED = {
     <path d="M12.5 2c.6 3.2-1.4 5-3 6.8C8 10.5 7 12.2 7 14.5a5 5 0 0 0 10 0c0-1.8-.8-3.2-1.6-4.2-.2 1.3-.9 2.2-1.9 2.6.6-3.6-.2-7.6-1-10.9z" />
   ),
   crown: <path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z" />,
+  diamond: (
+    <>
+      <path d="M6.5 3.5h11l4 5.5L12 21 2.5 9z" />
+      <path d="M2.5 9h19M9 3.5 7.5 9 12 21l4.5-12L15 3.5" fill="none" stroke="rgba(255,255,255,.55)" strokeWidth="1.2" />
+    </>
+  ),
 };
 
 export default function Icon({ name, size = 20, label, className, strokeWidth = 2.2 }) {

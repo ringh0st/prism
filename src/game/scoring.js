@@ -1,7 +1,6 @@
 import { DIFFICULTY } from './constants.js';
 
 export const MAX_STARS = 3;
-export const HINT_COST = 15;
 export const STARTING_SPARKS = 30;
 export const SPARKS_PER_STAR = 5;
 export const DAILY_BASE_SPARKS = 20;
@@ -12,12 +11,10 @@ const DIFFICULTY_MULTIPLIER = {
   [DIFFICULTY.EXTRA]: 3,
 };
 
-/** 3 stars at par, 2 stars within a small margin, otherwise 1. Hints cap you at 2. */
-export function starsForMoves(moves, par, { usedHint = false } = {}) {
+/** 3 stars at par, 2 stars within a small margin, otherwise 1. Helpers can lower the cap (see catalog.js). */
+export function starsForMoves(moves, par) {
   const margin = Math.max(2, Math.ceil(par * 0.5));
-  let stars = moves <= par ? 3 : moves <= par + margin ? 2 : 1;
-  if (usedHint) stars = Math.min(stars, 2);
-  return stars;
+  return moves <= par ? 3 : moves <= par + margin ? 2 : 1;
 }
 
 /** Sparks for improving a level's best result (only the newly earned stars pay out). */

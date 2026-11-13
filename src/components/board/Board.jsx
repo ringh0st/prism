@@ -16,6 +16,7 @@ import styles from './Board.module.css';
  * @param onActivate   (cellIndex, tileIndex|-1) when a cell is tapped or Enter/Space is pressed
  * @param highlightTile tile index to pulse (hints)
  * @param isEditing    in the editor every cell is actionable
+ * @param ghostSegments faint preview of the solved light path (Lens helper)
  */
 export default function Board({
   level,
@@ -26,6 +27,7 @@ export default function Board({
   highlightTile = null,
   isEditing = false,
   isLocked = false,
+  ghostSegments = null,
   label = 'Puzzle board',
 }) {
   const { width, height, tiles } = level;
@@ -75,7 +77,7 @@ export default function Board({
           <span key={cell} className={styles.plate} />
         ))}
       </div>
-      <BeamLayer width={width} height={height} segments={trace.segments} />
+      <BeamLayer width={width} height={height} segments={trace.segments} ghostSegments={ghostSegments} />
       <div className={styles.cells} role="grid" aria-label={label} aria-rowcount={height} aria-colcount={width}>
         {Array.from({ length: height }, (_, row) => (
           <div role="row" key={row} className={styles.row}>

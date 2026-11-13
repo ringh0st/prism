@@ -5,3 +5,10 @@ export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_P96gX4pjrmkFtvrbHGQdRg_6
 
 export const HOME_PAGE_URL = '../';
 export const PRIVACY_URL = '../privacy.html';
+export const TERMS_URL = '../terms.html';
+
+/**
+ * Real-money diamond purchases. Turned on once the Lemon Squeezy store is set up
+ * and the Supabase payment functions are deployed (see PAYMENTS.md).
+ */
+export const PAYMENTS_ENABLED = false;
