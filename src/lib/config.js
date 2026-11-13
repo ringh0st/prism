@@ -11,4 +11,4 @@ export const TERMS_URL = '../terms.html';
  * Real-money diamond purchases. Turned on once the Lemon Squeezy store is set up
  * and the Supabase payment functions are deployed (see PAYMENTS.md).
  */
-export const PAYMENTS_ENABLED = false;
+export const PAYMENTS_ENABLED = true;
