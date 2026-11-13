@@ -5,7 +5,7 @@ name: Deploy Supabase functions
 on:
   push:
     branches: [main]
-    paths: ['supabase/functions/**', 'supabase/config.toml']
+    paths: ['supabase/functions/**', 'supabase/config.toml', '.github/workflows/supabase-functions.yml']
   workflow_dispatch:
 
 concurrency:
@@ -46,11 +46,12 @@ jobs:
             if [ -n "${!name}" ]; then args+=("$name=${!name}"); fi
           done
           if [ ${#args[@]} -gt 0 ]; then
-            supabase secrets set --project-ref "$PROJECT_REF" "${args[@]}"
+            supabase secrets set --project-ref "$PROJECT_REF" --yes "${args[@]}"
           fi
 
       - name: Deploy functions
         if: steps.token.outputs.missing != 'true'
         run: |
-          supabase functions deploy create-checkout --project-ref "$PROJECT_REF"
-          supabase functions deploy lemonsqueezy-webhook --project-ref "$PROJECT_REF" --no-verify-jwt
+          # --yes: CI can't answer the CLI's confirmation prompts
+          supabase functions deploy create-checkout --project-ref "$PROJECT_REF" --yes
+          supabase functions deploy lemonsqueezy-webhook --project-ref "$PROJECT_REF" --no-verify-jwt --yes
