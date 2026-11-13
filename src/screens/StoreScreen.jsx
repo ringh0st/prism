@@ -1,19 +1,20 @@
 import { useEffect, useState } from 'react';
 import ScreenHeader from '../components/game/ScreenHeader.jsx';
 import BottomNav from '../components/game/BottomNav.jsx';
-import Panel from '../components/game/Panel.jsx';
-import Lumi from '../components/game/Lumi.jsx';
 import Button from '../components/Button.jsx';
 import Icon from '../components/Icon.jsx';
 import BuyButtons from '../components/BuyButtons.jsx';
+import StallFront from './store/StallFront.jsx';
+import ShelfItem from './store/ShelfItem.jsx';
+import ItemInfoDialog from './store/ItemInfoDialog.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
-import { DIAMOND_PACKS, DIAMOND_REWARDS, HELPERS, INVENTORY_CAP, STORE_ITEMS } from '../game/catalog.js';
+import { DIAMOND_PACKS, DIAMOND_REWARDS, HELPERS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS } from '../game/catalog.js';
 import { sparkPurchasesLeft } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
 import { startDiamondCheckout } from '../lib/economyApi.js';
 import { PAYMENTS_ENABLED, TERMS_URL } from '../lib/config.js';
 import { sfx } from '../audio/sfx.js';
-import styles from './StoreScreen.module.css';
+import styles from './store/Stall.module.css';
 
 const TABS = [
   { id: 'helpers', label: 'Helpers', icon: 'hint' },
@@ -21,43 +22,60 @@ const TABS = [
   { id: 'diamonds', label: 'Diamonds', icon: 'diamond' },
 ];
 
-function ShopSlot({ icon, tone, title, badge, tag, children }) {
+const helperItems = STORE_ITEMS.filter((item) => item.kind === 'helper');
+const sparkItems = STORE_ITEMS.filter((item) => item.kind === 'sparks');
+const weeklyDiamonds = WEEKLY_REWARDS.filter((reward) => reward.diamonds > 0).map((reward) => reward.diamonds);
+
+/** A pinned paper note on the stall wall. */
+function Note({ children, className = '' }) {
+  return <div className={`${styles.note} ${className}`}>{children}</div>;
+}
+
+function SignInNote() {
   return (
-    <Panel as="li" className={styles.slot}>
-      {tag && <span className={`game-title on-color ${styles.tag}`}>{tag}</span>}
-      <div className={`${styles.art} ${styles[tone]}`} aria-hidden="true">
-        <span className={styles.burst} />
-        <span className={styles.artIcon}>
-          <Icon name={icon} size={40} />
+    <Note>
+      <p className={styles.noteRow}>
+        <Icon name="user" size={20} />
+        <span>
+          Diamonds live in your account. <a href="#/settings">Sign in with Google</a> to earn and use them.
         </span>
-        {badge && <span className={`game-title on-color ${styles.badge}`}>{badge}</span>}
-      </div>
-      <h2 className={`game-title ${styles.slotTitle}`}>{title}</h2>
-      {children}
-    </Panel>
+      </p>
+    </Note>
   );
 }
 
-function HelpersTab({ onBuy, busyItem }) {
-  const { progress, isSignedIn } = usePlayer();
-  const left = sparkPurchasesLeft(progress, todayKey());
+function HelpersShelf({ buyProps, onInfo }) {
+  const { progress } = usePlayer();
   return (
     <>
-      <p className={styles.intro}>
-        Stuck? Helpers get you moving. Hold up to {INVENTORY_CAP} of each. Spark buys left today: <strong>{left}</strong>
+      <p className={styles.shelfIntro}>
+        Hold up to {INVENTORY_CAP} of each · spark buys left today: <strong>{sparkPurchasesLeft(progress, todayKey())}</strong>
       </p>
-      <ul className={styles.grid}>
-        {STORE_ITEMS.filter((item) => item.kind === 'helper').map((item) => {
+      <ul className={styles.shelf}>
+        {helperItems.map((item) => {
           const helper = HELPERS[item.grants.helper];
           const owned = progress.helpers[helper.id] ?? 0;
           return (
-            <ShopSlot key={item.id} icon={helper.icon} tone="helper" title={helper.name} badge={`x${owned}`}>
-              <p className={styles.slotText}>{helper.description}</p>
-              <p className={styles.cap}>
-                <Icon name="star" size={13} /> max {helper.starCap} when used
-              </p>
-              <BuyButtons item={item} itemName={helper.name} progress={progress} isSignedIn={isSignedIn} isBusy={busyItem === item.id} onBuy={(currency) => onBuy(item.id, currency)} />
-            </ShopSlot>
+            <ShelfItem
+              key={item.id}
+              art={helper.id}
+              title={helper.name}
+              badge={`×${owned}`}
+              onInfo={() =>
+                onInfo({
+                  item,
+                  title: helper.name,
+                  art: helper.id,
+                  description: helper.description,
+                  facts: [
+                    { icon: 'star', text: `Using it caps the level at ${helper.starCap} ★` },
+                    { icon: 'bag', text: `You have ${owned} of ${INVENTORY_CAP}` },
+                  ],
+                })
+              }
+            >
+              <BuyButtons item={item} itemName={helper.name} look="tag" {...buyProps(item)} />
+            </ShelfItem>
           );
         })}
       </ul>
@@ -65,17 +83,30 @@ function HelpersTab({ onBuy, busyItem }) {
   );
 }
 
-function SparksTab({ onBuy, busyItem }) {
-  const { progress, isSignedIn } = usePlayer();
+function SparksShelf({ buyProps, onInfo }) {
+  const { isSignedIn } = usePlayer();
   return (
     <>
-      <p className={styles.intro}>Trade diamonds for sparks. You also earn sparks from new stars, chests and daily puzzles.</p>
-      <ul className={styles.grid}>
-        {STORE_ITEMS.filter((item) => item.kind === 'sparks').map((item, i) => (
-          <ShopSlot key={item.id} icon="spark" tone={`sparks${i}`} title={`${item.grants.sparks}`} tag={i === 2 ? 'Best value' : null}>
-            <p className={styles.slotText}>sparks</p>
-            <BuyButtons item={item} itemName={`${item.grants.sparks} sparks`} progress={progress} isSignedIn={isSignedIn} isBusy={busyItem === item.id} onBuy={(currency) => onBuy(item.id, currency)} />
-          </ShopSlot>
+      <p className={styles.shelfIntro}>Trade diamonds for sparks. You also earn sparks from stars, chests and daily puzzles.</p>
+      <ul className={styles.shelf}>
+        {sparkItems.map((item, i) => (
+          <ShelfItem
+            key={item.id}
+            art={`sparks${i}`}
+            title={`${item.grants.sparks}`}
+            subtitle="sparks"
+            tag={i === sparkItems.length - 1 ? 'Best value' : null}
+            onInfo={() =>
+              onInfo({
+                item,
+                title: `${item.grants.sparks} sparks`,
+                art: `sparks${i}`,
+                description: 'Spend sparks on Hints and Lenses. Sparks can never be turned back into diamonds.',
+              })
+            }
+          >
+            <BuyButtons item={item} itemName={`${item.grants.sparks} sparks`} look="tag" {...buyProps(item)} />
+          </ShelfItem>
         ))}
       </ul>
       {!isSignedIn && <SignInNote />}
@@ -83,18 +114,7 @@ function SparksTab({ onBuy, busyItem }) {
   );
 }
 
-function SignInNote() {
-  return (
-    <Panel className={styles.note}>
-      <Icon name="user" size={20} />
-      <p>
-        Diamonds live in your account. <a href="#/settings">Sign in with Google</a> to earn and use them.
-      </p>
-    </Panel>
-  );
-}
-
-function DiamondsTab({ onError }) {
+function DiamondsShelf({ onError }) {
   const { isSignedIn } = usePlayer();
   const [busyPack, setBusyPack] = useState(null);
 
@@ -110,7 +130,7 @@ function DiamondsTab({ onError }) {
 
   return (
     <>
-      <Panel className={styles.free}>
+      <Note className={styles.freeNote}>
         <h2 className="game-title">Free diamonds!</h2>
         <ul>
           <li>
@@ -122,25 +142,36 @@ function DiamondsTab({ onError }) {
           <li>
             <Icon name="flame" size={18} /> 7-day daily streak <strong>+{DIAMOND_REWARDS.streakWeek}</strong>
           </li>
+          <li>
+            <Icon name="trophy" size={18} /> Weekly top 3{' '}
+            <strong>
+              +{Math.min(...weeklyDiamonds)} to +{Math.max(...weeklyDiamonds)}
+            </strong>
+          </li>
         </ul>
-      </Panel>
+      </Note>
 
       {!isSignedIn && <SignInNote />}
 
-      <ul className={styles.grid}>
+      <ul className={styles.shelf}>
         {DIAMOND_PACKS.map((pack, i) => (
-          <ShopSlot key={pack.id} icon="diamond" tone={`diamonds${i}`} title={`${pack.diamonds + pack.bonus}`} tag={pack.tag}>
-            <p className={styles.slotText}>{pack.bonus > 0 ? `diamonds (+${pack.bonus} bonus)` : 'diamonds'}</p>
+          <ShelfItem
+            key={pack.id}
+            art={`diamonds${i}`}
+            title={`${pack.diamonds + pack.bonus}`}
+            subtitle={pack.bonus > 0 ? `diamonds (+${pack.bonus} bonus)` : 'diamonds'}
+            tag={pack.tag}
+          >
             <Button
               size="sm"
-              variant="go"
+              className={styles.moneyTag}
               disabled={!PAYMENTS_ENABLED || !isSignedIn || busyPack !== null}
               onClick={() => buyPack(pack.id)}
               aria-label={`Buy ${pack.diamonds + pack.bonus} diamonds for ${pack.displayPrice}`}
             >
               {PAYMENTS_ENABLED ? (busyPack === pack.id ? 'Opening…' : pack.displayPrice) : 'Coming soon'}
             </Button>
-          </ShopSlot>
+          </ShelfItem>
         ))}
       </ul>
 
@@ -152,14 +183,16 @@ function DiamondsTab({ onError }) {
   );
 }
 
+/** The shop, drawn as Lumi's market stall: an awning, a counter, signs and shelves of goods. */
 export default function StoreScreen({ isReturningFromCheckout = false }) {
-  const { buyItem, refresh } = usePlayer();
+  const { progress, isSignedIn, buyItem, refresh } = usePlayer();
   const [tab, setTab] = useState(isReturningFromCheckout ? 'diamonds' : 'helpers');
   const [busyItem, setBusyItem] = useState(null);
+  const [info, setInfo] = useState(null);
   const [lumi, setLumi] = useState(() =>
     isReturningFromCheckout
       ? { mood: 'dance', line: 'Thank you! Your diamonds are on their way!' }
-      : { mood: 'happy', line: 'Welcome to my shop! Everything is shiny.' },
+      : { mood: 'happy', line: 'Welcome to my stall! Tap anything for a closer look.' },
   );
 
   // After checkout the payment webhook adds the diamonds; check back a couple of times.
@@ -174,7 +207,8 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
     try {
       await buyItem(itemId, currency);
       sfx.sparkle();
-      setLumi({ mood: 'excited', line: 'Ka-ching! Pleasure doing business!' });
+      setLumi({ mood: 'dance', line: 'Ka-ching! Pleasure doing business!' });
+      setInfo(null);
     } catch (error) {
       setLumi({ mood: 'worried', line: error.message });
     } finally {
@@ -182,15 +216,20 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
     }
   };
 
+  const buyProps = (item) => ({
+    progress,
+    isSignedIn,
+    isBusy: busyItem === item.id,
+    onBuy: (currency) => buy(item.id, currency),
+  });
+
   return (
     <div className={styles.page}>
       <ScreenHeader title="Shop" />
-      <main className={styles.main}>
-        <div className={styles.keeper}>
-          <Lumi mood={lumi.mood} size={60} line={lumi.line} />
-        </div>
+      <main className={styles.stall}>
+        <StallFront lumiMood={lumi.mood} lumiLine={lumi.line} />
 
-        <div className={styles.tabs} role="tablist" aria-label="Shop sections">
+        <div className={styles.signs} role="tablist" aria-label="Shop sections">
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -199,22 +238,28 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
               id={`store-tab-${t.id}`}
               aria-selected={tab === t.id}
               aria-controls="store-panel"
-              className={`${styles.tab} ${tab === t.id ? styles.tabActive : ''}`}
+              className={`${styles.sign} ${tab === t.id ? styles.signActive : ''}`}
               onClick={() => setTab(t.id)}
             >
-              <Icon name={t.icon} size={20} />
+              <Icon name={t.icon} size={18} />
               <span>{t.label}</span>
             </button>
           ))}
         </div>
 
-        <section id="store-panel" role="tabpanel" aria-labelledby={`store-tab-${tab}`} className={styles.panel}>
-          {tab === 'helpers' && <HelpersTab onBuy={buy} busyItem={busyItem} />}
-          {tab === 'sparks' && <SparksTab onBuy={buy} busyItem={busyItem} />}
-          {tab === 'diamonds' && <DiamondsTab onError={(message) => setLumi({ mood: 'worried', line: message })} />}
+        <section id="store-panel" role="tabpanel" aria-labelledby={`store-tab-${tab}`} className={styles.wall}>
+          {tab === 'helpers' && <HelpersShelf buyProps={buyProps} onInfo={setInfo} />}
+          {tab === 'sparks' && <SparksShelf buyProps={buyProps} onInfo={setInfo} />}
+          {tab === 'diamonds' && <DiamondsShelf onError={(message) => setLumi({ mood: 'worried', line: message })} />}
         </section>
       </main>
       <BottomNav active="store" />
+
+      {info && (
+        <ItemInfoDialog info={info} onClose={() => setInfo(null)}>
+          <BuyButtons item={info.item} itemName={info.title} {...buyProps(info.item)} />
+        </ItemInfoDialog>
+      )}
     </div>
   );
 }

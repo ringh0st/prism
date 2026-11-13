@@ -10,3 +10,28 @@
   padding: 0 12px;
   font-variant-numeric: tabular-nums;
 }
+
+/* Price tags: a punched hole and a slight tilt, like a tag tied to the goods */
+.tags .price {
+  min-width: 64px;
+  min-height: 38px;
+  padding: 0 12px 0 20px;
+  border-radius: 8px 16px 16px 8px;
+  transform: rotate(-2deg);
+}
+
+.tags .price:nth-child(2) {
+  transform: rotate(2deg);
+}
+
+.tags .price::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: rgba(43, 33, 24, 0.35);
+}

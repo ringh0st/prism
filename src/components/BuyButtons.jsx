@@ -7,14 +7,15 @@ import styles from './BuyButtons.module.css';
 /**
  * One button per currency an item can be bought with. Disables (with a reason) when the
  * player can't afford it, hit the daily spark limit, or needs an account for diamonds.
+ * look: "button" (default) or "tag" (little price tags hanging on a shop shelf).
  */
-export default function BuyButtons({ item, itemName, progress, isSignedIn, isBusy, onBuy }) {
+export default function BuyButtons({ item, itemName, progress, isSignedIn, isBusy, onBuy, look = 'button' }) {
   const { sparks: sparkPrice, diamonds: diamondPrice } = item.price;
   const isHelper = item.kind === 'helper';
   const dailyLimitReached = isHelper && sparkPurchasesLeft(progress, todayKey()) === 0;
 
   return (
-    <div className={styles.row}>
+    <div className={`${styles.row} ${look === 'tag' ? styles.tags : ''}`}>
       {sparkPrice && (
         <Button
           size="sm"

@@ -75,6 +75,14 @@
   --surface-tonal: #efe7da;
   --surface-tonal-hover: #e7ddcd;
 
+  /* Market stall (shop): wood, wall and awning */
+  --wood: #c9925f;
+  --wood-dark: #a8734a;
+  --wood-sign: #ecd5b4;
+  --stall-wall: #f5e9d6;
+  --awning-light: #fffdf8;
+  --paper: #fffdf4;
+
   /* Text */
   --text-strong: #2b2118;
   --text-soft: #65503f;
@@ -143,6 +151,12 @@
     --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
     --surface-tonal: #38332c;
     --surface-tonal-hover: #423c34;
+    --wood: #7a5638;
+    --wood-dark: #5e412a;
+    --wood-sign: #4d3a2b;
+    --stall-wall: #2a241f;
+    --awning-light: #d9cdb8;
+    --paper: #322e28;
     --text-strong: #fff4e8;
     --text-soft: #cdb6a6;
     --text-accent: #8fd3ae;
@@ -177,6 +191,12 @@
   --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   --surface-tonal: #38332c;
   --surface-tonal-hover: #423c34;
+  --wood: #7a5638;
+  --wood-dark: #5e412a;
+  --wood-sign: #4d3a2b;
+  --stall-wall: #2a241f;
+  --awning-light: #d9cdb8;
+  --paper: #322e28;
   --text-strong: #fff4e8;
   --text-soft: #cdb6a6;
   --text-accent: #8fd3ae;
