@@ -177,6 +177,6 @@ test('store prices in the database match the game catalog', async () => {
     assert.equal(Number(grantSparks), item.grants.sparks ?? 0, item.id);
   }
   for (const pack of DIAMOND_PACKS) {
-    assert.match(sql, new RegExp(`\\('${pack.id}', ${pack.diamonds + pack.bonus}\\)`), `${pack.id} diamonds`);
+    assert.match(sql, new RegExp(`\\('${pack.id}', ${pack.diamonds + pack.bonus}[,)]`), `${pack.id} diamonds`);
   }
 });

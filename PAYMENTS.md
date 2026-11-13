@@ -30,7 +30,7 @@ Never paste API keys, secrets or tokens into a chat, an issue or a commit. They 
 
 For each variant, copy its **variant ID** (a number) from the variant's menu.
 
-Then in Supabase → **Table Editor → `diamond_packs`**, paste each variant ID into the `variant_id` column of the matching row.
+The variant IDs are saved in `supabase/economy.sql` (`diamond_packs`): 10 → `2372489`, 60 → `2372493`, 130 → `2372494`. If you ever recreate the product, update them there and re-run the script.
 
 ## 3. Keys from Lemon Squeezy
 
