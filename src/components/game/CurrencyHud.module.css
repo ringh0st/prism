@@ -5,15 +5,13 @@
   padding: 4px;
   border-radius: var(--radius-pill);
   text-decoration: none;
-  background: var(--glass);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-md);
-  transition: transform 180ms var(--ease-spring);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
+  transition: transform 160ms var(--ease-out);
 }
 
 .hud:hover {
-  transform: scale(1.03);
+  transform: translateY(-1px);
 }
 
 .counter {
@@ -32,19 +30,19 @@
   height: 26px;
   border-radius: 50%;
   color: #fff;
-  box-shadow: var(--clay);
+  box-shadow: var(--highlight-on-color);
 }
 
 .star .badge {
-  background: linear-gradient(160deg, #ffe066, #ffad0d);
+  background: linear-gradient(180deg, #ffd84f, #ffbf14);
 }
 
 .spark .badge {
-  background: linear-gradient(160deg, #ffc163, #ff8a1c);
+  background: linear-gradient(180deg, #ffaa3d, #ff951a);
 }
 
 .diamond .badge {
-  background: linear-gradient(160deg, #6fe6d6, var(--color-mint-deep));
+  background: linear-gradient(180deg, #3dd3c4, #1fae9f);
 }
 
 .value {
@@ -64,10 +62,10 @@
   height: 32px;
   border-radius: 50%;
   color: #fff;
-  background: linear-gradient(160deg, #5eeaa8, #17b874);
+  background: linear-gradient(180deg, #ec5644, #dd4634);
   box-shadow:
-    var(--clay),
-    0 6px 14px -6px rgba(23, 184, 116, 0.7);
+    var(--highlight-on-color),
+    0 2px 0 #a8331f;
 }
 
 @keyframes bump {

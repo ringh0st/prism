@@ -1,94 +1,38 @@
+/*
+ * A calm, sunlit paper scene: flat cream sky, a soft pool of sunlight and two layers of rolling
+ * hills that fade with distance. Matte grain gives it a printed feel. Decorative only.
+ */
 .background {
   position: fixed;
   inset: 0;
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background: var(--mesh-base);
+  background:
+    radial-gradient(60vmax 40vmax at 78% -6%, var(--scene-sun), transparent 70%),
+    var(--surface-page);
 }
 
-/* Big soft color blobs, blurred together into a mesh gradient that slowly drifts. */
-.blob {
+.hills {
   position: absolute;
-  width: 70vmax;
-  height: 70vmax;
-  border-radius: 50%;
-  filter: blur(70px);
-  opacity: 0.9;
-  animation: drift 26s ease-in-out infinite alternate;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 34vh;
 }
 
-.one {
-  left: -25vmax;
-  top: -25vmax;
-  background: var(--mesh-1);
+.far {
+  fill: var(--scene-hill-far);
 }
 
-.two {
-  right: -30vmax;
-  top: 10vh;
-  background: var(--mesh-2);
-  animation-duration: 32s;
-  animation-delay: -8s;
+.near {
+  fill: var(--scene-hill-near);
 }
 
-.three {
-  left: 10vw;
-  bottom: -35vmax;
-  background: var(--mesh-3);
-  animation-duration: 28s;
-  animation-delay: -14s;
-}
-
-.four {
-  right: -10vmax;
-  bottom: -20vmax;
-  width: 45vmax;
-  height: 45vmax;
-  background: var(--mesh-4);
-  opacity: 0.7;
-  animation-duration: 36s;
-  animation-delay: -4s;
-}
-
-.sparkle {
-  position: absolute;
-  background: #fff;
-  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
-  opacity: 0;
-  animation: twinkle 7s ease-in-out infinite;
-}
-
-/* A whisper of film grain keeps the gradient from looking flat and digital. */
 .grain {
   position: absolute;
   inset: 0;
-  opacity: 0.05;
-  mix-blend-mode: overlay;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-@keyframes drift {
-  to {
-    transform: translate(10vmax, 6vmax) scale(1.15);
-  }
-}
-
-@keyframes twinkle {
-  0%,
-  100% {
-    opacity: 0;
-    transform: scale(0.4) translateY(0);
-  }
-  50% {
-    opacity: 0.85;
-    transform: scale(1) translateY(-12px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .blob,
-  .sparkle {
-    animation: none;
-  }
 }

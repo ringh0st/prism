@@ -70,7 +70,7 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
 
       <div className={styles.actions}>
         {hasNext ? (
-          <Button size="lg" variant="go" icon="play" onClick={onNext} data-autofocus>
+          <Button size="lg" icon="play" onClick={onNext} data-autofocus>
             Next level
           </Button>
         ) : (

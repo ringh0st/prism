@@ -1,7 +1,7 @@
 /*
- * Design tokens: "soft glow".
- * Warm palette (sunshine, tangerine, coral, mint), soft 3D clay shapes, frosted glass
- * surfaces and mesh-gradient light. No hard outlines. No purple or blue as main colors.
+ * Design tokens: "Sunlit Paper".
+ * Warm palette (sunshine, tangerine, coral, mint), matte surfaces, warm layered shadows and solid
+ * "ledge" buttons. Only light beams glow. No outlines, glass, mesh gradients or neon. No purple or blue as main colors.
  */
 :root {
   --color-sunshine: #ffd23f;
@@ -13,33 +13,29 @@
   --color-mint: #2ec4b6;
   --color-mint-deep: #17988c;
 
-  /* Surfaces */
-  --surface-page: #fff4e6;
-  --surface-card: #ffffff;
-  --surface-board: rgba(255, 250, 244, 0.7);
+  /* Surfaces: matte, sunlit paper. Edges come from fill contrast and shadow, never from lines. */
+  --surface-page: #fff8ef;
+  --surface-raised: #ffffff;
+  --surface-overlay: #fffcf7;
+  --surface-sunken: #f6ebdd;
+  --surface-board: #fff3e3;
   --surface-cell: #fffaf3;
   --surface-cell-edge: #f2dcc4;
   --surface-locked: #ecd9c4;
   --pivot-fill: rgba(255, 255, 255, 0.6);
   --gem-unlit-opacity: 0.45;
+  --scene-hill-near: #ffe2bf;
+  --scene-hill-far: #fff0dc;
+  --scene-sun: #ffe9a8;
 
-  /* Frosted "liquid glass" */
-  --glass: rgba(255, 255, 255, 0.58);
-  --glass-strong: rgba(255, 251, 246, 0.86);
-  --glass-edge: rgba(255, 255, 255, 0.7);
-  --glass-blur: blur(22px) saturate(1.5);
-  --sheet: rgba(255, 250, 244, 0.97);
-
-  /* Mesh-gradient sky */
-  --mesh-base: #fff1df;
-  --mesh-1: #ffd29e;
-  --mesh-2: #ffab95;
-  --mesh-3: #ffe680;
-  --mesh-4: #c8f3e6;
+  /* A faint top highlight on raised surfaces, and on colored buttons */
+  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --highlight-on-color: inset 0 2px 0 rgba(255, 255, 255, 0.28);
 
   /* Text */
   --text-strong: #2b2118;
   --text-soft: #7a6152;
+  --text-accent: #c8402f;
   --text-on-accent: #ffffff;
   --line: rgba(43, 33, 24, 0.08);
   --shadow-color: 165, 70, 25;
@@ -65,14 +61,12 @@
   --space-5: 24px;
   --space-6: 32px;
 
-  /* Soft, colored, layered shadows instead of outlines */
-  --shadow-sm: 0 2px 6px rgba(var(--shadow-color), 0.1);
-  --shadow-md: 0 12px 28px -14px rgba(var(--shadow-color), 0.45), 0 2px 6px rgba(var(--shadow-color), 0.08);
-  --shadow-lg: 0 28px 60px -26px rgba(var(--shadow-color), 0.55), 0 4px 12px rgba(var(--shadow-color), 0.08);
-  /* Clay lighting: a soft highlight on top and gentle shade underneath */
-  --clay: inset 0 3px 2px rgba(255, 255, 255, 0.55), inset 0 -5px 10px rgba(110, 35, 5, 0.16);
-  /* A diffuse top highlight only: edges are defined by soft shadows, never by a visible line */
-  --glass-shine: inset 0 2px 6px -2px var(--glass-edge);
+  /* Warm layered shadows from one light source above. Never colored glows. */
+  --shadow-hue: 24 35% 25%;
+  --shadow-sm: 0 1px 2px hsl(var(--shadow-hue) / 0.08), 0 2px 4px hsl(var(--shadow-hue) / 0.06);
+  --shadow-md: 0 1px 2px hsl(var(--shadow-hue) / 0.06), 0 4px 8px hsl(var(--shadow-hue) / 0.08), 0 10px 20px hsl(var(--shadow-hue) / 0.08);
+  --shadow-lg: 0 2px 4px hsl(var(--shadow-hue) / 0.06), 0 8px 16px hsl(var(--shadow-hue) / 0.08), 0 24px 48px hsl(var(--shadow-hue) / 0.12);
+  --shadow-inset: inset 0 2px 4px hsl(var(--shadow-hue) / 0.1);
 
   --ease-pop: cubic-bezier(0.3, 1.6, 0.5, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
@@ -86,51 +80,57 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     --surface-page: #1e1714;
-    --surface-card: #2a201a;
-    --surface-board: rgba(46, 33, 26, 0.72);
-    --surface-cell: #3a2c23;
+    --surface-raised: #2a211c;
+    --surface-overlay: #352a24;
+    --surface-sunken: #171210;
+    --surface-board: #2a211c;
+    --surface-cell: #3a2e27;
     --surface-cell-edge: #241913;
     --surface-locked: #4a3a2e;
     --pivot-fill: rgba(255, 255, 255, 0.08);
     --gem-unlit-opacity: 0.7;
-    --glass: rgba(52, 37, 29, 0.6);
-    --glass-strong: rgba(44, 31, 24, 0.9);
-    --glass-edge: rgba(255, 255, 255, 0.06);
-    --sheet: rgba(40, 28, 22, 0.97);
-    --mesh-base: #1e1714;
-    --mesh-1: #5c2f17;
-    --mesh-2: #57221e;
-    --mesh-3: #4d3b0f;
-    --mesh-4: #12403a;
+    --scene-hill-near: #2a1f19;
+    --scene-hill-far: #241b16;
+    --scene-sun: #3d2c18;
+    --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --highlight-on-color: inset 0 2px 0 rgba(255, 255, 255, 0.2);
     --text-strong: #fff4e8;
     --text-soft: #cdb6a6;
+    --text-accent: #ff8a7a;
     --line: rgba(255, 255, 255, 0.1);
+    --shadow-hue: 0 0% 0%;
     --shadow-color: 0, 0, 0;
+    --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.35), 0 2px 4px hsl(0 0% 0% / 0.25);
+    --shadow-md: 0 1px 2px hsl(0 0% 0% / 0.3), 0 4px 8px hsl(0 0% 0% / 0.3), 0 10px 20px hsl(0 0% 0% / 0.3);
+    --shadow-lg: 0 2px 4px hsl(0 0% 0% / 0.3), 0 8px 16px hsl(0 0% 0% / 0.35), 0 24px 48px hsl(0 0% 0% / 0.45);
     color-scheme: dark;
   }
 }
 
 :root[data-theme='dark'] {
   --surface-page: #1e1714;
-  --surface-card: #2a201a;
-  --surface-board: rgba(46, 33, 26, 0.72);
-  --surface-cell: #3a2c23;
+  --surface-raised: #2a211c;
+  --surface-overlay: #352a24;
+  --surface-sunken: #171210;
+  --surface-board: #2a211c;
+  --surface-cell: #3a2e27;
   --surface-cell-edge: #241913;
   --surface-locked: #4a3a2e;
   --pivot-fill: rgba(255, 255, 255, 0.08);
   --gem-unlit-opacity: 0.7;
-  --glass: rgba(52, 37, 29, 0.6);
-  --glass-strong: rgba(44, 31, 24, 0.9);
-  --glass-edge: rgba(255, 255, 255, 0.06);
-  --sheet: rgba(40, 28, 22, 0.97);
-  --mesh-base: #1e1714;
-  --mesh-1: #5c2f17;
-  --mesh-2: #57221e;
-  --mesh-3: #4d3b0f;
-  --mesh-4: #12403a;
+  --scene-hill-near: #2a1f19;
+  --scene-hill-far: #241b16;
+  --scene-sun: #3d2c18;
+  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --highlight-on-color: inset 0 2px 0 rgba(255, 255, 255, 0.2);
   --text-strong: #fff4e8;
   --text-soft: #cdb6a6;
+  --text-accent: #ff8a7a;
   --line: rgba(255, 255, 255, 0.1);
+  --shadow-hue: 0 0% 0%;
   --shadow-color: 0, 0, 0;
+  --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.35), 0 2px 4px hsl(0 0% 0% / 0.25);
+  --shadow-md: 0 1px 2px hsl(0 0% 0% / 0.3), 0 4px 8px hsl(0 0% 0% / 0.3), 0 10px 20px hsl(0 0% 0% / 0.3);
+  --shadow-lg: 0 2px 4px hsl(0 0% 0% / 0.3), 0 8px 16px hsl(0 0% 0% / 0.35), 0 24px 48px hsl(0 0% 0% / 0.45);
   color-scheme: dark;
 }

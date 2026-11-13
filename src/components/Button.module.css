@@ -1,8 +1,13 @@
-/* Soft 3D "clay" pills: gradient fill, top highlight, colored glow. Springy press. */
+/*
+ * Solid "ledge" buttons: a matte fill sitting on a darker lip of the same hue.
+ * Pressing pushes the button down onto its lip. No outlines, no glows.
+ */
 .button {
-  --from: #ff8e7a;
-  --to: var(--color-coral);
-  --glow: 255, 107, 91;
+  --fill-top: #ec5644;
+  --fill-bottom: #dd4634;
+  --ledge: #a8331f;
+  --label: #ffffff;
+  --ledge-height: 4px;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -10,24 +15,25 @@
   gap: var(--space-2);
   min-height: 50px;
   padding: 0 var(--space-5);
+  margin-bottom: var(--ledge-height);
   border: 0;
   border-radius: var(--radius-pill);
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 18px;
   line-height: 1;
-  color: #fff;
+  color: var(--label);
   text-decoration: none;
-  background: linear-gradient(160deg, var(--from), var(--to));
+  background: linear-gradient(180deg, var(--fill-top), var(--fill-bottom));
   box-shadow:
-    var(--clay),
-    0 10px 22px -8px rgba(var(--glow), 0.65),
-    0 2px 4px rgba(var(--glow), 0.25);
+    var(--highlight-on-color),
+    0 var(--ledge-height) 0 var(--ledge),
+    var(--shadow-md);
   cursor: pointer;
   user-select: none;
   transition:
-    transform 180ms var(--ease-spring),
-    box-shadow 180ms ease,
+    transform 110ms var(--ease-out),
+    box-shadow 110ms var(--ease-out),
     filter 150ms ease;
 }
 
@@ -35,23 +41,18 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  text-shadow: 0 1px 2px rgba(110, 35, 5, 0.25);
 }
 
 .button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  filter: brightness(1.04);
-  box-shadow:
-    var(--clay),
-    0 14px 28px -8px rgba(var(--glow), 0.7),
-    0 2px 4px rgba(var(--glow), 0.25);
+  filter: brightness(1.05);
 }
 
 .button:active:not(:disabled) {
-  transform: translateY(1px) scale(0.96);
+  transform: translateY(var(--ledge-height));
   box-shadow:
-    inset 0 3px 8px rgba(110, 35, 5, 0.25),
-    0 4px 10px -6px rgba(var(--glow), 0.6);
+    var(--highlight-on-color),
+    0 0 0 var(--ledge),
+    var(--shadow-sm);
 }
 
 .button:disabled,
@@ -59,68 +60,65 @@
   cursor: not-allowed;
   filter: grayscale(0.9);
   opacity: 0.5;
-  box-shadow: var(--clay);
 }
 
 .primary {
   /* coral, see defaults */
 }
 
+/* Success / "go" moments */
 .go {
-  --from: #5eeaa8;
-  --to: #17b874;
-  --glow: 23, 184, 116;
+  --fill-top: #3dd3c4;
+  --fill-bottom: #26bdae;
+  --ledge: #158a7f;
+  --label: #2b2118;
 }
 
+/* Rewards and currency */
 .gold {
-  --from: #ffe066;
-  --to: #ffad0d;
-  --glow: 255, 173, 13;
-  color: #5a3300;
-}
-
-.gold > span {
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+  --fill-top: #ffd84f;
+  --fill-bottom: #ffc61f;
+  --ledge: #d99a00;
+  --label: #3b2400;
 }
 
 .secondary {
-  color: var(--text-strong);
-  background: var(--glass-strong);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-md);
-}
-
-.secondary > span {
-  text-shadow: none;
-}
-
-.secondary:hover:not(:disabled) {
-  box-shadow: var(--glass-shine), var(--shadow-lg);
+  --fill-top: var(--surface-raised);
+  --fill-bottom: var(--surface-raised);
+  --ledge: var(--surface-cell-edge);
+  --label: var(--text-strong);
+  box-shadow:
+    var(--highlight),
+    0 var(--ledge-height) 0 var(--ledge),
+    var(--shadow-md);
 }
 
 .ghost {
-  color: var(--text-strong);
+  --label: var(--text-strong);
+  margin-bottom: 0;
   background: transparent;
   box-shadow: none;
 }
 
-.ghost > span {
-  text-shadow: none;
+.ghost:hover:not(:disabled) {
+  background: var(--surface-sunken);
+  filter: none;
 }
 
-.ghost:hover:not(:disabled) {
-  background: var(--glass);
+.ghost:active:not(:disabled) {
+  transform: scale(0.97);
   box-shadow: none;
 }
 
 .sm {
+  --ledge-height: 3px;
   min-height: 40px;
   padding: 0 var(--space-4);
   font-size: 16px;
 }
 
 .lg {
+  --ledge-height: 5px;
   min-height: 62px;
   padding: 0 var(--space-6);
   font-size: 22px;

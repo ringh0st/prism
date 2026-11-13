@@ -16,7 +16,7 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: var(--text-strong);
-  background: var(--mesh-base);
+  background: var(--surface-page);
   -webkit-tap-highlight-color: transparent;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
@@ -82,9 +82,9 @@ a {
 }
 
 /* Titles that sit on a colored, clay surface. */
+/* Text on a colored surface. The surface sets --label to a color with enough contrast. */
 .on-color {
-  color: #fff;
-  text-shadow: 0 1px 1px rgba(110, 35, 5, 0.25), 0 2px 10px rgba(110, 35, 5, 0.18);
+  color: var(--label, #fff);
 }
 
 /* Icons inside flex/grid controls must not sit on the text baseline. */

@@ -32,8 +32,8 @@
   height: 18px;
   margin-top: 16px;
   border-radius: var(--radius-pill);
-  background: rgba(var(--shadow-color), 0.12);
-  box-shadow: inset 0 2px 4px rgba(var(--shadow-color), 0.18);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
 }
 
 .fill {
@@ -43,28 +43,19 @@
   transition:
     width 420ms var(--ease-spring),
     background 300ms ease;
-  box-shadow: var(--clay);
+  box-shadow: var(--highlight-on-color);
 }
 
 .good {
-  background: linear-gradient(90deg, #13b56f, #6ff0b4);
-  box-shadow:
-    var(--clay),
-    0 0 14px rgba(19, 181, 111, 0.5);
+  background: var(--color-mint);
 }
 
 .warn {
-  background: linear-gradient(90deg, #ff9a0d, #ffe066);
-  box-shadow:
-    var(--clay),
-    0 0 14px rgba(255, 173, 13, 0.5);
+  background: var(--color-sunshine);
 }
 
 .danger {
-  background: linear-gradient(90deg, #f0453a, #ff9a86);
-  box-shadow:
-    var(--clay),
-    0 0 16px rgba(240, 69, 58, 0.6);
+  background: var(--color-coral);
   animation: blink 0.6s ease-in-out infinite alternate;
 }
 
@@ -74,7 +65,7 @@
   display: flex;
   transform: translateX(-50%);
   color: var(--color-sunshine);
-  filter: drop-shadow(0 2px 3px rgba(200, 110, 0, 0.5));
+  filter: drop-shadow(0 1px 0 #c98a00);
   transition:
     transform 500ms var(--ease-pop),
     opacity 400ms ease;
@@ -89,8 +80,7 @@
   height: 22px;
   margin-left: -1.5px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 1px 3px rgba(var(--shadow-color), 0.25);
+  background: var(--surface-raised);
 }
 
 .lost {

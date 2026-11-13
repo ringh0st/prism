@@ -1,6 +1,6 @@
 import styles from './Ribbon.module.css';
 
-/** A glowing clay title pill for screen and section titles. */
+/** A solid title pill on a darker ledge for screen and section titles. */
 export default function Ribbon({ as: Component = 'h2', tone = 'coral', size = 'md', className = '', children, ...rest }) {
   return (
     <div className={`${styles.wrap} ${styles[size]} ${className}`}>

@@ -6,25 +6,28 @@
   margin: 0 auto;
   padding: var(--pad);
   border-radius: var(--radius-xl);
-  background: var(--surface-board);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-lg);
-  transition: box-shadow var(--duration-base) ease;
+  /* A soft pool of sunlight on matte paper: light is shown as color, not bloom */
+  --pool: rgba(255, 210, 63, 0.14);
+  background:
+    radial-gradient(80% 70% at 50% 40%, var(--pool), transparent 75%),
+    var(--surface-board);
+  box-shadow: var(--highlight), var(--shadow-lg);
+  transition: transform var(--duration-base) var(--ease-pop);
 }
 
 .board.solved {
-  box-shadow:
-    var(--glass-shine),
-    0 0 28px 2px rgba(255, 210, 63, 0.7),
-    0 0 70px 10px rgba(255, 200, 40, 0.45);
+  --pool: rgba(255, 210, 63, 0.42);
+  animation: solvedPop 520ms var(--ease-pop);
+}
+
+@keyframes solvedPop {
+  40% {
+    transform: scale(1.025);
+  }
 }
 
 .board.alarm {
-  box-shadow:
-    var(--glass-shine),
-    0 0 36px 4px rgba(255, 59, 48, 0.35),
-    var(--shadow-lg);
+  --pool: rgba(255, 90, 70, 0.13);
 }
 
 .floor,
@@ -45,9 +48,8 @@
   border-radius: 26%;
   background: var(--surface-cell);
   box-shadow:
-    inset 0 2px 1px rgba(255, 255, 255, 0.8),
-    inset 0 -3px 6px rgba(var(--shadow-color), 0.12),
-    0 2px 4px rgba(var(--shadow-color), 0.08);
+    var(--highlight),
+    inset 0 -3px 0 rgba(var(--shadow-color), 0.07);
 }
 
 .beams {
@@ -65,7 +67,7 @@
 }
 
 .ghostBeam {
-  /* Lens preview: a dotted white trail with a soft glow, clearly different from real beams. */
+  /* Lens preview: a dotted, pulsing trail, clearly different from real beams. */
   opacity: 0.95;
   filter: drop-shadow(0 0 0.08px var(--ghost-color)) drop-shadow(0 0 0.08px var(--ghost-color));
   animation: ghostIn 300ms ease, ghostPulse 0.9s ease-in-out infinite alternate;
@@ -221,8 +223,7 @@
   position: absolute;
   inset: 4%;
   border-radius: 50%;
-  background: radial-gradient(circle, transparent 55%, rgba(255, 210, 63, 0.55) 70%, transparent 74%);
-  box-shadow: 0 0 22px 6px rgba(255, 210, 63, 0.6);
+  background: rgba(255, 210, 63, 0.4);
   animation: hintPulse 1.1s ease-in-out infinite;
   pointer-events: none;
 }
@@ -298,28 +299,14 @@
 }
 
 .boss {
-  box-shadow:
-    var(--glass-shine),
-    0 0 22px 2px rgba(255, 74, 58, 0.35),
-    0 0 44px 6px rgba(255, 74, 58, 0.45),
-    var(--shadow-lg);
-  animation: bossGlow 1.6s ease-in-out infinite alternate;
-}
-
-@keyframes bossGlow {
-  to {
-    box-shadow:
-      var(--glass-shine),
-      0 0 30px 4px rgba(255, 74, 58, 0.45),
-      0 0 64px 12px rgba(255, 74, 58, 0.55),
-      var(--shadow-lg);
-  }
+  /* Boss boards sit in warmer, redder light */
+  --pool: rgba(255, 107, 91, 0.2);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .disco .beams,
   .disco .plate,
-  .boss {
+  .board.solved {
     animation: none;
   }
 }

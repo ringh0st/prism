@@ -23,10 +23,8 @@
   gap: 4px;
   padding: 5px;
   border-radius: var(--radius-pill);
-  background: var(--glass);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-md);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
 }
 
 .tab {
@@ -55,10 +53,10 @@
 
 .tabActive {
   color: #fff;
-  background: linear-gradient(160deg, #ff8e7a, var(--color-coral));
+  background: linear-gradient(180deg, #ec5644, #dd4634);
   box-shadow:
-    var(--clay),
-    0 8px 18px -8px rgba(255, 107, 91, 0.75);
+    var(--highlight-on-color),
+    0 3px 0 #a8331f;
 }
 
 .panel {
@@ -95,18 +93,15 @@
   gap: 6px;
   padding: var(--space-4) var(--space-2) var(--space-4);
   text-align: center;
-  transition: transform 220ms var(--ease-spring);
 }
 
-.slot:hover {
-  transform: translateY(-3px);
-}
-
-/* Clay "app icon" artwork with a slow light burst. */
+/* Solid "app icon" artwork on a darker ledge, with slow light rays. */
 .art {
-  --from: #fff1a6;
-  --to: #ffb800;
-  --glow: 255, 173, 13;
+  --from: #ffd84f;
+  --to: #ffc21a;
+  --ledge: #d99a00;
+  --icon: #5a3300;
+  --label: var(--icon);
   position: relative;
   display: grid;
   place-items: center;
@@ -115,37 +110,36 @@
   margin-top: 2px;
   border-radius: 30px;
   overflow: hidden;
-  background: linear-gradient(160deg, var(--from), var(--to));
+  margin-bottom: 4px;
+  background: linear-gradient(180deg, var(--from), var(--to));
   box-shadow:
-    var(--clay),
-    0 14px 26px -12px rgba(var(--glow), 0.85);
+    var(--highlight-on-color),
+    0 5px 0 var(--ledge);
 }
 
 .burst {
   position: absolute;
   inset: -30px;
-  background: repeating-conic-gradient(rgba(255, 255, 255, 0.3) 0deg 12deg, transparent 12deg 30deg);
+  background: repeating-conic-gradient(rgba(255, 255, 255, 0.22) 0deg 12deg, transparent 12deg 30deg);
   animation: spin 16s linear infinite;
 }
 
 .artIcon {
   position: relative;
-  color: #fff;
-  filter: drop-shadow(0 3px 6px rgba(110, 35, 5, 0.35));
+  color: var(--icon);
 }
 
 .helper {
-  --from: #fff1a6;
-  --to: #ffb800;
-  --glow: 255, 173, 13;
+  /* gold, see .art */
 }
 
 .sparks0,
 .sparks1,
 .sparks2 {
-  --from: #ffcf8a;
-  --to: #ff8a1c;
-  --glow: 255, 138, 28;
+  --from: #ffaa3d;
+  --to: #ff951a;
+  --ledge: #c86a00;
+  --icon: #3b2400;
 }
 
 .sparks1 .artIcon,
@@ -161,9 +155,10 @@
 .diamonds0,
 .diamonds1,
 .diamonds2 {
-  --from: #8ef1e3;
-  --to: #13a597;
-  --glow: 19, 165, 151;
+  --from: #3dd3c4;
+  --to: #26bdae;
+  --ledge: #158a7f;
+  --icon: #10312d;
 }
 
 .badge {
@@ -181,10 +176,8 @@
   border-radius: var(--radius-pill);
   font-size: 12.5px;
   white-space: nowrap;
-  background: linear-gradient(160deg, #ff8e7a, var(--color-coral));
-  box-shadow:
-    var(--clay),
-    0 6px 14px -6px rgba(255, 107, 91, 0.8);
+  background: #dd4634;
+  box-shadow: var(--shadow-sm);
 }
 
 .slotTitle {

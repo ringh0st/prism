@@ -14,10 +14,8 @@
   gap: var(--space-3);
   padding: var(--space-5);
   border-radius: var(--radius-lg);
-  background: var(--glass-strong);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-md);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
 }
 
 .card h2 {
@@ -162,8 +160,8 @@
 }
 
 .themeSelected {
-  background: var(--glass-strong);
-  box-shadow: 0 10px 24px -10px rgba(255, 107, 91, 0.7), 0 0 18px rgba(255, 107, 91, 0.3);
+  background: color-mix(in srgb, var(--color-coral) 14%, var(--surface-raised));
+  box-shadow: var(--shadow-md);
   transform: translateY(-2px);
 }
 
@@ -173,9 +171,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  box-shadow:
-    var(--clay),
-    0 0 18px;
+  box-shadow: var(--highlight-on-color), var(--shadow-sm);
 }
 
 .themeSwatch svg {

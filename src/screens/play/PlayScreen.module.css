@@ -42,10 +42,8 @@
   gap: var(--space-3);
   padding: 10px 16px 12px 10px;
   border-radius: var(--radius-lg);
-  background: var(--glass-strong);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-md);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
 }
 
 .gems {

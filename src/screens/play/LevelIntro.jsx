@@ -45,7 +45,7 @@ export default function LevelIntro({ level, title, subtitle, modifier, lumiLine,
         <div className={styles.lumi}>
           <Lumi mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={70} line={lumiLine} bubbleSide="right" />
         </div>
-        <Button size="lg" variant="go" icon="play" onClick={onDone} data-autofocus autoFocus>
+        <Button size="lg" icon="play" onClick={onDone} data-autofocus autoFocus>
           Let’s go!
         </Button>
       </div>

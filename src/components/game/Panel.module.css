@@ -1,21 +1,15 @@
-/* Frosted "liquid glass" card. */
+/* A matte paper card: edges come from fill contrast and a soft warm shadow. */
 .panel {
   position: relative;
   padding: var(--space-4);
   border-radius: var(--radius-lg);
-  background: var(--glass-strong);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-md);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
   color: var(--text-strong);
-}
-
-.glass {
-  background: var(--glass);
 }
 
 .dark {
   color: #fff;
-  background: rgba(60, 28, 12, 0.55);
-  box-shadow: var(--glass-shine), var(--shadow-md);
+  background: #3a2a20;
+  box-shadow: var(--shadow-md);
 }

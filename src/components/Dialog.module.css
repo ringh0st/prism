@@ -5,9 +5,7 @@
   display: grid;
   place-items: center;
   padding: var(--space-4);
-  background: rgba(80, 30, 10, 0.32);
-  backdrop-filter: blur(10px) saturate(1.2);
-  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  background: rgba(43, 33, 24, 0.45);
   animation: fadeIn var(--duration-base) ease;
 }
 
@@ -19,10 +17,8 @@
   overflow-y: auto;
   padding: var(--space-6) var(--space-5) var(--space-5);
   border-radius: var(--radius-xl);
-  background: var(--sheet);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), 0 -10px 40px -10px rgba(var(--shadow-color), 0.35), var(--shadow-lg);
+  background: var(--surface-overlay);
+  box-shadow: var(--highlight), var(--shadow-lg);
   text-align: center;
   animation: rise 520ms var(--ease-spring);
 }
@@ -74,11 +70,7 @@
 
 .celebrate .title {
   font-size: 38px;
-  background: linear-gradient(120deg, #ffad0d, var(--color-coral) 70%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 6px 14px rgba(255, 107, 91, 0.35));
+  color: var(--text-accent);
   animation: titleBounce 700ms var(--ease-pop);
 }
 

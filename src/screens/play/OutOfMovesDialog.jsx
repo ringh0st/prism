@@ -12,7 +12,7 @@ export default function OutOfMovesDialog({ lumiLine, onRetry, onMap }) {
       </div>
       <p className={styles.tip}>Tip: count the turns before you tap. Every move counts!</p>
       <div className={styles.actions}>
-        <Button size="lg" variant="go" icon="restart" onClick={onRetry} data-autofocus>
+        <Button size="lg" icon="restart" onClick={onRetry} data-autofocus>
           Try again
         </Button>
         <Button variant="secondary" icon="map" onClick={onMap}>

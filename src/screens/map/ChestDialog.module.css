@@ -10,7 +10,7 @@
 
 .chest svg {
   position: relative;
-  filter: drop-shadow(0 10px 16px rgba(200, 110, 0, 0.45));
+  filter: drop-shadow(0 6px 0 rgba(150, 80, 0, 0.18));
 }
 
 .shaking svg {
@@ -25,7 +25,7 @@
   position: absolute;
   inset: -40px;
   border-radius: 50%;
-  background: repeating-conic-gradient(rgba(255, 226, 120, 0.7) 0deg 12deg, transparent 12deg 30deg);
+  background: repeating-conic-gradient(rgba(255, 210, 63, 0.45) 0deg 12deg, transparent 12deg 30deg);
   mask-image: radial-gradient(circle, #000 20%, transparent 70%);
   -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 70%);
   opacity: 0;
@@ -56,10 +56,10 @@
   font-weight: 600;
   font-size: 20px;
   color: #5a3300;
-  background: linear-gradient(160deg, #fff1a6, #ffc61a);
+  background: linear-gradient(180deg, #ffd84f, #ffc21a);
   box-shadow:
-    var(--clay),
-    0 10px 20px -10px rgba(255, 173, 13, 0.8);
+    var(--highlight-on-color),
+    0 4px 0 #d99a00;
   animation: rise 500ms var(--ease-pop) both;
 }
 

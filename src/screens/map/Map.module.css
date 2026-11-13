@@ -15,10 +15,8 @@
   max-width: 560px;
   margin: 0 auto;
   padding: max(10px, env(safe-area-inset-top)) var(--space-3) 18px;
-  /* Frosted band that fades out at its lower edge, so content scrolling underneath melts away */
-  background: color-mix(in srgb, var(--mesh-base) 90%, transparent);
-  backdrop-filter: blur(16px) saturate(1.4);
-  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  /* A paper band that fades out at its lower edge, so content scrolling underneath melts away */
+  background: var(--surface-page);
   mask-image: linear-gradient(180deg, #000 78%, transparent);
   -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent);
 }
@@ -36,12 +34,13 @@
   height: 34px;
   padding: 0 12px 0 8px;
   border-radius: var(--radius-pill);
-  color: #fff;
+  --label: #3b2400;
+  color: #3b2400;
   font-size: 17px;
-  background: linear-gradient(160deg, #ffb547, #ff5a2a);
+  background: linear-gradient(180deg, #ffaa3d, #ff951a);
   box-shadow:
-    var(--clay),
-    0 8px 18px -8px rgba(255, 90, 42, 0.8);
+    var(--highlight-on-color),
+    0 3px 0 #c86a00;
   animation: flicker 1.3s ease-in-out infinite alternate;
 }
 
@@ -73,27 +72,19 @@
   position: relative;
   padding: var(--space-5) var(--space-2) var(--space-5);
   border-radius: 40px;
-  background:
-    radial-gradient(120% 60% at 50% 0%, rgba(255, 255, 255, 0.55), transparent 70%),
-    linear-gradient(180deg, color-mix(in srgb, var(--tint-a) 55%, transparent), color-mix(in srgb, var(--tint-b) 45%, transparent));
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-lg);
+  /* Flat tinted paper: each world gets its own soft color, edges come from the shadow alone */
+  background: color-mix(in srgb, var(--tint-a) 55%, var(--surface-raised));
+  box-shadow: var(--highlight), var(--shadow-lg);
 }
 
-/* In the dark, tints become a warm glow over the night glass instead of a pale card */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .world {
-    background:
-      radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--tint-b) 22%, transparent), transparent 70%),
-      linear-gradient(180deg, color-mix(in srgb, var(--tint-b) 14%, var(--glass)), var(--glass));
+    background: color-mix(in srgb, var(--tint-b) 12%, var(--surface-raised));
   }
 }
 
 :root[data-theme='dark'] .world {
-  background:
-    radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--tint-b) 22%, transparent), transparent 70%),
-    linear-gradient(180deg, color-mix(in srgb, var(--tint-b) 14%, var(--glass)), var(--glass));
+  background: color-mix(in srgb, var(--tint-b) 12%, var(--surface-raised));
 }
 
 .sunshine {
@@ -162,8 +153,8 @@
   border-radius: var(--radius-pill);
   font-family: var(--font-display);
   font-weight: 600;
-  background: var(--glass-strong);
-  box-shadow: var(--glass-shine);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight);
 }
 
 .worldStars svg {
@@ -205,12 +196,13 @@
   list-style: none;
 }
 
-/* ---------- Level nodes: glossy clay spheres ---------- */
+/* ---------- Level nodes: solid coins on a darker ledge ---------- */
 .node {
   --size: 62px;
-  --from: #ffffff;
-  --to: #ffe4c4;
-  --glow: 165, 70, 25;
+  --fill-top: var(--surface-raised);
+  --fill-bottom: var(--surface-raised);
+  --ledge: var(--surface-cell-edge);
+  --label: var(--text-strong);
   position: absolute;
   display: grid;
   place-items: center;
@@ -219,15 +211,15 @@
   margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
   text-decoration: none;
   z-index: 1;
-  transition: transform 220ms var(--ease-spring);
+  transition: transform 160ms var(--ease-out);
 }
 
 a.node:hover {
-  transform: scale(1.1);
+  transform: translateY(-2px);
 }
 
 a.node:active {
-  transform: scale(0.93);
+  transform: translateY(3px);
 }
 
 .nodeFace {
@@ -236,68 +228,56 @@ a.node:active {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  color: var(--text-strong);
-  background: radial-gradient(circle at 34% 28%, #fff 0 8%, transparent 9%), radial-gradient(circle at 40% 32%, var(--from), var(--to) 75%);
+  color: var(--label);
+  background: linear-gradient(180deg, var(--fill-top), var(--fill-bottom));
   box-shadow:
-    var(--clay),
-    0 12px 22px -10px rgba(var(--glow), 0.65);
+    var(--highlight-on-color),
+    0 5px 0 var(--ledge),
+    var(--shadow-md);
 }
 
 .nodeNumber {
+  color: inherit;
   font-size: 25px;
   line-height: 1;
 }
 
 .doneNode {
-  --from: #fff3b0;
-  --to: #ffb21a;
-  --glow: 255, 160, 10;
+  --fill-top: #ffd84f;
+  --fill-bottom: #ffc21a;
+  --ledge: #d99a00;
+  --label: #5a3300;
 }
 
-.doneNode .nodeNumber,
-.currentNode .nodeNumber {
-  color: #fff;
-  text-shadow: 0 1px 1px rgba(110, 35, 5, 0.3), 0 2px 8px rgba(110, 35, 5, 0.2);
-}
-
+/* The current level is the hero: biggest, coral, and the only thing that moves */
 .currentNode {
-  --size: 76px;
-  --from: #8ff5c8;
-  --to: #13b56f;
-  --glow: 19, 181, 111;
+  --size: 78px;
+  --fill-top: #ec5644;
+  --fill-bottom: #dd4634;
+  --ledge: #a8331f;
+  --label: #fff;
   z-index: 3;
 }
 
 .currentNode .nodeFace {
-  animation: pulse 1.6s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  50% {
-    box-shadow:
-      var(--clay),
-      0 12px 22px -10px rgba(var(--glow), 0.65),
-      0 0 30px 6px rgba(19, 181, 111, 0.35);
-  }
+  animation: bob 1.8s ease-in-out infinite;
 }
 
 .lockedNode .nodeFace {
   color: var(--text-soft);
-  background: var(--glass);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-sm);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
 }
 
 .hard {
   --size: 68px;
 }
 
-.hard.doneNode,
-.hard.currentNode {
-  --from: #ffd197;
-  --to: #ff8a1c;
-  --glow: 255, 138, 28;
+.hard.doneNode {
+  --fill-top: #ffaa3d;
+  --fill-bottom: #ff951a;
+  --ledge: #c86a00;
+  --label: #3b2400;
 }
 
 .extra {
@@ -306,9 +286,10 @@ a.node:active {
 
 .extra.doneNode,
 .extra.currentNode {
-  --from: #ffb3a3;
-  --to: #f0453a;
-  --glow: 240, 69, 58;
+  --fill-top: #e34a37;
+  --fill-bottom: #c8402f;
+  --ledge: #8f2a1d;
+  --label: #fff;
 }
 
 .extra .nodeNumber {
@@ -329,12 +310,11 @@ a.node:active {
 
 .starOn {
   color: var(--color-sunshine);
-  filter: drop-shadow(0 2px 3px rgba(200, 110, 0, 0.55));
+  filter: drop-shadow(0 1px 0 #c98a00);
 }
 
 .starOff {
-  color: rgba(255, 255, 255, 0.85);
-  filter: drop-shadow(0 1px 2px rgba(var(--shadow-color), 0.25));
+  color: rgba(var(--shadow-color), 0.18);
 }
 
 .flame,
@@ -343,10 +323,7 @@ a.node:active {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  color: #fff;
-  box-shadow:
-    var(--clay),
-    0 4px 10px -4px rgba(var(--shadow-color), 0.6);
+  box-shadow: var(--highlight-on-color), var(--shadow-sm);
 }
 
 .flame {
@@ -354,15 +331,16 @@ a.node:active {
   bottom: -2px;
   width: 26px;
   height: 26px;
-  background: linear-gradient(160deg, #ffb547, #ff5a2a);
+  color: #3b2400;
+  background: linear-gradient(180deg, #ffaa3d, #ff951a);
 }
 
 .crown {
   top: -26px;
   width: 38px;
   height: 38px;
-  background: linear-gradient(160deg, #ffe066, #ffad0d);
-  animation: bob 2s ease-in-out infinite;
+  color: #5a3300;
+  background: linear-gradient(180deg, #ffd84f, #ffc21a);
 }
 
 .extra .nodeStars {
@@ -376,10 +354,9 @@ a.node:active {
   border-radius: var(--radius-pill);
   font-size: 12px;
   letter-spacing: 0.08em;
-  background: linear-gradient(160deg, #ff8e7a, #e5333a);
-  box-shadow:
-    var(--clay),
-    0 6px 14px -6px rgba(229, 51, 58, 0.8);
+  --label: #fff;
+  background: #c8402f;
+  box-shadow: var(--highlight-on-color), 0 2px 0 #8f2a1d;
 }
 
 .lumiOnNode {
@@ -398,7 +375,7 @@ a.node:active {
 
 .currentNode {
   /* Keeps the current level clear of the HUD and the PLAY button when it is scrolled into view */
-  scroll-margin: 96px 0 250px;
+  scroll-margin: 96px 0 205px;
 }
 
 .currentNode .nodeStars {
@@ -423,10 +400,8 @@ a.node:active {
   border: 0;
   border-radius: 22px;
   color: #d9a24a;
-  background: var(--glass);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-md);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
   z-index: 1;
 }
 
@@ -440,12 +415,13 @@ a.node:active {
 }
 
 .chest_ready {
-  color: #ffb800;
+  color: #b86e00;
   cursor: pointer;
-  background: radial-gradient(circle at 50% 40%, #fff9d6, #ffe07a);
+  background: linear-gradient(180deg, #ffd84f, #ffc21a);
   box-shadow:
-    var(--clay),
-    0 0 34px 8px rgba(255, 200, 40, 0.6);
+    var(--highlight-on-color),
+    0 4px 0 #d99a00,
+    var(--shadow-md);
   animation: wiggle 1.1s ease-in-out infinite;
 }
 
@@ -462,8 +438,8 @@ a.node:active {
   border-radius: var(--radius-pill);
   font-size: 13px;
   color: #5a3300;
-  background: linear-gradient(160deg, #ffe066, #ffad0d);
-  box-shadow: var(--clay);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
 }
 
 @keyframes wiggle {
@@ -522,13 +498,17 @@ a.node:active {
   transform: translateX(-50%);
   border-radius: var(--radius-pill);
   text-decoration: none;
+  margin-bottom: 5px;
   color: #fff;
-  background: linear-gradient(160deg, #5eeaa8, #13b56f);
+  --label: #fff;
+  background: linear-gradient(180deg, #ec5644, #dd4634);
   box-shadow:
-    var(--clay),
-    0 18px 34px -12px rgba(19, 181, 111, 0.85),
-    0 0 28px 4px rgba(94, 234, 168, 0.3);
-  animation: playPulse 1.8s var(--ease-spring) infinite;
+    var(--highlight-on-color),
+    0 5px 0 #a8331f,
+    var(--shadow-lg);
+  transition:
+    transform 110ms var(--ease-out),
+    box-shadow 110ms var(--ease-out);
 }
 
 .playButton > :first-child {
@@ -544,11 +524,9 @@ a.node:active {
 }
 
 .playButton:active {
-  transform: translateX(-50%) scale(0.95);
-}
-
-@keyframes playPulse {
-  50% {
-    transform: translateX(-50%) scale(1.05);
-  }
+  transform: translateX(-50%) translateY(5px);
+  box-shadow:
+    var(--highlight-on-color),
+    0 0 0 #a8331f,
+    var(--shadow-sm);
 }

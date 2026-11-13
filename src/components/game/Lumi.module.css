@@ -58,10 +58,8 @@
   font-size: 15px;
   line-height: 1.3;
   color: var(--text-strong);
-  background: var(--glass-strong);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-md);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
   animation: pop 420ms var(--ease-pop);
   z-index: 3;
 }
@@ -73,7 +71,7 @@
   width: 14px;
   height: 14px;
   border-radius: 0 0 4px 0;
-  background: var(--glass-strong);
+  background: var(--surface-raised);
   transform: rotate(45deg);
 }
 

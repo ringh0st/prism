@@ -8,16 +8,17 @@
   font-weight: 600;
   font-size: 13px;
   color: #fff;
+  box-shadow: var(--highlight-on-color);
   white-space: nowrap;
 }
 
 .hard {
-  background: linear-gradient(180deg, #ffb547, var(--color-tangerine-deep));
+  color: #3b2400;
+  background: linear-gradient(180deg, #ffaa3d, #ff951a);
 }
 
 .extra {
-  background: linear-gradient(180deg, #ff8a72, var(--color-coral-deep));
-  box-shadow: 0 0 12px rgba(255, 107, 91, 0.6);
+  background: linear-gradient(180deg, #e34a37, #c8402f);
 }
 
 .compact {

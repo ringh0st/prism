@@ -1,4 +1,4 @@
-/* Floating liquid-glass dock. */
+/* Floating matte dock. The active tab sits in a solid coral pill. */
 .nav {
   position: fixed;
   left: 50%;
@@ -11,10 +11,8 @@
   padding: 6px;
   transform: translateX(-50%);
   border-radius: 30px;
-  background: var(--glass-strong);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  box-shadow: var(--glass-shine), var(--shadow-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-lg);
 }
 
 .tab {
@@ -56,10 +54,10 @@
 
 .active {
   color: #fff;
-  background: linear-gradient(160deg, #ff8e7a, var(--color-coral));
+  background: linear-gradient(180deg, #ec5644, #dd4634);
   box-shadow:
-    var(--clay),
-    0 8px 18px -8px rgba(255, 107, 91, 0.75);
+    var(--highlight-on-color),
+    0 3px 0 #a8331f;
 }
 
 .active:hover {
@@ -77,9 +75,8 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #17b874;
-  box-shadow:
-    0 0 10px rgba(23, 184, 116, 0.8);
+  background: var(--color-mint-deep);
+  box-shadow: 0 0 0 2px var(--surface-raised);
   animation: ping 1.6s ease-in-out infinite;
 }
 
@@ -96,9 +93,9 @@
   font-size: 11px;
   line-height: 17px;
   text-align: center;
-  color: #fff;
-  background: linear-gradient(160deg, #ffc163, #ff8a1c);
-  box-shadow: 0 3px 8px -2px rgba(255, 138, 28, 0.7);
+  color: #3b2400;
+  background: var(--color-tangerine);
+  box-shadow: 0 0 0 2px var(--surface-raised);
 }
 
 @keyframes hop {

@@ -5,20 +5,22 @@
 }
 
 .ribbon {
-  --from: #ff8e7a;
-  --to: var(--color-coral);
-  --glow: 255, 107, 91;
-  margin: 0;
+  --fill-top: #ec5644;
+  --fill-bottom: #dd4634;
+  --ledge: #a8331f;
+  --label: #fff;
+  margin: 0 0 4px;
   max-width: 100%;
   padding: 9px 26px 10px;
   border-radius: var(--radius-pill);
   font-size: 21px;
   line-height: 1.15;
   text-align: center;
-  background: linear-gradient(160deg, var(--from), var(--to));
+  background: linear-gradient(180deg, var(--fill-top), var(--fill-bottom));
   box-shadow:
-    var(--clay),
-    0 12px 26px -10px rgba(var(--glow), 0.6);
+    var(--highlight-on-color),
+    0 4px 0 var(--ledge),
+    var(--shadow-md);
 }
 
 .sm .ribbon {
@@ -33,26 +35,27 @@
 }
 
 .coral {
-  --from: #ff8e7a;
-  --to: var(--color-coral);
-  --glow: 255, 107, 91;
+  /* defaults */
 }
 
 .tangerine {
-  --from: #ffc163;
-  --to: #ff8a1c;
-  --glow: 255, 138, 28;
+  --fill-top: #ffaa3d;
+  --fill-bottom: #ff9a1f;
+  --ledge: #c86a00;
+  --label: #3b2400;
 }
 
 .sunshine,
 .gold {
-  --from: #ffe066;
-  --to: #ffad0d;
-  --glow: 255, 173, 13;
+  --fill-top: #ffd84f;
+  --fill-bottom: #ffc61f;
+  --ledge: #d99a00;
+  --label: #3b2400;
 }
 
 .mint {
-  --from: #5ee0d0;
-  --to: var(--color-mint-deep);
-  --glow: 23, 152, 140;
+  --fill-top: #3dd3c4;
+  --fill-bottom: #26bdae;
+  --ledge: #158a7f;
+  --label: #10312d;
 }
