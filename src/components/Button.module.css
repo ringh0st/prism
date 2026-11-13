@@ -1,13 +1,12 @@
 /*
- * Solid "ledge" buttons: a matte fill sitting on a darker lip of the same hue.
- * Pressing pushes the button down onto its lip. No outlines, no glows.
+ * 2026 buttons: solid, flat color with a soft neutral shadow. No outlines, ledges or glows.
+ * Pressing gives tactile feedback through motion instead: the button shrinks a little and its
+ * corners morph (a pill softens into a rounded square), springing back on release.
  */
 .button {
-  --fill-top: var(--action-top);
-  --fill-bottom: var(--action-bottom);
-  --ledge: var(--action-ledge);
+  --fill: var(--action-bottom);
+  --fill-hover: var(--action-top);
   --label: var(--action-label);
-  --ledge-height: 4px;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -15,7 +14,6 @@
   gap: var(--space-2);
   min-height: 50px;
   padding: 0 var(--space-5);
-  margin-bottom: var(--ledge-height);
   border: 0;
   border-radius: var(--radius-pill);
   font-family: var(--font-display);
@@ -24,17 +22,15 @@
   line-height: 1;
   color: var(--label);
   text-decoration: none;
-  background: linear-gradient(180deg, var(--fill-top), var(--fill-bottom));
-  box-shadow:
-    var(--highlight-on-color),
-    0 var(--ledge-height) 0 var(--ledge),
-    var(--shadow-md);
+  background: var(--fill);
+  box-shadow: var(--shadow-button);
   cursor: pointer;
   user-select: none;
   transition:
-    transform 110ms var(--ease-out),
-    box-shadow 110ms var(--ease-out),
-    filter 150ms ease;
+    transform 260ms var(--ease-spring),
+    border-radius 260ms var(--ease-spring),
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .button > span {
@@ -43,85 +39,71 @@
   gap: 6px;
 }
 
-.button:hover:not(:disabled) {
-  filter: brightness(1.05);
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    background: var(--fill-hover);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+  }
 }
 
 .button:active:not(:disabled) {
-  transform: translateY(var(--ledge-height));
-  box-shadow:
-    var(--highlight-on-color),
-    0 0 0 var(--ledge),
-    var(--shadow-sm);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transform: scale(0.95);
+  transition-duration: 90ms;
 }
 
 .button:disabled,
 .button[aria-disabled='true'] {
   cursor: not-allowed;
-  filter: grayscale(0.9);
-  opacity: 0.5;
+  opacity: 0.45;
+  box-shadow: none;
 }
 
 .primary {
-  /* coral, see defaults */
+  /* sage, see defaults */
 }
 
 /* Success / "go" moments */
 .go {
-  --fill-top: var(--calm-top);
-  --fill-bottom: var(--calm-bottom);
-  --ledge: var(--calm-ledge);
-  --label: #2b2118;
+  --fill: var(--calm-bottom);
+  --fill-hover: var(--calm-top);
+  --label: var(--calm-label);
 }
 
 /* Rewards and currency */
 .gold {
-  --fill-top: var(--reward-top);
-  --fill-bottom: var(--reward-bottom);
-  --ledge: var(--reward-ledge);
-  --label: var(--warm-label);
+  --fill: var(--reward-bottom);
+  --fill-hover: var(--reward-top);
+  --label: var(--reward-label);
 }
 
+/* Quiet actions: a tonal surface that sits on cards and sheets */
 .secondary {
-  --fill-top: var(--surface-raised);
-  --fill-bottom: var(--surface-raised);
-  --ledge: var(--surface-cell-edge);
+  --fill: var(--surface-tonal);
+  --fill-hover: var(--surface-tonal-hover);
   --label: var(--text-strong);
-  box-shadow:
-    var(--highlight),
-    0 var(--ledge-height) 0 var(--ledge),
-    var(--shadow-md);
-}
-
-.ghost {
-  --label: var(--text-strong);
-  margin-bottom: 0;
-  background: transparent;
   box-shadow: none;
 }
 
-.ghost:hover:not(:disabled) {
-  background: var(--surface-sunken);
-  filter: none;
-}
-
-.ghost:active:not(:disabled) {
-  transform: scale(0.97);
+.ghost {
+  --fill: transparent;
+  --fill-hover: var(--surface-tonal);
+  --label: var(--text-strong);
   box-shadow: none;
 }
 
 .sm {
-  --ledge-height: 3px;
   min-height: 40px;
   padding: 0 var(--space-4);
   font-size: 16px;
 }
 
 .lg {
-  --ledge-height: 5px;
-  min-height: 62px;
+  min-height: 60px;
   padding: 0 var(--space-6);
-  font-size: 22px;
+  font-size: 21px;
 }
 
 .iconOnly {
@@ -134,5 +116,5 @@
 }
 
 .iconOnly.lg {
-  width: 62px;
+  width: 60px;
 }

@@ -30,20 +30,19 @@
   height: 26px;
   border-radius: 50%;
   color: var(--reward-label);
-  box-shadow: var(--highlight-on-color);
 }
 
 .star .badge {
-  background: linear-gradient(180deg, var(--reward-top), var(--reward-bottom));
+  background: var(--reward-bottom);
 }
 
 .spark .badge {
-  background: linear-gradient(180deg, var(--warm-top), var(--warm-bottom));
+  background: var(--warm-bottom);
 }
 
 .diamond .badge {
   color: var(--calm-label);
-  background: linear-gradient(180deg, var(--calm-top), var(--calm-bottom));
+  background: var(--calm-bottom);
 }
 
 .value {
@@ -63,10 +62,7 @@
   height: 32px;
   border-radius: 50%;
   color: var(--action-label);
-  background: linear-gradient(180deg, var(--action-top), var(--action-bottom));
-  box-shadow:
-    var(--highlight-on-color),
-    0 2px 0 var(--action-ledge);
+  background: var(--action-bottom);
 }
 
 @keyframes bump {

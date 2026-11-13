@@ -33,19 +33,13 @@
   font-size: 22px;
   color: var(--calm-label);
   transform: rotate(-6deg);
-  background: linear-gradient(180deg, var(--calm-top), var(--calm-bottom));
-  box-shadow:
-    var(--highlight-on-color),
-    0 4px 0 var(--calm-ledge);
+  background: var(--calm-bottom);
   animation: stamp 500ms var(--ease-pop) 250ms both;
 }
 
 .boss .sticker {
   color: var(--alert-label);
-  background: linear-gradient(180deg, var(--alert-top), var(--alert-bottom));
-  box-shadow:
-    var(--highlight-on-color),
-    0 4px 0 var(--alert-ledge);
+  background: var(--alert-bottom);
 }
 
 .disco .sticker {
@@ -53,11 +47,12 @@
   background-size: 300% 100%;
   animation:
     stamp 500ms var(--ease-pop) 250ms both,
-    shimmer 1.2s linear infinite;
+    shimmer 5s linear infinite;
 }
 
 .night .sticker {
-  background: linear-gradient(160deg, #6b4a3a, #2b1d16);
+  color: #fff4e8;
+  background: #3a2a20;
 }
 
 .goal {

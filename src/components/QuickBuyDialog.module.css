@@ -6,11 +6,8 @@
   margin: 0 auto var(--space-3);
   border-radius: 24px;
   color: var(--reward-label);
-  background: linear-gradient(180deg, var(--reward-top), var(--reward-bottom));
-  box-shadow:
-    var(--highlight-on-color),
-    0 4px 0 var(--reward-ledge),
-    var(--shadow-md);
+  background: var(--reward-bottom);
+  box-shadow: var(--shadow-md);
 }
 
 .description {

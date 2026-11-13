@@ -24,7 +24,6 @@
   background: var(--surface-raised);
   box-shadow:
     var(--highlight),
-    0 3px 0 var(--surface-cell-edge),
     var(--shadow-sm);
   cursor: pointer;
   transition:
@@ -33,8 +32,9 @@
 }
 
 .helper:active:not(:disabled) {
-  transform: translateY(3px);
-  box-shadow: var(--highlight), 0 0 0 var(--surface-cell-edge);
+  border-radius: var(--radius-sm);
+  transform: scale(0.94);
+  transition-duration: 90ms;
 }
 
 .helper:disabled {
@@ -49,10 +49,7 @@
   height: 36px;
   border-radius: 13px;
   color: var(--reward-label);
-  background: linear-gradient(180deg, var(--reward-top), var(--reward-bottom));
-  box-shadow:
-    var(--highlight-on-color),
-    0 3px 0 var(--reward-ledge);
+  background: var(--reward-bottom);
 }
 
 .empty .icon {

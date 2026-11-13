@@ -23,14 +23,12 @@
   font-weight: 600;
   font-size: 20px;
   color: var(--reward-label);
-  background: linear-gradient(180deg, var(--reward-top), var(--reward-bottom));
-  box-shadow: var(--highlight-on-color), 0 4px 0 var(--reward-ledge);
+  background: var(--reward-bottom);
 }
 
 .diamond {
   color: var(--calm-label);
-  background: linear-gradient(180deg, var(--calm-top), var(--calm-bottom));
-  box-shadow: var(--highlight-on-color), 0 4px 0 var(--calm-ledge);
+  background: var(--calm-bottom);
 }
 
 .lumi {

@@ -8,17 +8,16 @@
   font-weight: 600;
   font-size: 13px;
   color: var(--alert-label);
-  box-shadow: var(--highlight-on-color);
   white-space: nowrap;
 }
 
 .hard {
   color: var(--warm-label);
-  background: linear-gradient(180deg, var(--warm-top), var(--warm-bottom));
+  background: var(--warm-bottom);
 }
 
 .extra {
-  background: linear-gradient(180deg, var(--alert-top), var(--alert-bottom));
+  background: var(--alert-bottom);
 }
 
 .compact {

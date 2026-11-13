@@ -53,10 +53,7 @@
 
 .tabActive {
   color: var(--action-label);
-  background: linear-gradient(180deg, var(--action-top), var(--action-bottom));
-  box-shadow:
-    var(--highlight-on-color),
-    0 3px 0 var(--action-ledge);
+  background: var(--action-bottom);
 }
 
 .panel {
@@ -97,7 +94,6 @@
 
 /* Solid "app icon" artwork on a darker ledge, with slow light rays. */
 .art {
-  --from: var(--reward-top);
   --to: var(--reward-bottom);
   --ledge: var(--reward-ledge);
   --icon: var(--reward-label);
@@ -111,10 +107,7 @@
   border-radius: 30px;
   overflow: hidden;
   margin-bottom: 4px;
-  background: linear-gradient(180deg, var(--from), var(--to));
-  box-shadow:
-    var(--highlight-on-color),
-    0 5px 0 var(--ledge);
+  background: var(--to);
 }
 
 .burst {
@@ -136,7 +129,6 @@
 .sparks0,
 .sparks1,
 .sparks2 {
-  --from: var(--warm-top);
   --to: var(--warm-bottom);
   --ledge: var(--warm-ledge);
   --icon: var(--warm-label);
@@ -155,7 +147,6 @@
 .diamonds0,
 .diamonds1,
 .diamonds2 {
-  --from: var(--calm-top);
   --to: var(--calm-bottom);
   --ledge: var(--calm-ledge);
   --icon: var(--calm-label);
@@ -200,8 +191,8 @@
   border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 700;
-  color: var(--reward-label);
-  background: rgba(255, 210, 63, 0.3);
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--color-honey) 30%, var(--surface-raised));
 }
 
 .cap svg {
@@ -209,7 +200,7 @@
 }
 
 /* ---------- Notes ---------- */
-.free h3 {
+.free h2 {
   margin-bottom: var(--space-3);
   font-size: 21px;
   text-align: center;
@@ -234,7 +225,7 @@
   margin-left: auto;
   font-family: var(--font-display);
   font-size: 18px;
-  color: var(--color-mint-deep);
+  color: var(--text-calm);
 }
 
 .free svg {

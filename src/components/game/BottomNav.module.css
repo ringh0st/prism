@@ -54,10 +54,7 @@
 
 .active {
   color: var(--action-label);
-  background: linear-gradient(180deg, var(--action-top), var(--action-bottom));
-  box-shadow:
-    var(--highlight-on-color),
-    0 3px 0 var(--action-ledge);
+  background: var(--action-bottom);
 }
 
 .active:hover {

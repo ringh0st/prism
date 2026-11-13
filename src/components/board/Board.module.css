@@ -47,9 +47,7 @@
   margin: 6%;
   border-radius: 26%;
   background: var(--surface-cell);
-  box-shadow:
-    var(--highlight),
-    inset 0 -3px 0 rgba(var(--shadow-color), 0.07);
+  box-shadow: var(--shadow-sm);
 }
 
 .beams {
@@ -70,7 +68,7 @@
   /* Lens preview: a dotted, pulsing trail, clearly different from real beams. */
   opacity: 0.95;
   filter: drop-shadow(0 0 0.08px var(--ghost-color)) drop-shadow(0 0 0.08px var(--ghost-color));
-  animation: ghostIn 300ms ease, ghostPulse 0.9s ease-in-out infinite alternate;
+  animation: ghostIn 300ms ease, ghostPulse 1.4s ease-in-out infinite alternate;
 }
 
 @keyframes ghostPulse {
@@ -152,10 +150,8 @@
 }
 
 .pivotBase {
+  /* A soft sage disc marks pieces that can turn */
   fill: var(--pivot-fill);
-  stroke: rgba(255, 107, 91, 0.45);
-  stroke-width: 2.5;
-  stroke-dasharray: 4 5;
 }
 
 .lockBase rect {
@@ -169,7 +165,7 @@
 .gem {
   transform-origin: 50px 50px;
   opacity: var(--gem-unlit-opacity);
-  filter: saturate(0.35);
+  filter: saturate(0.6);
   transition:
     opacity var(--duration-base) ease,
     filter var(--duration-base) ease;
@@ -242,43 +238,48 @@
 }
 
 /* ---------- Surprise looks ---------- */
+/*
+ * Disco levels drift slowly through soft colors. Photosensitivity safe: no flashes, no hard cuts,
+ * no brightness pulses, and each color change takes seconds (WCAG 2.3.1 allows at most 3 flashes/s).
+ */
 .disco .beams {
-  animation: discoBeams 1.2s ease-in-out infinite alternate;
+  animation: discoBeams 6s ease-in-out infinite alternate;
 }
 
 .disco .plate {
-  animation: discoFloor 1.6s steps(1) infinite;
+  animation: discoFloor 12s ease-in-out infinite;
 }
 
 .disco .plate:nth-child(3n) {
-  animation-delay: -0.4s;
+  animation-delay: -3s;
 }
 
 .disco .plate:nth-child(4n + 1) {
-  animation-delay: -0.8s;
+  animation-delay: -6s;
 }
 
 @keyframes discoBeams {
   from {
-    filter: hue-rotate(-35deg) saturate(1.4);
+    filter: hue-rotate(-25deg);
   }
   to {
-    filter: hue-rotate(35deg) saturate(1.4) brightness(1.15);
+    filter: hue-rotate(25deg);
   }
 }
 
 @keyframes discoFloor {
-  0% {
+  0%,
+  100% {
     background: var(--surface-cell);
   }
   25% {
-    background: #ffe0d8;
+    background: #fbe3d6;
   }
   50% {
-    background: #fff3b8;
+    background: #f8edc8;
   }
   75% {
-    background: #d4f7ef;
+    background: #dcefe3;
   }
 }
 

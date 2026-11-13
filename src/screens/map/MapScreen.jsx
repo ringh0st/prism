@@ -156,16 +156,16 @@ export default function MapScreen() {
             + {worldsLeft} more worlds and {worldsLeft * 20} levels waiting…
           </p>
         )}
+        {currentRef && (
+          <a href={`#/play/${currentRef.id}`} className={styles.playButton}>
+            <span className="game-title on-color">PLAY</span>
+            <span className={styles.playLevel}>
+              Level {currentRef.world}-{currentRef.index}
+            </span>
+          </a>
+        )}
       </main>
 
-      {currentRef && (
-        <a href={`#/play/${currentRef.id}`} className={styles.playButton}>
-          <span className="game-title on-color">PLAY</span>
-          <span className={styles.playLevel}>
-            Level {currentRef.world}-{currentRef.index}
-          </span>
-        </a>
-      )}
       <BottomNav active="map" />
       {chestOpening && <ChestDialog opening={chestOpening} onClose={() => setChestOpening(null)} />}
     </div>

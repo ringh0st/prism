@@ -31,7 +31,7 @@
   font-family: var(--font-display);
   font-weight: 600;
   color: var(--reward-label);
-  background: linear-gradient(180deg, #fff1b8, var(--color-sunshine));
+  background: var(--reward-bottom);
   opacity: 0;
   animation: pop 500ms var(--ease-pop) 1.3s forwards;
 }
@@ -42,12 +42,12 @@
 
 .best {
   color: var(--calm-label);
-  background: linear-gradient(180deg, var(--calm-top), var(--calm-bottom));
+  background: var(--calm-bottom);
 }
 
 .shield {
   color: var(--action-label);
-  background: linear-gradient(180deg, var(--action-top), var(--action-bottom));
+  background: var(--action-bottom);
 }
 
 .share {
@@ -66,7 +66,7 @@
 
 .streak {
   color: var(--warm-label);
-  background: linear-gradient(180deg, var(--warm-top), var(--warm-bottom));
+  background: var(--warm-bottom);
 }
 
 .streak svg {
@@ -97,7 +97,7 @@
 
 .diamond {
   color: var(--calm-label);
-  background: linear-gradient(180deg, var(--calm-top), var(--calm-bottom));
+  background: var(--calm-bottom);
 }
 
 .diamond svg {

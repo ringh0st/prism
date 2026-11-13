@@ -32,7 +32,7 @@ function ShopSlot({ icon, tone, title, badge, tag, children }) {
         </span>
         {badge && <span className={`game-title on-color ${styles.badge}`}>{badge}</span>}
       </div>
-      <h3 className={`game-title ${styles.slotTitle}`}>{title}</h3>
+      <h2 className={`game-title ${styles.slotTitle}`}>{title}</h2>
       {children}
     </Panel>
   );
@@ -111,7 +111,7 @@ function DiamondsTab({ onError }) {
   return (
     <>
       <Panel className={styles.free}>
-        <h3 className="game-title">Free diamonds!</h3>
+        <h2 className="game-title">Free diamonds!</h2>
         <ul>
           <li>
             <Icon name="check" size={18} /> Finish a world <strong>+{DIAMOND_REWARDS.worldComplete}</strong>

@@ -55,7 +55,7 @@
 }
 
 .place1 {
-  color: var(--reward-label);
+  color: var(--text-strong);
   background: color-mix(in srgb, var(--color-honey) 45%, var(--surface-raised));
 }
 
@@ -111,20 +111,17 @@
 
 .gold {
   color: var(--reward-label);
-  background: linear-gradient(180deg, var(--reward-top), var(--reward-bottom));
-  box-shadow: 0 2px 0 var(--reward-ledge);
+  background: var(--reward-bottom);
 }
 
 .silver {
   color: #2f2a22;
-  background: linear-gradient(180deg, #e4ded3, #cfc7b9);
-  box-shadow: 0 2px 0 #a59c8c;
+  background: #d6cfc2;
 }
 
 .bronze {
   color: var(--warm-label);
-  background: linear-gradient(180deg, var(--warm-top), var(--warm-bottom));
-  box-shadow: 0 2px 0 var(--warm-ledge);
+  background: var(--warm-bottom);
 }
 
 .name {

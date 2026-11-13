@@ -11,17 +11,16 @@ export function TileDefs() {
     <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id="tile-mirror" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#ffffff" />
-          <stop offset="0.5" stopColor="#f3ece4" />
-          <stop offset="1" stopColor="#d9cbbb" />
+          <stop offset="0" style={{ stopColor: 'var(--mirror-top)' }} />
+          <stop offset="1" style={{ stopColor: 'var(--mirror-bottom)' }} />
         </linearGradient>
         <linearGradient id="tile-splitter" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#d6fff8" stopOpacity="0.95" />
           <stop offset="1" stopColor="#2ec4b6" stopOpacity="0.75" />
         </linearGradient>
         <linearGradient id="tile-emitter" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ffb547" />
-          <stop offset="1" stopColor="#ff7a45" />
+          <stop offset="0" stopColor="#f6b45e" />
+          <stop offset="1" stopColor="#e5864f" />
         </linearGradient>
         <linearGradient id="tile-wall" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#c9a27e" />
@@ -59,16 +58,16 @@ function Mirror({ turns, isSplitter, isLocked }) {
           height="16"
           rx="8"
           fill={isSplitter ? 'url(#tile-splitter)' : 'url(#tile-mirror)'}
-          stroke={isSplitter ? '#17988c' : '#b8a48f'}
+          stroke={isSplitter ? '#17988c' : 'none'}
           strokeWidth="2.5"
         />
         {isSplitter ? (
           <line x1="16" y1="50" x2="84" y2="50" stroke="#fff" strokeWidth="3" strokeDasharray="6 6" strokeLinecap="round" />
         ) : (
-          <rect x="16" y="45" width="68" height="3.5" rx="2" fill="#fff" opacity="0.9" />
+          <rect x="16" y="45" width="68" height="3.5" rx="2" fill="#fff" opacity="0.55" />
         )}
       </g>
-      <circle cx="50" cy="50" r="6.5" fill={isLocked ? '#9c8873' : 'var(--color-coral)'} stroke="#fff" strokeWidth="2.5" />
+      <circle cx="50" cy="50" r="6.5" fill={isLocked ? '#9c8873' : 'var(--color-sage)'} stroke="#fff" strokeWidth="2.5" />
     </>
   );
 }
