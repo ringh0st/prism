@@ -1,6 +1,6 @@
 import { sparksForDaily, sparksForNewStars, starsForMoves, STARTING_SPARKS } from './scoring.js';
 import { daysBetween } from './daily.js';
-import { DAILY_SPARK_PURCHASE_LIMIT, HELPER_IDS, INVENTORY_CAP, storeItem } from './catalog.js';
+import { DAILY_GIFT_SPARKS, DAILY_SPARK_PURCHASE_LIMIT, HELPER_IDS, INVENTORY_CAP, storeItem } from './catalog.js';
 
 export const BEAM_THEMES = [
   { id: 'sunbeam', name: 'Sunbeam', color: '#FFD23F', starsToUnlock: 0 },
@@ -30,6 +30,7 @@ export function createEmptyProgress() {
     beamTheme: 'sunbeam',
     claimedChests: [],
     hotStreak: 0,
+    giftDate: null,
   };
 }
 
@@ -172,6 +173,15 @@ export function claimChestLocally(progress, chestKey, reward) {
   };
 }
 
+/** The daily gift is waiting when it hasn't been collected today. */
+export const isDailyGiftReady = (progress, today) => progress.giftDate !== today;
+
+/** Guest daily gift. Mirrors public.claim_daily_gift() in supabase/social.sql. @throws EconomyError */
+export function claimDailyGiftLocally(progress, today) {
+  if (!isDailyGiftReady(progress, today)) throw new EconomyError('You already opened today’s gift. Come back tomorrow!');
+  return { ...progress, sparks: progress.sparks + DAILY_GIFT_SPARKS, giftDate: today };
+}
+
 /** Consecutive levels solved with three stars and no helpers (just for fun and bragging). */
 export const nextHotStreak = (progress, { stars, usedHelpers }) => (stars === 3 && !usedHelpers ? progress.hotStreak + 1 : 0);
 
@@ -185,5 +195,6 @@ export function withServerState(progress, state, today) {
     daily: { streak: state.dailyStreak, lastDate: state.lastDailyDate, shields: state.streakShields ?? 0 },
     sparkPurchases: { date: today, count: state.sparkPurchasesToday },
     claimedChests: state.claimedChests ?? progress.claimedChests,
+    giftDate: state.lastGiftDate ?? progress.giftDate,
   };
 }

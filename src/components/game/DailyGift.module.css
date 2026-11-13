@@ -1,0 +1,138 @@
+/* ---------- Map HUD gift box ---------- */
+.button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  color: var(--text-soft);
+  background: var(--surface-tonal);
+  cursor: default;
+}
+
+.button.ready {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: var(--shadow-button);
+  cursor: pointer;
+  animation: wiggle 2.4s ease-in-out infinite;
+}
+
+.button.ready:active {
+  transform: scale(0.92);
+}
+
+.dot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-terracotta);
+  box-shadow: 0 0 0 2px var(--surface-page);
+}
+
+/* A wiggle, then a rest, so it's noticed without nagging */
+@keyframes wiggle {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  70% {
+    transform: rotate(-10deg) scale(1.06);
+  }
+  80% {
+    transform: rotate(9deg) scale(1.06);
+  }
+  90% {
+    transform: rotate(-4deg);
+  }
+}
+
+/* ---------- Shop note ---------- */
+.note {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-md);
+}
+
+.noteIcon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  color: var(--text-soft);
+  background: var(--surface-tonal);
+}
+
+.noteIcon.ready {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  animation: wiggle 2.4s ease-in-out infinite;
+}
+
+.noteText {
+  display: grid;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.noteText strong {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--text-strong);
+}
+
+/* ---------- Opened gift ---------- */
+.box {
+  display: grid;
+  place-items: center;
+  margin: 0 auto var(--space-3);
+  color: var(--color-honey-deep);
+  animation: pop 600ms var(--ease-pop);
+}
+
+.reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-3);
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  font-size: 22px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.text {
+  margin-bottom: var(--space-4);
+  font-weight: 700;
+}
+
+.lumi {
+  display: flex;
+  align-items: flex-end;
+  min-height: 90px;
+  margin: 0 0 var(--space-3) var(--space-2);
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.5) rotate(-12deg);
+  }
+  60% {
+    transform: scale(1.15) rotate(6deg);
+  }
+}

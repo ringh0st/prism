@@ -21,23 +21,38 @@
   -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent);
 }
 
+.hudStart {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .logo img {
   display: block;
   border-radius: 14px;
   box-shadow: var(--shadow-md);
 }
 
+.logo {
+  position: relative;
+}
+
+/* The hot streak sits on the logo's corner as a small flame badge */
 .hotStreak {
+  position: absolute;
+  right: -8px;
+  bottom: -6px;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  height: 34px;
-  padding: 0 12px 0 8px;
+  gap: 1px;
+  height: 22px;
+  padding: 0 7px 0 5px;
   border-radius: var(--radius-pill);
   --label: var(--warm-label);
   color: var(--warm-label);
-  font-size: 17px;
+  font-size: 13px;
   background: var(--warm-bottom);
+  box-shadow: 0 0 0 2px var(--surface-page);
   animation: flicker 1.3s ease-in-out infinite alternate;
 }
 

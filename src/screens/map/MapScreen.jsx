@@ -7,6 +7,7 @@ import ChestNode from './ChestNode.jsx';
 import ChestDialog from './ChestDialog.jsx';
 import WorldScenery from './scenery/WorldScenery.jsx';
 import WorldSign from './scenery/WorldSign.jsx';
+import DailyGift from '../../components/game/DailyGift.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
@@ -123,15 +124,18 @@ export default function MapScreen() {
   return (
     <div className={styles.page}>
       <header className={styles.hud}>
-        <a href="#/" className={styles.logo} aria-label="Rinny's Prism">
-          <img src={logoUrl} alt="" width="44" height="44" />
-        </a>
-        {progress.hotStreak >= 2 && (
-          <span className={styles.hotStreak} aria-label={`Hot streak: ${progress.hotStreak} perfect levels in a row`}>
-            <Icon name="flame" size={18} />
-            <span className="game-title on-color">{progress.hotStreak}</span>
-          </span>
-        )}
+        <div className={styles.hudStart}>
+          <a href="#/" className={styles.logo} aria-label="Rinny's Prism">
+            <img src={logoUrl} alt="" width="44" height="44" />
+            {progress.hotStreak >= 2 && (
+              <span className={styles.hotStreak} role="img" aria-label={`Hot streak: ${progress.hotStreak} perfect levels in a row`}>
+                <Icon name="flame" size={12} />
+                <span className="game-title on-color">{progress.hotStreak}</span>
+              </span>
+            )}
+          </a>
+          <DailyGift />
+        </div>
         <CurrencyHud />
       </header>
 

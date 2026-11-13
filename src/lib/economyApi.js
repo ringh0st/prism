@@ -34,6 +34,9 @@ export const consumeHelperOnServer = (helperId) => rpc('use_helper', { p_helper:
 
 export const claimChestOnServer = (world, chestNumber) => rpc('claim_chest', { p_world: world, p_chest: chestNumber });
 
+/** Collects today's free gift of sparks. */
+export const claimDailyGiftOnServer = (dateKey) => rpc('claim_daily_gift', { p_date: dateKey });
+
 /** This week's top players (nicknames only) and the caller's place. Works for guests too. */
 export const fetchWeeklyLeaderboard = () => rpc('weekly_leaderboard');
 

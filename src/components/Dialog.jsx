@@ -1,9 +1,11 @@
 import { useEffect, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './Dialog.module.css';
 
 /**
  * Accessible modal: labelled, traps Tab focus, closes on Escape, restores focus on close.
  * The first element with [data-autofocus] (or the dialog itself) receives focus.
+ * Rendered at the end of <body>, so it always sits above the screen it was opened from.
  * tone: default | celebrate | gentle (a light scrim, so the board stays visible behind the sheet)
  */
 export default function Dialog({ title, onClose, children, tone = 'default' }) {
@@ -40,7 +42,7 @@ export default function Dialog({ title, onClose, children, tone = 'default' }) {
     };
   }, [onClose]);
 
-  return (
+  return createPortal(
     <div className={`${styles.backdrop} ${styles[`${tone}Backdrop`] ?? ''}`} onClick={onClose ? () => onClose() : undefined}>
       <div
         ref={dialogRef}
@@ -56,6 +58,7 @@ export default function Dialog({ title, onClose, children, tone = 'default' }) {
         </h2>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

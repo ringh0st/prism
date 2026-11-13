@@ -4,6 +4,7 @@ import { readJson, removeKey, writeJson } from '../lib/storage.js';
 import {
   buyStoreItemOnServer,
   claimChestOnServer,
+  claimDailyGiftOnServer,
   claimWeeklyRewardOnServer,
   consumeHelperOnServer,
   fetchEconomyState,
@@ -16,6 +17,7 @@ import {
 import {
   buyStoreItemLocally,
   claimChestLocally,
+  claimDailyGiftLocally,
   consumeHelperLocally,
   nextHotStreak,
   createEmptyProgress,
@@ -26,6 +28,7 @@ import {
 } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
+import { DAILY_GIFT_SPARKS } from '../game/catalog.js';
 import { sfx } from '../audio/sfx.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
@@ -157,6 +160,18 @@ export function PlayerProvider({ children }) {
         const state = await claimChestOnServer(world, chestNumber);
         applyServerState(state);
         return state.reward ?? reward;
+      },
+
+      /** Collect today's free gift. @returns the sparks received. @throws EconomyError */
+      async claimDailyGift() {
+        const today = todayKey();
+        if (!userId) {
+          setProgress(claimDailyGiftLocally(progressRef.current, today));
+          return DAILY_GIFT_SPARKS;
+        }
+        const state = await claimDailyGiftOnServer(today);
+        applyServerState(state);
+        return state.sparksEarned;
       },
 
       /** @throws EconomyError when none are left */

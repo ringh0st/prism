@@ -7,6 +7,7 @@ import BuyButtons from '../components/BuyButtons.jsx';
 import StallFront from './store/StallFront.jsx';
 import ShelfItem from './store/ShelfItem.jsx';
 import ItemInfoDialog from './store/ItemInfoDialog.jsx';
+import DailyGift from '../components/game/DailyGift.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
 import { DIAMOND_PACKS, DIAMOND_REWARDS, HELPERS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS } from '../game/catalog.js';
 import { sparkPurchasesLeft } from '../game/progress.js';
@@ -248,6 +249,7 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
         </div>
 
         <section id="store-panel" role="tabpanel" aria-labelledby={`store-tab-${tab}`} className={styles.wall}>
+          <DailyGift look="note" />
           {tab === 'helpers' && <HelpersShelf buyProps={buyProps} onInfo={setInfo} />}
           {tab === 'sparks' && <SparksShelf buyProps={buyProps} onInfo={setInfo} />}
           {tab === 'diamonds' && <DiamondsShelf onError={(message) => setLumi({ mood: 'worried', line: message })} />}

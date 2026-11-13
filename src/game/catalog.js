@@ -85,6 +85,9 @@ export const DIAMOND_REWARDS = {
   streakWeek: 1,
 };
 
+/** A free gift of sparks, once a day. Must match public.claim_daily_gift() in supabase/social.sql. */
+export const DAILY_GIFT_SPARKS = 15;
+
 /**
  * Weekly top players (worldwide, signed-in players). The week runs Monday to Sunday, UTC.
  * Score: +1 per new star earned, +3 per daily puzzle. Must match supabase/social.sql.

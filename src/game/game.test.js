@@ -242,3 +242,16 @@ test('player titles and finished worlds', async () => {
   const levels = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`w1-${String(i + 1).padStart(2, '0')}`, { stars: 1 }]));
   assert.equal(finishedWorldCount({ ...levels, 'w2-01': { stars: 3 } }), 1);
 });
+
+test('daily gift: once a day, same amount as the database', async () => {
+  const { DAILY_GIFT_SPARKS } = await import('./catalog.js');
+  const { claimDailyGiftLocally, createEmptyProgress, isDailyGiftReady } = await import('./progress.js');
+  const sql = readFileSync(new URL('../../supabase/social.sql', import.meta.url), 'utf8');
+  assert.match(sql, new RegExp(`v_sparks constant integer := ${DAILY_GIFT_SPARKS};`));
+  const start = createEmptyProgress();
+  const after = claimDailyGiftLocally(start, '2026-03-01');
+  assert.equal(after.sparks, start.sparks + DAILY_GIFT_SPARKS);
+  assert.equal(isDailyGiftReady(after, '2026-03-01'), false);
+  assert.throws(() => claimDailyGiftLocally(after, '2026-03-01'));
+  assert.equal(isDailyGiftReady(after, '2026-03-02'), true);
+});
