@@ -1,0 +1,169 @@
+import { memo } from 'react';
+import { TILE } from '../../game/constants.js';
+import { beamColorVar, shapePathFor } from '../GemShape.jsx';
+import styles from './Board.module.css';
+
+const DIRECTION_ANGLE = { right: 0, down: 90, left: 180, up: 270 };
+
+/** Shared SVG gradients, rendered once per board. */
+export function TileDefs() {
+  return (
+    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="tile-mirror" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="0.5" stopColor="#f3ece4" />
+          <stop offset="1" stopColor="#d9cbbb" />
+        </linearGradient>
+        <linearGradient id="tile-splitter" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#d6fff8" stopOpacity="0.95" />
+          <stop offset="1" stopColor="#2ec4b6" stopOpacity="0.75" />
+        </linearGradient>
+        <linearGradient id="tile-emitter" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffb547" />
+          <stop offset="1" stopColor="#ff7a45" />
+        </linearGradient>
+        <linearGradient id="tile-wall" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#c9a27e" />
+          <stop offset="1" stopColor="#9c7350" />
+        </linearGradient>
+        <radialGradient id="tile-shade" cx="0.35" cy="0.3" r="0.8">
+          <stop offset="0" stopColor="#6b5a52" />
+          <stop offset="1" stopColor="#2b211c" />
+        </radialGradient>
+        <filter id="tile-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="6" />
+        </filter>
+      </defs>
+    </svg>
+  );
+}
+
+function Mirror({ turns, isSplitter, isLocked }) {
+  const angle = -45 + turns * 90;
+  return (
+    <>
+      {isLocked ? (
+        <g className={styles.lockBase}>
+          <rect x="14" y="14" width="72" height="72" rx="14" />
+          {[22, 78].map((x) => [22, 78].map((y) => <circle key={`${x}-${y}`} cx={x} cy={y} r="3.5" />))}
+        </g>
+      ) : (
+        <circle className={styles.pivotBase} cx="50" cy="50" r="36" />
+      )}
+      <g className={styles.rotor} style={{ transform: `rotate(${angle}deg)` }}>
+        <rect
+          x="9"
+          y="42"
+          width="82"
+          height="16"
+          rx="8"
+          fill={isSplitter ? 'url(#tile-splitter)' : 'url(#tile-mirror)'}
+          stroke={isSplitter ? '#17988c' : '#b8a48f'}
+          strokeWidth="2.5"
+        />
+        {isSplitter ? (
+          <line x1="16" y1="50" x2="84" y2="50" stroke="#fff" strokeWidth="3" strokeDasharray="6 6" strokeLinecap="round" />
+        ) : (
+          <rect x="16" y="45" width="68" height="3.5" rx="2" fill="#fff" opacity="0.9" />
+        )}
+      </g>
+      <circle cx="50" cy="50" r="6.5" fill={isLocked ? '#9c8873' : 'var(--color-coral)'} stroke="#fff" strokeWidth="2.5" />
+    </>
+  );
+}
+
+function Emitter({ dir, color }) {
+  return (
+    <g style={{ transform: `rotate(${DIRECTION_ANGLE[dir]}deg)`, transformOrigin: '50px 50px' }}>
+      <rect x="14" y="14" width="72" height="72" rx="20" fill="url(#tile-emitter)" />
+      <rect x="14" y="14" width="72" height="36" rx="18" fill="#fff" opacity="0.18" />
+      <path d="M70 34 L90 50 L70 66 Z" fill="#fff" opacity="0.9" />
+      <circle cx="48" cy="50" r="17" fill={beamColorVar(color)} stroke="#fff" strokeWidth="5" />
+      <circle cx="43" cy="44" r="5" fill="#fff" opacity="0.8" />
+    </g>
+  );
+}
+
+function Gem({ color, isLit }) {
+  const path = shapePathFor(color);
+  return (
+    <g className={`${styles.gem} ${isLit ? styles.gemLit : ''}`}>
+      {isLit && <path d={path} fill={beamColorVar(color)} filter="url(#tile-glow)" opacity="0.9" />}
+      <g transform="translate(50 50) scale(0.78) translate(-50 -50)">
+        <path d={path} fill={beamColorVar(color)} stroke="rgba(0,0,0,.22)" strokeWidth="5" strokeLinejoin="round" />
+        <path d={path} fill="#fff" opacity="0.4" transform="translate(50 50) scale(0.45) translate(-56 -62)" />
+      </g>
+    </g>
+  );
+}
+
+function Filter({ color }) {
+  return (
+    <>
+      <circle cx="50" cy="50" r="34" fill={beamColorVar(color)} opacity="0.35" />
+      <circle cx="50" cy="50" r="34" fill="none" stroke={beamColorVar(color)} strokeWidth="6" />
+      <path d={shapePathFor(color)} transform="translate(50 50) scale(0.32) translate(-50 -50)" fill="#fff" />
+    </>
+  );
+}
+
+function Shade({ isLit }) {
+  return (
+    <g className={isLit ? styles.shadeLit : ''}>
+      {isLit && <circle cx="50" cy="50" r="34" fill="#ff3b30" filter="url(#tile-glow)" />}
+      <circle cx="50" cy="50" r="32" fill="url(#tile-shade)" />
+      <path d="M58 30a20 20 0 1 0 12 28 16 16 0 1 1-12-28z" fill="#a58f80" opacity="0.65" />
+      {isLit && (
+        <text x="50" y="62" textAnchor="middle" fontSize="36" fontWeight="800" fill="#fff" fontFamily="var(--font-display)">
+          !
+        </text>
+      )}
+    </g>
+  );
+}
+
+function Wall() {
+  return (
+    <>
+      <rect x="10" y="10" width="80" height="80" rx="14" fill="url(#tile-wall)" />
+      <rect x="10" y="10" width="80" height="22" rx="11" fill="#fff" opacity="0.18" />
+      <path d="M10 50 H90 M50 10 V50 M30 50 V90 M70 50 V90" stroke="#7d5a3d" strokeWidth="3" opacity="0.35" />
+    </>
+  );
+}
+
+/** Visual for one tile. Pure presentation: no interaction here. */
+function TileArt({ tile, turns = 0, isLit = false, isRotatable = false }) {
+  let art = null;
+  switch (tile.type) {
+    case TILE.MIRROR:
+    case TILE.SPLITTER:
+      art = <Mirror turns={turns} isSplitter={tile.type === TILE.SPLITTER} isLocked={!isRotatable} />;
+      break;
+    case TILE.EMITTER:
+      art = <Emitter dir={tile.dir} color={tile.color} />;
+      break;
+    case TILE.GEM:
+      art = <Gem color={tile.color} isLit={isLit} />;
+      break;
+    case TILE.FILTER:
+      art = <Filter color={tile.color} />;
+      break;
+    case TILE.SHADE:
+      art = <Shade isLit={isLit} />;
+      break;
+    case TILE.WALL:
+      art = <Wall />;
+      break;
+    default:
+      return null;
+  }
+  return (
+    <svg className={styles.tileArt} viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+      {art}
+    </svg>
+  );
+}
+
+export default memo(TileArt);

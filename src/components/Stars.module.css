@@ -1,0 +1,43 @@
+.stars {
+  display: inline-flex;
+  gap: 2px;
+  line-height: 0;
+}
+
+.star {
+  color: var(--surface-cell-edge);
+}
+
+.earned {
+  color: var(--color-sunshine);
+  filter: drop-shadow(0 1px 0 var(--color-sunshine-deep));
+}
+
+.animate .star {
+  opacity: 0;
+  transform: scale(0.3) rotate(-30deg);
+  animation: starIn 520ms var(--ease-pop) forwards;
+  animation-delay: calc(350ms + var(--i) * 260ms);
+}
+
+.animate .star:not(.earned) {
+  animation-name: starInDim;
+}
+
+@keyframes starIn {
+  60% {
+    opacity: 1;
+    transform: scale(1.35) rotate(8deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes starInDim {
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

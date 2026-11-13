@@ -1,0 +1,77 @@
+.stars {
+  justify-content: center;
+  margin: var(--space-2) 0 var(--space-4);
+}
+
+.summary {
+  font-size: 18px;
+}
+
+.tip {
+  margin-top: var(--space-1);
+  color: var(--text-soft);
+  font-size: 15px;
+}
+
+.rewards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 8px;
+  margin: var(--space-4) 0 var(--space-5);
+}
+
+.reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: #6b4500;
+  background: linear-gradient(180deg, #fff1b8, var(--color-sunshine));
+  opacity: 0;
+  animation: pop 500ms var(--ease-pop) 1.3s forwards;
+}
+
+.reward svg {
+  color: var(--color-tangerine-deep);
+}
+
+.best {
+  color: #fff;
+  background: linear-gradient(180deg, #5ee0d3, var(--color-mint-deep));
+}
+
+.streak {
+  color: #fff;
+  background: linear-gradient(180deg, #ffb547, var(--color-tangerine-deep));
+}
+
+.streak svg {
+  color: #fff;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.actions {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.secondary {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}

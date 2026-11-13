@@ -1,0 +1,37 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px 0 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-sm), inset 0 0 0 1.5px var(--line);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sunshine svg {
+  color: var(--color-sunshine-deep);
+}
+
+.coral svg {
+  color: var(--color-coral);
+}
+
+.tangerine svg {
+  color: var(--color-tangerine);
+}
+
+.value {
+  display: inline-block;
+  animation: bump 380ms var(--ease-pop);
+}
+
+@keyframes bump {
+  from {
+    transform: scale(1.35);
+  }
+}

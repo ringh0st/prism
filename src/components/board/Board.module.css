@@ -1,0 +1,222 @@
+.board {
+  --pad: clamp(6px, 2vw, 12px);
+  position: relative;
+  width: min(100%, 560px, calc((100dvh - var(--board-reserved, 300px)) * var(--cols) / var(--rows)));
+  aspect-ratio: var(--cols) / var(--rows);
+  margin: 0 auto;
+  padding: var(--pad);
+  border-radius: var(--radius-lg);
+  background: var(--surface-board);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -6px 0 var(--surface-cell-edge),
+    var(--shadow-lg);
+  transition: box-shadow var(--duration-base) ease;
+}
+
+.board.solved {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -6px 0 var(--surface-cell-edge),
+    0 0 0 4px var(--color-sunshine),
+    0 0 50px 4px rgba(255, 210, 63, 0.55);
+}
+
+.board.alarm {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -6px 0 var(--surface-cell-edge),
+    0 0 0 3px rgba(255, 59, 48, 0.55),
+    var(--shadow-lg);
+}
+
+.floor,
+.cells,
+.beams {
+  position: absolute;
+  inset: var(--pad);
+}
+
+.floor {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+}
+
+.plate {
+  margin: 6%;
+  border-radius: 22%;
+  background: var(--surface-cell);
+  box-shadow: inset 0 -3px 0 var(--surface-cell-edge);
+}
+
+.beams {
+  width: calc(100% - 2 * var(--pad));
+  height: calc(100% - 2 * var(--pad));
+  pointer-events: none;
+  overflow: visible;
+}
+
+.beamCore {
+  stroke: #fff;
+  opacity: 0.9;
+  stroke-dasharray: 0.18 0.22;
+  animation: flow 1.1s linear infinite;
+}
+
+@keyframes flow {
+  to {
+    stroke-dashoffset: -0.4;
+  }
+}
+
+.cells {
+  display: grid;
+  grid-template-rows: repeat(var(--rows), 1fr);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+}
+
+.cellWrap {
+  /* Keep a real box: display: contents can drop the gridcell role in some browsers. */
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 22%;
+  cursor: default;
+  touch-action: manipulation;
+}
+
+.cell.actionable {
+  cursor: pointer;
+}
+
+.cell.actionable:hover .tileArt {
+  transform: scale(1.06);
+}
+
+.cell.actionable:active .tileArt {
+  transform: scale(0.92);
+}
+
+.cell:focus-visible {
+  outline-offset: -2px;
+}
+
+.tileArt {
+  width: 92%;
+  height: 92%;
+  overflow: visible;
+  transition: transform var(--duration-fast) var(--ease-pop);
+  filter: drop-shadow(0 3px 2px rgba(var(--shadow-color), 0.22));
+}
+
+.rotor {
+  transform-origin: 50px 50px;
+  transition: transform 320ms var(--ease-pop);
+}
+
+.pivotBase {
+  fill: var(--pivot-fill);
+  stroke: rgba(255, 107, 91, 0.45);
+  stroke-width: 2.5;
+  stroke-dasharray: 4 5;
+}
+
+.lockBase rect {
+  fill: var(--surface-locked);
+}
+
+.lockBase circle {
+  fill: rgba(0, 0, 0, 0.18);
+}
+
+.gem {
+  transform-origin: 50px 50px;
+  opacity: var(--gem-unlit-opacity);
+  filter: saturate(0.35);
+  transition:
+    opacity var(--duration-base) ease,
+    filter var(--duration-base) ease;
+}
+
+.gemLit {
+  opacity: 1;
+  filter: none;
+  animation: gemPop 600ms var(--ease-pop), gemPulse 1.8s ease-in-out 600ms infinite;
+}
+
+@keyframes gemPop {
+  0% {
+    transform: scale(0.7);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes gemPulse {
+  50% {
+    transform: scale(1.07);
+  }
+}
+
+.shadeLit {
+  transform-origin: 50px 50px;
+}
+
+.shake {
+  animation: shake 420ms ease;
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(-6%);
+  }
+  40%,
+  80% {
+    transform: translateX(6%);
+  }
+}
+
+.hint::after {
+  content: '';
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  border: 3px solid var(--color-sunshine);
+  box-shadow: 0 0 18px 4px rgba(255, 210, 63, 0.7);
+  animation: hintPulse 1.1s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes hintPulse {
+  50% {
+    transform: scale(1.12);
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beamCore {
+    animation: none;
+  }
+}

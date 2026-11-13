@@ -1,0 +1,51 @@
+import { supabase } from './supabase.js';
+import { levelFromRow, rowFromLevel } from '../state/LevelsContext.jsx';
+
+const throwIfError = ({ data, error }) => {
+  if (error) throw error;
+  return data;
+};
+
+/** Every level in the database, including unpublished drafts (admins only, enforced by RLS). */
+export async function fetchAllLevels() {
+  const rows = throwIfError(
+    await supabase
+      .from('levels')
+      .select('id, world, level_index, difficulty, name, par, data, is_published, updated_at')
+      .order('world')
+      .order('level_index'),
+  );
+  return rows.map((row) => ({ ...levelFromRow(row), updatedAt: row.updated_at }));
+}
+
+export async function saveLevel(level, { isPublished }) {
+  const { data: session } = await supabase.auth.getSession();
+  const row = { ...rowFromLevel(level, { isPublished }), updated_by: session.session?.user.id ?? null };
+  throwIfError(await supabase.from('levels').upsert(row, { onConflict: 'id' }));
+}
+
+export async function deleteLevel(id) {
+  throwIfError(await supabase.from('levels').delete().eq('id', id));
+}
+
+/** Copy the built-in level pack into the database so it can be edited. */
+export async function importLevels(levels, { isPublished }) {
+  const rows = levels.map((level) => rowFromLevel(level, { isPublished }));
+  throwIfError(await supabase.from('levels').upsert(rows, { onConflict: 'id', ignoreDuplicates: true }));
+}
+
+/** Completion stats per level, aggregated from everyone's progress (admins can read all rows). */
+export async function fetchLevelStats() {
+  const rows = throwIfError(await supabase.from('progress').select('user_id, level_id, stars, best_moves'));
+  const players = new Set(rows.map((row) => row.user_id));
+  const byLevel = new Map();
+  for (const row of rows) {
+    const entry = byLevel.get(row.level_id) ?? { completions: 0, starTotal: 0, perfect: 0, movesTotal: 0 };
+    entry.completions++;
+    entry.starTotal += row.stars;
+    entry.movesTotal += row.best_moves ?? 0;
+    if (row.stars === 3) entry.perfect++;
+    byLevel.set(row.level_id, entry);
+  }
+  return { playerCount: players.size, byLevel };
+}

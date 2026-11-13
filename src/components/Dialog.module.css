@@ -1,0 +1,55 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: rgba(43, 33, 24, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn var(--duration-base) ease;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 380px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  animation: rise 420ms var(--ease-pop);
+}
+
+.dialog:focus {
+  outline: none;
+}
+
+.title {
+  font-size: 28px;
+  margin-bottom: var(--space-3);
+}
+
+.celebrate .title {
+  font-size: 34px;
+  background: linear-gradient(120deg, var(--color-tangerine), var(--color-coral));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.92);
+  }
+}
