@@ -1,10 +1,11 @@
 /*
  * A Pal card: one layout for every Pal.
- * Rarity → the ribbon under the Pal and the frame (plain, gold or sunset).
- * Age    → the five growth icons and the age's name under the Pal's name.
+ * Rarity → a soft wash over the card, the ribbon under the Pal and the frame (sage, gold or sunset).
+ * Age    → the five growth icons and a small tag in the age's color (mint → sage → honey → peach → gold).
  */
 .card {
-  --frame: color-mix(in srgb, var(--text-strong) 8%, var(--surface-raised));
+  --face: color-mix(in srgb, var(--color-sage) 9%, var(--surface-raised));
+  --frame: color-mix(in srgb, var(--color-sage) 22%, var(--surface-raised));
 
   position: relative;
   display: grid;
@@ -15,7 +16,7 @@
   border: 2px solid var(--frame);
   border-radius: var(--radius-lg);
   text-align: center;
-  background: var(--surface-raised);
+  background: var(--face);
   /* A soft, modern lift (no heavy ledge under the card) */
   box-shadow:
     0 1px 2px rgb(43 33 24 / 0.06),
@@ -34,13 +35,18 @@
 }
 
 .legendary {
+  --face: color-mix(in srgb, var(--color-honey) 18%, var(--surface-raised));
   --frame: #f0c14e;
 }
 
 .mythic {
   border-color: transparent;
   background:
-    linear-gradient(var(--surface-raised), var(--surface-raised)) padding-box,
+    linear-gradient(
+        color-mix(in srgb, var(--color-peach) 22%, var(--surface-raised)),
+        color-mix(in srgb, var(--color-honey) 14%, var(--surface-raised))
+      )
+      padding-box,
     linear-gradient(135deg, #df7458, #f0c14e 34%, #f2a67e 62%, #df7458) border-box;
 }
 
@@ -100,6 +106,10 @@
 }
 
 /* ---------- Rarity ribbon: always in the same place ---------- */
+.locked {
+  --face: var(--surface-tonal);
+}
+
 .ribbon {
   justify-self: stretch;
   margin: -6px -10px 2px;
@@ -111,8 +121,8 @@
   text-transform: uppercase;
   white-space: nowrap;
   text-align: center;
-  color: var(--text-soft);
-  background: var(--surface-sunken);
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--color-sage) 40%, var(--surface-raised));
   clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 50%, 100% 100%, 0 100%, 7px 50%);
 }
 
@@ -161,6 +171,35 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-soft);
+}
+
+/* The age tag: a small pill that warms up as the Pal grows */
+.ageTag {
+  margin-top: 2px;
+  padding: 1px 10px;
+  border-radius: var(--radius-pill);
+  color: var(--text-strong);
+}
+
+.baby {
+  background: color-mix(in srgb, var(--color-mint) 30%, var(--surface-raised));
+}
+
+.junior {
+  background: color-mix(in srgb, var(--color-sage) 36%, var(--surface-raised));
+}
+
+.buddy {
+  background: color-mix(in srgb, var(--color-honey) 45%, var(--surface-raised));
+}
+
+.champ {
+  background: color-mix(in srgb, var(--color-peach) 50%, var(--surface-raised));
+}
+
+.legend {
+  background: color-mix(in srgb, var(--color-honey) 75%, var(--color-peach));
+  color: #3a2a0e;
 }
 
 /* ---------- Partner ribbon ---------- */

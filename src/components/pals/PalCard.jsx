@@ -8,8 +8,8 @@ const RIBBONS = { common: 'Regular', legendary: '★ Legendary', mythic: '✦ My
 
 /**
  * A Pal card. Every card has the same layout, so they're easy to compare at a glance:
- * the Pal, a rarity ribbon (Regular, ★ Legendary or ✦ Mythic, with a matching frame), the name, and
- * its age as five growth icons (sprout → crown) with the age's name.
+ * the Pal, a rarity ribbon (Regular, ★ Legendary or ✦ Mythic, with a matching frame and a soft wash over
+ * the card), the name, and its age as five growth icons (sprout → crown) with a tag in the age's color.
  * @param stage    the Pal's form (from palStage) if you have it, else null
  * @param onLook   opens the Pal's forms; without it the art isn't a button (locked Pals)
  * @param children the card's action (a button) or hint, at the bottom
@@ -36,7 +36,7 @@ export default function PalCard({ pal, stage = null, isUnlocked = true, isPartne
       {stage ? (
         <span className={styles.form}>
           <GrowthPips stageIndex={stage.index} />
-          <span className={styles.formName}>{stage.name}</span>
+          <span className={`${styles.formName} ${styles.ageTag} ${styles[stage.id]}`}>{stage.name}</span>
         </span>
       ) : (
         isUnlocked && <span className={styles.formName}>Not on your team yet</span>
