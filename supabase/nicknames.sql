@@ -1,4 +1,5 @@
--- Prism nicknames: players build their public name from two safe word lists.
+-- Prism nicknames: players build their public name from two safe word lists,
+-- and the weekly board shows nickname, Pal and title.
 -- Run in Supabase → SQL Editor AFTER pals.sql. Safe to run more than once.
 -- The word lists must match src/game/nicknames.js (a test checks).
 
@@ -51,6 +52,37 @@ as $$
   where p.id = p_user;
 $$;
 
+-- The weekly board shows each player's nickname, Pal and total stars (the game turns stars into a title).
+create or replace function public.weekly_leaderboard()
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with ranking as (
+    select r.*, (select coalesce(sum(g.stars), 0) from public.progress g where g.user_id = r.user_id) as total_stars, p.pal_id, coalesce((p.pals -> p.pal_id ->> 'xp')::integer, 0) as pal_xp, p.pal_accessory
+    from public._weekly_ranking(public._week_start()) r
+    join public.profiles p on p.id = r.user_id
+  )
+  select jsonb_build_object(
+    'weekStart', public._week_start(),
+    'endsAt', (public._week_start() + 7)::timestamp at time zone 'utc',
+    'top', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'rank', r.rank, 'nickname', public._nickname_for(r.user_id), 'score', r.score, 'isMe', r.user_id = auth.uid(),
+        'pal', r.pal_id, 'palXp', r.pal_xp, 'accessory', r.pal_accessory, 'stars', r.total_stars)
+        order by r.rank)
+      from ranking r where r.rank <= 50), '[]'::jsonb),
+    'me', (
+      select jsonb_build_object('rank', r.rank, 'score', r.score, 'nickname', public._nickname_for(r.user_id),
+        'pal', r.pal_id, 'palXp', r.pal_xp, 'accessory', r.pal_accessory, 'stars', r.total_stars)
+      from ranking r where r.user_id = auth.uid()),
+    'myNickname', case when auth.uid() is null then null else public._nickname_for(auth.uid()) end
+  );
+$$;
+
 revoke all on function public._nickname_for(uuid) from public, anon, authenticated;
 revoke all on function public.set_nickname(text, text) from public, anon;
 grant execute on function public.set_nickname(text, text) to authenticated;
+grant execute on function public.weekly_leaderboard() to anon, authenticated;

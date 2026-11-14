@@ -2,6 +2,7 @@ import Icon from '../../components/Icon.jsx';
 import { weeklyRewardFor } from '../../game/catalog.js';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { animalAvatar } from './animalAvatar.js';
+import { titleFor } from '../../game/titles.js';
 import styles from './Podium.module.css';
 
 const PLACE_ORDER = [2, 1, 3];
@@ -27,6 +28,7 @@ export default function Podium({ top }) {
               {rank === 1 && <Icon name="crown" size={26} className={styles.crown} />}
             </span>
             <span className={styles.name}>{row ? row.nickname : 'Up for grabs'}</span>
+            {row?.stars != null && <span className={styles.title}>{titleFor(row.stars).current.name}</span>}
             {row && (
               <span className={`game-title ${styles.score}`}>
                 {row.score} <span className={styles.points}>pts</span>
