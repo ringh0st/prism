@@ -21,6 +21,7 @@ import LuckyPalDialog from './screens/pals/LuckyPalDialog.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
 import LoadingScreen from './screens/LoadingScreen.jsx';
 import SplashScreen from './components/splash/SplashScreen.jsx';
+import { SplashContext } from './state/SplashContext.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
 import { BEAM_THEMES } from './game/progress.js';
 import { sfx } from './audio/sfx.js';
@@ -134,7 +135,9 @@ export default function App() {
         <LevelsProvider>
           <GameBackground />
           <BeamThemeStyle />
-          <Routes />
+          <SplashContext.Provider value={showsSplash}>
+            <Routes />
+          </SplashContext.Provider>
           {/* Pop-ups wait until the splash is gone */}
           {showsSplash ? (
             <SplashScreen onDone={hideSplash} />

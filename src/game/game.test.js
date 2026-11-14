@@ -551,3 +551,14 @@ test('event puzzles exist for upcoming weekends, climb in difficulty and match t
   assert.match(sql, new RegExp(`p_number > ${EVENT_LEVELS}\\b`));
   assert.match(sql, new RegExp(`v_solved < ${EVENT_LEVELS}\\b`));
 });
+
+test('Pal of the day leads with news, otherwise says hello for the time of day', async () => {
+  const { palGreetingFor } = await import('./palGreetings.js');
+  const { createEmptyProgress } = await import('./progress.js');
+  const base = createEmptyProgress();
+  const almost = { ...base, pal: { ...base.pal, id: 'mossy', owned: { mossy: { stage: 1, growth: 18 } } } };
+  assert.match(palGreetingFor(almost, new Date(2026, 10, 18, 9), 0), /2 more levels and I grow into a Buddy/);
+  const fresh = { ...base, pal: { ...base.pal, id: 'mossy', owned: { mossy: { stage: 0, growth: 3 } } } };
+  assert.match(palGreetingFor(fresh, new Date(2026, 10, 14, 15), 0), /weekend/);
+  assert.match(palGreetingFor(fresh, new Date(2026, 10, 18, 8), 0), /morning/i);
+});

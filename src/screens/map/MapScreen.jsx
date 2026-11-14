@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CurrencyHud from '../../components/game/CurrencyHud.jsx';
 import BottomNav from '../../components/game/BottomNav.jsx';
 import Icon from '../../components/Icon.jsx';
@@ -11,6 +11,7 @@ import DailyGift from '../../components/game/DailyGift.jsx';
 import DailyButton from '../../components/game/DailyButton.jsx';
 import InstallButton from '../../components/install/InstallButton.jsx';
 import EventButton from '../../components/game/EventButton.jsx';
+import PalHello from '../../components/pals/PalHello.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
@@ -98,6 +99,7 @@ export default function MapScreen() {
   const currentNodeRef = useRef(null);
   const stars = totalStars(progress);
   const [greeting, setGreeting] = useState(() => quipFor('start'));
+  const hushLumi = useCallback(() => setGreeting(null), []);
 
   const unlockedWorlds = worlds.filter((world) => stars >= world.starsToUnlock);
   const nextLockedWorld = worlds.find((world) => stars < world.starsToUnlock);
@@ -169,6 +171,8 @@ export default function MapScreen() {
         )}
       </main>
 
+      {/* The partner Pal says hello once a day; Lumi lets them talk. */}
+      {currentRef && <PalHello onHello={hushLumi} />}
       <BottomNav active="map" />
       {chestOpening && <ChestDialog opening={chestOpening} onClose={() => setChestOpening(null)} />}
     </div>
