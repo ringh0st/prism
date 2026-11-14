@@ -5,6 +5,9 @@ import {
   buyStoreItemOnServer,
   claimChestOnServer,
   claimDailyGiftOnServer,
+  choosePalOnServer,
+  buyAccessoryOnServer,
+  equipAccessoryOnServer,
   claimWeeklyRewardOnServer,
   consumeHelperOnServer,
   fetchEconomyState,
@@ -29,6 +32,7 @@ import {
 import { todayKey } from '../game/daily.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
 import { DAILY_GIFT_SPARKS } from '../game/catalog.js';
+import { buyAccessoryLocally, choosePalLocally, equipAccessoryLocally, growPartnerPal } from '../game/pals.js';
 import { sfx } from '../audio/sfx.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
@@ -110,6 +114,13 @@ export function PlayerProvider({ children }) {
         const hotStreak = nextHotStreak(progressRef.current, { stars: local.stars, usedHelpers: result.usedHelpers });
         local.progress = { ...local.progress, hotStreak };
         local.hotStreak = hotStreak;
+        // A newly solved level helps the partner Pal grow (the server does the same for accounts).
+        local.palEvolvedTo = null;
+        if (local.previousStars === 0 && local.stars > 0) {
+          const grown = growPartnerPal(local.progress);
+          local.progress = grown.progress;
+          local.palEvolvedTo = grown.evolvedTo;
+        }
         setProgress(local.progress);
         if (!userId) return { ...local, diamondsEarned: 0 };
         try {
@@ -160,6 +171,33 @@ export function PlayerProvider({ children }) {
         const state = await claimChestOnServer(world, chestNumber);
         applyServerState(state);
         return state.reward ?? reward;
+      },
+
+      /** Pick your partner Pal. @throws EconomyError */
+      async choosePal(palId) {
+        if (!userId) {
+          setProgress(choosePalLocally(progressRef.current, palId));
+          return;
+        }
+        applyServerState(await choosePalOnServer(palId));
+      },
+
+      /** Buy a Pal accessory with sparks. @throws EconomyError */
+      async buyAccessory(itemId) {
+        if (!userId) {
+          setProgress(buyAccessoryLocally(progressRef.current, itemId));
+          return;
+        }
+        applyServerState(await buyAccessoryOnServer(itemId));
+      },
+
+      /** Wear an owned accessory, or null to take it off. @throws EconomyError */
+      async equipAccessory(itemId) {
+        if (!userId) {
+          setProgress(equipAccessoryLocally(progressRef.current, itemId));
+          return;
+        }
+        applyServerState(await equipAccessoryOnServer(itemId));
       },
 
       /** Collect today's free gift. @returns the sparks received. @throws EconomyError */

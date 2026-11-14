@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import Lumi from '../../components/game/Lumi.jsx';
+import PalArt from '../../components/pals/PalArt.jsx';
+import { palById, palStage } from '../../game/pals.js';
 import Icon from '../../components/Icon.jsx';
 import { useAuth } from '../../state/AuthContext.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
@@ -38,6 +40,8 @@ export default function PlayerCard() {
   const solved = Object.values(progress.levels).filter((entry) => entry.stars > 0).length;
   const streak = currentStreak(progress, todayKey());
   const shields = progress.daily.shields ?? 0;
+  const partner = palById(progress.pal.id);
+  const partnerXp = partner ? progress.pal.owned[partner.id]?.xp ?? 0 : 0;
 
   // The public nickname shown on the Top board (signed-in players only).
   useEffect(() => {
@@ -55,11 +59,22 @@ export default function PlayerCard() {
     <section className={styles.card} aria-labelledby="player-name">
       <div className={styles.banner} aria-hidden="true" />
       <div className={styles.avatar}>
-        {avatarUrl ? <img src={avatarUrl} alt="" width="84" height="84" referrerPolicy="no-referrer" /> : <Lumi mood="happy" size={58} />}
+        {partner ? (
+          <PalArt palId={partner.id} xp={partnerXp} accessory={progress.pal.accessory} size={84} />
+        ) : avatarUrl ? (
+          <img src={avatarUrl} alt="" width="84" height="84" referrerPolicy="no-referrer" />
+        ) : (
+          <Lumi mood="happy" size={58} />
+        )}
       </div>
       <h2 id="player-name" className={`game-title ${styles.name}`}>
         {user ? displayName : 'Guest player'}
       </h2>
+      {partner && (
+        <p className={styles.nickname}>
+          Partner: {partner.name} the {partner.species} · {palStage(partnerXp).name}
+        </p>
+      )}
       {nickname && <p className={styles.nickname}>On the Top board as {nickname}</p>}
 
       <div className={styles.title}>

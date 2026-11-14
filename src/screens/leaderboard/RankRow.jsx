@@ -1,3 +1,4 @@
+import PalArt from '../../components/pals/PalArt.jsx';
 import { animalAvatar } from './animalAvatar.js';
 import styles from './LeaderboardScreen.module.css';
 
@@ -7,7 +8,7 @@ export default function RankRow({ row }) {
     <li className={`${styles.row} ${row.isMe ? styles.me : ''}`} aria-current={row.isMe ? 'true' : undefined}>
       <span className={`game-title ${styles.rank}`}>{row.rank}</span>
       <span className={styles.rowAvatar} aria-hidden="true">
-        {animalAvatar(row.nickname)}
+        {row.pal ? <PalArt palId={row.pal} xp={row.palXp} accessory={row.accessory} size={38} /> : animalAvatar(row.nickname)}
       </span>
       <span className={styles.name}>
         {row.nickname}

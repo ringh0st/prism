@@ -34,6 +34,12 @@ export const consumeHelperOnServer = (helperId) => rpc('use_helper', { p_helper:
 
 export const claimChestOnServer = (world, chestNumber) => rpc('claim_chest', { p_world: world, p_chest: chestNumber });
 
+export const choosePalOnServer = (palId) => rpc('choose_pal', { p_pal: palId });
+
+export const buyAccessoryOnServer = (itemId) => rpc('buy_accessory', { p_item: itemId });
+
+export const equipAccessoryOnServer = (itemId) => rpc('equip_accessory', { p_item: itemId });
+
 /** Collects today's free gift of sparks. */
 export const claimDailyGiftOnServer = (dateKey) => rpc('claim_daily_gift', { p_date: dateKey });
 

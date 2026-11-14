@@ -255,3 +255,41 @@ test('daily gift: once a day, same amount as the database', async () => {
   assert.throws(() => claimDailyGiftLocally(after, '2026-03-01'));
   assert.equal(isDailyGiftReady(after, '2026-03-02'), true);
 });
+
+test('pals: starter choice, unlocks, growth and accessories', async () => {
+  const { createEmptyProgress } = await import('./progress.js');
+  const pals = await import('./pals.js');
+  let progress = createEmptyProgress();
+  // Any starter can be the very first Pal; others are locked.
+  assert.equal(pals.isPalUnlocked(progress, pals.palById('mossy')), true);
+  assert.equal(pals.isPalUnlocked(progress, pals.palById('hoot')), false);
+  assert.throws(() => pals.choosePalLocally(progress, 'hoot'));
+  progress = pals.choosePalLocally(progress, 'mossy');
+  // After the first pick, the other starters need their own milestone.
+  assert.equal(pals.isPalUnlocked(progress, pals.palById('ember')), false);
+  // Growing: Baby → Grown at 100 new levels.
+  progress.pal.owned.mossy.xp = 99;
+  const grown = pals.growPartnerPal(progress);
+  assert.equal(grown.evolvedTo.id, 'grown');
+  assert.equal(pals.palStage(300).id, 'radiant');
+  // Accessories cost sparks and must be owned to wear.
+  assert.throws(() => pals.equipAccessoryLocally(progress, 'scarf'));
+  const rich = { ...progress, sparks: 100 };
+  const bought = pals.buyAccessoryLocally(rich, 'scarf');
+  assert.equal(bought.sparks, 60);
+  assert.equal(pals.equipAccessoryLocally(bought, 'scarf').pal.accessory, 'scarf');
+});
+
+test('pal unlocks and accessory prices match the database', async () => {
+  const { PALS, PAL_ACCESSORIES } = await import('./pals.js');
+  const sql = readFileSync(new URL('../../supabase/pals.sql', import.meta.url), 'utf8');
+  for (const pal of PALS) {
+    const [kind, value] = Object.entries(pal.unlock)[0];
+    const starter = pal.isStarter ? '"starter": true, ' : '';
+    assert.ok(sql.includes(`when '${pal.id}' then '{${starter}"${kind}": ${value}}'::jsonb`), `${pal.id} unlock`);
+    assert.ok(sql.includes(`'${pal.id}' then '${pal.animal}'`), `${pal.id} animal`);
+  }
+  for (const item of PAL_ACCESSORIES) {
+    assert.ok(sql.includes(`when '${item.id}' then ${item.price}`), `${item.id} price`);
+  }
+});

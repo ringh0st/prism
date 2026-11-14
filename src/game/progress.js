@@ -31,13 +31,20 @@ export function createEmptyProgress() {
     claimedChests: [],
     hotStreak: 0,
     giftDate: null,
+    pal: { id: null, owned: {}, accessories: [], accessory: null },
   };
 }
 
 /** Fill in fields added after a player's progress was first saved. */
 export function upgradeProgress(saved) {
   const empty = createEmptyProgress();
-  return { ...empty, ...saved, helpers: { ...empty.helpers, ...saved?.helpers }, daily: { ...empty.daily, ...saved?.daily } };
+  return {
+    ...empty,
+    ...saved,
+    helpers: { ...empty.helpers, ...saved?.helpers },
+    daily: { ...empty.daily, ...saved?.daily },
+    pal: { ...empty.pal, ...saved?.pal },
+  };
 }
 
 export const totalStars = (progress) => Object.values(progress.levels).reduce((sum, entry) => sum + entry.stars, 0);
@@ -196,5 +203,6 @@ export function withServerState(progress, state, today) {
     sparkPurchases: { date: today, count: state.sparkPurchasesToday },
     claimedChests: state.claimedChests ?? progress.claimedChests,
     giftDate: state.lastGiftDate ?? progress.giftDate,
+    pal: state.pal ?? progress.pal,
   };
 }

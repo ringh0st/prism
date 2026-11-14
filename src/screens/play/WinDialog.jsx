@@ -7,6 +7,8 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { sfx } from '../../audio/sfx.js';
 import { DIFFICULTY } from '../../game/constants.js';
 import { shareText } from '../../lib/shareText.js';
+import PalArt from '../../components/pals/PalArt.jsx';
+import { palById } from '../../game/pals.js';
 import styles from './WinDialog.module.css';
 
 function headlineFor({ stars, isSkipped, completesWorld }, difficulty) {
@@ -36,7 +38,8 @@ function ShareResult({ text }) {
 }
 
 export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasNext, shareMessage = null, onNext, onReplay, onMap }) {
-  const { isSignedIn } = usePlayer();
+  const { isSignedIn, progress } = usePlayer();
+  const partner = palById(progress.pal.id);
   const { stars, moves, sparksEarned = 0, diamondsEarned = 0, isNewBest, streak = 0, shieldsUsed = 0, shieldEarned = false, isSkipped, completesWorld } =
     result;
 
@@ -91,6 +94,14 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
           </span>
         )}
       </div>
+      {result.palEvolvedTo && partner && (
+        <div className={styles.evolved}>
+          <PalArt palId={partner.id} xp={progress.pal.owned[partner.id]?.xp ?? 0} accessory={progress.pal.accessory} size={72} />
+          <p>
+            <strong>{partner.name} evolved!</strong> Now {result.palEvolvedTo.name}.
+          </p>
+        </div>
+      )}
       {shareMessage && <ShareResult text={shareMessage} />}
       {completesWorld && !isSignedIn && (
         <p className={styles.nudge}>

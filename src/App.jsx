@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { AuthProvider } from './state/AuthContext.jsx';
 import { PlayerProvider, usePlayer } from './state/PlayerContext.jsx';
 import { LevelsProvider, useLevels } from './state/LevelsContext.jsx';
@@ -11,6 +11,8 @@ import SettingsScreen from './screens/SettingsScreen.jsx';
 import StoreScreen from './screens/StoreScreen.jsx';
 import LeaderboardScreen from './screens/leaderboard/LeaderboardScreen.jsx';
 import WeeklyRewardDialog from './screens/leaderboard/WeeklyRewardDialog.jsx';
+import StarterPicker from './screens/pals/StarterPicker.jsx';
+import PalUnlockNotice from './screens/pals/PalUnlockNotice.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
 import LoadingScreen from './screens/LoadingScreen.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
@@ -34,6 +36,18 @@ function BeamThemeStyle() {
 function WeeklyRewardNotice() {
   const { weeklyReward, dismissWeeklyReward } = usePlayer();
   return weeklyReward ? <WeeklyRewardDialog reward={weeklyReward} onClose={dismissWeeklyReward} /> : null;
+}
+
+/** First game: pick a starter Pal. Later: celebrate newly unlocked Pals. Only on menu screens, never mid-level. */
+const PAL_NOTICE_ROUTES = ['map', 'settings', 'store', 'top'];
+
+function PalNotices() {
+  const { progress } = usePlayer();
+  const route = useHashRoute();
+  const [isSkipped, setIsSkipped] = useState(false);
+  if (!PAL_NOTICE_ROUTES.includes(route.name)) return null;
+  if (!progress.pal.id) return isSkipped ? null : <StarterPicker onSkip={() => setIsSkipped(true)} />;
+  return <PalUnlockNotice />;
 }
 
 function LevelRoute({ levelId }) {
@@ -98,6 +112,7 @@ export default function App() {
           <BeamThemeStyle />
           <Routes />
           <WeeklyRewardNotice />
+          <PalNotices />
         </LevelsProvider>
       </PlayerProvider>
     </AuthProvider>

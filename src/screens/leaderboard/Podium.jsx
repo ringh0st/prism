@@ -1,5 +1,6 @@
 import Icon from '../../components/Icon.jsx';
 import { weeklyRewardFor } from '../../game/catalog.js';
+import PalArt from '../../components/pals/PalArt.jsx';
 import { animalAvatar } from './animalAvatar.js';
 import styles from './Podium.module.css';
 
@@ -16,7 +17,13 @@ export default function Podium({ top }) {
         return (
           <li key={rank} className={`${styles.place} ${styles[PLACE_CLASS[rank]]} ${row?.isMe ? styles.me : ''}`} value={rank}>
             <span className={styles.avatar} aria-hidden="true">
-              {row ? animalAvatar(row.nickname) : '?'}
+              {row?.pal ? (
+                <PalArt palId={row.pal} xp={row.palXp} accessory={row.accessory} size={rank === 1 ? 70 : 56} />
+              ) : row ? (
+                animalAvatar(row.nickname)
+              ) : (
+                '?'
+              )}
               {rank === 1 && <Icon name="crown" size={26} className={styles.crown} />}
             </span>
             <span className={styles.name}>{row ? row.nickname : 'Up for grabs'}</span>
