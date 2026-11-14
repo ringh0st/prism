@@ -23,7 +23,7 @@ export const he = {
 
   'place.map': 'מפה',
   'place.event': 'אירוע',
-  'place.rush': 'מרוץ האור',
+  'place.rush': 'מרתון האור',
 
   'splash.line1': 'מעירים את אבני החן…',
   'splash.line2': 'מבריקים מראות…',
@@ -61,7 +61,7 @@ export const he = {
   'play.eventSpot': 'אירוע סוף שבוע · {n}/{total}',
   'play.challengeFrom': 'אתגר מאת {name}',
   'play.challengeFromFriend': 'אתגר מחבר',
-  'play.rushSpot': 'מרוץ האור · {n}/{total}',
+  'play.rushSpot': 'מרתון האור · {n}/{total}',
   'play.backTo': 'חזרה ל{place}',
   'play.boardLabel': 'לוח המשחק של {name}. זזים עם החצים ומסובבים עם Enter.',
   'play.restart': 'להתחיל מחדש',

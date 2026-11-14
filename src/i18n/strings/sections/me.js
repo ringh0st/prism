@@ -538,7 +538,7 @@ export const he = {
   'ui.daily.label': 'חידת היום: חידה חדשה ופרס מחכים לכם',
   'ui.daily.labelStreak': 'חידת היום: חידה חדשה ופרס מחכים לכם, רצף של {n} ימים',
   'ui.event.label': 'אירוע סוף שבוע: {name}, נפתרו {solved} מתוך {total} חידות',
-  'ui.rush.label': 'מרוץ האור: הריצה הכי טובה השבוע, {best} מתוך {total}',
+  'ui.rush.label': 'מרתון האור: המרתון הכי טוב השבוע, {best} מתוך {total}',
 
   'ui.notFound.title': 'אין כאן כלום',
   'ui.notFound.text': 'השלב הזה לא קיים, או שעוד לא פורסם.',
