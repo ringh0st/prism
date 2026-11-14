@@ -31,9 +31,14 @@ export function createEmptyProgress() {
     claimedChests: [],
     hotStreak: 0,
     giftDate: null,
-    pal: { id: null, owned: {}, accessories: [], accessory: null },
+    pal: { id: null, owned: {}, accessories: [], wearing: [] },
     nickname: null,
   };
+}
+
+/** Older saves wore a single `accessory`; Pals now wear one item per slot in `wearing`. */
+function upgradePal({ accessory, ...pal }) {
+  return accessory && pal.wearing.length === 0 ? { ...pal, wearing: [accessory] } : pal;
 }
 
 /** Fill in fields added after a player's progress was first saved. */
@@ -44,7 +49,7 @@ export function upgradeProgress(saved) {
     ...saved,
     helpers: { ...empty.helpers, ...saved?.helpers },
     daily: { ...empty.daily, ...saved?.daily },
-    pal: { ...empty.pal, ...saved?.pal },
+    pal: upgradePal({ ...empty.pal, ...saved?.pal }),
   };
 }
 

@@ -9,7 +9,8 @@ import {
   setNicknameOnServer,
   glowUpPalOnServer,
   buyAccessoryOnServer,
-  equipAccessoryOnServer,
+  wearAccessoryOnServer,
+  adoptPalOnServer,
   claimWeeklyRewardOnServer,
   consumeHelperOnServer,
   fetchEconomyState,
@@ -36,7 +37,7 @@ import { todayKey } from '../game/daily.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
 import { DAILY_GIFT_SPARKS } from '../game/catalog.js';
 import { nicknameProblem } from '../game/nicknames.js';
-import { buyAccessoryLocally, choosePalLocally, equipAccessoryLocally, glowUpPalLocally, glowUpsEarned } from '../game/pals.js';
+import { buyAccessoryLocally, choosePalLocally, glowUpPalLocally, glowUpsEarned, wearAccessoryLocally } from '../game/pals.js';
 import { sfx } from '../audio/sfx.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
@@ -231,13 +232,21 @@ export function PlayerProvider({ children }) {
         applyServerState(await buyAccessoryOnServer(itemId));
       },
 
-      /** Wear an owned accessory, or null to take it off. @throws EconomyError */
-      async equipAccessory(itemId) {
-        if (!userId) {
-          setProgress(equipAccessoryLocally(progressRef.current, itemId));
-          return;
+      /** Put on an owned item (it replaces whatever is in its slot) or take it off. @throws EconomyError */
+      async wearAccessory(itemId, isWearing) {
+        setProgress(wearAccessoryLocally(progressRef.current, itemId, isWearing));
+        if (!userId) return;
+        try {
+          applyServerState(await wearAccessoryOnServer(itemId, isWearing));
+        } catch {
+          setSyncStatus('error');
         }
-        applyServerState(await equipAccessoryOnServer(itemId));
+      },
+
+      /** Adopt a Pal you choose for diamonds (accounts only; the server charges). @throws EconomyError */
+      async adoptPal(palId) {
+        if (!userId) throw new EconomyError('Sign in to use diamonds.');
+        applyServerState(await adoptPalOnServer(palId));
       },
 
       /** Collect today's free gift. @returns the sparks received. @throws EconomyError */

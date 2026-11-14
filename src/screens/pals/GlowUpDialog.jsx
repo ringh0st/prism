@@ -29,7 +29,7 @@ export default function GlowUpDialog({ onClose }) {
     const stage = palStage(stageOf(progress.pal.owned[grown.id]));
     return (
       <Dialog title={`${grown.name} grew!`} tone="celebrate" onClose={onClose}>
-        <PalArt palId={grown.id} stage={stage.index} accessory={progress.pal.id === grown.id ? progress.pal.accessory : null} size={140} className={styles.unlockArt} />
+        <PalArt palId={grown.id} stage={stage.index} wearing={progress.pal.id === grown.id ? progress.pal.wearing : []} size={140} className={styles.unlockArt} />
         <p className={styles.unlockText}>
           {grown.name} is now a <strong>{stage.name}</strong>!
         </p>

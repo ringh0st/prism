@@ -47,7 +47,10 @@ export const glowUpPalOnServer = (palId) => rpc('glow_up_pal', { p_pal: palId })
 
 export const buyAccessoryOnServer = (itemId) => rpc('buy_accessory', { p_item: itemId });
 
-export const equipAccessoryOnServer = (itemId) => rpc('equip_accessory', { p_item: itemId });
+export const wearAccessoryOnServer = (itemId, isWearing) => rpc('wear_accessory', { p_item: itemId, p_wear: isWearing });
+
+/** Adopt a Pal you choose for diamonds. */
+export const adoptPalOnServer = (palId) => rpc('adopt_pal', { p_pal: palId });
 
 /** Collects today's free gift of sparks. */
 export const claimDailyGiftOnServer = (dateKey) => rpc('claim_daily_gift', { p_date: dateKey });

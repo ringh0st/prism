@@ -96,7 +96,7 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
       </div>
       {result.glowUpEarned && partner && (
         <div className={styles.evolved}>
-          <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} accessory={progress.pal.accessory} size={72} />
+          <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={72} />
           <p>
             <strong>World finished: you earned a Glow-up!</strong> Choose which Pal grows on the map.
           </p>

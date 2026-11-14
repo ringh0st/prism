@@ -6,7 +6,11 @@ alter table public.profiles
   add column if not exists pal_id text,
   add column if not exists pals jsonb not null default '{}',
   add column if not exists pal_accessories text[] not null default '{}',
-  add column if not exists pal_accessory text;
+  add column if not exists pal_accessory text,
+  add column if not exists pal_wearing text[] not null default '{}';
+
+-- Saves from before slots wore one item in pal_accessory.
+update public.profiles set pal_wearing = array[pal_accessory] where pal_accessory is not null and pal_wearing = '{}';
 
 -- ---------------------------------------------------------------------------
 -- Catalog
@@ -91,21 +95,32 @@ as $$
   end;
 $$;
 
-create or replace function public._accessory_price(p_item text)
-returns integer
+-- Clothes and gear: price in sparks and the slot it is worn in. Must match PAL_ACCESSORIES in src/game/pals.js.
+create or replace function public._accessory(p_item text)
+returns jsonb
 language sql
 immutable
 as $$
   select case p_item
-    when 'scarf' then 40
-    when 'bow' then 50
-    when 'partyHat' then 60
-    when 'flowerCrown' then 80
-    when 'headphones' then 100
-    when 'crown' then 150
+    when 'beanie' then '{"price": 50, "slot": "head"}'::jsonb
+    when 'partyHat' then '{"price": 60, "slot": "head"}'::jsonb
+    when 'flowerCrown' then '{"price": 80, "slot": "head"}'::jsonb
+    when 'wizardHat' then '{"price": 90, "slot": "head"}'::jsonb
+    when 'headphones' then '{"price": 100, "slot": "head"}'::jsonb
+    when 'crown' then '{"price": 150, "slot": "head"}'::jsonb
+    when 'scarf' then '{"price": 40, "slot": "neck"}'::jsonb
+    when 'bow' then '{"price": 50, "slot": "neck"}'::jsonb
+    when 'medal' then '{"price": 70, "slot": "neck"}'::jsonb
+    when 'cape' then '{"price": 120, "slot": "neck"}'::jsonb
+    when 'balloon' then '{"price": 70, "slot": "hand"}'::jsonb
+    when 'lantern' then '{"price": 80, "slot": "hand"}'::jsonb
+    when 'magicWand' then '{"price": 110, "slot": "hand"}'::jsonb
+    when 'heroShield' then '{"price": 120, "slot": "hand"}'::jsonb
+    when 'sword' then '{"price": 130, "slot": "hand"}'::jsonb
     else null
   end;
 $$;
+drop function if exists public._accessory_price(text);
 
 -- ---------------------------------------------------------------------------
 -- Rules
@@ -197,7 +212,7 @@ as $$
     'lastGiftDate', p.last_gift_date,
     'sparkPurchasesToday', case when p.spark_purchase_date = current_date then p.spark_purchases_today else 0 end,
     'claimedChests', to_jsonb(p.claimed_chests),
-    'pal', jsonb_build_object('id', p.pal_id, 'owned', p.pals, 'accessories', to_jsonb(p.pal_accessories), 'accessory', p.pal_accessory)
+    'pal', jsonb_build_object('id', p.pal_id, 'owned', p.pals, 'accessories', to_jsonb(p.pal_accessories), 'wearing', to_jsonb(p.pal_wearing))
   )
   from public.profiles p
   where p.id = p_user;
@@ -261,7 +276,7 @@ set search_path = public
 as $$
 declare
   v_user uuid := public._require_user();
-  v_price integer := public._accessory_price(p_item);
+  v_price integer := (public._accessory(p_item) ->> 'price')::integer;
   v_profile public.profiles;
 begin
   if v_price is null then
@@ -279,7 +294,8 @@ begin
 end;
 $$;
 
-create or replace function public.equip_accessory(p_item text)
+-- Put on an owned item (replacing whatever is in the same slot), or take it off.
+create or replace function public.wear_accessory(p_item text, p_wear boolean)
 returns jsonb
 language plpgsql
 security definer
@@ -287,11 +303,50 @@ set search_path = public
 as $$
 declare
   v_user uuid := public._require_user();
+  v_slot text := public._accessory(p_item) ->> 'slot';
 begin
-  if p_item is not null and not exists (select 1 from public.profiles where id = v_user and p_item = any (pal_accessories)) then
+  if v_slot is null then
+    raise exception using message = 'That item is not in the shop.';
+  end if;
+  if p_wear and not exists (select 1 from public.profiles where id = v_user and p_item = any (pal_accessories)) then
     raise exception using message = 'Buy it first.';
   end if;
-  update public.profiles set pal_accessory = p_item where id = v_user;
+  update public.profiles set pal_wearing =
+    array(select item from unnest(pal_wearing) as item where public._accessory(item) ->> 'slot' <> v_slot)
+    || case when p_wear then array[p_item] else '{}'::text[] end
+  where id = v_user;
+  return public._economy_state(v_user);
+end;
+$$;
+drop function if exists public.equip_accessory(text);
+
+-- Adopt a Pal you choose (one you don't have yet) for diamonds. Must match ADOPT_PAL_DIAMONDS.
+create or replace function public.adopt_pal(p_pal text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user uuid := public._require_user();
+  v_price constant integer := 20;
+  v_profile public.profiles;
+begin
+  if public._pal_unlock(p_pal) is null then
+    raise exception using message = 'That Pal doesn’t exist.';
+  end if;
+  select * into v_profile from public.profiles where id = v_user for update;
+  if v_profile.pals ? p_pal then
+    raise exception using message = 'This Pal is already on your team.';
+  end if;
+  if v_profile.diamonds < v_price then
+    raise exception using message = 'Not enough diamonds.';
+  end if;
+  update public.profiles set
+    diamonds = diamonds - v_price,
+    pals = pals || jsonb_build_object(p_pal, jsonb_build_object('stage', 0)),
+    pal_id = coalesce(pal_id, p_pal)
+  where id = v_user;
   return public._economy_state(v_user);
 end;
 $$;
@@ -351,7 +406,7 @@ security definer
 set search_path = public
 as $$
   with ranking as (
-    select r.*, p.pal_id, coalesce((p.pals -> p.pal_id ->> 'stage')::integer, 0) as pal_stage, p.pal_accessory
+    select r.*, p.pal_id, coalesce((p.pals -> p.pal_id ->> 'stage')::integer, 0) as pal_stage, p.pal_wearing
     from public._weekly_ranking(public._week_start()) r
     join public.profiles p on p.id = r.user_id
   )
@@ -361,12 +416,12 @@ as $$
     'top', coalesce((
       select jsonb_agg(jsonb_build_object(
         'rank', r.rank, 'nickname', public._nickname_for(r.user_id), 'score', r.score, 'isMe', r.user_id = auth.uid(),
-        'pal', r.pal_id, 'palStage', r.pal_stage, 'accessory', r.pal_accessory)
+        'pal', r.pal_id, 'palStage', r.pal_stage, 'wearing', to_jsonb(r.pal_wearing))
         order by r.rank)
       from ranking r where r.rank <= 50), '[]'::jsonb),
     'me', (
       select jsonb_build_object('rank', r.rank, 'score', r.score, 'nickname', public._nickname_for(r.user_id),
-        'pal', r.pal_id, 'palStage', r.pal_stage, 'accessory', r.pal_accessory)
+        'pal', r.pal_id, 'palStage', r.pal_stage, 'wearing', to_jsonb(r.pal_wearing))
       from ranking r where r.user_id = auth.uid()),
     'myNickname', case when auth.uid() is null then null else public._nickname_for(auth.uid()) end
   );
@@ -376,11 +431,13 @@ revoke all on function public._is_pal_unlocked(uuid, text) from public, anon, au
 revoke all on function public._nickname_for(uuid) from public, anon, authenticated;
 revoke all on function public.choose_pal(text) from public, anon;
 revoke all on function public.buy_accessory(text) from public, anon;
-revoke all on function public.equip_accessory(text) from public, anon;
+revoke all on function public.wear_accessory(text, boolean) from public, anon;
+revoke all on function public.adopt_pal(text) from public, anon;
 grant execute on function public.choose_pal(text) to authenticated;
 revoke all on function public.glow_up_pal(text) from public, anon;
 grant execute on function public.glow_up_pal(text) to authenticated;
 revoke all on function public._finished_world_count(uuid) from public, anon, authenticated;
 grant execute on function public.buy_accessory(text) to authenticated;
-grant execute on function public.equip_accessory(text) to authenticated;
+grant execute on function public.wear_accessory(text, boolean) to authenticated;
+grant execute on function public.adopt_pal(text) to authenticated;
 grant execute on function public.weekly_leaderboard() to anon, authenticated;

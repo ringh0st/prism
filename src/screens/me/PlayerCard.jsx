@@ -64,7 +64,7 @@ export default function PlayerCard() {
       <div className={styles.banner} aria-hidden="true" />
       <div className={styles.avatar}>
         {partner ? (
-          <PalArt palId={partner.id} stage={partnerStage} accessory={progress.pal.accessory} size={84} />
+          <PalArt palId={partner.id} stage={partnerStage} wearing={progress.pal.wearing} size={84} />
         ) : avatarUrl ? (
           <img src={avatarUrl} alt="" width="84" height="84" referrerPolicy="no-referrer" />
         ) : (

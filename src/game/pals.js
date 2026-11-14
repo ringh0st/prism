@@ -76,15 +76,33 @@ export function glowUpsAvailable(progress) {
 }
 
 
-/** Cosmetic accessories, bought with sparks (evolution itself can't be bought). */
+/** Clothes and gear, bought with sparks. A Pal wears one item per slot: head, neck and hand. */
 export const PAL_ACCESSORIES = [
-  { id: 'scarf', name: 'Cozy scarf', price: 40 },
-  { id: 'bow', name: 'Bow tie', price: 50 },
-  { id: 'partyHat', name: 'Party hat', price: 60 },
-  { id: 'flowerCrown', name: 'Flower crown', price: 80 },
-  { id: 'headphones', name: 'Headphones', price: 100 },
-  { id: 'crown', name: 'Royal crown', price: 150 },
+  { id: 'beanie', name: 'Cozy beanie', slot: 'head', price: 50 },
+  { id: 'partyHat', name: 'Party hat', slot: 'head', price: 60 },
+  { id: 'flowerCrown', name: 'Flower crown', slot: 'head', price: 80 },
+  { id: 'wizardHat', name: 'Wizard hat', slot: 'head', price: 90 },
+  { id: 'headphones', name: 'Headphones', slot: 'head', price: 100 },
+  { id: 'crown', name: 'Royal crown', slot: 'head', price: 150 },
+  { id: 'scarf', name: 'Cozy scarf', slot: 'neck', price: 40 },
+  { id: 'bow', name: 'Bow tie', slot: 'neck', price: 50 },
+  { id: 'medal', name: 'Gold medal', slot: 'neck', price: 70 },
+  { id: 'cape', name: 'Hero cape', slot: 'neck', price: 120 },
+  { id: 'balloon', name: 'Balloon', slot: 'hand', price: 70 },
+  { id: 'lantern', name: 'Little lantern', slot: 'hand', price: 80 },
+  { id: 'magicWand', name: 'Magic wand', slot: 'hand', price: 110 },
+  { id: 'heroShield', name: 'Hero shield', slot: 'hand', price: 120 },
+  { id: 'sword', name: 'Brave sword', slot: 'hand', price: 130 },
 ];
+
+export const PAL_SLOTS = [
+  { id: 'head', name: 'Hats' },
+  { id: 'neck', name: 'Neck & capes' },
+  { id: 'hand', name: 'Gear' },
+];
+
+/** Adopting a Pal you choose (one you don't have yet) costs diamonds. Must match public.adopt_pal(). */
+export const ADOPT_PAL_DIAMONDS = 20;
 
 export const accessoryById = (id) => PAL_ACCESSORIES.find((item) => item.id === id) ?? null;
 
@@ -134,8 +152,16 @@ export function buyAccessoryLocally(progress, accessoryId) {
   return { ...progress, sparks: progress.sparks - item.price, pal: { ...progress.pal, accessories: [...progress.pal.accessories, accessoryId] } };
 }
 
-/** Wear an owned accessory, or take it off with null. @throws EconomyError */
-export function equipAccessoryLocally(progress, accessoryId) {
-  if (accessoryId && !progress.pal.accessories.includes(accessoryId)) throw new EconomyError('Buy it first.');
-  return { ...progress, pal: { ...progress.pal, accessory: accessoryId } };
+/** Put on an owned item (replacing whatever was in its slot) or take it off. @throws EconomyError */
+export function wearAccessoryLocally(progress, accessoryId, isWearing) {
+  const item = accessoryById(accessoryId);
+  if (!item) throw new EconomyError('That item is not in the shop.');
+  if (isWearing && !progress.pal.accessories.includes(accessoryId)) throw new EconomyError('Buy it first.');
+  const others = progress.pal.wearing.filter((id) => accessoryById(id)?.slot !== item.slot);
+  return { ...progress, pal: { ...progress.pal, wearing: isWearing ? [...others, accessoryId] : others } };
+}
+
+/** Adopt a Pal of your choice (signed-in players pay with diamonds on the server). */
+export function canAdopt(progress, palId) {
+  return Boolean(palById(palId)) && !progress.pal.owned[palId];
 }

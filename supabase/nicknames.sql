@@ -71,7 +71,7 @@ security definer
 set search_path = public
 as $$
   with ranking as (
-    select r.*, (select coalesce(sum(g.stars), 0) from public.progress g where g.user_id = r.user_id) as total_stars, p.pal_id, coalesce((p.pals -> p.pal_id ->> 'stage')::integer, 0) as pal_stage, p.pal_accessory
+    select r.*, (select coalesce(sum(g.stars), 0) from public.progress g where g.user_id = r.user_id) as total_stars, p.pal_id, coalesce((p.pals -> p.pal_id ->> 'stage')::integer, 0) as pal_stage, p.pal_wearing
     from public._weekly_ranking(public._week_start()) r
     join public.profiles p on p.id = r.user_id
   )
@@ -81,12 +81,12 @@ as $$
     'top', coalesce((
       select jsonb_agg(jsonb_build_object(
         'rank', r.rank, 'nickname', public._nickname_for(r.user_id), 'score', r.score, 'isMe', r.user_id = auth.uid(),
-        'pal', r.pal_id, 'palStage', r.pal_stage, 'accessory', r.pal_accessory, 'stars', r.total_stars)
+        'pal', r.pal_id, 'palStage', r.pal_stage, 'wearing', to_jsonb(r.pal_wearing), 'stars', r.total_stars)
         order by r.rank)
       from ranking r where r.rank <= 50), '[]'::jsonb),
     'me', (
       select jsonb_build_object('rank', r.rank, 'score', r.score, 'nickname', public._nickname_for(r.user_id),
-        'pal', r.pal_id, 'palStage', r.pal_stage, 'accessory', r.pal_accessory, 'stars', r.total_stars)
+        'pal', r.pal_id, 'palStage', r.pal_stage, 'wearing', to_jsonb(r.pal_wearing), 'stars', r.total_stars)
       from ranking r where r.user_id = auth.uid()),
     'myNickname', case when auth.uid() is null then null else public._nickname_for(auth.uid()) end
   );

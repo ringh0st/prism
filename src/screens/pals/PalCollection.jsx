@@ -3,7 +3,7 @@ import Icon from '../../components/Icon.jsx';
 import Button from '../../components/Button.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { PALS, PAL_ACCESSORIES, isPalUnlocked, palStage, stageOf, unlockText } from '../../game/pals.js';
+import { PALS, PAL_ACCESSORIES, PAL_SLOTS, isPalUnlocked, palStage, stageOf, unlockText } from '../../game/pals.js';
 import GlowUpStatus from './GlowUpStatus.jsx';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Pals.module.css';
@@ -29,7 +29,7 @@ function Collection({ onError }) {
         const stage = palStage(stageOf(owned));
         return (
           <li key={pal.id} className={`${styles.palCard} ${isPartner ? styles.partner : ''} ${isUnlocked ? '' : styles.locked}`}>
-            <PalArt palId={pal.id} stage={stage.index} accessory={isPartner ? progress.pal.accessory : null} size={76} className={styles.palArt} />
+            <PalArt palId={pal.id} stage={stage.index} wearing={isPartner ? progress.pal.wearing : []} size={76} className={styles.palArt} />
             <span className={`game-title ${styles.palName}`}>{isUnlocked ? pal.name : '???'}</span>
             {isPartner && <span className={styles.badge}>Partner</span>}
             {owned && !isPartner && (
@@ -55,13 +55,14 @@ function Collection({ onError }) {
   );
 }
 
-/** Clothes you own (bought in the Shop): put one on your partner, or take it off. */
+/** Clothes and gear you own (bought in the Shop): one per slot on your partner. */
 function Wardrobe({ onError }) {
-  const { progress, equipAccessory } = usePlayer();
+  const { progress, wearAccessory } = usePlayer();
   const owned = PAL_ACCESSORIES.filter((item) => progress.pal.accessories.includes(item.id));
-  const wear = async (itemId) => {
+  const stage = stageOf(progress.pal.owned[progress.pal.id]);
+  const toggle = async (itemId, isWearing) => {
     try {
-      await equipAccessory(itemId);
+      await wearAccessory(itemId, isWearing);
       sfx.sparkle();
     } catch (error) {
       onError(error.message);
@@ -71,32 +72,33 @@ function Wardrobe({ onError }) {
   if (owned.length === 0) {
     return (
       <p className={styles.growth}>
-        No clothes yet. Find scarves, hats and crowns in the <a href="#/store">Shop</a>.
+        No clothes yet. Find hats, capes and swords in the <a href="#/store">Shop</a>.
       </p>
     );
   }
-  return (
-    <ul className={styles.wardrobe}>
-      {owned.map((item) => {
-        const isWorn = progress.pal.accessory === item.id;
-        return (
-          <li key={item.id} className={`${styles.accessory} ${isWorn ? styles.worn : ''}`}>
-            <PalArt palId={progress.pal.id} stage={stageOf(progress.pal.owned[progress.pal.id])} accessory={item.id} size={58} />
-            <span className={styles.accessoryName}>{item.name}</span>
-            {isWorn ? (
-              <Button size="sm" variant="secondary" onClick={() => wear(null)}>
-                Take off
-              </Button>
-            ) : (
-              <Button size="sm" onClick={() => wear(item.id)}>
-                Wear
-              </Button>
-            )}
-          </li>
-        );
-      })}
-    </ul>
-  );
+  return PAL_SLOTS.map((slot) => {
+    const items = owned.filter((item) => item.slot === slot.id);
+    if (items.length === 0) return null;
+    return (
+      <div key={slot.id} className={styles.slotGroup}>
+        <h4 className={styles.slotTitle}>{slot.name}</h4>
+        <ul className={styles.wardrobe}>
+          {items.map((item) => {
+            const isWorn = progress.pal.wearing.includes(item.id);
+            return (
+              <li key={item.id} className={`${styles.accessory} ${isWorn ? styles.worn : ''}`}>
+                <PalArt palId={progress.pal.id} stage={stage} wearing={[item.id]} size={58} />
+                <span className={styles.accessoryName}>{item.name}</span>
+                <Button size="sm" variant={isWorn ? 'secondary' : 'primary'} onClick={() => toggle(item.id, !isWorn)} aria-pressed={isWorn}>
+                  {isWorn ? 'Take off' : 'Wear'}
+                </Button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  });
 }
 
 /** The "My Pals" section on the Me screen. */
@@ -114,7 +116,7 @@ export default function PalCollection() {
       {partner && (
         <>
           <h3 className={`game-title ${styles.subheading}`}>Wardrobe</h3>
-          <p className={styles.growth}>Dress up your partner. Any Pal can wear your clothes.</p>
+          <p className={styles.growth}>Dress up your partner: one hat, one neck item and one piece of gear at a time.</p>
           <Wardrobe onError={setMessage} />
         </>
       )}

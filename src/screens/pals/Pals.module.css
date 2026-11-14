@@ -373,3 +373,15 @@
 .worn :global(button) {
   background: var(--surface-raised);
 }
+
+.slotGroup {
+  display: grid;
+  gap: 6px;
+}
+
+.slotTitle {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-soft);
+}

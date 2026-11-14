@@ -43,7 +43,7 @@ export default function NicknameDialog({ current, onSaved, onClose }) {
     <Dialog title="Your nickname" onClose={onClose}>
       <form onSubmit={save}>
         <div className={styles.preview}>
-          {progress.pal.id && <PalArt palId={progress.pal.id} stage={stageOf(progress.pal.owned[progress.pal.id])} accessory={progress.pal.accessory} size={56} />}
+          {progress.pal.id && <PalArt palId={progress.pal.id} stage={stageOf(progress.pal.owned[progress.pal.id])} wearing={progress.pal.wearing} size={56} />}
           <span className="game-title">{nickname.trim() || '…'}</span>
         </div>
         <label htmlFor={inputId} className={styles.label}>

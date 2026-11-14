@@ -1,4 +1,8 @@
-import { palStage } from '../../game/pals.js';
+import { accessoryById, palStage } from '../../game/pals.js';
+
+const SLOT_ORDER = ['neck', 'head', 'hand'];
+const slotOf = (id) => accessoryById(id)?.slot;
+const bySlotOrder = (a, b) => SLOT_ORDER.indexOf(slotOf(a)) - SLOT_ORDER.indexOf(slotOf(b));
 
 /*
  * Pals (inline SVG, 100×100, standing on y≈94). Eight are hand-drawn; the other 22 are built from a
@@ -485,6 +489,79 @@ function Accessory({ id, hat, neck }) {
           ))}
         </g>
       );
+    case 'beanie':
+      return (
+        <g transform={`translate(${hx} ${hy + 6})`}>
+          <path d="M-20 4a20 18 0 0 1 40 0z" fill="#df9078" />
+          <rect x="-21" y="1" width="42" height="7" rx="3" fill="#c97a52" />
+          <circle cx="0" cy="-15" r="5" fill="#fffaf2" />
+        </g>
+      );
+    case 'wizardHat':
+      return (
+        <g transform={`translate(${hx} ${hy + 4}) rotate(-8)`}>
+          <ellipse cx="0" cy="2" rx="22" ry="5" fill="#3f8a64" />
+          <path d="M-13 1 3-32 13 1z" fill="#58ac82" />
+          <path d="M-2-14l2-4 2 4 4 1-3 3 1 4-4-2-4 2 1-4-3-3z" fill="#f0c14e" />
+        </g>
+      );
+    case 'medal':
+      return (
+        <g>
+          <path d={`M42 ${neck - 6}l8 14 8-14`} stroke="#58ac82" strokeWidth="4" fill="none" />
+          <circle cx="50" cy={neck + 11} r="6.5" fill="#f0c14e" />
+          <path d={`M50 ${neck + 7}l1.4 3 3 .4-2.2 2 .6 3-2.8-1.5-2.8 1.5.6-3-2.2-2 3-.4z`} fill="#c99a2e" />
+        </g>
+      );
+    case 'cape':
+      return (
+        <g>
+          <path d={`M30 ${neck - 3}q20 8 40 0l8 26q-28 8-56 0z`} fill="#df7458" opacity=".9" />
+          <path d={`M30 ${neck - 3}q20 8 40 0`} stroke="#b05a40" strokeWidth="4" fill="none" />
+          <circle cx="50" cy={neck + 1} r="3.5" fill="#f0c14e" />
+        </g>
+      );
+    case 'balloon':
+      return (
+        <g>
+          <path d={`M78 ${neck + 6}q-4-18 4-34`} stroke="#7d6e63" strokeWidth="1.5" fill="none" />
+          <ellipse cx="84" cy={neck - 34} rx="10" ry="12" fill="#df7458" />
+          <ellipse cx="80" cy={neck - 38} rx="3" ry="4" fill="#fff" opacity=".6" />
+        </g>
+      );
+    case 'lantern':
+      return (
+        <g transform={`translate(80 ${neck - 4})`}>
+          <circle cx="0" cy="8" r="12" fill="#ffe27a" opacity=".35" />
+          <path d="M0-8v6" stroke="#7d6e63" strokeWidth="2" />
+          <rect x="-6" y="-2" width="12" height="16" rx="4" fill="#f0c14e" />
+          <rect x="-7" y="-4" width="14" height="4" rx="2" fill="#7d6e63" />
+        </g>
+      );
+    case 'magicWand':
+      return (
+        <g transform={`translate(80 ${neck})`}>
+          <path d="M-6 12 8-14" stroke="#4a3e36" strokeWidth="4" strokeLinecap="round" />
+          <path d="M8-24l2.6 5.4 6 .9-4.3 4.2 1 5.9L8-10.4l-5.3 2.8 1-5.9-4.3-4.2 6-.9z" fill="#f0c14e" />
+        </g>
+      );
+    case 'heroShield':
+      return (
+        <g transform={`translate(80 ${neck + 2})`}>
+          <path d="M-12-12h24v8c0 10-6 16-12 19-6-3-12-9-12-19z" fill="#58ac82" />
+          <path d="M-7-7h14v4c0 6-3 9-7 11-4-2-7-5-7-11z" fill="#f0c14e" />
+        </g>
+      );
+    case 'sword':
+      return (
+        <g transform={`translate(80 ${neck + 4}) rotate(18)`}>
+          <path d="M-3-36h6v30h-6z" fill="#d8dde0" />
+          <path d="M-3-36 0-41 3-36z" fill="#d8dde0" />
+          <path d="M0-35v28" stroke="#fff" strokeWidth="1.5" opacity=".7" />
+          <rect x="-10" y="-7" width="20" height="5" rx="2" fill="#c99a2e" />
+          <rect x="-2.5" y="-2" width="5" height="11" rx="2" fill="#a8734a" />
+        </g>
+      );
     case 'headphones':
       return (
         <g>
@@ -515,8 +592,8 @@ const STAGE_LOOKS = [
   { scale: 1.04, feature: true, gem: true, aura: 0.38, wings: true, halo: true, sparkles: true },
 ];
 
-/** A Pal in one of its five forms, optionally wearing an accessory. Decorative unless `label` is given. */
-export default function PalArt({ palId, stage = 0, accessory = null, size = 64, label, className }) {
+/** A Pal in one of its five forms, wearing up to one item per slot (head, neck, hand). Decorative unless `label` is given. */
+export default function PalArt({ palId, stage = 0, wearing = [], size = 64, label, className }) {
   const art = ART[palId];
   if (!art) return null;
   const look = STAGE_LOOKS[palStage(stage).index];
@@ -544,8 +621,10 @@ export default function PalArt({ palId, stage = 0, accessory = null, size = 64, 
         {look.feature && art.grown}
         {art.base}
         {look.gem && <path d={`M${hx} ${hy + 6}l4 5-4 5-4-5z`} fill="#f0c14e" />}
-        {accessory && <Accessory id={accessory} hat={art.hat} neck={art.neck} />}
-        {look.halo && !accessory && <ellipse cx={hx} cy={hy - 10} rx="14" ry="4" fill="none" stroke="#f0c14e" strokeWidth="3" />}
+        {[...wearing].sort(bySlotOrder).map((id) => (
+          <Accessory key={id} id={id} hat={art.hat} neck={art.neck} />
+        ))}
+        {look.halo && !wearing.some((id) => slotOf(id) === 'head') && <ellipse cx={hx} cy={hy - 10} rx="14" ry="4" fill="none" stroke="#f0c14e" strokeWidth="3" />}
       </g>
       {look.sparkles && (
         <g fill="#f0c14e">

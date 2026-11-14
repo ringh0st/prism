@@ -9,7 +9,8 @@ import ShelfItem from './store/ShelfItem.jsx';
 import ItemInfoDialog from './store/ItemInfoDialog.jsx';
 import DailyGift from '../components/game/DailyGift.jsx';
 import PalArt from '../components/pals/PalArt.jsx';
-import { PAL_ACCESSORIES, stageOf } from '../game/pals.js';
+import { PAL_ACCESSORIES, PAL_SLOTS, stageOf } from '../game/pals.js';
+import AdoptShelf from './store/AdoptShelf.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
 import { DIAMOND_PACKS, DIAMOND_REWARDS, HELPERS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS } from '../game/catalog.js';
 import { sparkPurchasesLeft } from '../game/progress.js';
@@ -22,7 +23,7 @@ import styles from './store/Stall.module.css';
 const TABS = [
   { id: 'helpers', label: 'Helpers', icon: 'hint' },
   { id: 'sparks', label: 'Sparks', icon: 'spark' },
-  { id: 'clothes', label: 'Clothes', icon: 'shirt' },
+  { id: 'pals', label: 'Pals', icon: 'shirt' },
   { id: 'diamonds', label: 'Diamonds', icon: 'diamond' },
 ];
 
@@ -140,33 +141,44 @@ function ClothesShelf({ onBought, onError }) {
   return (
     <>
       <p className={styles.shelfIntro}>
-        Dress up your Pals! Clothes are yours forever. Put them on in <a href="#/settings">Me → Wardrobe</a>.
+        Clothes and gear are yours forever. Put them on in <a href="#/settings">Me → Wardrobe</a>.
       </p>
-      <ul className={styles.shelf}>
-        {PAL_ACCESSORIES.map((item) => {
-          const isOwned = progress.pal.accessories.includes(item.id);
-          return (
-            <ShelfItem key={item.id} artNode={<PalArt palId={model} stage={modelStage} accessory={item.id} size={92} className={styles.goodsArt} />} title={item.name}>
-              {isOwned ? (
-                <span className={styles.ownedTag}>
-                  <Icon name="check" size={16} /> Owned
-                </span>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="gold"
-                  disabled={busyItem !== null || progress.sparks < item.price}
-                  onClick={() => buy(item)}
-                  aria-label={`Buy ${item.name} for ${item.price} sparks`}
+      {PAL_SLOTS.map((slot) => (
+        <section key={slot.id} aria-labelledby={`slot-${slot.id}`}>
+          <h3 id={`slot-${slot.id}`} className={`game-title ${styles.slotHeading}`}>
+            {slot.name}
+          </h3>
+          <ul className={styles.shelf}>
+            {PAL_ACCESSORIES.filter((item) => item.slot === slot.id).map((item) => {
+              const isOwned = progress.pal.accessories.includes(item.id);
+              return (
+                <ShelfItem
+                  key={item.id}
+                  artNode={<PalArt palId={model} stage={modelStage} wearing={[item.id]} size={92} className={styles.goodsArt} />}
+                  title={item.name}
                 >
-                  <Icon name="spark" size={16} />
-                  <span>{item.price}</span>
-                </Button>
-              )}
-            </ShelfItem>
-          );
-        })}
-      </ul>
+                  {isOwned ? (
+                    <span className={styles.ownedTag}>
+                      <Icon name="check" size={16} /> Owned
+                    </span>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="gold"
+                      disabled={busyItem !== null || progress.sparks < item.price}
+                      onClick={() => buy(item)}
+                      aria-label={`Buy ${item.name} for ${item.price} sparks`}
+                    >
+                      <Icon name="spark" size={16} />
+                      <span>{item.price}</span>
+                    </Button>
+                  )}
+                </ShelfItem>
+              );
+            })}
+          </ul>
+        </section>
+      ))}
     </>
   );
 }
@@ -249,7 +261,10 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
   const [lumi, setLumi] = useState(() =>
     isReturningFromCheckout
       ? { mood: 'dance', line: 'Thank you! Your diamonds are on their way!' }
-      : { mood: 'happy', line: 'Welcome to my stall! Tap anything for a closer look.' },
+      : {
+          mood: 'happy',
+          line: 'Welcome to my stall! Tap anything for a closer look.',
+        },
   );
 
   // After checkout the payment webhook adds the diamonds; check back a couple of times.
@@ -308,14 +323,31 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
           <DailyGift look="note" />
           {tab === 'helpers' && <HelpersShelf buyProps={buyProps} onInfo={setInfo} />}
           {tab === 'sparks' && <SparksShelf buyProps={buyProps} onInfo={setInfo} />}
-          {tab === 'clothes' && (
-            <ClothesShelf
-              onBought={(item) => {
-                sfx.sparkle();
-                setLumi({ mood: 'dance', line: `Ooh, the ${item.name.toLowerCase()}! Try it on in Me.` });
-              }}
-              onError={(message) => setLumi({ mood: 'worried', line: message })}
-            />
+          {tab === 'pals' && (
+            <>
+              <h2 className={`game-title ${styles.sectionTitle}`}>Adopt a Pal</h2>
+              <AdoptShelf
+                onAdopted={(pal) => {
+                  sfx.win();
+                  setLumi({
+                    mood: 'dance',
+                    line: `Welcome home, ${pal.name}! Find them in Me.`,
+                  });
+                }}
+                onError={(message) => setLumi({ mood: 'worried', line: message })}
+              />
+              <h2 className={`game-title ${styles.sectionTitle}`}>Clothes & gear</h2>
+              <ClothesShelf
+                onBought={(item) => {
+                  sfx.sparkle();
+                  setLumi({
+                    mood: 'dance',
+                    line: `Ooh, the ${item.name.toLowerCase()}! Try it on in Me.`,
+                  });
+                }}
+                onError={(message) => setLumi({ mood: 'worried', line: message })}
+              />
+            </>
           )}
           {tab === 'diamonds' && <DiamondsShelf onError={(message) => setLumi({ mood: 'worried', line: message })} />}
         </section>

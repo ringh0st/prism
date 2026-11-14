@@ -21,7 +21,7 @@ export default function PartnerSwitcher() {
 
   return (
     <section className={styles.partnerCard} aria-labelledby="partner-title">
-      <PalArt palId={partner.id} stage={stage.index} accessory={progress.pal.accessory} size={96} className={styles.partnerArt} />
+      <PalArt palId={partner.id} stage={stage.index} wearing={progress.pal.wearing} size={96} className={styles.partnerArt} />
       <div className={styles.partnerInfo}>
         <h2 id="partner-title" className={`game-title ${styles.partnerName}`}>
           {partner.name} <span className={styles.stageChip}>{stage.name}</span>

@@ -279,11 +279,17 @@ test('pals: starter choice, unlocks, growth and accessories', async () => {
   assert.equal(pals.palStage(4).name, 'Legend');
   assert.equal(pals.PALS.length, 30);
   // Accessories cost sparks and must be owned to wear.
-  assert.throws(() => pals.equipAccessoryLocally(progress, 'scarf'));
+  assert.throws(() => pals.wearAccessoryLocally(progress, 'scarf', true));
   const rich = { ...progress, sparks: 100 };
   const bought = pals.buyAccessoryLocally(rich, 'scarf');
   assert.equal(bought.sparks, 60);
-  assert.equal(pals.equipAccessoryLocally(bought, 'scarf').pal.accessory, 'scarf');
+  const scarfed = pals.wearAccessoryLocally(bought, 'scarf', true);
+  assert.deepEqual(scarfed.pal.wearing, ['scarf']);
+  // One item per slot: a new neck item replaces the scarf; a hat sits alongside it.
+  const geared = { ...scarfed, pal: { ...scarfed.pal, accessories: ['scarf', 'bow', 'crown'] } };
+  assert.deepEqual(pals.wearAccessoryLocally(geared, 'bow', true).pal.wearing, ['bow']);
+  assert.deepEqual(pals.wearAccessoryLocally(geared, 'crown', true).pal.wearing, ['scarf', 'crown']);
+  assert.deepEqual(pals.wearAccessoryLocally(scarfed, 'scarf', false).pal.wearing, []);
 });
 
 test('pal unlocks and accessory prices match the database', async () => {
@@ -296,8 +302,10 @@ test('pal unlocks and accessory prices match the database', async () => {
     assert.ok(sql.includes(`'${pal.id}' then '${pal.animal}'`), `${pal.id} animal`);
   }
   for (const item of PAL_ACCESSORIES) {
-    assert.ok(sql.includes(`when '${item.id}' then ${item.price}`), `${item.id} price`);
+    assert.ok(sql.includes(`when '${item.id}' then '{"price": ${item.price}, "slot": "${item.slot}"}'::jsonb`), `${item.id} price and slot`);
   }
+  const { ADOPT_PAL_DIAMONDS } = await import('./pals.js');
+  assert.ok(sql.includes(`v_price constant integer := ${ADOPT_PAL_DIAMONDS};`), 'adopt price');
 });
 
 test('nicknames: friendly rules, random names and the same blocked list as the database', async () => {
