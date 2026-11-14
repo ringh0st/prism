@@ -13,7 +13,7 @@ const BACKDROP_GRACE_MS = 600;
  * Taps on the backdrop in the first moments after opening are ignored either way (they were meant for
  * whatever was there before the dialog slid in).
  */
-export default function Dialog({ title, onClose, children, tone = 'default', closesOnBackdrop = true }) {
+export default function Dialog({ title, onClose, children, tone = 'default', closesOnBackdrop = true, hideTitle = false }) {
   const titleId = useId();
   const dialogRef = useRef(null);
   const openedAt = useRef(0);
@@ -67,7 +67,7 @@ export default function Dialog({ title, onClose, children, tone = 'default', clo
         tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
       >
-        <h2 id={titleId} className={styles.title}>
+        <h2 id={titleId} className={hideTitle ? 'visually-hidden' : styles.title}>
           {title}
         </h2>
         {children}

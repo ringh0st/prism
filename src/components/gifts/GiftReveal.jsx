@@ -56,7 +56,7 @@ export default function GiftReveal({
 }) {
   const { t, lang } = useI18n();
   const [phase, setPhase] = useState('wrapped'); // wrapped | charging | open | done | error
-  const [index, setIndex] = useState(0);
+  const [openedCount, setOpenedCount] = useState(0);
   const [glow, setGlow] = useState(0);
   const [charge, setCharge] = useState(0);
   const [items, setItems] = useState([]);
@@ -106,7 +106,6 @@ export default function GiftReveal({
     if (phase !== 'wrapped') return;
     const opened = [];
     for (let i = 0; i < count; i++) {
-      setIndex(i);
       setGlow(0);
       setCharge(0);
       setItems([]);
@@ -138,6 +137,7 @@ export default function GiftReveal({
       if (!isMounted.current) return;
       setPhase('open');
       sfx.giftOpen({ isBig: isBig || rarityStep(gift) >= 2 });
+      setOpenedCount(i + 1);
       await showItems(giftItems(lang, gift, partner));
       opened.push(gift);
       if (i < count - 1) await pause(NEXT_GIFT_MS);
@@ -152,13 +152,27 @@ export default function GiftReveal({
     setPhase('done');
   };
 
-  const left = count - index - 1;
+  // Several presents: no sentence, just the pile and a number counting down as each one opens.
+  const isPile = count > 1;
+  const left = count - openedCount;
   const heading = phase === 'done' ? doneTitle : phase === 'error' ? t('ui.hmm') : title;
   const look = GLOW_LOOKS[glow];
 
   return (
-    <Dialog title={heading} tone="celebrate" onClose={phase === 'wrapped' || phase === 'done' || phase === 'error' ? onClose : undefined}>
+    <Dialog
+      title={heading}
+      hideTitle={isPile && phase !== 'done'}
+      tone="celebrate"
+      onClose={phase === 'wrapped' || phase === 'done' || phase === 'error' ? onClose : undefined}
+    >
       <div className={styles.stage} onClick={() => hurry.current?.()} role="presentation">
+        {isPile && phase !== 'done' && (
+          <span className={styles.pile} aria-hidden="true">
+            {Array.from({ length: Math.max(0, left - 1) }, (_, i) => (
+              <GiftBoxArt key={i} tone={wrapping.tone} phase="still" size={34} />
+            ))}
+          </span>
+        )}
         {glow > 0 && phase !== 'done' && <span className={styles.rays} style={{ '--ray': look.light }} aria-hidden="true" />}
         <button
           type="button"
@@ -181,9 +195,9 @@ export default function GiftReveal({
               isBig={isBig}
             />
           )}
-          {count > 1 && left > 0 && phase !== 'done' && (
-            <span className={`game-title ${styles.stack}`} dir="ltr" aria-hidden="true">
-              +{left}
+          {isPile && phase !== 'done' && (
+            <span key={left} className={`game-title ${styles.countdown}`} aria-hidden="true">
+              {left}
             </span>
           )}
         </button>

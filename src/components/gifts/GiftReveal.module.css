@@ -131,17 +131,50 @@
   }
 }
 
-/* "+2": more presents waiting behind this one */
-.stack {
+/* Several presents: the ones still waiting sit in a little pile, and a big number counts down */
+.pile {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 260px;
+  min-height: 34px;
+}
+
+.pile > svg {
+  margin-inline: -3px;
+  animation: pileIn 300ms var(--ease-pop) both;
+}
+
+.countdown {
   position: absolute;
-  top: 4px;
-  inset-inline-end: -6px;
-  padding: 2px 9px;
+  top: -6px;
+  inset-inline-end: -14px;
+  display: grid;
+  place-items: center;
+  min-width: 46px;
+  height: 46px;
+  padding: 0 8px;
   border-radius: var(--radius-pill);
-  font-size: 18px;
+  font-size: 28px;
   color: var(--action-label);
   background: var(--action-bottom);
-  box-shadow: 0 0 0 3px var(--surface-raised);
+  box-shadow:
+    0 0 0 4px var(--surface-raised),
+    var(--shadow-md);
+  animation: countPop 420ms var(--ease-pop) both;
+}
+
+@keyframes countPop {
+  from {
+    transform: scale(1.8);
+  }
+}
+
+@keyframes pileIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 
 /* The charge bar: fills notch by notch (◆ ★ ✦); each notch reached makes the present glow up */
@@ -276,6 +309,8 @@
   .rays,
   .chest-wrapped,
   .chest-charging,
+  .countdown,
+  .pile > svg,
   .chargeFill,
   .chest-open,
   .item,
