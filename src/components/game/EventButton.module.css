@@ -1,0 +1,31 @@
+.button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  text-decoration: none;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: var(--shadow-button);
+  transition: transform 220ms var(--ease-spring);
+}
+
+.button:active {
+  transform: scale(0.92);
+}
+
+.count {
+  position: absolute;
+  bottom: -7px;
+  right: -10px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  line-height: 20px;
+  color: var(--action-label);
+  background: var(--action-bottom);
+  box-shadow: 0 0 0 2px var(--surface-page);
+}

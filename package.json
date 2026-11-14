@@ -10,6 +10,7 @@
     "lint": "oxlint src scripts",
     "test": "node --test src/game/*.test.js",
     "levels": "node scripts/generate-levels.mjs",
+    "events": "node scripts/generate-events.mjs",
     "ios": "vite build && cap sync ios"
   },
   "dependencies": {

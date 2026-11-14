@@ -516,3 +516,38 @@ test('iPhones and iPads add apps through Share, other browsers through their men
   assert.equal(installMethod('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 0), 'menu');
   assert.equal(installMethod('Mozilla/5.0 (Linux; Android 14)'), 'menu');
 });
+
+test('weekend events run Saturday and Sunday, take turns by theme and pay the prize once', async () => {
+  const events = await import('./events.js');
+  assert.equal(events.eventWeekendOf(new Date(2026, 10, 14, 10)), '2026-11-14');
+  assert.equal(events.eventWeekendOf(new Date(2026, 10, 15, 23)), '2026-11-14');
+  assert.equal(events.eventWeekendOf(new Date(2026, 10, 16, 9)), null);
+  assert.equal(events.nextEventWeekend(new Date(2026, 10, 18)), '2026-11-21');
+  assert.notEqual(events.eventThemeFor('2026-11-14').id, events.eventThemeFor('2026-11-21').id);
+  assert.deepEqual(events.parseEventLevelId('event-2026-11-14-7'), { weekend: '2026-11-14', number: 7 });
+
+  let progress = { sparks: 0, events: {} };
+  for (let n = 1; n <= events.EVENT_LEVELS; n++) progress = events.recordEventLevelLocally(progress, '2026-11-14', n, 2);
+  progress = events.recordEventLevelLocally(progress, '2026-11-14', 3, 1);
+  assert.equal(progress.events['2026-11-14'].stars[3], 2, 'keeps the best stars');
+  progress = events.claimEventPrizeLocally(progress, '2026-11-14');
+  assert.equal(progress.sparks, events.EVENT_PRIZE_SPARKS);
+  assert.throws(() => events.claimEventPrizeLocally(progress, '2026-11-14'));
+  assert.equal(events.eventStamps(progress)[0].weekend, '2026-11-14');
+});
+
+test('event puzzles exist for upcoming weekends, climb in difficulty and match the server prize', async () => {
+  const { EVENT_LEVELS, EVENT_PRIZE_SPARKS } = await import('./events.js');
+  const { readdirSync } = await import('node:fs');
+  const files = readdirSync(new URL('../data/events/', import.meta.url));
+  assert.ok(files.length >= 50, 'about a year of weekends');
+  for (const file of files) {
+    const levels = JSON.parse(readFileSync(new URL(`../data/events/${file}`, import.meta.url), 'utf8'));
+    assert.equal(levels.length, EVENT_LEVELS, file);
+    levels.forEach((level, i) => i > 0 && assert.ok(level.par >= levels[i - 1].par, `${file} climbs`));
+  }
+  const sql = readFileSync(new URL('../../supabase/events.sql', import.meta.url), 'utf8');
+  assert.match(sql, new RegExp(`sparks = sparks \\+ ${EVENT_PRIZE_SPARKS}\\b`));
+  assert.match(sql, new RegExp(`p_number > ${EVENT_LEVELS}\\b`));
+  assert.match(sql, new RegExp(`v_solved < ${EVENT_LEVELS}\\b`));
+});

@@ -12,6 +12,8 @@ import StoreScreen from './screens/StoreScreen.jsx';
 import LeaderboardScreen from './screens/leaderboard/LeaderboardScreen.jsx';
 import PalsScreen from './screens/pals/PalsScreen.jsx';
 import GroveScreen from './screens/grove/GroveScreen.jsx';
+import EventScreen from './screens/event/EventScreen.jsx';
+import EventLevelRoute from './screens/event/EventLevelRoute.jsx';
 import WeeklyRewardDialog from './screens/leaderboard/WeeklyRewardDialog.jsx';
 import StarterPicker from './screens/pals/StarterPicker.jsx';
 import PalUnlockNotice from './screens/pals/PalUnlockNotice.jsx';
@@ -88,6 +90,8 @@ function Routes() {
       ) : (
         <NotFoundScreen />
       );
+    case 'event':
+      return route.params[0] ? <EventLevelRoute number={Number(route.params[0])} /> : <EventScreen />;
     case 'top':
       return <LeaderboardScreen />;
     case 'pals':

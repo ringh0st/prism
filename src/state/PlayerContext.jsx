@@ -4,6 +4,9 @@ import { readJson, removeKey, writeJson } from '../lib/storage.js';
 import {
   buyStoreItemOnServer,
   claimChestOnServer,
+  claimEventPrizeOnServer,
+  fetchMyEvents,
+  recordEventLevelOnServer,
   claimDailyGiftOnServer,
   choosePalOnServer,
   setNicknameOnServer,
@@ -36,6 +39,8 @@ import {
   EconomyError,
 } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
+import { claimEventPrizeLocally, EVENT_PRIZE_SPARKS, recordEventLevelLocally } from '../game/events.js';
+import { starsForMoves } from '../game/scoring.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
 import { DAILY_GIFT_SPARKS } from '../game/catalog.js';
 import { nicknameProblem } from '../game/nicknames.js';
@@ -126,6 +131,9 @@ export function PlayerProvider({ children }) {
       }
       // The nickname chosen on this device is the one the board should show.
       if (progressRef.current.nickname) await setNicknameOnServer(progressRef.current.nickname).catch(() => {});
+      // Weekend event results saved on the account.
+      const events = await fetchMyEvents().catch(() => null);
+      if (events?.events) setProgress({ ...progressRef.current, events: events.events });
       // Finished last week in the top 10? Collect the reward (the server pays it only once).
       const claimed = await claimWeeklyRewardOnServer().catch(() => null);
       if (claimed?.reward) {
@@ -187,6 +195,39 @@ export function PlayerProvider({ children }) {
           setSyncStatus('error');
           return { ...local, diamondsEarned: 0 };
         }
+      },
+
+      /**
+       * A solved weekend-event puzzle: keeps the best stars and grows the partner Pal (no sparks per puzzle;
+       * the prize comes after all 10). @returns Promise<{ stars, sparksEarned, diamondsEarned, isNewBest, palGrewTo }>
+       */
+      async finishEventLevel(level, { weekend, number, moves, starCap = 3 }) {
+        const stars = Math.min(starsForMoves(moves, level.par, level.difficulty), starCap);
+        const grown = growPartnerLocally(recordEventLevelLocally(progressRef.current, weekend, number, stars));
+        setProgress(grown.progress);
+        const outcome = { stars, sparksEarned: 0, diamondsEarned: 0, isNewBest: false, palGrewTo: grown.grewTo };
+        if (!userId) return outcome;
+        try {
+          applyServerState(await recordEventLevelOnServer(weekend, number, stars));
+          setSyncStatus('synced');
+        } catch {
+          setSyncStatus('error');
+        }
+        return outcome;
+      },
+
+      /** Open the prize for finishing a weekend's 10 puzzles. @returns sparks won. @throws EconomyError */
+      async claimEventPrize(weekend) {
+        if (!userId) {
+          try {
+            setProgress(claimEventPrizeLocally(progressRef.current, weekend));
+          } catch (error) {
+            throw new EconomyError(error.message);
+          }
+          return EVENT_PRIZE_SPARKS;
+        }
+        applyServerState(await claimEventPrizeOnServer(weekend));
+        return EVENT_PRIZE_SPARKS;
       },
 
       /** @returns Promise<{ sparksEarned, diamondsEarned, streak, isFirstToday }> */

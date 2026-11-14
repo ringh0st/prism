@@ -1,0 +1,292 @@
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 var(--space-3) 130px;
+}
+
+.main {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
+}
+
+.card h2 {
+  font-size: 20px;
+}
+
+.muted {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+/* ---------- Theme banner ---------- */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-honey) 30%, var(--surface-raised));
+}
+
+.bannerIcon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  font-size: 36px;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  animation: bob 3s ease-in-out infinite;
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(-4px) rotate(-4deg);
+  }
+}
+
+.kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--reward-label);
+}
+
+.themeName {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.tagline {
+  margin: 2px 0 0;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+/* ---------- The 10 puzzles ---------- */
+.puzzles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-strong);
+  background: var(--surface-tonal);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--surface-tonal) 75%, var(--text-strong));
+  transition: transform 200ms var(--ease-spring);
+}
+
+a.puzzle:active {
+  transform: translateY(3px);
+}
+
+.puzzleNumber {
+  font-size: 22px;
+}
+
+.solved {
+  background: color-mix(in srgb, var(--color-honey) 32%, var(--surface-raised));
+}
+
+.next {
+  color: var(--action-label);
+  background: var(--action-bottom);
+  animation: glow 1.8s ease-in-out infinite;
+}
+
+@keyframes glow {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.lockedPuzzle {
+  color: var(--text-soft);
+  opacity: 0.6;
+}
+
+.hard {
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+}
+
+/* ---------- Prize ---------- */
+.prize {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
+}
+
+.prize h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.prize p {
+  margin: 4px 0 var(--space-2);
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.prizeReady {
+  background: color-mix(in srgb, var(--color-honey) 34%, var(--surface-raised));
+}
+
+.chest {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.prizeReady .chest {
+  animation: wiggle 1.6s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%,
+  70%,
+  100% {
+    rotate: 0deg;
+  }
+  78%,
+  92% {
+    rotate: -8deg;
+  }
+  85% {
+    rotate: 8deg;
+  }
+}
+
+.meter {
+  height: 12px;
+  margin-bottom: var(--space-2);
+  padding: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  min-width: 8px;
+  border-radius: inherit;
+  background: var(--color-sage);
+  transition: width 500ms var(--ease-out);
+}
+
+.prizeMessage:empty {
+  display: none;
+}
+
+/* ---------- Stamps ---------- */
+.count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  vertical-align: 2px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.stamps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stamp {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: var(--space-3) var(--space-2);
+  border: 6px solid transparent;
+  text-align: center;
+  /* A postage stamp: a perforated edge (little holes in the border) around a warm face */
+  background:
+    linear-gradient(
+        color-mix(in srgb, var(--color-peach) 26%, var(--surface-raised)),
+        color-mix(in srgb, var(--color-peach) 26%, var(--surface-raised))
+      )
+      padding-box,
+    radial-gradient(circle, var(--surface-raised) 2.5px, color-mix(in srgb, var(--color-peach) 55%, var(--surface-raised)) 3px) -1px -1px / 9px 9px
+      border-box;
+  box-shadow: var(--shadow-sm);
+  rotate: -2deg;
+}
+
+.stamp:nth-child(even) {
+  rotate: 2deg;
+}
+
+.stampIcon {
+  font-size: 30px;
+}
+
+.stampName {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.15;
+}
+
+.stampDate {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bannerIcon,
+  .next,
+  .prizeReady .chest {
+    animation: none;
+  }
+}

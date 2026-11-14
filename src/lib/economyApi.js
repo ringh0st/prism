@@ -84,3 +84,11 @@ export async function startDiamondCheckout(packId) {
   if (error || !data?.url) throw new EconomyError('Checkout isn’t available right now. Please try again later.');
   return data.url;
 }
+
+/** Weekend events (supabase/events.sql). Each returns the economy state plus `events`. */
+export const recordEventLevelOnServer = (weekend, number, stars) =>
+  rpc('record_event_level', { p_weekend: weekend, p_number: number, p_stars: stars });
+
+export const claimEventPrizeOnServer = (weekend) => rpc('claim_event_prize', { p_weekend: weekend });
+
+export const fetchMyEvents = () => rpc('my_events');

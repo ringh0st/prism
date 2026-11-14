@@ -41,7 +41,19 @@ function ShareResult({ text }) {
   );
 }
 
-export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasNext, shareMessage = null, onNext, onReplay, onMap }) {
+/** backName says where onMap goes: 'map', or 'event' for weekend-event puzzles. */
+export default function WinDialog({
+  result,
+  par,
+  difficulty,
+  hotStreak = 0,
+  hasNext,
+  shareMessage = null,
+  backName = 'map',
+  onNext,
+  onReplay,
+  onMap,
+}) {
   const { isSignedIn, progress } = usePlayer();
   const partner = palById(progress.pal.id);
   const {
@@ -159,7 +171,7 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
           </Button>
         ) : (
           <Button size="lg" onClick={onMap} data-autofocus>
-            Back to map
+            Back to {backName}
           </Button>
         )}
         <div className={styles.secondary}>
@@ -168,7 +180,7 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
           </Button>
           {hasNext && (
             <Button variant="secondary" onClick={onMap}>
-              Map
+              {backName === 'event' ? 'Event' : 'Map'}
             </Button>
           )}
         </div>

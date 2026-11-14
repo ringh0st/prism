@@ -32,6 +32,7 @@ import { quipFor } from '../../game/quips.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
 import { firstTileOf, newPiecesIn, piecesMetIn } from '../../game/pieces.js';
 import { readJson, writeJson } from '../../lib/storage.js';
+import { EVENT_LEVELS, parseEventLevelId } from '../../game/events.js';
 import styles from './PlayScreen.module.css';
 
 const WIN_DIALOG_DELAY_MS = 900;
@@ -46,10 +47,10 @@ function seenPieces(progress) {
 }
 
 /**
- * mode: 'level' (records progress) | 'daily' (streak + sparks) | 'playtest' (admin preview, free helpers, records nothing)
+ * mode: 'level' (records progress) | 'daily' (streak + sparks) | 'event' (weekend event puzzle) | 'playtest' (admin preview, free helpers, records nothing)
  */
 export default function PlayScreen({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey }) {
-  const { progress, finishLevel, finishDaily, consumeHelper } = usePlayer();
+  const { progress, finishLevel, finishDaily, finishEventLevel, consumeHelper } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
   const { trace, moves } = puzzle;
@@ -72,15 +73,20 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const moveLimit = moveLimitFor(level.par, level.difficulty);
   const gems = level.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
   const helpersAllowed = helpersAllowedFor(level.difficulty);
-  const offeredHelpers = mode === 'daily' ? HELPER_IDS.filter((id) => id !== 'skip') : HELPER_IDS;
+  // Daily and event puzzles can't be skipped.
+  const offeredHelpers = mode === 'daily' || mode === 'event' ? HELPER_IDS.filter((id) => id !== 'skip') : HELPER_IDS;
   const levelName = title || levelNameFor(level);
   // Built-in worlds have their own look (board colors and landscape) and show their name.
-  const world = !level.isDaily && mode !== 'playtest' ? WORLDS[level.world - 1] : null;
+  const world = mode === 'level' ? WORLDS[level.world - 1] : null;
+  const backName = mode === 'event' ? 'event' : 'map';
+  const eventSpot = useMemo(() => (mode === 'event' ? parseEventLevelId(level.id) : null), [mode, level.id]);
   const subtitle = level.isDaily
     ? 'Daily puzzle'
-    : mode === 'playtest'
-      ? 'Test play'
-      : `${world ? `${world.name} · ` : ''}${level.world}-${level.index}`;
+    : eventSpot
+      ? `Weekend event · ${eventSpot.number}/${EVENT_LEVELS}`
+      : mode === 'playtest'
+        ? 'Test play'
+        : `${world ? `${world.name} · ` : ''}${level.world}-${level.index}`;
   const introLine = useMemo(() => quipFor(modifier === 'normal' ? 'start' : modifier), [modifier]);
   const isOver = trace.isSolved || isOutOfMoves || Boolean(result);
 
@@ -156,6 +162,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           level,
           isSkipped ? { moves: null, forcedStars: 1, usedHelpers: true } : { moves, starCap: puzzle.starCap, usedHelpers },
         );
+      } else if (mode === 'event') {
+        outcome = finishEventLevel(level, { ...eventSpot, moves, starCap: puzzle.starCap });
       } else if (mode === 'daily') {
         outcome = finishDaily(dateKey).then((daily) => ({ ...daily, stars, isNewBest: false }));
       } else {
@@ -166,7 +174,22 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       const completesWorld = mode === 'level' && !wasWorldComplete && isWorldComplete({ levels: solvedLevels }, worldRefs);
       setResult({ ...finished, moves: isSkipped ? null : moves, isSkipped, completesWorld });
     },
-    [moves, level, modifier, puzzle.starCap, puzzle.usedHelpers.length, mode, levelRefsInWorld, progress, finishLevel, finishDaily, dateKey, say],
+    [
+      moves,
+      level,
+      modifier,
+      puzzle.starCap,
+      puzzle.usedHelpers.length,
+      mode,
+      levelRefsInWorld,
+      progress,
+      finishLevel,
+      finishDaily,
+      finishEventLevel,
+      eventSpot,
+      dateKey,
+      say,
+    ],
   );
 
   useEffect(() => {
@@ -281,7 +304,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     <main className={`${styles.screen} ${styles[modifier] ?? ''} ${world ? `${styles.themed} ${styles[world.theme]}` : ''}`}>
       {world && <WorldBackdrop levelId={level.id} theme={world.theme} />}
       <header className={styles.header}>
-        <Button as="a" href={backHref} variant="secondary" icon="back" label="Back to map" />
+        <Button as="a" href={backHref} variant="secondary" icon="back" label={`Back to ${backName}`} />
         <div className={styles.titleBlock}>
           <p className={styles.subtitle}>{subtitle}</p>
           <ScreenTitle as="h1" size="sm" tone={modifier === 'boss' ? 'boss' : 'calm'}>
@@ -372,6 +395,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       )}
       {isOutOfMoves && !result && (
         <OutOfMovesDialog
+          backName={backName}
           gemsLeft={gems.length - trace.litGems.size}
           lumiLine={quipFor('outOfMoves')}
           hintsOwned={progress.helpers.hint ?? 0}
@@ -389,6 +413,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       )}
       {result && (
         <WinDialog
+          backName={backName}
           result={result}
           par={level.par}
           difficulty={level.difficulty}

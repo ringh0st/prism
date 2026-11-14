@@ -6,7 +6,7 @@ import styles from './OutOfMovesDialog.module.css';
  * Shown when the move limit runs out before every gem is lit. Kept light and quick:
  * the board stays visible, retrying is one tap, and a hint is offered as a gentle way forward.
  */
-export default function OutOfMovesDialog({ gemsLeft, lumiLine, hintsOwned = 0, onRetry, onRetryWithHint = null, onMap }) {
+export default function OutOfMovesDialog({ gemsLeft, lumiLine, hintsOwned = 0, backName = 'map', onRetry, onRetryWithHint = null, onMap }) {
   const isClose = gemsLeft <= 1;
   return (
     <Dialog title={isClose ? 'So close!' : 'Out of moves'} tone="gentle" onClose={onMap}>
@@ -23,7 +23,7 @@ export default function OutOfMovesDialog({ gemsLeft, lumiLine, hintsOwned = 0, o
           </Button>
         )}
         <Button variant="ghost" icon="map" onClick={onMap}>
-          Back to map
+          Back to {backName}
         </Button>
       </div>
     </Dialog>

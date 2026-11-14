@@ -10,6 +10,7 @@ import WorldSign from './scenery/WorldSign.jsx';
 import DailyGift from '../../components/game/DailyGift.jsx';
 import DailyButton from '../../components/game/DailyButton.jsx';
 import InstallButton from '../../components/install/InstallButton.jsx';
+import EventButton from '../../components/game/EventButton.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
@@ -126,6 +127,7 @@ export default function MapScreen() {
       <header className={styles.hud}>
         <div className={styles.hudStart}>
           <DailyButton />
+          <EventButton />
           <DailyGift />
           <InstallButton />
         </div>
