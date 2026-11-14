@@ -8,6 +8,7 @@ import * as pals from './sections/pals.js';
 import * as shop from './sections/shop.js';
 import * as grove from './sections/grove.js';
 import * as extras from './sections/extras.js';
+import * as gifts from './sections/gifts.js';
 
 export const en = {
   'common.gotIt': 'Got it!',
@@ -245,4 +246,5 @@ export const en = {
   ...shop.en,
   ...grove.en,
   ...extras.en,
+  ...gifts.en,
 };

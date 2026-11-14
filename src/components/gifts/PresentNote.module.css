@@ -1,0 +1,37 @@
+.note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.ready {
+  color: var(--calm-label);
+}
+
+.ready svg {
+  animation: wiggle 1.6s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%,
+  70%,
+  100% {
+    transform: none;
+  }
+  80% {
+    transform: rotate(-14deg) scale(1.15);
+  }
+  90% {
+    transform: rotate(10deg) scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ready svg {
+    animation: none;
+  }
+}

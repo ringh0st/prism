@@ -1,0 +1,44 @@
+.odds {
+  display: grid;
+  gap: 6px;
+  margin-bottom: var(--space-4);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.always,
+.note {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+}
+
+.what {
+  flex: 1;
+}
+
+.chance {
+  font-size: 15px;
+  color: var(--text-strong);
+}

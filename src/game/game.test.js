@@ -269,17 +269,76 @@ test('a solve reports a level-up and a new title only when it crosses one', asyn
   assert.equal(climb.newTitle.name, 'Beam Bender');
 });
 
-test('daily gift: once a day, same amount as the database', async () => {
-  const { DAILY_GIFT_SPARKS } = await import('./catalog.js');
-  const { claimDailyGiftLocally, createEmptyProgress, isDailyGiftReady } = await import('./progress.js');
-  const sql = readFileSync(new URL('../../supabase/social.sql', import.meta.url), 'utf8');
-  assert.match(sql, new RegExp(`v_sparks constant integer := ${DAILY_GIFT_SPARKS};`));
-  const start = createEmptyProgress();
-  const after = claimDailyGiftLocally(start, '2026-03-01');
-  assert.equal(after.sparks, start.sparks + DAILY_GIFT_SPARKS);
-  assert.equal(isDailyGiftReady(after, '2026-03-01'), false);
-  assert.throws(() => claimDailyGiftLocally(after, '2026-03-01'));
-  assert.equal(isDailyGiftReady(after, '2026-03-02'), true);
+test('gift calendar: one a day, grows through the week, pauses when a day is missed, matches the database', async () => {
+  const { GIFT_CALENDAR, calendarGift, claimCalendarGiftLocally, isDailyGiftReady } = await import('./gifts.js');
+  const { createEmptyProgress } = await import('./progress.js');
+  const sql = readFileSync(new URL('../../supabase/gifts.sql', import.meta.url), 'utf8');
+  GIFT_CALENDAR.forEach((day, i) => {
+    const { guestHelper, ...server } = day;
+    const row = new RegExp(`when ${i} then '(\\{[^']*\\})'::jsonb`).exec(sql);
+    assert.ok(row, `day ${i + 1} is in gifts.sql`);
+    assert.deepEqual(JSON.parse(row[1]), server, `day ${i + 1} matches`);
+    assert.ok(!guestHelper || day.diamonds, 'only the diamond day has a guest stand-in');
+  });
+  // Diamonds need an account: guests get the stand-in helper on day 7.
+  assert.deepEqual(calendarGift(6, true), { sparks: 60, helper: null, diamonds: 1, isBig: true });
+  assert.deepEqual(calendarGift(6, false), { sparks: 60, helper: 'skip', isBig: true });
+  assert.equal(calendarGift(7, false).sparks, GIFT_CALENDAR[0].sparks, 'a new week starts');
+
+  let progress = createEmptyProgress();
+  ({ progress } = claimCalendarGiftLocally(progress, '2026-03-01'));
+  assert.equal(isDailyGiftReady(progress, '2026-03-01'), false);
+  assert.throws(() => claimCalendarGiftLocally(progress, '2026-03-01'));
+  // Three days away: the calendar waits on day 2.
+  const { progress: later, gift } = claimCalendarGiftLocally(progress, '2026-03-05');
+  assert.deepEqual(gift, { sparks: 20, helper: 'hint', isBig: false });
+  assert.equal(later.helpers.hint, progress.helpers.hint + 1);
+  // A full helper becomes 10 sparks instead.
+  const full = { ...progress, helpers: { ...progress.helpers, hint: 5 } };
+  assert.deepEqual(claimCalendarGiftLocally(full, '2026-03-05').gift, { sparks: 30, helper: null, isBig: false });
+});
+
+test('pal presents: one per 10 stars, odds shown, never something you own, matches the database', async () => {
+  const { PRESENT_BASE_SPARKS, PRESENT_EVERY_STARS, PRESENT_ITEMS, PRESENT_ODDS, drawPresent, openPresentLocally, presentProgress, presentsWaiting } =
+    await import('./gifts.js');
+  const { accessoryById } = await import('./pals.js');
+  const { groveItemById } = await import('./grove.js');
+  const { createEmptyProgress } = await import('./progress.js');
+  const sql = readFileSync(new URL('../../supabase/gifts.sql', import.meta.url), 'utf8');
+  assert.equal(
+    PRESENT_ODDS.reduce((sum, odd) => sum + odd.chance, 0),
+    100,
+  );
+  assert.match(sql, new RegExp(`v_stars / ${PRESENT_EVERY_STARS} <= v_profile.presents_opened`));
+  assert.match(sql, new RegExp(`'\\{"sparks": ${PRESENT_BASE_SPARKS}\\}'::jsonb`));
+  assert.match(sql, new RegExp(`'\\{"sparks": ${PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks}\\}'::jsonb`));
+  assert.match(sql, new RegExp(`v_roll < ${PRESENT_ODDS[0].chance}\\b`));
+  assert.match(sql, new RegExp(`v_roll >= ${PRESENT_ODDS[0].chance + PRESENT_ODDS[1].chance}\\b`));
+  assert.deepEqual(
+    [...sql.match(/'(outfit|decor):(\w+)'/g)].map((entry) => entry.slice(1, -1)),
+    PRESENT_ITEMS.map((item) => `${item.type}:${item.id}`),
+  );
+  PRESENT_ITEMS.forEach((item) => assert.ok(item.type === 'outfit' ? accessoryById(item.id) : groveItemById(item.id), item.id));
+
+  const levels = Object.fromEntries(Array.from({ length: 9 }, (_, i) => [`w1-0${i + 1}`, { stars: 3, bestMoves: 3 }]));
+  let progress = { ...createEmptyProgress(), levels: { ...levels, 'event-x': { stars: 3 } } };
+  assert.equal(presentsWaiting(progress), 2, "27 stars from built-in levels (events don't count)");
+  assert.deepEqual(presentProgress(progress), { have: 10, need: 10 }, 'full while a present waits');
+
+  assert.deepEqual(drawPresent(progress, 0.1, 0), { sparks: PRESENT_BASE_SPARKS, helper: 'hint' });
+  assert.deepEqual(drawPresent(progress, 0.5, 0), { sparks: PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks });
+  const withItem = openPresentLocally(progress, 0.9, 0);
+  assert.equal(withItem.gift.item.id, PRESENT_ITEMS[0].id);
+  assert.ok(withItem.progress.pal.accessories.includes(PRESENT_ITEMS[0].id));
+  assert.notEqual(drawPresent(withItem.progress, 0.9, 0).item.id, PRESENT_ITEMS[0].id, 'never something you own');
+  progress = withItem.progress;
+  ({ progress } = openPresentLocally(progress, 0.5, 0));
+  assert.equal(presentsWaiting(progress), 0);
+  assert.deepEqual(presentProgress(progress), { have: 7, need: 10 });
+  assert.throws(() => openPresentLocally(progress));
+  // Every helper full: the helper surprise becomes the sparks bag.
+  const full = { ...progress, helpers: { hint: 5, lens: 5, autoturn: 5, skip: 0 } };
+  assert.deepEqual(drawPresent(full, 0.1, 0), { sparks: PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks });
 });
 
 test('pals: starter choice, unlocks, growth and accessories', async () => {
@@ -862,11 +921,21 @@ test('translations: every language uses the same keys and placeholders as Englis
   const { es } = await import('../i18n/strings/es.js');
   const { he } = await import('../i18n/strings/he.js');
   // Keys for game content (pieces, flavors, helpers…) only exist in translations: English lives in the game modules.
-  const CONTENT = /^(piece|recipe|helper|stage|title|treat|sticker|quips|combo|palName|palBio|outfit|decor|themeSet|bug|quest|eventTheme|beam|item)\./;
+  const CONTENT =
+    /^(piece|recipe|helper|stage|title|treat|sticker|quips|combo|palName|palBio|outfit|decor|themeSet|bug|quest|eventTheme|beam|item)\./;
   const base = (key) => key.replace(/\.(zero|one|two|few|many|other)$/, '');
   const enBases = new Set(Object.keys(en).map(base));
-  const placeholders = (text) => (typeof text === 'string' ? [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).filter((n) => n !== 'count').sort() : []);
-  for (const [name, dict] of [['es', es], ['he', he]]) {
+  const placeholders = (text) =>
+    typeof text === 'string'
+      ? [...text.matchAll(/\{(\w+)\}/g)]
+          .map((m) => m[1])
+          .filter((n) => n !== 'count')
+          .sort()
+      : [];
+  for (const [name, dict] of [
+    ['es', es],
+    ['he', he],
+  ]) {
     for (const [key, value] of Object.entries(dict)) {
       if (CONTENT.test(key)) continue;
       assert.ok(enBases.has(base(key)), `${name}: "${key}" is not an English key`);
@@ -884,8 +953,8 @@ test('translations: plurals, placeholders, English fallback and the device langu
   const { translate, detectLanguage } = await import('../i18n/translate.js');
   assert.equal(translate('en', 'win.solvedIn', { count: 1 }), 'Solved in 1 move');
   assert.equal(translate('es', 'win.solvedIn', { count: 3 }), 'Resuelto en 3 movimientos');
-  assert.equal(translate('he', 'win.solvedIn', { count: 1 }), 'נפתר במהלך אחד');
-  assert.equal(translate('he', 'win.solvedIn', { count: 2 }), 'נפתר ב-2 מהלכים');
+  assert.equal(translate('he', 'win.solvedIn', { count: 1 }), 'עברתם במהלך אחד');
+  assert.equal(translate('he', 'win.solvedIn', { count: 2 }), 'עברתם ב-2 מהלכים');
   assert.equal(translate('he', 'no.such.key', {}, 'fallback'), 'fallback');
   assert.equal(detectLanguage(['he-IL']), 'he');
   assert.equal(detectLanguage(['iw']), 'he');
@@ -899,7 +968,10 @@ test('translations: every key the screens ask for exists in English', async () =
   const { en } = await import('../i18n/strings/en.js');
   const root = new URL('../', import.meta.url).pathname;
   const files = [];
-  const walk = (dir) => readdirSync(dir).forEach((name) => (statSync(join(dir, name)).isDirectory() ? walk(join(dir, name)) : /\.jsx?$/.test(name) && files.push(join(dir, name))));
+  const walk = (dir) =>
+    readdirSync(dir).forEach((name) =>
+      statSync(join(dir, name)).isDirectory() ? walk(join(dir, name)) : /\.jsx?$/.test(name) && files.push(join(dir, name)),
+    );
   walk(root);
   const base = (key) => key.replace(/\.(one|other)$/, '');
   const known = new Set(Object.keys(en).map(base));

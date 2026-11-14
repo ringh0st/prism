@@ -10,6 +10,7 @@ import { DIFFICULTY } from '../../game/constants.js';
 import { shareText } from '../../lib/shareText.js';
 import PalArt from '../../components/pals/PalArt.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
+import PresentNote from '../../components/gifts/PresentNote.jsx';
 import { palById, stageOf } from '../../game/pals.js';
 import ReplayShare from '../../components/replay/ReplayShare.jsx';
 import GlowbugRescue from './GlowbugRescue.jsx';
@@ -183,6 +184,7 @@ export default function WinDialog({
                   {t('win.cheer', { name: palName(lang, partner), line: lang === 'en' ? cheer.line : t('win.cheerLine') })}
                 </p>
                 <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
+                <PresentNote partner={partner} />
               </>
             )}
           </div>

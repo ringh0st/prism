@@ -108,5 +108,6 @@ svg {
 }
 
 :root[lang='he'] {
-  --font-body: 'Fredoka', 'Arial Hebrew', 'Noto Sans Hebrew', system-ui, sans-serif;
+  --font-display: 'Rubik', 'Fredoka', 'Arial Hebrew', system-ui, sans-serif;
+  --font-body: 'Rubik', 'Nunito', 'Arial Hebrew', system-ui, sans-serif;
 }

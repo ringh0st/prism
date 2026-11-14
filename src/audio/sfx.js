@@ -235,6 +235,25 @@ export const sfx = {
     feel('success');
   },
 
+  /** A wrapped gift wobbles in your hands: two soft paper rustles. */
+  giftShake() {
+    tone(300, 260, 0.08, { type: 'triangle', volume: 0.05 });
+    tone(320, 280, 0.08, { type: 'triangle', volume: 0.05, delay: 0.14 });
+    feel('light');
+  },
+  /** The lid pops off: a bright pop and a sparkle run (fuller for the big gifts). */
+  giftOpen({ isBig = false } = {}) {
+    tone(520, 900, 0.09, { volume: 0.08 });
+    const steps = isBig ? [5, 7, 8, 10, 12, 14] : [5, 7, 10];
+    steps.forEach((step, i) => bell(note(step), { delay: 0.1 + i * 0.06, volume: 0.07, duration: 0.5 }));
+    feel('success');
+  },
+  /** Each thing that comes out of a gift: one chime, a step higher every time. */
+  giftItem(index) {
+    bell(note(7 + index * 2), { volume: 0.08, duration: 0.45 });
+    feel('light');
+  },
+
   // --- Moving around ---
   /** Switching tabs. */
   tab() {

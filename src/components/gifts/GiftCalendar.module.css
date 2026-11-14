@@ -1,0 +1,77 @@
+.calendar {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.day {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 6px 0 7px;
+  border-radius: 12px;
+  color: var(--text-soft);
+  background: var(--surface-sunken);
+}
+
+.number {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  height: 22px;
+}
+
+.done {
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+}
+
+.next {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow:
+    0 0 0 3px var(--surface-raised),
+    0 0 0 5px var(--reward-ledge);
+  animation: glow 1.8s ease-in-out infinite;
+}
+
+.big:not(.done) {
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+}
+
+.big.next {
+  background: var(--reward-bottom);
+}
+
+.note {
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  color: var(--text-soft);
+}
+
+@keyframes glow {
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .next {
+    animation: none;
+  }
+}

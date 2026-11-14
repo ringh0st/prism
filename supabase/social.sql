@@ -211,31 +211,6 @@ begin
 end;
 $$;
 
--- The free daily gift: 15 sparks once per day. Must match DAILY_GIFT_SPARKS in src/game/catalog.js.
-create or replace function public.claim_daily_gift(p_date date)
-returns jsonb
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_user uuid := public._require_user();
-  v_sparks constant integer := 15;
-  v_last date;
-begin
-  -- Allow for time zones: the player's "today" is within a day of the server's.
-  if p_date < current_date - 1 or p_date > current_date + 1 then
-    raise exception using message = 'That gift is not available.';
-  end if;
-  select last_gift_date into v_last from public.profiles where id = v_user for update;
-  if v_last is not null and p_date <= v_last then
-    raise exception using message = 'You already opened today’s gift. Come back tomorrow!';
-  end if;
-  update public.profiles set sparks = sparks + v_sparks, last_gift_date = p_date where id = v_user;
-  return public._economy_state(v_user) || jsonb_build_object('sparksEarned', v_sparks);
-end;
-$$;
-
 -- ---------------------------------------------------------------------------
 -- Weekly leaderboard
 -- ---------------------------------------------------------------------------
@@ -330,5 +305,3 @@ revoke all on function public._weekly_ranking(date) from public, anon, authentic
 revoke all on function public.claim_weekly_reward() from public, anon;
 grant execute on function public.weekly_leaderboard() to anon, authenticated;
 grant execute on function public.claim_weekly_reward() to authenticated;
-revoke all on function public.claim_daily_gift(date) from public, anon;
-grant execute on function public.claim_daily_gift(date) to authenticated;

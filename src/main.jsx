@@ -6,6 +6,10 @@ import '@fontsource/fredoka/700.css';
 import '@fontsource/nunito/400.css';
 import '@fontsource/nunito/700.css';
 import '@fontsource/nunito/800.css';
+// Hebrew: Rubik is clearer than Fredoka's Hebrew (its ך and ג were misread). Only the Hebrew letters load.
+import '@fontsource/rubik/hebrew-400.css';
+import '@fontsource/rubik/hebrew-500.css';
+import '@fontsource/rubik/hebrew-700.css';
 import './styles/tokens.css';
 import './styles/global.css';
 import App from './App.jsx';

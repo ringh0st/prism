@@ -1,0 +1,87 @@
+.art {
+  overflow: visible;
+}
+
+.body,
+.lid,
+.art {
+  transform-box: view-box;
+  transform-origin: 50% 92%;
+}
+
+.lid {
+  transform-origin: 50% 40%;
+  transition: transform 420ms var(--ease-pop);
+}
+
+.glow {
+  opacity: 0;
+  transform-box: view-box;
+  transform-origin: 50% 42%;
+}
+
+/* Waiting to be opened: a gentle bob now and then */
+.wrapped {
+  animation: bob 2.4s ease-in-out infinite;
+}
+
+.shaking {
+  animation: shake 0.45s ease-in-out infinite;
+}
+
+.open .lid {
+  transform: translateY(-34px) rotate(-14deg);
+}
+
+.open .glow {
+  animation: glow 900ms var(--ease-out) both;
+}
+
+.big.wrapped {
+  animation-duration: 1.6s;
+}
+
+@keyframes bob {
+  0%,
+  70%,
+  100% {
+    transform: none;
+  }
+  80% {
+    transform: rotate(-5deg) translateY(-4px);
+  }
+  90% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes shake {
+  25% {
+    transform: rotate(-7deg) scale(1.03);
+  }
+  75% {
+    transform: rotate(7deg) scale(1.03);
+  }
+}
+
+@keyframes glow {
+  from {
+    opacity: 0.9;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrapped,
+  .shaking,
+  .open .glow {
+    animation: none;
+  }
+  .lid {
+    transition: none;
+  }
+}

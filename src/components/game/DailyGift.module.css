@@ -96,43 +96,9 @@
 }
 
 /* ---------- Opened gift ---------- */
-.box {
-  display: grid;
-  place-items: center;
-  margin: 0 auto var(--space-3);
-  color: var(--color-honey-deep);
-  animation: pop 600ms var(--ease-pop);
-}
-
-.reward {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: var(--space-3);
-  padding: 10px 20px;
-  border-radius: var(--radius-pill);
-  font-size: 22px;
-  color: var(--reward-label);
-  background: var(--reward-bottom);
-}
-
-.text {
-  margin-bottom: var(--space-4);
-  font-weight: 700;
-}
-
 .lumi {
   display: flex;
   align-items: flex-end;
-  min-height: 126px;
-  margin: 0 0 var(--space-3) var(--space-2);
-}
-
-@keyframes pop {
-  0% {
-    transform: scale(0.5) rotate(-12deg);
-  }
-  60% {
-    transform: scale(1.15) rotate(6deg);
-  }
+  min-height: 110px;
+  margin-inline-start: var(--space-2);
 }

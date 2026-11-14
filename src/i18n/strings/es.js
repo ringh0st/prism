@@ -4,6 +4,7 @@ import * as pals from './sections/pals.js';
 import * as shop from './sections/shop.js';
 import * as grove from './sections/grove.js';
 import * as extras from './sections/extras.js';
+import * as gifts from './sections/gifts.js';
 
 export const es = {
   'common.gotIt': '¡Entendido!',
@@ -356,4 +357,5 @@ export const es = {
   ...shop.es,
   ...grove.es,
   ...extras.es,
+  ...gifts.es,
 };

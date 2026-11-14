@@ -12,6 +12,7 @@ import {
   claimQuestOnServer,
   recordEventLevelOnServer,
   claimDailyGiftOnServer,
+  claimPresentOnServer,
   choosePalOnServer,
   setNicknameOnServer,
   buyAccessoryOnServer,
@@ -33,7 +34,6 @@ import {
 import {
   buyStoreItemLocally,
   claimChestLocally,
-  claimDailyGiftLocally,
   consumeHelperLocally,
   nextHotStreak,
   createEmptyProgress,
@@ -49,7 +49,7 @@ import { recordRushRunLocally, rushWeekOf } from '../game/rush.js';
 import { starsForMoves } from '../game/scoring.js';
 import { claimQuestLocally, questWeekOf, questsForWeek, recordQuestProgress } from '../game/quests.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
-import { DAILY_GIFT_SPARKS } from '../game/catalog.js';
+import { claimCalendarGiftLocally, openPresentLocally } from '../game/gifts.js';
 import { nicknameProblem } from '../game/nicknames.js';
 import {
   buyAccessoryLocally,
@@ -419,16 +419,30 @@ export function PlayerProvider({ children }) {
         applyServerState(await adoptPalOnServer(palId));
       },
 
-      /** Collect today's free gift. @returns the sparks received. @throws EconomyError */
+      /** Open today's calendar gift. @returns { sparks, helper, diamonds?, isBig } @throws EconomyError */
       async claimDailyGift() {
         const today = todayKey();
         if (!userId) {
-          setProgress(claimDailyGiftLocally(progressRef.current, today));
-          return DAILY_GIFT_SPARKS;
+          const { progress: next, gift } = claimCalendarGiftLocally(progressRef.current, today);
+          setProgress(next);
+          return gift;
         }
         const state = await claimDailyGiftOnServer(today);
         applyServerState(state);
-        return state.sparksEarned;
+        // Before supabase/gifts.sql is run, the server gives the old flat gift (no calendar).
+        return state.gift ?? { sparks: state.sparksEarned ?? 0, helper: null, isBig: false };
+      },
+
+      /** Open the partner Pal's present (one per 10 stars). @returns { sparks, helper?, item? } @throws EconomyError */
+      async openPresent() {
+        if (!userId) {
+          const { progress: next, gift } = openPresentLocally(progressRef.current);
+          setProgress(next);
+          return gift;
+        }
+        const state = await claimPresentOnServer();
+        applyServerState(state);
+        return state.gift;
       },
 
       /** @throws EconomyError when none are left */

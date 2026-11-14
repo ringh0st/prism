@@ -1,0 +1,77 @@
+/* The partner Pal's present on the map's top bar */
+.button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0 0 6px;
+  border: 0;
+  border-radius: 16px;
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+  box-shadow: var(--shadow-button);
+  cursor: pointer;
+  transition: transform 220ms var(--ease-spring);
+}
+
+.button:active {
+  transform: scale(0.92);
+}
+
+.ready {
+  padding-bottom: 0;
+  animation: wiggle 2.4s ease-in-out infinite;
+}
+
+/* Stars toward the next present */
+.meter {
+  position: absolute;
+  inset-inline: 8px;
+  bottom: 6px;
+  height: 5px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: rgba(15, 46, 41, 0.25);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--calm-label);
+}
+
+.dot {
+  position: absolute;
+  top: -3px;
+  inset-inline-end: -3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-terracotta);
+  box-shadow: 0 0 0 2px var(--surface-page);
+}
+
+@keyframes wiggle {
+  0%,
+  80%,
+  100% {
+    transform: none;
+  }
+  85% {
+    transform: rotate(-12deg) scale(1.08);
+  }
+  90% {
+    transform: rotate(10deg) scale(1.08);
+  }
+  95% {
+    transform: rotate(-6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ready {
+    animation: none;
+  }
+}

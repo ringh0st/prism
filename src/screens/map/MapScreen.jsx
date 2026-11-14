@@ -12,6 +12,9 @@ import DailyButton from '../../components/game/DailyButton.jsx';
 import InstallButton from '../../components/install/InstallButton.jsx';
 import RushButton from '../../components/game/RushButton.jsx';
 import EventButton from '../../components/game/EventButton.jsx';
+import PresentButton from '../../components/gifts/PresentButton.jsx';
+import PalPresent from '../../components/gifts/PalPresent.jsx';
+import { presentsWaiting } from '../../game/gifts.js';
 import PalHello from '../../components/pals/PalHello.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { useLevels } from '../../state/LevelsContext.jsx';
@@ -142,6 +145,7 @@ export default function MapScreen() {
               <DailyButton />
               <EventButton />
               <RushButton />
+              <PresentButton />
               <DailyGift />
               <InstallButton />
             </>
@@ -179,8 +183,9 @@ export default function MapScreen() {
         )}
       </main>
 
-      {/* The partner Pal says hello once a day; Lumi lets them talk. */}
-      {currentRef && <PalHello onHello={hushLumi} />}
+      {/* The partner Pal says hello once a day (Lumi lets them talk), or holds up a waiting present. */}
+      {currentRef && <PalPresent />}
+      {currentRef && presentsWaiting(progress) === 0 && <PalHello onHello={hushLumi} />}
       <BottomNav active="map" />
       {chestOpening && <ChestDialog opening={chestOpening} onClose={() => setChestOpening(null)} />}
     </div>

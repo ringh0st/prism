@@ -1,11 +1,12 @@
-import { en } from './strings/sections/me.js';
+import { en as meEn } from './strings/sections/me.js';
+import { en as giftsEn } from './strings/sections/gifts.js';
 
 /*
  * Player-facing messages that come from game modules or the server in English (EconomyError), shown
  * in the player's language when we know them; anything else is shown as it came.
  */
 const KNOWN_ERRORS = new Map(
-  Object.entries(en)
+  Object.entries({ ...meEn, ...giftsEn })
     .filter(([key]) => key.startsWith('ui.error.') || key.startsWith('me.nickname.rule.') || key === 'ui.signInDiamonds')
     .map(([key, english]) => [english, key]),
 );

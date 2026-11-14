@@ -1,0 +1,162 @@
+.stage {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  min-height: 200px;
+}
+
+.wrapped {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: none;
+  cursor: pointer;
+  transition: transform 200ms var(--ease-spring);
+}
+
+.wrapped:not(:disabled):active {
+  transform: scale(0.94);
+}
+
+.wrapped:disabled {
+  cursor: default;
+}
+
+/* Once open, the box steps back so the gifts take the stage */
+.open {
+  transform: scale(0.8);
+  transition: transform 400ms var(--ease-pop);
+}
+
+.prompt {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text-soft);
+  animation: nudge 1.8s ease-in-out infinite;
+}
+
+/* The chest wobbles and then bursts open, like the box */
+.chest {
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 140px;
+  color: var(--reward-ledge);
+}
+
+.chest-wrapped {
+  animation: nudge 2.4s ease-in-out infinite;
+}
+
+.chest-shaking {
+  animation: shake 0.45s ease-in-out infinite;
+}
+
+.chest-open {
+  animation: pop 500ms var(--ease-pop) both;
+}
+
+.items {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 6px var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  animation: itemIn 520ms var(--ease-pop) both;
+}
+
+.itemArt {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+}
+
+.itemText {
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--text-strong);
+}
+
+.after {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  animation: fadeIn 300ms var(--ease-out) both;
+}
+
+.error {
+  text-align: center;
+}
+
+@keyframes nudge {
+  0%,
+  70%,
+  100% {
+    transform: none;
+  }
+  85% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes shake {
+  25% {
+    transform: rotate(-7deg) scale(1.03);
+  }
+  75% {
+    transform: rotate(7deg) scale(1.03);
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes itemIn {
+  from {
+    opacity: 0;
+    transform: translateY(-36px) scale(0.6);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prompt,
+  .chest-wrapped,
+  .chest-shaking,
+  .chest-open,
+  .item,
+  .after {
+    animation: none;
+  }
+  .open {
+    transition: none;
+  }
+}

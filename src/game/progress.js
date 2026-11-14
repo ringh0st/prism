@@ -1,6 +1,6 @@
 import { sparksForDaily, sparksForNewStars, starsForMoves, STARTING_SPARKS } from './scoring.js';
 import { daysBetween } from './daily.js';
-import { DAILY_GIFT_SPARKS, DAILY_SPARK_PURCHASE_LIMIT, HELPER_IDS, INVENTORY_CAP, storeItem } from './catalog.js';
+import { DAILY_SPARK_PURCHASE_LIMIT, HELPER_IDS, INVENTORY_CAP, storeItem } from './catalog.js';
 
 export const BEAM_THEMES = [
   { id: 'sunbeam', name: 'Sunbeam', color: '#FFD23F', starsToUnlock: 0 },
@@ -31,6 +31,10 @@ export function createEmptyProgress() {
     claimedChests: [],
     hotStreak: 0,
     giftDate: null,
+    // Calendar gifts opened (the day in the 7-day gift calendar; see gifts.js).
+    giftDays: 0,
+    // The partner Pal's presents opened (one per 10 stars; see gifts.js).
+    presents: { opened: 0 },
     pal: { id: null, owned: {}, accessories: [], wearing: [] },
     grove: { items: [], placed: [] },
     luckyPals: { claimed: 0 },
@@ -64,6 +68,7 @@ export function upgradeProgress(saved) {
     pal: upgradePal({ ...empty.pal, ...saved?.pal }),
     grove: { ...empty.grove, ...saved?.grove },
     luckyPals: { ...empty.luckyPals, ...saved?.luckyPals },
+    presents: { ...empty.presents, ...saved?.presents },
   };
 }
 
@@ -200,15 +205,6 @@ export function claimChestLocally(progress, chestKey, reward) {
   };
 }
 
-/** The daily gift is waiting when it hasn't been collected today. */
-export const isDailyGiftReady = (progress, today) => progress.giftDate !== today;
-
-/** Guest daily gift. Mirrors public.claim_daily_gift() in supabase/social.sql. @throws EconomyError */
-export function claimDailyGiftLocally(progress, today) {
-  if (!isDailyGiftReady(progress, today)) throw new EconomyError('You already opened today’s gift. Come back tomorrow!');
-  return { ...progress, sparks: progress.sparks + DAILY_GIFT_SPARKS, giftDate: today };
-}
-
 /** Consecutive levels solved with three stars and no helpers (just for fun and bragging). */
 /** Perfect solves in a row; replaying a level that already had ★★★ keeps the streak but doesn't add to it. */
 export const nextHotStreak = (progress, { stars, usedHelpers, previousStars = 0 }) =>
@@ -225,6 +221,8 @@ export function withServerState(progress, state, today) {
     sparkPurchases: { date: today, count: state.sparkPurchasesToday },
     claimedChests: state.claimedChests ?? progress.claimedChests,
     giftDate: state.lastGiftDate ?? progress.giftDate,
+    giftDays: state.giftDays ?? progress.giftDays,
+    presents: { opened: state.presentsOpened ?? progress.presents.opened },
     // The account's Pals win, unless the account has none yet (then keep this device's choice).
     pal: state.pal?.id ? state.pal : progress.pal,
     grove: state.grove ?? progress.grove,

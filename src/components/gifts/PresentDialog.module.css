@@ -1,0 +1,50 @@
+.giver {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 76px;
+}
+
+.info,
+.thanks {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+}
+
+.lead {
+  margin: 0;
+  font-weight: 700;
+}
+
+.thanks {
+  font-weight: 700;
+}
+
+.progress {
+  display: grid;
+  gap: 6px;
+  margin-bottom: var(--space-3);
+}
+
+.bar {
+  height: 14px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--reward-bottom);
+  transition: width 600ms var(--ease-out);
+}
+
+.count {
+  margin: 0;
+  font-size: 18px;
+  text-align: center;
+}
