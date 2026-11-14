@@ -539,7 +539,7 @@ button.goods:active .goodsArt {
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--reward-label);
+  color: var(--text-strong);
 }
 
 .themeName {
