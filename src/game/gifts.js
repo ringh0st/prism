@@ -206,3 +206,13 @@ export function claimWinGiftLocally(progress, today) {
   }
   return { progress: next, gift: { sparks, helper } };
 }
+
+/** Several opened gifts as one: all the sparks and diamonds added up, every helper and item listed. */
+export function mergeGifts(gifts) {
+  return {
+    sparks: gifts.reduce((sum, gift) => sum + (gift.sparks ?? 0), 0),
+    diamonds: gifts.reduce((sum, gift) => sum + (gift.diamonds ?? 0), 0),
+    helpers: gifts.map((gift) => gift.helper).filter(Boolean),
+    items: gifts.map((gift) => gift.item).filter(Boolean),
+  };
+}

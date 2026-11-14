@@ -44,11 +44,16 @@
 
 .dot {
   position: absolute;
-  top: -3px;
-  inset-inline-end: -3px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
+  top: -5px;
+  inset-inline-end: -5px;
+  display: grid;
+  place-items: center;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  color: #fff;
   background: var(--color-terracotta);
   box-shadow: 0 0 0 2px var(--surface-page);
 }

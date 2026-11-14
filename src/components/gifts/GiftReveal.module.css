@@ -51,7 +51,7 @@
   animation: nudge 2.4s ease-in-out infinite;
 }
 
-.chest-shaking {
+.chest-charging {
   animation: shake 0.45s ease-in-out infinite;
 }
 
@@ -129,6 +129,56 @@
     opacity: 0;
     transform: scale(2.2) rotate(-20deg);
   }
+}
+
+/* "+2": more presents waiting behind this one */
+.stack {
+  position: absolute;
+  top: 4px;
+  inset-inline-end: -6px;
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  font-size: 18px;
+  color: var(--action-label);
+  background: var(--action-bottom);
+  box-shadow: 0 0 0 3px var(--surface-raised);
+}
+
+/* The charge bar: fills notch by notch (◆ ★ ✦); each notch reached makes the present glow up */
+.charge {
+  position: relative;
+  width: min(240px, 80%);
+  height: 16px;
+  margin-top: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
+}
+
+.chargeFill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: inherit;
+  transition:
+    width 600ms var(--ease-out),
+    background 300ms ease;
+}
+
+.notch {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  margin-inline-start: -12px;
+  border-radius: 50%;
+  font-size: 13px;
+  color: var(--text-soft);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-50%);
 }
 
 .items {
@@ -225,7 +275,8 @@
   .glowMark,
   .rays,
   .chest-wrapped,
-  .chest-shaking,
+  .chest-charging,
+  .chargeFill,
   .chest-open,
   .item,
   .after {

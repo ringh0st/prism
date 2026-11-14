@@ -19,16 +19,19 @@ export default function PresentDialog({ onClose }) {
   const { progress, openPresent } = usePlayer();
   const { t, lang } = useI18n();
   // Decided once: opening the present must not switch this dialog to the progress view mid-reveal.
-  const [hasPresent] = useState(() => presentsWaiting(progress) > 0);
+  // How many presents are waiting (all open in this window, one after another).
+  const [waiting] = useState(() => presentsWaiting(progress));
   const partner = palById(progress.pal.id);
   if (!partner) return null;
   const giver = palName(lang, partner);
   const giverArt = <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={72} alive />;
 
-  if (hasPresent) {
+  if (waiting > 0) {
     return (
       <GiftReveal
-        title={t('present.title', { name: giver })}
+        title={t('present.title', { name: giver, count: waiting })}
+        count={waiting}
+        charges
         doneTitle={t('present.doneTitle')}
         wrapping={{ kind: 'box', tone: 'mint' }}
         open={openPresent}

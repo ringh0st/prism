@@ -39,7 +39,8 @@ export const en = {
   'gift.calendar.waits': 'Miss a day? Your gift waits for you.',
   'ui.chest.title': 'A treasure chest!',
 
-  'present.title': '{name} found a present!',
+  'present.title.one': '{name} found a present!',
+  'present.title.other': '{name} found {count} presents!',
   'present.doneTitle': 'For you!',
   'present.thanks': '{name} brings you a present for every {n} ★.',
   'present.infoTitle': '{name}’s presents',
@@ -102,7 +103,8 @@ export const es = {
   'gift.calendar.waits': '¿Te saltas un día? Tu regalo te espera.',
   'ui.chest.title': '¡Un cofre del tesoro!',
 
-  'present.title': '¡{name} encontró un regalo!',
+  'present.title.one': '¡{name} encontró un regalo!',
+  'present.title.other': '¡{name} encontró {count} regalos!',
   'present.doneTitle': '¡Para ti!',
   'present.thanks': '{name} te trae un regalo por cada {n} ★.',
   'present.infoTitle': 'Los regalos de {name}',
@@ -165,7 +167,8 @@ export const he = {
   'gift.calendar.waits': 'פספסתם יום? המתנה מחכה לכם.',
   'ui.chest.title': 'תיבת אוצר!',
 
-  'present.title': '{name} מצא מתנה!',
+  'present.title.one': '{name} מצא מתנה!',
+  'present.title.other': '{name} מצא {count} מתנות!',
   'present.doneTitle': 'זה בשבילכם!',
   'present.thanks': '{name} מביא לכם מתנה על כל {n} ★.',
   'present.infoTitle': 'המתנות של {name}',

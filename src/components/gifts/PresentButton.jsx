@@ -28,7 +28,9 @@ export default function PresentButton() {
       >
         <Icon name="paw" size={24} />
         {waiting > 0 ? (
-          <span className={styles.dot} aria-hidden="true" />
+          <span className={`game-title ${styles.dot}`} aria-hidden="true">
+            {waiting > 1 ? waiting : ''}
+          </span>
         ) : (
           <span className={styles.meter} aria-hidden="true">
             <span className={styles.fill} style={{ width: `${(have / need) * 100}%` }} />
