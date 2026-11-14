@@ -30,8 +30,9 @@ import { useLevels } from '../../state/LevelsContext.jsx';
 import { navigate } from '../../hooks/useHashRoute.js';
 import { music } from '../../audio/music.js';
 import { sfx } from '../../audio/sfx.js';
+import { playLightFinale } from '../../lib/lightFinale.js';
 import { moveLimitFor, starsForMoves } from '../../game/scoring.js';
-import { HELPER_IDS, LENS_DURATION_MS, helpersAllowedFor } from '../../game/catalog.js';
+import { HELPERS, HELPER_IDS, LENS_DURATION_MS, helpersAllowedFor } from '../../game/catalog.js';
 import { isWorldComplete } from '../../game/progress.js';
 import { dailyShareText } from '../../game/share.js';
 import { PUBLIC_GAME_URL } from '../../lib/config.js';
@@ -276,6 +277,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       } else {
         sfx.gemLit(litCount);
       }
+      // Each gem's spark lands in the counter a moment later (see flyToCounter): one "ting" each, rising.
+      for (let n = lastLitCount.current + 1; n <= litCount; n++) setTimeout(() => sfx.gemCollect(n), 600 + (n - lastLitCount.current - 1) * 90);
       say('excited', litCount < gems.length ? (combo ? 'combo' : 'gem') : null);
       react(combo ? 'spin' : 'hop');
     } else if (shadeCount > lastShadeCount.current) {
@@ -311,8 +314,13 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       setSolvedStars(stars);
       const isBig = modifier === 'boss' || level.difficulty === DIFFICULTY.EXTRA;
       sfx.win({ stars, isBig });
-      if (!isSkipped) celebrate({ stars, isBig, from: boardAreaRef.current });
-      say(stars === 3 ? 'dance' : 'excited', isSkipped ? null : `win${stars}`);
+      // Hard levels get the big celebration too: beating one should feel like it.
+      if (!isSkipped) celebrate({ stars, isBig: isBig || level.difficulty === DIFFICULTY.HARD, from: boardAreaRef.current });
+      // The light finale: each move left over bursts along the winning light path before the result shows.
+      const movesLeft = isSkipped ? 0 : moveLimit - moves;
+      const finaleMs = playLightFinale({ segments: trace.segments, width: level.width, movesLeft, onBurst: sfx.finaleBurst });
+      if (finaleMs > 0) setLumi({ mood: 'dance', line: t('play.spare', { count: movesLeft }) });
+      else say(stars === 3 ? 'dance' : 'excited', isSkipped ? null : `win${stars}`);
       react('dance');
       const worldRefs = mode === 'level' ? levelRefsInWorld(level.world) : [];
       const wasWorldComplete = isWorldComplete(progress, worldRefs);
@@ -331,7 +339,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       } else {
         outcome = Promise.resolve({ stars, sparksEarned: 0, diamondsEarned: 0, isNewBest: false });
       }
-      const [finished] = await Promise.all([outcome, wait(WIN_DIALOG_DELAY_MS)]);
+      const [finished] = await Promise.all([outcome, wait(WIN_DIALOG_DELAY_MS + finaleMs)]);
       const solvedLevels = { ...progress.levels, [level.id]: { stars } };
       const completesWorld = mode === 'level' && !wasWorldComplete && isWorldComplete({ levels: solvedLevels }, worldRefs);
       const glowbugResult = glowbug && {
@@ -367,6 +375,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       react,
       glowbug,
       playStats,
+      moveLimit,
+      trace.segments,
+      t,
     ],
   );
 
@@ -443,10 +454,13 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       puzzle.applyHelper(helperId);
       sfx.helper();
       // Say plainly what a helper costs: the best result left for this try.
-      if (helperId !== 'skip') setLumi({ mood: 'excited', line: t(`lumi.helper.${helperId}`) });
+      if (helperId !== 'skip') {
+        const best = Math.min(starCap, HELPERS[helperId].starCap);
+        setLumi({ mood: 'excited', line: t(`lumi.helper.${helperId}`, { stars: '★'.repeat(best) }) });
+      }
       if (helperId === 'skip') completeLevel({ isSkipped: true });
     },
-    [mode, consumeHelper, puzzle, completeLevel],
+    [mode, consumeHelper, puzzle, completeLevel, starCap],
   );
 
   const requestHelper = useCallback(
@@ -606,7 +620,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} />}
         <ul className={styles.gems} aria-label={t('play.gemsLit', { n: trace.litGems.size, total: gems.length })}>
           {gems.map(({ tile, i }) => (
-            <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff}>
+            <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff} data-gem-slot={i}>
               <GemShape color={tile.color} size={24} />
             </li>
           ))}

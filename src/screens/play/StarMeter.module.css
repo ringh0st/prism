@@ -77,6 +77,35 @@
   opacity: 0.25;
   transform: translateY(6px) rotate(25deg) scale(0.8);
   filter: grayscale(1);
+  animation: drop 700ms ease-in;
+}
+
+/* A star that just slipped out of reach wobbles, then falls into place greyed out */
+@keyframes drop {
+  0% {
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+  25% {
+    transform: rotate(-18deg) scale(1.2);
+  }
+  45% {
+    transform: rotate(14deg) scale(1.15);
+    opacity: 1;
+    filter: none;
+  }
+  100% {
+    opacity: 0.25;
+    filter: grayscale(1);
+    transform: translateY(6px) rotate(25deg) scale(0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lost {
+    animation: none;
+  }
 }
 
 @keyframes tick {

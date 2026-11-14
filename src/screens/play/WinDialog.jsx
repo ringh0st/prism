@@ -22,6 +22,7 @@ import ChallengeShare from './ChallengeShare.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './WinDialog.module.css';
 import { palName } from '../../i18n/palText.js';
+import { useCountUp } from '../../hooks/useCountUp.js';
 
 /** The headline's translation key. */
 function headlineFor({ stars, isSkipped, completesWorld, isFirstToday }, difficulty) {
@@ -29,6 +30,8 @@ function headlineFor({ stars, isSkipped, completesWorld, isFirstToday }, difficu
   if (isFirstToday) return 'win.dailyDone';
   if (completesWorld) return 'win.worldComplete';
   if (stars === 3 && difficulty === DIFFICULTY.EXTRA) return 'win.legendary';
+  if (difficulty === DIFFICULTY.EXTRA) return 'win.bossBeaten';
+  if (difficulty === DIFFICULTY.HARD) return 'win.hardBeaten';
   if (stars === 3) return 'win.brilliant';
   if (stars === 2) return 'win.great';
   return 'win.solved';
@@ -89,6 +92,9 @@ export default function WinDialog({
     isFirstToday = false,
   } = result;
   const cheer = useMemo(() => cheerFor(result, hotStreak), [result, hotStreak]);
+  // The rewards pour in once the stars have landed.
+  const rewardsAt = 350 + stars * 260 + 150;
+  const shownSparks = useCountUp(sparksEarned, { delay: rewardsAt, onTick: sfx.countTick });
 
   useEffect(() => {
     const timers = Array.from({ length: stars }, (_, i) => setTimeout(() => sfx.star(i), 350 + i * 260));
@@ -115,7 +121,7 @@ export default function WinDialog({
       <div className={styles.rewards}>
         {sparksEarned > 0 && (
           <span className={styles.reward}>
-            <Icon name="spark" size={18} /> {t('win.sparks', { count: sparksEarned })}
+            <Icon name="spark" size={18} /> {t('win.sparks', { count: shownSparks })}
           </span>
         )}
         {diamondsEarned > 0 && (

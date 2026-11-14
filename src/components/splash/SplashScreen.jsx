@@ -73,7 +73,7 @@ export default function SplashScreen({ onDone }) {
 
       <h1 className={styles.title} aria-hidden="true">
         <span className={styles.rinny}>Rinny’s</span>
-        <span className={styles.word}>
+        <span className={styles.word} dir="ltr">
           {[...GAME_NAME].map((letter, i) => (
             <span key={i} className={styles.letter} style={{ '--i': i, color: TITLE_COLORS[i % TITLE_COLORS.length] }}>
               {letter}

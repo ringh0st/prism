@@ -20,21 +20,100 @@ function originOf(element) {
   return { x: (rect.left + rect.width / 2) / window.innerWidth, y: (rect.top + rect.height / 2) / window.innerHeight };
 }
 
-/** A little starburst where a gem just lit up, in that gem's light color. */
+/** A burst of light where a gem just lit up, in that gem's light color, with a ring of light around it. */
 export function gemBurst(element, color) {
   if (!element) return;
   fire({
     origin: originOf(element),
-    particleCount: 18,
+    particleCount: 34,
     spread: 360,
-    startVelocity: 14,
-    gravity: 0.6,
+    startVelocity: 22,
+    gravity: 0.5,
     decay: 0.88,
-    scalar: 0.7,
-    ticks: 70,
+    scalar: 0.95,
+    ticks: 80,
     shapes: [STAR, 'circle'],
-    colors: color ? [color, '#FFF6E0'] : PALETTE,
+    colors: color ? [color, '#FFF6E0', '#F0C14E'] : PALETTE,
   });
+  lightRing(element, color);
+}
+
+const centerOf = (element) => {
+  const rect = element.getBoundingClientRect();
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, size: Math.max(rect.width, rect.height) };
+};
+
+/** A glowing ring that swells out from a lit gem. */
+function lightRing(element, color = '#F0C14E') {
+  if (prefersReducedMotion()) return;
+  const { x, y, size } = centerOf(element);
+  const ring = document.createElement('span');
+  Object.assign(ring.style, {
+    position: 'fixed',
+    left: `${x - size / 2}px`,
+    top: `${y - size / 2}px`,
+    width: `${size}px`,
+    height: `${size}px`,
+    borderRadius: '50%',
+    border: `4px solid ${color}`,
+    boxShadow: `0 0 18px ${color}`,
+    pointerEvents: 'none',
+    zIndex: 59,
+  });
+  document.body.append(ring);
+  ring.animate(
+    [
+      { transform: 'scale(0.4)', opacity: 1 },
+      { transform: 'scale(2.4)', opacity: 0 },
+    ],
+    { duration: 520, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
+  ).onfinish = () => ring.remove();
+}
+
+/**
+ * A spark flies in an arc from a lit gem to its spot in the gem counter, which bounces when it lands,
+ * so every gem visibly "counts". Without motion, the counter just bounces.
+ */
+export function flyToCounter(fromElement, toElement, color = '#F0C14E') {
+  if (!fromElement || !toElement) return;
+  const bump = () =>
+    toElement.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.45)' }, { transform: 'scale(1)' }], {
+      duration: 380,
+      easing: 'cubic-bezier(0.3, 1.6, 0.5, 1)',
+    });
+  if (prefersReducedMotion()) {
+    bump();
+    return;
+  }
+  const from = centerOf(fromElement);
+  const to = centerOf(toElement);
+  const spark = document.createElement('span');
+  Object.assign(spark.style, {
+    position: 'fixed',
+    left: `${from.x - 9}px`,
+    top: `${from.y - 9}px`,
+    width: '18px',
+    height: '18px',
+    borderRadius: '50%',
+    background: `radial-gradient(circle, #FFF6E0 0 30%, ${color} 60%, transparent 72%)`,
+    boxShadow: `0 0 14px 4px ${color}`,
+    pointerEvents: 'none',
+    zIndex: 61,
+  });
+  document.body.append(spark);
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  spark.animate(
+    [
+      { transform: 'translate(0, 0) scale(1.4)' },
+      { transform: `translate(${dx * 0.35}px, ${dy * 0.35 - 70}px) scale(1.1)`, offset: 0.45 },
+      { transform: `translate(${dx}px, ${dy}px) scale(0.6)` },
+    ],
+    { duration: 620, easing: 'cubic-bezier(0.4, 0, 0.6, 1)' },
+  ).onfinish = () => {
+    spark.remove();
+    bump();
+  };
 }
 
 /**

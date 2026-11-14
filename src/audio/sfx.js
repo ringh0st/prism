@@ -107,13 +107,32 @@ export const sfx = {
   // --- Playing a level ---
   /** A piece turns: a little wooden tick. */
   rotate() {
-    tone(380, 520, 0.06, { type: 'triangle', volume: 0.07 });
+    tone(380, 520, 0.06, { type: 'triangle', volume: 0.09 });
+    tone(1400, 1100, 0.03, { volume: 0.035, delay: 0.01 });
     feel('light');
   },
   /** Another gem lights up: each one a step higher. */
   gemLit(count) {
     play(voiceNote(count + 1), { volume: 0.11, duration: 0.5 });
     feel('light');
+  },
+  /** A reward counting up: a tiny coin tick, a little higher each time. */
+  countTick(index) {
+    tone(1200 + index * 40, 1400 + index * 40, 0.035, { volume: 0.03 });
+  },
+  /** A gem's spark lands in the gem counter: a bright little "ting", higher for each gem. */
+  gemCollect(count) {
+    bell(note(9 + count), { volume: 0.06, duration: 0.3 });
+  },
+  /** The light finale: one bright burst per move left over, each a step higher. */
+  finaleBurst(index) {
+    bell(note(5 + index), { volume: 0.07, duration: 0.4 });
+    tone(900 + index * 60, 1500 + index * 80, 0.08, { volume: 0.025 });
+    feel('light');
+  },
+  /** A star can no longer be reached: it drops off the meter with a soft falling "whoop". */
+  starLost() {
+    tone(660, 330, 0.28, { type: 'triangle', volume: 0.05 });
   },
   /** One tap lit several gems: a rising run of chimes that grows with the combo. */
   combo(size) {

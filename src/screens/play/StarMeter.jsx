@@ -1,4 +1,6 @@
+import { useEffect, useRef } from 'react';
 import { useI18n } from '../../i18n/I18nContext.jsx';
+import { sfx } from '../../audio/sfx.js';
 import Icon from '../../components/Icon.jsx';
 import styles from './StarMeter.module.css';
 
@@ -16,6 +18,12 @@ export default function StarMeter({ moves, par, limit, starCap, tapsLeft = 0, is
   // The best you can still get: your moves so far plus the fewest taps that can finish it.
   const finish = moves + (tapsLeft ?? 0);
   const stars = Math.min(starCap, finish <= par ? 3 : finish <= twoStarLimit ? 2 : 1);
+  // A star slipping out of reach is a moment too: a soft falling sound (not on a restart).
+  const shown = useRef(stars);
+  useEffect(() => {
+    if (!isSimple && stars < shown.current && moves > 0) sfx.starLost();
+    shown.current = stars;
+  }, [stars, moves, isSimple]);
 
   return (
     <div

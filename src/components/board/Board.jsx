@@ -8,7 +8,7 @@ import { glowbugName } from '../../i18n/groveText.js';
 import { describeTile } from '../../game/describe.js';
 import { isRotatable as tileIsRotatable } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
-import { gemBurst } from '../../lib/effects.js';
+import { flyToCounter, gemBurst } from '../../lib/effects.js';
 import CoachHand from './CoachHand.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './Board.module.css';
@@ -93,7 +93,7 @@ export default function Board({
     }
   };
 
-  // A little starburst on each gem the moment it lights up (not in the editor, not on the first draw).
+  // A burst of light on each gem the moment it lights up (not in the editor, not on the first draw).
   const litBefore = useRef(null);
   useEffect(() => {
     const previous = litBefore.current;
@@ -105,7 +105,10 @@ export default function Board({
       const color = getComputedStyle(document.documentElement)
         .getPropertyValue(`--beam-${tile.color ?? 'sun'}`)
         .trim();
-      gemBurst(cellRefs.current[tile.y * width + tile.x], color || null);
+      const cell = cellRefs.current[tile.y * width + tile.x];
+      gemBurst(cell, color || null);
+      // The gem's spark flies to its place in the gem counter above the board.
+      flyToCounter(cell, document.querySelector(`[data-gem-slot="${tileIndex}"]`), color || undefined);
     }
   }, [trace.litGems, tiles, width, isEditing]);
 

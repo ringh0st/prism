@@ -17,18 +17,20 @@ import styles from './DailyGift.module.css';
 export default function DailyGift({ look = 'button', className = '' }) {
   const { progress, isSignedIn, claimDailyGift } = usePlayer();
   const { t } = useI18n();
-  const [isOpen, setIsOpen] = useState(false);
   const isReady = isDailyGiftReady(progress, todayKey());
   const day = calendarDay(progress.giftDays) + 1;
   const { isBig } = calendarGift(progress.giftDays, isSignedIn);
+  // The day being opened, kept while it opens (the calendar moves on as soon as the gift is claimed).
+  const [opening, setOpening] = useState(null);
+  const open = () => setOpening({ day, isBig });
 
-  const dialog = isOpen && (
+  const dialog = opening && (
     <GiftReveal
-      title={t(isBig ? 'gift.daily.bigTitle' : 'gift.daily.title', { n: day })}
+      title={t(opening.isBig ? 'gift.daily.bigTitle' : 'gift.daily.title', { n: opening.day })}
       doneTitle={t('ui.gift.title')}
-      wrapping={{ kind: 'box', tone: isBig ? 'peach' : 'honey', isBig }}
+      wrapping={{ kind: 'box', tone: opening.isBig ? 'peach' : 'honey', isBig: opening.isBig }}
       open={claimDailyGift}
-      onClose={() => setIsOpen(false)}
+      onClose={() => setOpening(null)}
     >
       <GiftCalendar giftDays={progress.giftDays} isOpenedToday={!isReady} isSignedIn={isSignedIn} />
       <div className={styles.lumi}>
@@ -48,7 +50,7 @@ export default function DailyGift({ look = 'button', className = '' }) {
           <span>{isReady ? t('gift.note.ready', { n: day }) : t('ui.gift.collected')}</span>
         </p>
         {isReady && (
-          <Button size="sm" variant="gold" onClick={() => setIsOpen(true)}>
+          <Button size="sm" variant="gold" onClick={open}>
             {t('ui.gift.collect')}
           </Button>
         )}
@@ -61,12 +63,7 @@ export default function DailyGift({ look = 'button', className = '' }) {
   return (
     <>
       {isReady && (
-        <button
-          type="button"
-          className={`${styles.button} ${styles.ready} ${className}`}
-          onClick={() => setIsOpen(true)}
-          aria-label={t('gift.open', { n: day })}
-        >
+        <button type="button" className={`${styles.button} ${styles.ready} ${className}`} onClick={open} aria-label={t('gift.open', { n: day })}>
           <Icon name="gift" size={24} />
           <span className={styles.dot} aria-hidden="true" />
         </button>
