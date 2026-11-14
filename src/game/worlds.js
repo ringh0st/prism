@@ -99,7 +99,9 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 /**
  * Generator settings for a world/level. The difficulty curve rises across all 50 worlds
  * (bigger boards, longer solutions, more decoys), ramps inside each world, and spikes on
- * Hard and boss levels. Worlds 1–4 each introduce one mechanic; later worlds mix them.
+ * Hard and boss levels. New pieces arrive one at a time (see src/game/pieces.js): world 1 teaches
+ * mirrors, then walls (1-4), then fixed mirrors (1-10); world 2 splitters; world 3 color glass;
+ * world 4 shadow crystals. Later worlds mix them.
  */
 export function generatorPresetFor(world, index) {
   const difficulty = difficultyFor(index);
@@ -127,8 +129,21 @@ export function generatorPresetFor(world, index) {
   // Tutorial: one mirror, then two, then three.
   if (world === 1 && index <= 3) {
     const tutorialSize = index === 1 ? 4 : 5;
-    return { ...preset, width: tutorialSize, height: tutorialSize, turns: [index, index], decoys: index - 1, walls: 0, minPar: index, maxPar: index, lockedRatio: 0 };
+    return {
+      ...preset,
+      width: tutorialSize,
+      height: tutorialSize,
+      turns: [index, index],
+      decoys: index - 1,
+      walls: 0,
+      minPar: index,
+      maxPar: index,
+      lockedRatio: 0,
+    };
   }
+
+  // World 1 after the tutorial: walls only, then fixed mirrors from level 10.
+  if (world === 1) return { ...preset, lockedRatio: index < 10 ? 0 : index === 10 ? 0.5 : 0.1, mustHaveLocked: index === 10 };
 
   // Which mechanics this level uses. Early worlds introduce one at a time.
   const variety = (world * 7 + index * 3) % 4;

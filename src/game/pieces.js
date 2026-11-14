@@ -35,15 +35,8 @@ export const PIECES = [
   },
   {
     id: 'color',
-    name: 'Colored gems',
-    text: 'Colored gems only light up with light of their own color. Look at the shape on the gem too.',
-    lumi: 'Picky gems! They want their own color.',
-    sample: { type: TILE.GEM, color: 'coral' },
-  },
-  {
-    id: 'filter',
     name: 'Color glass',
-    text: 'Light that passes through colored glass takes on its color. Use it to reach colored gems.',
+    text: 'Light that passes through colored glass takes on its color. Colored gems only light up with their own color (match the shapes too).',
     lumi: 'Instant makeover for your light!',
     sample: { type: TILE.FILTER, color: 'lime' },
   },
@@ -61,15 +54,26 @@ const HAS = {
   wall: (tile) => tile.type === TILE.WALL,
   locked: (tile) => tile.type === TILE.MIRROR && tile.locked,
   splitter: (tile) => tile.type === TILE.SPLITTER,
-  color: (tile) => tile.type === TILE.GEM && tile.color && tile.color !== 'sun',
-  filter: (tile) => tile.type === TILE.FILTER,
+  color: (tile) => tile.type === TILE.FILTER || (tile.type === TILE.GEM && tile.color && tile.color !== 'sun'),
   shade: (tile) => tile.type === TILE.SHADE,
 };
 
-/** Pieces in this level the player hasn't been introduced to yet, in teaching order. */
+/** Where each piece is first taught (levels are built so each one brings at most one new piece). */
+export const PIECE_FIRST_LEVEL = { basics: 'w1-01', wall: 'w1-04', locked: 'w1-10', splitter: 'w2-01', color: 'w3-01', shade: 'w4-01' };
+
+/**
+ * The piece to introduce in this level, if any: the first one, in teaching order, the player hasn't met.
+ * Never more than one per level, so pieces arrive gradually.
+ */
 export function newPiecesIn(level, seenIds) {
-  return PIECES.filter((piece) => !seenIds.includes(piece.id) && level.tiles.some(HAS[piece.id]));
+  return PIECES.filter((piece) => !seenIds.includes(piece.id) && piecesIn(level).includes(piece.id)).slice(0, 1);
 }
+
+/** Every kind of piece a level uses, in teaching order. */
+export const piecesIn = (level) => PIECES.filter((piece) => level.tiles.some(HAS[piece.id])).map((piece) => piece.id);
+
+/** Pieces a player has already met: those whose first level they've solved (for players from before the cards). */
+export const piecesMetIn = (solvedLevels) => PIECES.filter((piece) => solvedLevels[PIECE_FIRST_LEVEL[piece.id]]).map((piece) => piece.id);
 
 /** The first tile of a piece in a level (to point at it on the board), or -1. */
 export function firstTileOf(level, pieceId) {

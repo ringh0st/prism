@@ -25,7 +25,8 @@ function simplifications(preset) {
   return [
     preset,
     { ...preset, emitters: Math.max(1, preset.emitters - 1), decoys: Math.max(0, preset.decoys - 2) },
-    { ...preset, emitters: 1, splits: Math.min(1, preset.splits ?? 0), decoys: 1, lockedRatio: 0.25 },
+    // More fixed mirrors make it easier to solve, but never before players have met them.
+    { ...preset, emitters: 1, splits: Math.min(1, preset.splits ?? 0), decoys: 1, lockedRatio: preset.lockedRatio > 0 ? 0.25 : 0 },
   ];
 }
 
@@ -37,7 +38,9 @@ function bestLevelFor(world, index) {
     for (let seed = 0; seed < 400 && Date.now() < deadline; seed++) {
       const random = createRandom(`prism-${levelId(world, index)}-${attempt}-${seed}`);
       const level = generateLevel({ ...variant, minPar: Math.min(variant.minPar, 2) }, random, 25);
-      if (level && level.par <= preset.maxPar && (!best || level.par > best.par)) best = level;
+      // A level that introduces a piece must actually contain it.
+      const hasRequired = !preset.mustHaveLocked || level?.tiles.some((tile) => tile.locked);
+      if (level && hasRequired && level.par <= preset.maxPar && (!best || level.par > best.par)) best = level;
       if (best && best.par >= preset.minPar) return best;
     }
     if (best && best.par >= preset.minPar - 2) return best;

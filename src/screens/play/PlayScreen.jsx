@@ -29,7 +29,7 @@ import { levelNameFor } from '../../game/levelNames.js';
 import { levelModifierFor } from '../../game/surprises.js';
 import { quipFor } from '../../game/quips.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
-import { firstTileOf, newPiecesIn } from '../../game/pieces.js';
+import { firstTileOf, newPiecesIn, piecesMetIn } from '../../game/pieces.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import styles from './PlayScreen.module.css';
 
@@ -39,11 +39,9 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const SEEN_PIECES_KEY = 'prism.seenPieces.v1';
 
-/** Pieces already introduced on this device. Players who have solved levels already know the basics. */
+/** Pieces already introduced on this device, or (first time) the ones met in levels already solved. */
 function seenPieces(progress) {
-  const saved = readJson(SEEN_PIECES_KEY, null);
-  if (saved) return saved;
-  return Object.keys(progress.levels).length > 0 ? ['basics'] : [];
+  return readJson(SEEN_PIECES_KEY, null) ?? piecesMetIn(progress.levels);
 }
 
 /**

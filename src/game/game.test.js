@@ -387,8 +387,8 @@ test('pals: daily Shop picks and Lucky Pal gifts', async () => {
   assert.equal(pals.isPalUnlocked({ ...base, levels }, pals.palById('leo')), false);
 });
 
-test('pieces: each new kind of piece is introduced once, in teaching order', async () => {
-  const { newPiecesIn, firstTileOf } = await import('./pieces.js');
+test('pieces: at most one new piece per level, and the built-in levels teach them one at a time', async () => {
+  const { newPiecesIn, firstTileOf, piecesMetIn, PIECE_FIRST_LEVEL } = await import('./pieces.js');
   const level = {
     tiles: [
       { x: 0, y: 0, type: 'emitter', dir: 'right', color: 'sun' },
@@ -398,9 +398,30 @@ test('pieces: each new kind of piece is introduced once, in teaching order', asy
       { x: 4, y: 0, type: 'filter', color: 'coral' },
     ],
   };
-  assert.deepEqual(newPiecesIn(level, []).map((piece) => piece.id), ['basics', 'wall', 'color', 'filter']);
-  assert.deepEqual(newPiecesIn(level, ['basics', 'wall', 'color']).map((piece) => piece.id), ['filter']);
-  assert.deepEqual(newPiecesIn(level, ['basics', 'wall', 'color', 'filter']), []);
+  assert.deepEqual(newPiecesIn(level, []).map((piece) => piece.id), ['basics']);
+  assert.deepEqual(newPiecesIn(level, ['basics']).map((piece) => piece.id), ['wall']);
+  assert.deepEqual(newPiecesIn(level, ['basics', 'wall', 'color']), []);
   assert.equal(firstTileOf(level, 'wall'), 2);
   assert.equal(firstTileOf(level, 'basics'), 1);
+  assert.deepEqual(piecesMetIn({ 'w1-01': { stars: 3 }, 'w1-04': { stars: 1 } }), ['basics', 'wall']);
+  // Playing the worlds in order, every level brings at most one new piece, exactly where planned.
+  const { piecesIn } = await import('./pieces.js');
+  const seen = [];
+  let lastIntro = null;
+  let previous = null;
+  for (let world = 1; world <= 5; world++) {
+    const levels = JSON.parse(readFileSync(new URL(`../data/worlds/world-${String(world).padStart(3, '0')}.json`, import.meta.url), 'utf8'));
+    for (const built of levels) {
+      const unseen = piecesIn(built).filter((id) => !seen.includes(id));
+      assert.ok(unseen.length <= 1, `${built.id} brings ${unseen.join(', ')}`);
+      if (unseen.length) {
+        assert.equal(PIECE_FIRST_LEVEL[unseen[0]], built.id, `${unseen[0]} should first appear in ${PIECE_FIRST_LEVEL[unseen[0]]}`);
+        seen.push(unseen[0]);
+        // Never two introductions in a row: at least one level without a new piece in between.
+        assert.ok(lastIntro === null || lastIntro !== previous, `${built.id} introduces a piece right after ${previous}`);
+        lastIntro = built.id;
+      }
+      previous = built.id;
+    }
+  }
 });
