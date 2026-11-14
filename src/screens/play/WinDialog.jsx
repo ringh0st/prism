@@ -51,6 +51,7 @@ function ShareResult({ text }) {
  * backName says where onMap goes: 'map', or 'event' for weekend-event puzzles.
  * replay: { level, history, title, subtitle } for the "Share replay" video (null to hide it).
  * challenge: { levelId, levelLabel, moves } for "Challenge a friend" (null to hide it).
+ * nextLabel: the main button's words (after the very first win it leads to picking a Pal).
  */
 export default function WinDialog({
   result,
@@ -61,6 +62,7 @@ export default function WinDialog({
   shareMessage = null,
   replay = null,
   challenge = null,
+  nextLabel = 'Next level',
   backName = 'map',
   onNext,
   onReplay,
@@ -197,7 +199,7 @@ export default function WinDialog({
       <div className={styles.actions}>
         {hasNext ? (
           <Button size="lg" icon="play" onClick={onNext} data-autofocus>
-            Next level
+            {nextLabel}
           </Button>
         ) : (
           <Button size="lg" onClick={onMap} data-autofocus>

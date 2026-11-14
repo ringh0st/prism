@@ -50,7 +50,7 @@ function WeeklyRewardNotice() {
   return weeklyReward ? <WeeklyRewardDialog reward={weeklyReward} onClose={dismissWeeklyReward} /> : null;
 }
 
-/** First game: pick a starter Pal. Later: celebrate newly unlocked Pals. Only on menu screens, never mid-level. */
+/** After the first win: pick a starter Pal. Later: celebrate newly unlocked Pals. Only on menu screens, never mid-level. */
 const PAL_NOTICE_ROUTES = ['map', 'pals', 'settings', 'store', 'top'];
 
 function PalNotices() {
@@ -58,7 +58,11 @@ function PalNotices() {
   const route = useHashRoute();
   const [isSkipped, setIsSkipped] = useState(false);
   if (!PAL_NOTICE_ROUTES.includes(route.name)) return null;
-  if (!progress.pal.id) return isSkipped ? null : <StarterPicker onSkip={() => setIsSkipped(true)} />;
+  // The partner is picked after the first solved level, once new players know what the game is.
+  if (!progress.pal.id) {
+    const hasSolvedOne = Object.values(progress.levels).some((entry) => entry.stars > 0);
+    return isSkipped || !hasSolvedOne ? null : <StarterPicker onSkip={() => setIsSkipped(true)} />;
+  }
   return (
     <>
       <PalUnlockNotice />

@@ -93,12 +93,16 @@ function LockedWorld({ world, stars }) {
   );
 }
 
+/** Levels solved before the daily puzzle, gift and other extras show up on the map. */
+const EXTRAS_AFTER_LEVELS = 3;
+
 export default function MapScreen() {
   const { progress, claimChest } = usePlayer();
   const { worlds, levelRefsInWorld } = useLevels();
   const [chestOpening, setChestOpening] = useState(null);
   const currentNodeRef = useRef(null);
   const stars = totalStars(progress);
+  const solvedCount = Object.values(progress.levels).filter((entry) => entry.stars > 0).length;
   const [greeting, setGreeting] = useState(() => quipFor('start'));
   const hushLumi = useCallback(() => setGreeting(null), []);
 
@@ -128,12 +132,17 @@ export default function MapScreen() {
   return (
     <div className={styles.page}>
       <header className={styles.hud}>
+        {/* Brand-new players see a calm map: the extras appear once they've solved a few levels. */}
         <div className={styles.hudStart}>
-          <DailyButton />
-          <EventButton />
-          <RushButton />
-          <DailyGift />
-          <InstallButton />
+          {solvedCount >= EXTRAS_AFTER_LEVELS && (
+            <>
+              <DailyButton />
+              <EventButton />
+              <RushButton />
+              <DailyGift />
+              <InstallButton />
+            </>
+          )}
         </div>
         <CurrencyHud />
       </header>

@@ -44,6 +44,15 @@
   animation: stamp 500ms var(--ease-pop) 250ms both;
 }
 
+.flavor {
+  padding: 6px 18px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 20px;
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+  animation: stamp 500ms var(--ease-pop) 250ms both;
+}
+
 .boss .sticker {
   color: var(--alert-label);
   background: var(--alert-bottom);

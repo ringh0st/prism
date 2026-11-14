@@ -813,3 +813,20 @@ test('Light Rush milestones match the database', async () => {
   assert.match(sql, new RegExp(`unnest\\(array\\[${RUSH_MILESTONES.map((m) => m.cleared).join(', ')}\\]\\)`));
   assert.match(sql, new RegExp(`p_cleared > ${RUSH_LENGTH}`));
 });
+
+test('worlds 1–3: every flavored level is built as its flavor, and no two in a row share one', async () => {
+  const { recipeFor } = await import('./recipes.js');
+  for (const world of [1, 2, 3]) {
+    const levels = JSON.parse(readFileSync(new URL(`../data/worlds/world-00${world}.json`, import.meta.url), 'utf8'));
+    levels.forEach((level, i) => {
+      assert.equal(level.recipe ?? null, recipeFor(world, level.index), level.id);
+      if (i > 0 && level.recipe) assert.notEqual(level.recipe, levels[i - 1].recipe, `${level.id} repeats ${level.recipe}`);
+      const lamps = level.tiles.filter((t) => t.type === 'emitter').length;
+      if (level.recipe === 'oneTap') assert.equal(level.par, 1, level.id);
+      if (level.recipe === 'twoLamps') assert.equal(lamps, 2, level.id);
+      if (level.recipe === 'lightShow') assert.equal(lamps, 3, level.id);
+      if (level.recipe === 'rainbow') assert.ok(level.tiles.some((t) => t.type === 'filter'), level.id);
+      if (level.recipe === 'oneTap') assert.notEqual(level.difficulty, 'hard', level.id);
+    });
+  }
+});

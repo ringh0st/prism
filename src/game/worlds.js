@@ -1,4 +1,5 @@
 import { DIFFICULTY } from './constants.js';
+import { recipeFor, recipePreset } from './recipes.js';
 
 export const WORLD_COUNT = 50;
 export const LEVELS_PER_WORLD = 20;
@@ -146,13 +147,25 @@ export function generatorPresetFor(world, index) {
     };
   }
 
-  // World 1 after the tutorial: walls only, then fixed mirrors from level 10.
-  if (world === 1) return { ...preset, lockedRatio: index < 10 ? 0 : index === 10 ? 0.5 : 0.1, mustHave: index === 10 ? 'locked' : null };
+  // Worlds 1–3: each level has its own flavor (two lamps, one tap wonder, long road…; see recipes.js),
+  // on top of the world's pieces. Levels that introduce a piece keep it simple.
+  const recipe = recipeFor(world, index);
+  const flavored = (base) => (recipe ? { ...recipePreset(recipe, base, { world, spike }), recipe } : base);
+
+  // World 1 after the tutorial: walls (from 1-4), then fixed mirrors from level 10.
+  if (world === 1) {
+    return flavored({
+      ...preset,
+      walls: index < 4 ? 0 : preset.walls,
+      lockedRatio: index < 10 ? 0 : index === 10 ? 0.5 : 0.1,
+      mustHave: index === 10 ? 'locked' : null,
+    });
+  }
 
   // Which mechanics this level uses. Early worlds introduce one at a time.
   const variety = (world * 7 + index * 3) % 4;
-  if (world === 2) return { ...preset, splits: 1 + (spike > 0 ? 1 : 0) };
-  if (world === 3) return { ...preset, filters: 1 + (index > 10 ? 1 : 0), splits: index > 8 ? 1 : 0 };
+  if (world === 2) return flavored({ ...preset, splits: 1 + (spike > 0 ? 1 : 0) });
+  if (world === 3) return flavored({ ...preset, filters: 1 + (index > 10 ? 1 : 0), splits: index > 8 ? 1 : 0 });
   if (world === 4) return { ...preset, shades: 1 + Math.round(ramp * 2) + spike, splits: index > 6 ? 1 : 0 };
   // Twists, each the theme of its own world, then mixed in later: twin mirrors (world 6), portals (8),
   // cracking mirrors (10), fog (12) and prism crystals (14).

@@ -36,6 +36,8 @@ import { levelModifierFor } from '../../game/surprises.js';
 import { quipFor } from '../../game/quips.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
 import { firstTileOf, newPiecesIn, piecesMetIn } from '../../game/pieces.js';
+import { findHint } from '../../game/solver.js';
+import { recipeOf } from '../../game/recipes.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import { EVENT_LEVELS, parseEventLevelId } from '../../game/events.js';
 import ComboBurst from './ComboBurst.jsx';
@@ -59,6 +61,20 @@ const SEEN_PIECES_KEY = 'prism.seenPieces.v1';
 function seenPieces(progress) {
   return readJson(SEEN_PIECES_KEY, null) ?? piecesMetIn(progress.levels);
 }
+
+/** The first three levels teach on the board itself (a pointing hand, Lamp/Gem tags) and hide the extras. */
+const isFirstStepsLevel = (level, mode) => mode === 'level' && level.world === 1 && level.index <= 3;
+
+/** New-piece cards to show; the basics are taught on the board in the first levels instead. */
+function piecesToIntroduce(level, mode, progress) {
+  if (mode === 'playtest') return [];
+  return newPiecesIn(level, seenPieces(progress)).filter((piece) => !(piece.id === 'basics' && isFirstStepsLevel(level, mode)));
+}
+
+const COACH_LINES = {
+  start: 'Tap the mirror the hand points at, and watch the light!',
+  firstMove: 'See? The mirror turned and the light bounced! Keep following the hand.',
+};
 
 /**
  * mode: 'level' (records progress) | 'daily' (streak + sparks) | 'event' (weekend event puzzle) | 'playtest' (admin preview, free helpers, records nothing)
@@ -95,7 +111,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const [rushOver, setRushOver] = useState(null);
   const [showIntro, setShowIntro] = useState(true);
   // Pieces this player meets for the first time get a "New piece!" card before the level starts.
-  const [newPieces, setNewPieces] = useState(() => (mode === 'playtest' ? [] : newPiecesIn(level, seenPieces(progress))));
+  const [newPieces, setNewPieces] = useState(() => piecesToIntroduce(level, mode, progress));
   const [spotlightTile, setSpotlightTile] = useState(-1);
   const [lumi, setLumi] = useState({ mood: 'happy', line: '' });
   const [buyingHelper, setBuyingHelper] = useState(null);
@@ -110,6 +126,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const react = useCallback((name) => setPalReaction({ name, key: Date.now() }), []);
 
   const modifier = useMemo(() => levelModifierFor(level), [level]);
+  const isFirstSteps = isFirstStepsLevel(level, mode);
+  const flavor = recipeOf(level);
   const moveLimit = mode === 'rush' ? rushMoveLimit(rush.run, level.par) : moveLimitFor(level.par, level.difficulty);
   const gems = level.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
   const helpersAllowed = helpersAllowedFor(level.difficulty);
@@ -152,7 +170,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     setResult(null);
     setIsOutOfMoves(false);
     setShowIntro(true);
-    setNewPieces(mode === 'playtest' ? [] : newPiecesIn(level, seenPieces(progress)));
+    setNewPieces(piecesToIntroduce(level, mode, progress));
     setSpotlightTile(-1);
     setLumi({ mood: 'happy', line: '' });
     hasRecordedWin.current = false;
@@ -205,6 +223,11 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     lastLitCount.current = litCount;
     lastShadeCount.current = shadeCount;
   }, [trace, moves, gems.length, moveLimit, say, react]);
+
+  // First levels: Lumi explains what just happened after the first tap.
+  useEffect(() => {
+    if (isFirstSteps && moves === 1 && !trace.isSolved) setLumi({ mood: 'excited', line: COACH_LINES.firstMove });
+  }, [moves]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /** Record the result (server-checked when signed in) and celebrate. */
   const completeLevel = useCallback(
@@ -420,7 +443,20 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     sfx.levelStart();
     playStats.start();
     setShowIntro(false);
-  }, [playStats]);
+    if (isFirstSteps) {
+      // The basics are taught right here on the board, so they count as met.
+      writeJson(SEEN_PIECES_KEY, [...new Set([...seenPieces(progress), 'basics'])]);
+      setLumi({ mood: 'excited', line: COACH_LINES.start });
+    } else if (flavor) {
+      setLumi({ mood: 'happy', line: flavor.goal });
+    }
+  }, [playStats, isFirstSteps, flavor, progress]);
+
+  // First levels: a hand points at the next mirror to turn.
+  const coachTile = useMemo(
+    () => (isFirstSteps && !showIntro && !isOver ? findHint(level, puzzle.orients) : null),
+    [isFirstSteps, showIntro, isOver, level, puzzle.orients],
+  );
 
   return (
     <main className={`${styles.screen} ${styles[modifier] ?? ''} ${world ? `${styles.themed} ${styles[world.theme]}` : ''}`}>
@@ -437,7 +473,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       </header>
 
       <section className={styles.status} aria-label="Level status">
-        <StarMeter moves={moves} par={level.par} difficulty={level.difficulty} starCap={puzzle.starCap} />
+        <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={puzzle.starCap} isSimple={isFirstSteps} />
         <ul className={styles.gems} aria-label={`${trace.litGems.size} of ${gems.length} gems lit`}>
           {gems.map(({ tile, i }) => (
             <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff}>
@@ -459,6 +495,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           highlightTile={puzzle.hintTile}
           spotlightTile={moves === 0 && spotlightTile >= 0 ? spotlightTile : null}
           ghostSegments={puzzle.ghostSegments}
+          coach={isFirstSteps ? { tile: coachTile, labels: true } : null}
           turnsLeft={puzzle.turnsLeft}
           revealedCells={puzzle.revealedCells}
           glowbug={
@@ -477,14 +514,16 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         </div>
         <div className={styles.controls}>
           <Button variant="secondary" icon="restart" label="Restart level" onClick={restart} />
-          <HelperBar
-            helperIds={offeredHelpers}
-            inventory={progress.helpers}
-            usedCount={puzzle.usedHelpers.length}
-            allowed={helpersAllowed}
-            disabled={isOver}
-            onUse={requestHelper}
-          />
+          {!isFirstSteps && (
+            <HelperBar
+              helperIds={offeredHelpers}
+              inventory={progress.helpers}
+              usedCount={puzzle.usedHelpers.length}
+              allowed={helpersAllowed}
+              disabled={isOver}
+              onUse={requestHelper}
+            />
+          )}
         </div>
       </div>
 
@@ -496,6 +535,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           subtitle={subtitle}
           modifier={modifier}
           lumiLine={introLine}
+          moveLimit={moveLimit}
+          flavor={flavor}
+          waitsForTap={isFirstSteps}
           glowbugId={glowbug?.id}
           onDone={dismissIntro}
         />
@@ -575,9 +617,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       )}
       {result && mode !== 'challenge' && mode !== 'rush' && (
         <WinDialog
-          challenge={mode === 'level' && !result.isSkipped ? { levelId: level.id, levelLabel, moves: result.moves } : null}
+          challenge={mode === 'level' && !result.isSkipped && !isFirstSteps ? { levelId: level.id, levelLabel, moves: result.moves } : null}
           backName={backName}
-          replay={mode === 'playtest' ? null : { level, history: puzzle.history, title: levelName, subtitle }}
+          replay={mode === 'playtest' || isFirstSteps ? null : { level, history: puzzle.history, title: levelName, subtitle }}
           result={result}
           par={level.par}
           difficulty={level.difficulty}
@@ -595,7 +637,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
                 })
               : null
           }
-          onNext={() => nextLevel && navigate(nextLevel)}
+          // No partner yet (a new player's first win): meet the Pals on the map before going on.
+          nextLabel={mode === 'level' && !progress.pal.id ? 'Meet your Pal friend' : 'Next level'}
+          onNext={() => (mode === 'level' && !progress.pal.id ? navigate('#/') : nextLevel && navigate(nextLevel))}
           onReplay={restart}
           onMap={() => navigate(backHref)}
         />

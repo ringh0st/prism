@@ -54,6 +54,7 @@ function generateWorld(world) {
   const levels = [];
   for (let index = 1; index <= LEVELS_PER_WORLD; index++) {
     const level = bestLevelFor(world, index);
+    const preset = generatorPresetFor(world, index);
     const check = analyzeLevel(level);
     const problems = validateLevel(level);
     if (problems.length || !check.isSolvable || check.par !== level.par) {
@@ -68,6 +69,7 @@ function generateWorld(world) {
       width: level.width,
       height: level.height,
       par: level.par,
+      ...(preset.recipe ? { recipe: preset.recipe } : {}),
       tiles: level.tiles,
     });
   }

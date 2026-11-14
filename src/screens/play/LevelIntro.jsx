@@ -16,17 +16,35 @@ const STICKERS = {
 };
 
 /** How long the intro stays before the level starts by itself (any tap starts it sooner). */
-const INTRO_MS = 1600;
+const INTRO_MS = 2400;
+/** Levels with a flavor stay up longer, so there's time to read what's different. */
+const FLAVOR_INTRO_MS = 4500;
 
-/** "Level 7 · The Sneaky Pickle · Light 2 gems in 6 moves". Tap anywhere or wait to start. */
-export default function LevelIntro({ level, title, subtitle, modifier, lumiLine, glowbugId = null, onDone }) {
+/**
+ * "Level 7 · The Sneaky Pickle · Light 2 gems in 6 moves". Tap anywhere or wait to start.
+ * `flavor` ({ name, goal }, see recipes.js) says what's different about this level.
+ * `waitsForTap` keeps it up until the player taps (the very first levels, for new players).
+ */
+export default function LevelIntro({
+  level,
+  title,
+  subtitle,
+  modifier,
+  lumiLine,
+  moveLimit,
+  flavor = null,
+  waitsForTap = false,
+  glowbugId = null,
+  onDone,
+}) {
   useEffect(() => {
-    const timer = setTimeout(onDone, modifier === 'normal' ? INTRO_MS : INTRO_MS * 1.6);
+    if (waitsForTap) return undefined;
+    const timer = setTimeout(onDone, flavor ? FLAVOR_INTRO_MS : modifier === 'normal' ? INTRO_MS : INTRO_MS * 1.6);
     return () => clearTimeout(timer);
-  }, [onDone]);
+  }, [onDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const gems = level.tiles.filter((tile) => tile.type === TILE.GEM);
-  const limit = moveLimitFor(level.par, level.difficulty);
+  const limit = moveLimit ?? moveLimitFor(level.par, level.difficulty);
   const sticker = STICKERS[modifier];
 
   return (
@@ -38,6 +56,7 @@ export default function LevelIntro({ level, title, subtitle, modifier, lumiLine,
           {title}
         </ScreenTitle>
         {sticker && <p className={`game-title ${styles.sticker}`}>{sticker.text}</p>}
+        {flavor && <p className={`game-title ${styles.flavor}`}>✨ {flavor.name}</p>}
         <p className={styles.goal}>
           Light {gems.length === 1 ? 'the gem' : `all ${gems.length} gems`}
           <span className={styles.gems}>
@@ -58,7 +77,7 @@ export default function LevelIntro({ level, title, subtitle, modifier, lumiLine,
           </p>
         )}
         <div className={styles.lumi}>
-          <LumiSays mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={84} line={lumiLine} />
+          <LumiSays mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={84} line={flavor?.goal ?? lumiLine} />
         </div>
         <Button size="lg" icon="play" onClick={onDone} data-autofocus autoFocus>
           Let’s go!

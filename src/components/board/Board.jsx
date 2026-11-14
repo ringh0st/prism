@@ -8,7 +8,11 @@ import { describeTile } from '../../game/describe.js';
 import { isRotatable as tileIsRotatable } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
 import { gemBurst } from '../../lib/effects.js';
+import CoachHand from './CoachHand.jsx';
 import styles from './Board.module.css';
+
+/** Name tags for the first levels, so new players know which piece is which. */
+const COACH_LABELS = { [TILE.EMITTER]: 'Lamp', [TILE.GEM]: 'Gem' };
 
 /**
  * Interactive puzzle board.
@@ -26,6 +30,7 @@ import styles from './Board.module.css';
  * @param turnsLeft    turns each cracking mirror has left (a cracked one can't turn)
  * @param revealedCells cells the light has reached (fog lifts there); null shows everything (editor)
  * @param glowbug      { id, cell, isAwake, isFreed }: a Glowbug sleeping on a cell (it wakes in the light)
+ * @param coach        first-levels coaching: { tile: tile index the hand points at, or null; labels: show Lamp/Gem tags }
  */
 export default function Board({
   level,
@@ -43,6 +48,7 @@ export default function Board({
   turnsLeft = null,
   revealedCells = null,
   glowbug = null,
+  coach = null,
 }) {
   const { width, height, tiles } = level;
   const [focusedCell, setFocusedCell] = useState(0);
@@ -132,7 +138,7 @@ export default function Board({
                       highlightTile === tileIndex && tileIndex >= 0 ? styles.hint : ''
                     } ${
                       spotlightTile === tileIndex && tileIndex >= 0 ? styles.spotlight : ''
-                    } ${tile?.type === TILE.SHADE && isLit ? styles.shake : ''}`}
+                    } ${coach?.tile === tileIndex && tileIndex >= 0 ? styles.coached : ''} ${tile?.type === TILE.SHADE && isLit ? styles.shake : ''}`}
                     tabIndex={cell === focusedCell ? 0 : -1}
                     aria-label={`${description}${glowbug?.cell === cell ? `. ${glowbugById(glowbug.id).name} the Glowbug is ${glowbug.isAwake ? 'awake' : 'asleep'} here` : ''}. Row ${row + 1}, column ${col + 1}`}
                     aria-disabled={!isActionable || undefined}
@@ -143,6 +149,12 @@ export default function Board({
                     {glowbug?.cell === cell && (
                       <span className={`${styles.glowbug} ${tile ? styles.glowbugOnTile : ''} ${glowbug.isFreed ? styles.glowbugFreed : ''}`}>
                         <GlowbugArt id={glowbug.id} size="100%" isAwake={glowbug.isAwake} />
+                      </span>
+                    )}
+                    {coach?.tile === tileIndex && tileIndex >= 0 && <CoachHand />}
+                    {coach?.labels && COACH_LABELS[tile?.type] && (
+                      <span className={styles.coachLabel} aria-hidden="true">
+                        {COACH_LABELS[tile.type]}
                       </span>
                     )}
                     {tile && (

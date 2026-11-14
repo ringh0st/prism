@@ -22,6 +22,7 @@ const TINTS = ['coral', 'lime', 'sky'];
  * @property {number} [fragile=0]    path mirrors that crack after a few turns
  * @property {number} [fog=0]        gems, walls or shades hidden under fog
  * @property {number} [prisms=0]     prism crystals that split the light to both sides
+ * @property {number} [flips]        scramble exactly this many pieces ("one tap wonder" boards)
  * @property {number} [minPar=1]     minimum taps needed to solve
  * @property {number} [maxPar=99]
  */
@@ -256,11 +257,19 @@ export function generateLevel(options, random, maxAttempts = 400) {
     for (let scramble = 0; scramble < 12; scramble++) {
       const scrambled = { ...level, tiles: level.tiles.map((t) => ({ ...t })) };
       // Scramble by taps (twins turn together), so the starting board is always reachable.
-      scrambled.tiles.forEach((t, i) => {
-        if (!isRotatable(t) || random.chance(0.35)) return;
-        if (t.link && scrambled.tiles.findIndex((other) => other.link === t.link) !== i) return;
-        for (const j of rotationGroup(scrambled.tiles, i)) scrambled.tiles[j].orient ^= 1;
-      });
+      const isTapTarget = (t, i) => isRotatable(t) && !(t.link && scrambled.tiles.findIndex((other) => other.link === t.link) !== i);
+      if (options.flips) {
+        // "One tap wonder": exactly this many pieces start turned the wrong way.
+        const targets = scrambled.tiles.map((t, i) => i).filter((i) => isTapTarget(scrambled.tiles[i], i));
+        for (const i of random.shuffle(targets).slice(0, options.flips))
+          for (const j of rotationGroup(scrambled.tiles, i)) scrambled.tiles[j].orient ^= 1;
+      } else {
+        scrambled.tiles.forEach((t, i) => {
+          if (!isRotatable(t) || random.chance(0.35)) return;
+          if (!isTapTarget(t, i)) return;
+          for (const j of rotationGroup(scrambled.tiles, i)) scrambled.tiles[j].orient ^= 1;
+        });
+      }
       if (traceBeams(scrambled).isSolved) continue;
       const analysis = analyzeLevel(scrambled);
       if (analysis.tooComplex || !analysis.isSolvable) break;

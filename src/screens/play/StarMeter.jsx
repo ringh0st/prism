@@ -1,13 +1,12 @@
 import Icon from '../../components/Icon.jsx';
-import { moveLimitFor } from '../../game/scoring.js';
 import styles from './StarMeter.module.css';
 
 /**
  * Moves-left meter. The bar drains with every move; star markers show where the 3★ and 2★
- * thresholds are, and each star pops off when you pass it.
+ * thresholds are, and each star pops off when you pass it. `isSimple` (the first levels) leaves
+ * the star markers out, so there's less to take in.
  */
-export default function StarMeter({ moves, par, difficulty, starCap }) {
-  const limit = moveLimitFor(par, difficulty);
+export default function StarMeter({ moves, par, limit, starCap, isSimple = false }) {
   const twoStarLimit = par + Math.ceil((limit - par) / 2);
   const left = Math.max(0, limit - moves);
   const fill = (left / limit) * 100;
@@ -27,18 +26,19 @@ export default function StarMeter({ moves, par, difficulty, starCap }) {
       </div>
       <div className={styles.track}>
         <div className={`${styles.fill} ${tone}`} style={{ width: `${fill}%` }} />
-        {markers.map((marker) => (
-          <span
-            key={marker.stars}
-            className={`${styles.marker} ${marker.isKept ? '' : styles.lost}`}
-            style={{ left: `${((limit - marker.at) / limit) * 100}%` }}
-            aria-hidden="true"
-          >
-            {Array.from({ length: marker.stars }, (_, i) => (
-              <Icon key={i} name="star" size={14} />
-            ))}
-          </span>
-        ))}
+        {!isSimple &&
+          markers.map((marker) => (
+            <span
+              key={marker.stars}
+              className={`${styles.marker} ${marker.isKept ? '' : styles.lost}`}
+              style={{ left: `${((limit - marker.at) / limit) * 100}%` }}
+              aria-hidden="true"
+            >
+              {Array.from({ length: marker.stars }, (_, i) => (
+                <Icon key={i} name="star" size={14} />
+              ))}
+            </span>
+          ))}
       </div>
     </div>
   );
