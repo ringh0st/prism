@@ -11,7 +11,7 @@ const PLACE = { 1: '1st', 2: '2nd', 3: '3rd' };
 
 /** "You finished 2nd last week!" with the reward the server just paid out. */
 export default function WeeklyRewardDialog({ reward, onClose }) {
-  useEffect(() => sfx.win(), []);
+  useEffect(() => sfx.reward(), []);
   const place = PLACE[reward.rank] ?? `${reward.rank}th`;
   return (
     <Dialog title={`You finished ${place}!`} tone="celebrate" onClose={onClose}>

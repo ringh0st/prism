@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, isPalUnlocked } from '../../game/pals.js';
 import { readJson, writeJson } from '../../lib/storage.js';
+import { sfx } from '../../audio/sfx.js';
 import styles from './Pals.module.css';
 
 const SEEN_KEY = 'prism.seenPals.v1';
@@ -13,8 +14,12 @@ const SEEN_KEY = 'prism.seenPals.v1';
 export default function PalUnlockNotice() {
   const { progress } = usePlayer();
   const [seen, setSeen] = useState(() => readJson(SEEN_KEY, []));
-  if (!progress.pal.id) return null;
-  const fresh = PALS.find((pal) => !progress.pal.owned[pal.id] && !seen.includes(pal.id) && isPalUnlocked(progress, pal));
+  const fresh = progress.pal.id ? PALS.find((pal) => !progress.pal.owned[pal.id] && !seen.includes(pal.id) && isPalUnlocked(progress, pal)) : null;
+  // A little fanfare once for each new Pal.
+  const freshId = fresh?.id;
+  useEffect(() => {
+    if (freshId) sfx.newPal();
+  }, [freshId]);
   if (!fresh) return null;
 
   const close = () => {
@@ -33,13 +38,7 @@ export default function PalUnlockNotice() {
         wants to join your team.
       </p>
       <div className={styles.pickerActions}>
-        <Button
-          size="lg"
-          as="a"
-          href="#/pals"
-          onClick={close}
-          data-autofocus
-        >
+        <Button size="lg" as="a" href="#/pals" onClick={close} data-autofocus>
           Meet {fresh.name}
         </Button>
         <Button variant="ghost" onClick={close}>

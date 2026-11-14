@@ -18,11 +18,11 @@ function DecorItem({ item, onDone, onError }) {
   const isOwned = progress.grove.items.includes(item.id);
   const isPlaced = progress.grove.placed.includes(item.id);
 
-  const act = async (action, message) => {
+  const act = async (action, message, sound) => {
     setIsBusy(true);
     try {
       await action();
-      sfx.sparkle();
+      sound();
       onDone(message);
     } catch (error) {
       onError(error.message);
@@ -40,7 +40,7 @@ function DecorItem({ item, onDone, onError }) {
           size="sm"
           variant="gold"
           disabled={isBusy || progress.sparks < item.price}
-          onClick={() => act(() => buyGroveItem(item.id), `${item.name}: yours! Now place it.`)}
+          onClick={() => act(() => buyGroveItem(item.id), `${item.name}: yours! Now place it.`, sfx.coin)}
           aria-label={`Buy ${item.name} for ${item.price} sparks`}
         >
           <Icon name="spark" size={16} />
@@ -52,7 +52,7 @@ function DecorItem({ item, onDone, onError }) {
           variant={isPlaced ? 'secondary' : 'primary'}
           disabled={isBusy}
           aria-pressed={isPlaced}
-          onClick={() => act(() => placeGroveItem(item.id, !isPlaced), isPlaced ? `${item.name} put away.` : `${item.name} placed!`)}
+          onClick={() => act(() => placeGroveItem(item.id, !isPlaced), isPlaced ? `${item.name} put away.` : `${item.name} placed!`, isPlaced ? sfx.tap : sfx.place)}
         >
           {isPlaced ? 'Put away' : 'Place'}
         </Button>

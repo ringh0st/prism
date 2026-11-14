@@ -52,7 +52,7 @@ export default function DailyGift({ look = 'button', className = '' }) {
     setIsOpening(true);
     try {
       const sparks = await claimDailyGift();
-      sfx.sparkle();
+      sfx.reward();
       setOutcome({ sparks });
     } catch (error) {
       setOutcome({ error: error.message });

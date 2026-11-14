@@ -279,7 +279,7 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
     setBusyItem(itemId);
     try {
       await buyItem(itemId, currency);
-      sfx.sparkle();
+      sfx.coin();
       setLumi({ mood: 'dance', line: 'Ka-ching! Pleasure doing business!' });
       setInfo(null);
     } catch (error) {
@@ -329,7 +329,7 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
               <h2 className={`game-title ${styles.sectionTitle}`}>Adopt a Pal</h2>
               <AdoptShelf
                 onAdopted={(pal) => {
-                  sfx.win();
+                  sfx.newPal();
                   setLumi({
                     mood: 'dance',
                     line: `Welcome home, ${pal.name}! Find them in Pals.`,
@@ -340,7 +340,7 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
               <h2 className={`game-title ${styles.sectionTitle}`}>Clothes & gear</h2>
               <ClothesShelf
                 onBought={(item) => {
-                  sfx.sparkle();
+                  sfx.coin();
                   setLumi({
                     mood: 'dance',
                     line: `Ooh, the ${item.name.toLowerCase()}! Try it on in Pals.`,
@@ -351,7 +351,7 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
               <h2 className={`game-title ${styles.sectionTitle}`}>Grove decor</h2>
               <GroveShelf
                 onBought={(item) => {
-                  sfx.sparkle();
+                  sfx.coin();
                   setLumi({ mood: 'dance', line: `The ${item.name.toLowerCase()} will look lovely in the Grove!` });
                 }}
                 onError={(message) => setLumi({ mood: 'worried', line: message })}

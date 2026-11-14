@@ -1,4 +1,5 @@
 import Icon from '../Icon.jsx';
+import { sfx } from '../../audio/sfx.js';
 import styles from './BottomNav.module.css';
 
 const TABS = [
@@ -14,7 +15,13 @@ export default function BottomNav({ active }) {
   return (
     <nav className={styles.nav} aria-label="Main">
       {TABS.map((tab) => (
-        <a key={tab.route} href={tab.href} className={`${styles.tab} ${active === tab.route ? styles.active : ''}`} aria-current={active === tab.route ? 'page' : undefined}>
+        <a
+          key={tab.route}
+          href={tab.href}
+          className={`${styles.tab} ${active === tab.route ? styles.active : ''}`}
+          aria-current={active === tab.route ? 'page' : undefined}
+          onClick={() => active !== tab.route && sfx.tab()}
+        >
           <span className={styles.icon}>
             <Icon name={tab.icon} size={24} strokeWidth={2.6} />
           </span>

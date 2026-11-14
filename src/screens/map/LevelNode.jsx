@@ -2,6 +2,7 @@ import Icon from '../../components/Icon.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
 import { DIFFICULTY } from '../../game/constants.js';
 import { MAX_STARS } from '../../game/scoring.js';
+import { sfx } from '../../audio/sfx.js';
 import styles from './Map.module.css';
 
 const DIFFICULTY_LABEL = { [DIFFICULTY.HARD]: 'hard', [DIFFICULTY.EXTRA]: 'boss' };
@@ -51,7 +52,7 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, greeting
       {content}
     </a>
   ) : (
-    <span className={className} style={style} role="img" aria-label={label}>
+    <span className={className} style={style} role="img" aria-label={label} onClick={() => sfx.locked()}>
       {content}
     </span>
   );

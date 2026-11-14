@@ -25,7 +25,7 @@ export default function ChestDialog({ opening, onClose }) {
         if (!isCurrent) return;
         setReward(result);
         setPhase('open');
-        sfx.win();
+        sfx.chest();
       } catch (claimError) {
         if (!isCurrent) return;
         setError(claimError.message);

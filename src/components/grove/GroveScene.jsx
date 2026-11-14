@@ -82,7 +82,7 @@ export default function GroveScene({ placed, partnerId, stage = 0, wearing = [] 
 
   const sayHello = () => {
     setHello({ line: HELLOS[Date.now() % HELLOS.length], key: Date.now() });
-    sfx.sparkle();
+    sfx.hello();
   };
 
   return (

@@ -25,7 +25,7 @@ import { PUBLIC_GAME_URL } from '../../lib/config.js';
 import { levelNameFor } from '../../game/levelNames.js';
 import { levelModifierFor } from '../../game/surprises.js';
 import { quipFor } from '../../game/quips.js';
-import { TILE } from '../../game/constants.js';
+import { DIFFICULTY, TILE } from '../../game/constants.js';
 import styles from './PlayScreen.module.css';
 
 const WIN_DIALOG_DELAY_MS = 900;
@@ -101,7 +101,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       sfx.gemLit(litCount);
       say('excited', litCount < gems.length ? 'gem' : null);
     } else if (shadeCount > lastShadeCount.current) {
-      sfx.warning();
+      sfx.shade();
       say('worried', 'shade');
     } else if (!trace.isSolved && moves === moveLimit - 1) {
       say('worried', 'lastMove');
@@ -117,10 +117,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     async ({ isSkipped = false } = {}) => {
       if (hasRecordedWin.current) return;
       hasRecordedWin.current = true;
-      sfx.win();
       setShowConfetti(!isSkipped);
 
       const stars = isSkipped ? 1 : Math.min(starsForMoves(moves, level.par, level.difficulty), puzzle.starCap);
+      sfx.win({ stars, isBig: modifier === 'boss' || level.difficulty === DIFFICULTY.EXTRA });
       say(stars === 3 ? 'dance' : 'excited', isSkipped ? null : `win${stars}`);
       const worldRefs = mode === 'level' ? levelRefsInWorld(level.world) : [];
       const wasWorldComplete = isWorldComplete(progress, worldRefs);
@@ -139,7 +139,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       const completesWorld = mode === 'level' && !wasWorldComplete && isWorldComplete({ levels: solvedLevels }, worldRefs);
       setResult({ ...finished, moves: isSkipped ? null : moves, isSkipped, completesWorld });
     },
-    [moves, level, puzzle.starCap, puzzle.usedHelpers.length, mode, levelRefsInWorld, progress, finishLevel, finishDaily, dateKey, say],
+    [moves, level, modifier, puzzle.starCap, puzzle.usedHelpers.length, mode, levelRefsInWorld, progress, finishLevel, finishDaily, dateKey, say],
   );
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   useEffect(() => {
     if (!trace.isSolved && moves >= moveLimit && !hasRecordedWin.current) {
       const timer = setTimeout(() => {
-        sfx.warning();
+        sfx.outOfMoves();
         say('sad', null);
         setIsOutOfMoves(true);
       }, 450);
@@ -169,7 +169,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   );
 
   const restart = useCallback(() => {
-    sfx.tap();
+    sfx.restart();
     puzzle.restart();
     setResult(null);
     setIsOutOfMoves(false);
@@ -188,7 +188,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         return;
       }
       puzzle.applyHelper(helperId);
-      sfx.sparkle();
+      sfx.helper();
       const lines = {
         hint: 'Psst! Rotate the glowing one.',
         lens: 'Follow the dotted path. Quick!',
@@ -240,6 +240,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
   const dismissIntro = useCallback(() => {
     sfx.unlock();
+    sfx.levelStart();
     setShowIntro(false);
   }, []);
 

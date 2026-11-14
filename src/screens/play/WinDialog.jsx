@@ -42,14 +42,30 @@ function ShareResult({ text }) {
 export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasNext, shareMessage = null, onNext, onReplay, onMap }) {
   const { isSignedIn, progress } = usePlayer();
   const partner = palById(progress.pal.id);
-  const { stars, moves, sparksEarned = 0, diamondsEarned = 0, isNewBest, streak = 0, shieldsUsed = 0, shieldEarned = false, isSkipped, completesWorld } =
-    result;
+  const {
+    stars,
+    moves,
+    sparksEarned = 0,
+    diamondsEarned = 0,
+    isNewBest,
+    streak = 0,
+    shieldsUsed = 0,
+    shieldEarned = false,
+    isSkipped,
+    completesWorld,
+    palGrewTo = null,
+    isFirstToday = false,
+  } = result;
 
   useEffect(() => {
     const timers = Array.from({ length: stars }, (_, i) => setTimeout(() => sfx.star(i), 350 + i * 260));
-    if (sparksEarned > 0 || diamondsEarned > 0) timers.push(setTimeout(() => sfx.sparkle(), 350 + stars * 260 + 150));
+    const afterStars = 350 + stars * 260 + 150;
+    if (sparksEarned > 0 || diamondsEarned > 0) timers.push(setTimeout(() => sfx.coin(), afterStars));
+    // The big moments get their own sounds once the stars have landed.
+    const finale = completesWorld ? sfx.worldComplete : palGrewTo ? sfx.palGrow : isFirstToday ? sfx.reward : null;
+    if (finale) timers.push(setTimeout(finale, afterStars + 450));
     return () => timers.forEach(clearTimeout);
-  }, [stars, sparksEarned, diamondsEarned]);
+  }, [stars, sparksEarned, diamondsEarned, completesWorld, palGrewTo, isFirstToday]);
 
   return (
     <Dialog title={headlineFor(result, difficulty)} tone="celebrate" onClose={onMap}>
@@ -63,7 +79,7 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
       )}
       {!isSkipped && stars < 3 && <p className={styles.tip}>Match par ({par} moves) without helpers for all three stars.</p>}
 
-      {result.isFirstToday && (
+      {isFirstToday && (
         <p className={`game-title ${styles.dailyReward}`}>
           <Icon name="gift" size={22} /> Daily reward collected
         </p>
@@ -102,12 +118,12 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
         )}
       </div>
       {partner && !isSkipped && (
-        <div className={`${styles.evolved} ${result.palGrewTo ? styles.grew : ''}`}>
+        <div className={`${styles.evolved} ${palGrewTo ? styles.grew : ''}`}>
           <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={64} portrait />
-          {result.palGrewTo ? (
+          {palGrewTo ? (
             <p role="status">
               <strong>
-                {partner.name} grew into a {result.palGrewTo.name}!
+                {partner.name} grew into a {palGrewTo.name}!
               </strong>
             </p>
           ) : (

@@ -24,7 +24,7 @@ export default function StarterPicker({ onSkip }) {
     setError('');
     try {
       await choosePal(palId);
-      sfx.win();
+      sfx.newPal();
     } catch (saveError) {
       setError(saveError.message);
       setIsSaving(false);
