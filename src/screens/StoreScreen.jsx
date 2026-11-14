@@ -262,7 +262,7 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
           <DailyGift look="note" />
           {tab === 'helpers' && <HelpersShelf buyProps={buyProps} onInfo={setInfo} />}
           {tab === 'sparks' && <SparksShelf buyProps={buyProps} onInfo={setInfo} />}
-          {tab === 'pals' && <PalShop onLumi={setLumi} />}
+          {tab === 'pals' && <PalShop onLumi={setLumi} onGetDiamonds={() => setTab('diamonds')} />}
           {tab === 'diamonds' && <DiamondsShelf onError={(message) => setLumi({ mood: 'worried', line: message })} />}
         </section>
       </main>

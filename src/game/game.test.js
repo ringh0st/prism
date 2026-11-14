@@ -642,3 +642,31 @@ test('player card stats: stars and levels from built-in levels only, worlds and 
   const sql = readFileSync(new URL('../../supabase/player_cards.sql', import.meta.url), 'utf8');
   for (const key of ['palsCount', 'stars', 'levelsSolved', 'worldsFinished']) assert.match(sql, new RegExp(`'${key}'`), key);
 });
+
+test('weekly theme collections: one theme a week, prices match the server, buying checks currency', async () => {
+  const themes = await import('./themes.js');
+  assert.equal(themes.themeOfWeek(new Date(Date.UTC(2026, 10, 14))).id, 'elvenWoods');
+  assert.equal(themes.themeOfWeek(new Date(Date.UTC(2026, 10, 16, 1))).id, 'autumnHarvest');
+  assert.equal(themes.nextTheme(new Date(Date.UTC(2026, 10, 14))).id, 'autumnHarvest');
+  const sql = readFileSync(new URL('../../supabase/themed_shop.sql', import.meta.url), 'utf8');
+  for (const theme of themes.THEMES) {
+    assert.ok(sql.includes(`'${theme.id}'`), theme.id);
+    for (const item of theme.items) {
+      const where = item.kind === 'outfit' ? `"slot": "${item.slot}"` : `"spot": "${item.spot}"`;
+      assert.ok(
+        sql.includes(`when '${item.id}' then '{"kind": "${item.kind}", ${where}, "price": ${item.price}, "currency": "${item.currency}"}'`),
+        item.id,
+      );
+      assert.ok(sql.includes(`when '${item.id}' then '${theme.id}'`), `${item.id} theme`);
+    }
+  }
+  const week = new Date(Date.UTC(2026, 10, 14));
+  const base = { sparks: 200, diamonds: 0, pal: { accessories: [], wearing: [] }, grove: { items: [], placed: [] } };
+  const bought = themes.buyThemeItemLocally(base, 'leafCrown', week);
+  assert.deepEqual([bought.sparks, bought.pal.accessories], [60, ['leafCrown']]);
+  assert.throws(() => themes.buyThemeItemLocally(base, 'elvenCloak', week), /Sign in|diamonds/);
+  assert.throws(() => themes.buyThemeItemLocally(base, 'snowman', week), /this week/);
+  const pals = await import('./pals.js');
+  assert.throws(() => pals.buyAccessoryLocally(base, 'leafCrown'), /not in the shop/, 'theme items never go through the regular sparks shop');
+  assert.equal(pals.accessoryById('leafCrown').slot, 'head');
+});

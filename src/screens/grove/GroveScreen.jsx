@@ -6,7 +6,7 @@ import Icon from '../../components/Icon.jsx';
 import GroveScene from '../../components/grove/GroveScene.jsx';
 import GroveItemArt from '../../components/grove/GroveItemArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { GROVE_ITEMS, GROVE_SPOTS } from '../../game/grove.js';
+import { ALL_DECOR, GROVE_ITEMS, GROVE_SPOTS } from '../../game/grove.js';
 import { finishedWorldCount } from '../../game/titles.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Grove.module.css';
@@ -94,14 +94,16 @@ export default function GroveScreen() {
               {spot.name}
             </h2>
             <ul className={styles.items}>
-              {GROVE_ITEMS.filter((item) => item.spot === spot.id).map((item) => (
-                <DecorItem
-                  key={item.id}
-                  item={item}
-                  onDone={(text) => setMessage({ text, isError: false })}
-                  onError={(text) => setMessage({ text, isError: true })}
-                />
-              ))}
+              {ALL_DECOR.filter((item) => item.spot === spot.id && (GROVE_ITEMS.includes(item) || progress.grove.items.includes(item.id))).map(
+                (item) => (
+                  <DecorItem
+                    key={item.id}
+                    item={item}
+                    onDone={(text) => setMessage({ text, isError: false })}
+                    onError={(text) => setMessage({ text, isError: true })}
+                  />
+                ),
+              )}
             </ul>
           </section>
         ))}

@@ -370,7 +370,10 @@ button.goods:active .goodsArt {
   gap: 4px;
   min-height: 38px;
   padding: 0 14px;
+  border: 0;
   border-radius: var(--radius-pill);
+  font: inherit;
+  cursor: pointer;
   font-weight: 800;
   font-size: 14px;
   color: var(--action-label);
@@ -506,4 +509,47 @@ button.goods:active .goodsArt {
 .palShopPanel {
   display: grid;
   gap: var(--space-4);
+}
+
+/* ---------- This week's theme collection ---------- */
+.themeBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-honey) 28%, var(--surface-raised));
+}
+
+.themeIcon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  font-size: 32px;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.themeKicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--reward-label);
+}
+
+.themeName {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.themeTagline {
+  margin: 2px 0 0;
+  font-weight: 700;
+  color: var(--text-soft);
 }

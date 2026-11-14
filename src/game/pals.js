@@ -1,5 +1,6 @@
 import { EconomyError, totalStars } from './progress.js';
 import { finishedWorldCount } from './titles.js';
+import { THEME_OUTFITS } from './themes.js';
 
 /**
  * Pals: profile characters. You pick one starter on your first game, then unlock the rest by playing.
@@ -207,7 +208,10 @@ export function claimLuckyPalLocally(progress, roll = Math.random(), pick = Math
   return { progress: { ...progress, luckyPals, pal: { ...progress.pal, id: progress.pal.id ?? pal.id, owned } }, palId: pal.id, sparks: 0 };
 }
 
-export const accessoryById = (id) => PAL_ACCESSORIES.find((item) => item.id === id) ?? null;
+/** Every outfit piece: the regular ones plus the weekly theme collections'. */
+export const ALL_OUTFITS = [...PAL_ACCESSORIES, ...THEME_OUTFITS];
+
+export const accessoryById = (id) => ALL_OUTFITS.find((item) => item.id === id) ?? null;
 
 export function unlockText({ stars, worlds, streak, lucky }) {
   if (lucky) return 'Lucky Pal gift';
@@ -241,7 +245,8 @@ export function choosePalLocally(progress, palId) {
 
 /** @throws EconomyError */
 export function buyAccessoryLocally(progress, accessoryId) {
-  const item = accessoryById(accessoryId);
+  // Only the regular shop items; theme pieces are bought through buyThemeItemLocally (they may cost diamonds).
+  const item = PAL_ACCESSORIES.find((accessory) => accessory.id === accessoryId);
   if (!item) throw new EconomyError('That item is not in the shop.');
   if (progress.pal.accessories.includes(accessoryId)) throw new EconomyError('You already have this.');
   if (progress.sparks < item.price) throw new EconomyError('Not enough sparks.');

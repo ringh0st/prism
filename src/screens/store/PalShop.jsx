@@ -3,39 +3,42 @@ import ChipTabs from '../../components/game/ChipTabs.jsx';
 import AdoptShelf from './AdoptShelf.jsx';
 import ClothesShelf from './ClothesShelf.jsx';
 import GroveShelf from './GroveShelf.jsx';
+import ThemeShelf from './ThemeShelf.jsx';
+import TryOnDialog from './TryOnDialog.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, PAL_ACCESSORIES } from '../../game/pals.js';
 import { GROVE_ITEMS } from '../../game/grove.js';
+import { themeOfWeek } from '../../game/themes.js';
 import { rewardShower } from '../../lib/effects.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Stall.module.css';
 
+const ownedOf = (progress, items, list) => [items.filter((item) => list.includes(item.id)).length, items.length];
+const clothesIn = (slot) => PAL_ACCESSORIES.filter((item) => item.slot === slot);
+
 /** The Pal shop's sections, each with how many of its things you already own. */
 const SECTIONS = [
+  {
+    id: 'week',
+    label: 'This week',
+    icon: 'gift',
+    owned: (progress) => ownedOf(progress, themeOfWeek().items, [...progress.pal.accessories, ...progress.grove.items]),
+  },
   { id: 'adopt', label: 'Adopt', icon: 'paw', owned: (progress) => [Object.keys(progress.pal.owned).length, PALS.length] },
-  { id: 'head', label: 'Hats', icon: 'crown', owned: (progress) => clothesCount(progress, 'head') },
-  { id: 'neck', label: 'Capes', icon: 'shirt', owned: (progress) => clothesCount(progress, 'neck') },
-  { id: 'hand', label: 'Gear', icon: 'wand', owned: (progress) => clothesCount(progress, 'hand') },
-  { id: 'grove', label: 'Grove', icon: 'home', owned: (progress) => [progress.grove.items.length, GROVE_ITEMS.length] },
+  { id: 'head', label: 'Hats', icon: 'crown', owned: (progress) => ownedOf(progress, clothesIn('head'), progress.pal.accessories) },
+  { id: 'neck', label: 'Capes', icon: 'shirt', owned: (progress) => ownedOf(progress, clothesIn('neck'), progress.pal.accessories) },
+  { id: 'hand', label: 'Gear', icon: 'wand', owned: (progress) => ownedOf(progress, clothesIn('hand'), progress.pal.accessories) },
+  { id: 'grove', label: 'Grove', icon: 'home', owned: (progress) => ownedOf(progress, GROVE_ITEMS, progress.grove.items) },
 ];
 
-function clothesCount(progress, slot) {
-  const items = PAL_ACCESSORIES.filter((item) => item.slot === slot);
-  return [items.filter((item) => progress.pal.accessories.includes(item.id)).length, items.length];
-}
-
 /**
- * Everything for your Pals, split into small tabs (adopt, hats, capes, gear, Grove decor) so nobody has to
- * scroll through it all. The tabs stay pinned at the top while you browse.
+ * Everything for your Pals, in small tabs pinned while you browse: this week's theme collection, adopting
+ * Pals, hats, capes, gear and Grove decor. Tapping any outfit piece or decoration opens "Try it on".
  */
-export default function PalShop({ onLumi }) {
+export default function PalShop({ onLumi, onGetDiamonds }) {
   const { progress } = usePlayer();
-  const [section, setSection] = useState('adopt');
-  const onError = (message) => onLumi({ mood: 'worried', line: message });
-  const onClothes = (item) => {
-    sfx.coin();
-    onLumi({ mood: 'dance', line: `Ooh, the ${item.name.toLowerCase()}! Try it on in Pals.` });
-  };
+  const [section, setSection] = useState('week');
+  const [trying, setTrying] = useState(null);
 
   return (
     <>
@@ -51,6 +54,7 @@ export default function PalShop({ onLumi }) {
         })}
       />
       <div id="pal-shop-panel" role="tabpanel" aria-labelledby={`pal-shop-${section}`} className={styles.palShopPanel}>
+        {section === 'week' && <ThemeShelf onTry={setTrying} />}
         {section === 'adopt' && (
           <AdoptShelf
             onAdopted={(pal) => {
@@ -58,22 +62,24 @@ export default function PalShop({ onLumi }) {
               rewardShower();
               onLumi({ mood: 'dance', line: `Welcome home, ${pal.name}! Find them in Pals.` });
             }}
-            onError={onError}
+            onError={(message) => onLumi({ mood: 'worried', line: message })}
           />
         )}
         {(section === 'head' || section === 'neck' || section === 'hand') && (
-          <ClothesShelf key={section} slotId={section} onBought={onClothes} onError={onError} />
+          <ClothesShelf key={section} items={clothesIn(section)} onTry={setTrying} />
         )}
-        {section === 'grove' && (
-          <GroveShelf
-            onBought={(item) => {
-              sfx.coin();
-              onLumi({ mood: 'dance', line: `The ${item.name.toLowerCase()} will look lovely in the Grove!` });
-            }}
-            onError={onError}
-          />
-        )}
+        {section === 'grove' && <GroveShelf onTry={setTrying} />}
       </div>
+      {trying && (
+        <TryOnDialog
+          item={trying}
+          onClose={() => setTrying(null)}
+          onGetDiamonds={() => {
+            setTrying(null);
+            onGetDiamonds();
+          }}
+        />
+      )}
     </>
   );
 }

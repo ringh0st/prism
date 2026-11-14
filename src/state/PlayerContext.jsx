@@ -17,6 +17,7 @@ import {
   adoptPalOnServer,
   claimLuckyPalOnServer,
   buyGroveItemOnServer,
+  buyThemeItemOnServer,
   placeGroveItemOnServer,
   claimWeeklyRewardOnServer,
   consumeHelperOnServer,
@@ -57,6 +58,7 @@ import {
   wearAccessoryLocally,
 } from '../game/pals.js';
 import { buyGroveItemLocally, placeGroveItemLocally } from '../game/grove.js';
+import { buyThemeItemLocally } from '../game/themes.js';
 import { sfx } from '../audio/sfx.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
@@ -350,6 +352,15 @@ export function PlayerProvider({ children }) {
           return;
         }
         applyServerState(await buyGroveItemOnServer(itemId));
+      },
+
+      /** Buy a piece of this week's theme collection (sparks, or diamonds with an account). @throws EconomyError */
+      async buyThemeItem(itemId) {
+        if (!userId) {
+          setProgress(buyThemeItemLocally(progressRef.current, itemId));
+          return;
+        }
+        applyServerState(await buyThemeItemOnServer(itemId));
       },
 
       /** Place owned decor in its Grove spot (replacing what was there) or put it away. @throws EconomyError */

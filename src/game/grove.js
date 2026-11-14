@@ -1,4 +1,5 @@
 import { EconomyError } from './progress.js';
+import { THEME_DECOR } from './themes.js';
 
 /**
  * The Grove: the Pals' home in the enchanted forest. Decor is bought with sparks (never random, never
@@ -34,11 +35,15 @@ export const GROVE_ITEMS = [
   { id: 'rainbow', name: 'Rainbow', spot: 'sky', price: 150 },
 ];
 
-export const groveItemById = (id) => GROVE_ITEMS.find((item) => item.id === id) ?? null;
+/** Every decoration: the regular ones plus the weekly theme collections'. */
+export const ALL_DECOR = [...GROVE_ITEMS, ...THEME_DECOR];
+
+export const groveItemById = (id) => ALL_DECOR.find((item) => item.id === id) ?? null;
 
 /** @throws EconomyError */
 export function buyGroveItemLocally(progress, itemId) {
-  const item = groveItemById(itemId);
+  // Only the regular decor; theme decor is bought through buyThemeItemLocally (it may cost diamonds).
+  const item = GROVE_ITEMS.find((decor) => decor.id === itemId);
   if (!item) throw new EconomyError('That decor is not in the shop.');
   if (progress.grove.items.includes(itemId)) throw new EconomyError('You already have this.');
   if (progress.sparks < item.price) throw new EconomyError('Not enough sparks.');

@@ -2,14 +2,14 @@ import { useState } from 'react';
 import Button from '../../components/Button.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { PAL_ACCESSORIES, PAL_SLOTS, stageOf } from '../../game/pals.js';
+import { ALL_OUTFITS, PAL_SLOTS, stageOf } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Pals.module.css';
 
 /** Clothes and gear you own (bought in the Shop): one per slot on your partner. */
 function Wardrobe({ onError }) {
   const { progress, wearAccessory } = usePlayer();
-  const owned = PAL_ACCESSORIES.filter((item) => progress.pal.accessories.includes(item.id));
+  const owned = ALL_OUTFITS.filter((item) => progress.pal.accessories.includes(item.id));
   const stage = stageOf(progress.pal.owned[progress.pal.id]);
   const toggle = async (itemId, isWearing) => {
     try {

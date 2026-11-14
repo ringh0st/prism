@@ -1,5 +1,6 @@
 import { accessoryById, palStage } from '../../game/pals.js';
 import { PAL_GROWTH } from './palGrowth.jsx';
+import { ThemeOutfit } from './themeOutfitArt.jsx';
 import styles from './PalArt.module.css';
 
 const SLOT_ORDER = ['neck', 'head', 'hand'];
@@ -712,7 +713,7 @@ function Accessory({ id, hat, neck }) {
         </g>
       );
     default:
-      return null;
+      return <ThemeOutfit id={id} hat={hat} neck={neck} />;
   }
 }
 

@@ -100,3 +100,6 @@ export const claimQuestOnServer = (questId) => rpc('claim_pal_quest', { p_quest:
 
 /** A player's card from this week's Top board (supabase/player_cards.sql), looked up by their place. */
 export const fetchPlayerCard = (rank) => rpc('player_card', { p_rank: rank });
+
+/** Buy a piece of this week's theme collection (supabase/themed_shop.sql); charges sparks or diamonds. */
+export const buyThemeItemOnServer = (itemId) => rpc('buy_theme_item', { p_item: itemId });

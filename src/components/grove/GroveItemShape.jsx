@@ -1,3 +1,5 @@
+import { THEME_SHAPES } from './themeDecorShapes.jsx';
+
 /* Grove decor, each drawn in a 100×100 box standing on the ground at y≈95. Illustration colors are fixed (like the map). */
 const WOOD = '#B07A4E';
 const WOOD_DARK = '#8A5A36';
@@ -279,5 +281,5 @@ const SHAPES = {
 
 /** One piece of Grove decor as SVG content (a <g>) in a 100×100 box. */
 export default function GroveItemShape({ id }) {
-  return SHAPES[id] ?? null;
+  return SHAPES[id] ?? THEME_SHAPES[id] ?? null;
 }

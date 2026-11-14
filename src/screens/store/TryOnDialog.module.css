@@ -1,0 +1,56 @@
+/* "Try it on": the item on your own Pal (or in your Grove) before buying */
+.preview {
+  margin-bottom: var(--space-2);
+}
+
+.stage {
+  width: min(62vw, 220px);
+  margin: 0 auto;
+  background:
+    radial-gradient(ellipse 42% 9% at 50% 93%, color-mix(in srgb, var(--color-sage) 34%, transparent), transparent 100%),
+    radial-gradient(circle at 50% 55%, color-mix(in srgb, var(--color-honey) 24%, transparent), transparent 64%);
+}
+
+.stage svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.caption {
+  margin: 0 0 var(--space-3);
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-soft);
+}
+
+.themeTag {
+  color: var(--reward-label);
+}
+
+.actions {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+}
+
+.note {
+  margin: 0;
+  font-weight: 700;
+  text-align: center;
+}
+
+.legal {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-soft);
+}
+
+.error {
+  margin: var(--space-2) 0 0;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-accent);
+}
