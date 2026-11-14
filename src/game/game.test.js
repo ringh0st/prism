@@ -738,3 +738,18 @@ test('stickers: six per world, earned from stars', async () => {
       .sort((a, b) => ['bossBeater', 'bugBuddy', 'perfect'].indexOf(a) - ['bossBeater', 'bugBuddy', 'perfect'].indexOf(b)),
   );
 });
+
+test('play counts: walls are levels with enough attempts and a low win rate, hardest first', async () => {
+  const { findWalls, winRateOf } = await import('./playCounts.js');
+  const counts = new Map([
+    ['w1-05', { starts: 40, wins: 36, outOfMoves: 4, quits: 0 }],
+    ['w3-17', { starts: 30, wins: 9, outOfMoves: 15, quits: 6 }],
+    ['w2-11', { starts: 20, wins: 8, outOfMoves: 10, quits: 2 }],
+    ['w9-01', { starts: 4, wins: 0, outOfMoves: 4, quits: 0 }],
+  ]);
+  assert.equal(winRateOf({ starts: 0, wins: 0 }), null);
+  assert.deepEqual(
+    findWalls(counts).map((wall) => wall.levelId),
+    ['w3-17', 'w2-11'],
+  );
+});

@@ -348,3 +348,38 @@
 .warnRow {
   background: rgba(255, 107, 91, 0.12);
 }
+
+.walls {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-sm);
+}
+
+.walls h3 {
+  font-size: 17px;
+}
+
+.wallList {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 1.4em;
+}
+
+.wallList li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.wallList a {
+  font-weight: 800;
+  color: var(--text-strong);
+}
+
+.wallList span {
+  color: var(--text-soft);
+}

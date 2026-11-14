@@ -38,6 +38,7 @@ import ComboBurst from './ComboBurst.jsx';
 import { treatFoundBy } from '../../game/treats.js';
 import { newStickersFor } from '../../game/stickers.js';
 import { climbFor } from '../../game/titles.js';
+import { usePlayStats } from '../../hooks/usePlayStats.js';
 import { glowbugCellOf, glowbugForLevel, rescuedGlowbugs } from '../../game/glowbugs.js';
 import { cellsOnBeams } from '../../game/beam.js';
 import PalBuddy from './PalBuddy.jsx';
@@ -123,6 +124,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const isOver = trace.isSolved || isOutOfMoves || Boolean(result);
 
   const say = useCallback((mood, event) => setLumi({ mood, line: event ? quipFor(event) : '' }), []);
+  const playStats = usePlayStats(level.id, mode === 'level', moves);
 
   // Reset per level.
   useEffect(() => {
@@ -188,6 +190,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     async ({ isSkipped = false } = {}) => {
       if (hasRecordedWin.current) return;
       hasRecordedWin.current = true;
+      playStats.end(isSkipped ? 'quit' : 'win');
 
       const stars = isSkipped ? 1 : Math.min(starsForMoves(moves, level.par, level.difficulty), puzzle.starCap);
       setSolvedStars(stars);
@@ -248,6 +251,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       say,
       react,
       glowbug,
+      playStats,
     ],
   );
 
@@ -263,11 +267,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         say('sad', null);
         react('droop');
         setIsOutOfMoves(true);
+        playStats.end('out_of_moves');
       }, 450);
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [moves, moveLimit, trace.isSolved, say, react]);
+  }, [moves, moveLimit, trace.isSolved, say, react, playStats]);
 
   const onActivate = useCallback(
     (_cell, tileIndex) => {
@@ -286,13 +291,14 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const restart = useCallback(() => {
     sfx.restart();
     puzzle.restart();
+    playStats.start();
     setResult(null);
     setIsOutOfMoves(false);
     setSolvedStars(0);
     hasRecordedWin.current = false;
     say('happy', 'start');
     setPalReaction(null);
-  }, [puzzle, say]);
+  }, [puzzle, say, playStats]);
 
   /** Spend one helper from the inventory (free in playtest) and apply it. */
   const spendHelper = useCallback(
@@ -378,8 +384,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const dismissIntro = useCallback(() => {
     sfx.unlock();
     sfx.levelStart();
+    playStats.start();
     setShowIntro(false);
-  }, []);
+  }, [playStats]);
 
   return (
     <main className={`${styles.screen} ${styles[modifier] ?? ''} ${world ? `${styles.themed} ${styles[world.theme]}` : ''}`}>
