@@ -21,7 +21,7 @@ import {
 } from './palGrowthParts.jsx';
 
 /*
- * Every Pal grows its own way. Each entry lists what the Junior, Buddy, Champ and Legend forms add
+ * Every Pal grows its own way. Each entry lists what the Junior, Buddy, Champ and Master forms add
  * (forms build on each other). `back` is drawn behind the Pal, `front` on top of it.
  * A Junior of `null` keeps the signature feature drawn with the Pal itself (PalArt's `grown`).
  */

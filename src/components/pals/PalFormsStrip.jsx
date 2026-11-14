@@ -5,7 +5,7 @@ import stageStyles from './PalStage.module.css';
 import styles from './PalFormsStrip.module.css';
 
 /**
- * All five forms of a Pal in a row, Baby to Legend. Forms after `revealedUpTo` are mystery silhouettes
+ * All five forms of a Pal in a row, Baby to Master. Forms after `revealedUpTo` are mystery silhouettes
  * (with a lock, so it's not color alone). With `onSelect`, each form is a button to look at it.
  */
 export default function PalFormsStrip({ palId, current = 0, revealedUpTo = PAL_STAGES.length - 1, selected = null, onSelect = null }) {

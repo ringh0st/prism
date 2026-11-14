@@ -46,7 +46,7 @@ function DailyPicks({ onChoose }) {
   );
 }
 
-/** Adopt Pals for diamonds: any regular Pal you choose, plus today's Legendary and Mythic picks. Never a surprise. */
+/** Adopt Pals for diamonds: any Basic Pal you choose, plus today's Legendary and Mythic picks. Never a surprise. */
 export default function AdoptShelf({ onAdopted, onError }) {
   const { progress, isSignedIn, adoptPal } = usePlayer();
   const [choice, setChoice] = useState(null);
@@ -112,7 +112,7 @@ export default function AdoptShelf({ onAdopted, onError }) {
           <PalArt palId={choice.id} size={120} className={styles.infoArt} />
           <p className={styles.infoText}>
             {choice.name} the {choice.species} <RarityBadge pal={choice} /> joins your team as a Baby. Play with it as your partner and it grows into
-            a Legend!
+            a Master!
           </p>
           <PalFormsStrip palId={choice.id} />
           <p className={styles.legal}>Diamonds can be bought with real money. Under 18? Ask a parent first.</p>

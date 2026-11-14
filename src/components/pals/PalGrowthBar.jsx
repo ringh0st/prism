@@ -3,7 +3,7 @@ import styles from './PalGrowthBar.module.css';
 
 /** What the bar is filling toward, in words. */
 function growthLine(pal, stage, left) {
-  if (!stage.next) return `${pal.name} is fully grown: a true Legend!`;
+  if (!stage.next) return `${pal.name} is fully grown: a true Master!`;
   return `${left} more ${left === 1 ? 'level' : 'levels'} to grow ${pal.name} into a ${stage.next.name}.`;
 }
 
@@ -15,7 +15,7 @@ export default function PalGrowthBar({ pal, owned, showLine = true }) {
   return (
     <div className={styles.box}>
       <div className={styles.head}>
-        <span>{stage.next ? `Next: ${stage.next.name}` : 'Legend'}</span>
+        <span>{stage.next ? `Next: ${stage.next.name}` : 'Master'}</span>
         <span className={styles.count}>
           {growth}/{PAL_GROWTH_LEVELS}
         </span>

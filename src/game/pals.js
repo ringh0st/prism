@@ -66,20 +66,20 @@ export const palById = (id) => PALS.find((pal) => pal.id === id) ?? null;
 
 /** How rare a Pal is: common (most), legendary or mythic. */
 export const rarityOf = (pal) => pal?.rarity ?? 'common';
-export const RARITY_NAMES = { common: 'Pal', legendary: 'Legendary', mythic: 'Mythic' };
+export const RARITY_NAMES = { common: 'Basic', legendary: 'Legendary', mythic: 'Mythic' };
 
-/** Each Pal has five forms, Baby to Legend. */
+/** Each Pal has five forms, Baby to Master. (The last one's id stays 'legend' so saved progress keeps working.) */
 export const PAL_STAGES = [
   { id: 'baby', name: 'Baby' },
   { id: 'junior', name: 'Junior' },
   { id: 'buddy', name: 'Buddy' },
   { id: 'champ', name: 'Champ' },
-  { id: 'legend', name: 'Legend' },
+  { id: 'legend', name: 'Master' },
 ];
 
 export const MAX_PAL_STAGE = PAL_STAGES.length - 1;
 
-/** A Pal's form (0 = Baby … 4 = Legend), with the next form or null. */
+/** A Pal's form (0 = Baby … 4 = Master), with the next form or null. */
 export function palStage(index = 0) {
   const safe = Math.max(0, Math.min(MAX_PAL_STAGE, index));
   return { ...PAL_STAGES[safe], index: safe, next: PAL_STAGES[safe + 1] ?? null };

@@ -4,11 +4,11 @@ import { rarityOf } from '../../game/pals.js';
 import styles from './PalCard.module.css';
 
 /** What each rarity's ribbon says (a symbol plus a word, so color is never the only signal). */
-const RIBBONS = { common: 'Regular', legendary: '★ Legendary', mythic: '✦ Mythic' };
+const RIBBONS = { common: 'Basic', legendary: '★ Legendary', mythic: '✦ Mythic' };
 
 /**
  * A Pal card. Every card has the same layout, so they're easy to compare at a glance:
- * the Pal, a rarity ribbon (Regular, ★ Legendary or ✦ Mythic, with a matching frame and a soft wash over
+ * the Pal, a rarity ribbon (Basic, ★ Legendary or ✦ Mythic, with a matching frame and a soft wash over
  * the card), the name, and its age as five growth icons (sprout → crown) with a tag in the age's color.
  * @param stage    the Pal's form (from palStage) if you have it, else null
  * @param onLook   opens the Pal's forms; without it the art isn't a button (locked Pals)
