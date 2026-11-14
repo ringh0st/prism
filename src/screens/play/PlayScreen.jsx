@@ -427,6 +427,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       {result && (
         <WinDialog
           backName={backName}
+          replay={mode === 'playtest' ? null : { level, history: puzzle.history, title: levelName, subtitle }}
           result={result}
           par={level.par}
           difficulty={level.difficulty}

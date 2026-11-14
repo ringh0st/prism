@@ -611,3 +611,22 @@ test('Pal quests: three a week, counted per level, paid once, and the same on th
     );
   }
 });
+
+test('the solve replay plays the winning taps back in order and ends solved', async () => {
+  const { replayTimeline, replayStateAt, replayDuration, REPLAY_TIMING } = await import('./replay.js');
+  const { nearestSolution } = await import('./solver.js');
+  const level = JSON.parse(readFileSync(new URL('../data/worlds/world-002.json', import.meta.url), 'utf8'))[4];
+  const start = level.tiles.map((t) => t.orient ?? 0);
+  const target = nearestSolution(level, start);
+  const history = target.map((orient, i) => (orient !== start[i] ? i : -1)).filter((i) => i >= 0);
+  const timeline = replayTimeline(level, history);
+  assert.equal(timeline.isSolved, true);
+  assert.equal(timeline.steps.length, history.length);
+  assert.equal(replayStateAt(timeline, 0).phase, 'intro');
+  const mid = replayStateAt(timeline, REPLAY_TIMING.introMs + timeline.stepMs * 0.1);
+  assert.deepEqual([mid.phase, mid.turning], ['play', timeline.steps[0].turning]);
+  const end = replayStateAt(timeline, replayDuration(timeline) - 10);
+  assert.equal(end.phase, 'outro');
+  assert.deepEqual(end.orients, target);
+  assert.ok(replayDuration(replayTimeline(level, Array(60).fill(history[0]))) < 15000, 'long solves are sped up');
+});

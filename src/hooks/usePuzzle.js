@@ -6,10 +6,10 @@ import { FRAGILE_TURNS } from '../game/constants.js';
 
 const initialState = (level) => {
   const orients = level.tiles.map((tile) => tile.orient ?? 0);
-  return { orients, turns: orients.slice(), moves: 0, usedHelpers: [], hintTile: null, ghostSegments: null };
+  return { orients, turns: orients.slice(), moves: 0, history: [], usedHelpers: [], hintTile: null, ghostSegments: null };
 };
 
-/** One tap: the tile turns, along with its twins. */
+/** One tap: the tile turns, along with its twins. `history` keeps every tap (for the solve replay). */
 const rotated = (s, tiles, tileIndex) => {
   const orients = s.orients.slice();
   const turns = s.turns.slice();
@@ -17,7 +17,7 @@ const rotated = (s, tiles, tileIndex) => {
     orients[i] ^= 1;
     turns[i] += 1;
   }
-  return { ...s, orients, turns, moves: s.moves + 1, hintTile: s.hintTile === tileIndex ? null : s.hintTile };
+  return { ...s, orients, turns, moves: s.moves + 1, history: [...s.history, tileIndex], hintTile: s.hintTile === tileIndex ? null : s.hintTile };
 };
 
 /** Turns a cracking mirror has left (Infinity for every other tile). */

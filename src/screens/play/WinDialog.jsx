@@ -11,6 +11,7 @@ import { shareText } from '../../lib/shareText.js';
 import PalArt from '../../components/pals/PalArt.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import { palById, stageOf } from '../../game/pals.js';
+import ReplayShare from '../../components/replay/ReplayShare.jsx';
 import { cheerFor } from '../../game/palCheers.js';
 import styles from './WinDialog.module.css';
 
@@ -41,7 +42,10 @@ function ShareResult({ text }) {
   );
 }
 
-/** backName says where onMap goes: 'map', or 'event' for weekend-event puzzles. */
+/**
+ * backName says where onMap goes: 'map', or 'event' for weekend-event puzzles.
+ * replay: { level, history, title, subtitle } for the "Share replay" video (null to hide it).
+ */
 export default function WinDialog({
   result,
   par,
@@ -49,6 +53,7 @@ export default function WinDialog({
   hotStreak = 0,
   hasNext,
   shareMessage = null,
+  replay = null,
   backName = 'map',
   onNext,
   onReplay,
@@ -158,6 +163,7 @@ export default function WinDialog({
         </div>
       )}
       {shareMessage && <ShareResult text={shareMessage} />}
+      {replay && !isSkipped && <ReplayShare replay={{ ...replay, stars, moves }} />}
       {completesWorld && !isSignedIn && (
         <p className={styles.nudge}>
           <Icon name="diamond" size={16} /> Finishing a world earns a diamond. <a href="#/settings">Sign in</a> to collect it.
