@@ -1,4 +1,4 @@
--- Prism progression: 1000 built-in levels (50 worlds × 20) and reward chests.
+-- Lumipals progression: 1000 built-in levels (50 worlds × 20) and reward chests.
 -- Run in Supabase → SQL Editor AFTER economy.sql. Safe to run more than once.
 --
 -- Built-in levels are recognized by their id (w1-01 … w50-20), so rewards work without

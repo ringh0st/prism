@@ -1,6 +1,6 @@
-# Prism: project guide
+# Lumipals: project guide
 
-Prism is a light-bending puzzle game: rotate mirrors and crystals to steer beams of light so every gem lights up. It is for all ages and is published on GitHub Pages at https://ringh0st.github.io/prism/.
+Lumipals is a light-bending puzzle game: rotate mirrors and crystals to steer beams of light so every gem lights up. It is for all ages and is published on GitHub Pages at https://ringh0st.github.io/prism/. The store name is "Rinny's Lumipals: Light Puzzle". It was called Prism before; the repository, URL path and `prism.*` storage keys keep that name on purpose, so players keep their progress.
 
 ## Product requirements (from the owner, apply to all work)
 

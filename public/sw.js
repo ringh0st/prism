@@ -1,6 +1,6 @@
 // Offline support: serve from network when possible, fall back to the cache.
 // Supabase requests are never cached.
-const CACHE = 'prism-v2';
+const CACHE = 'prism-v3';
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(['./', './index.html', './manifest.webmanifest'])));
   self.skipWaiting();

@@ -1,5 +1,5 @@
 -- Make the owner an admin.
--- Run in Supabase → SQL Editor AFTER schema.sql, and after signing in to Prism with Google at least once.
+-- Run in Supabase → SQL Editor AFTER schema.sql, and after signing in to Lumipals with Google at least once.
 -- Change the email if you sign in with a different Google account.
 -- Safe to run more than once. It also creates the profile if you signed in before running schema.sql.
 

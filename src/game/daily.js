@@ -16,7 +16,7 @@ export function daysBetween(fromKey, toKey) {
   return Math.round((to - from) / 86_400_000);
 }
 
-/** "Prism Daily #N": day 1 is the first day of 2026. */
+/** "Lumipals Daily #N": day 1 is the first day of 2026. */
 export function dailyNumber(dateKey) {
   return daysBetween('2025-12-31', dateKey);
 }

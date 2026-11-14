@@ -43,7 +43,7 @@ const MOUTHS = {
 };
 
 /**
- * Lumi, Prism's mascot: a little firefly whose glowing tail is the light you bend.
+ * Lumi, Lumipals' mascot: a little firefly whose glowing tail is the light you bend.
  * mood: happy | excited | worried | sad | sleepy | dance
  */
 export default function Lumi({ mood = 'happy', size = 72, line, bubbleSide = 'right', className = '' }) {

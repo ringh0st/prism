@@ -1,13 +1,13 @@
 {
-  "name": "Rinny's Prism: Light Puzzle",
-  "short_name": "Rinny's Prism",
+  "name": "Rinny's Lumipals: Light Puzzle",
+  "short_name": "Lumipals",
   "description": "Bend the light. Light every gem.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#FFF8EF",
-  "theme_color": "#FFF8EF",
+  "background_color": "#FAF6EE",
+  "theme_color": "#FAF6EE",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },

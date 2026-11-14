@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="google-site-verification" content="as_03o4aofhpz1R0LqBG7_ixwN9iJBsxof_07cAHUdw" />
-<meta name="theme-color" content="#FFF8EF" />
+<meta name="theme-color" content="#FAF6EE" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Rinny's Prism: Light Puzzle – free light-bending puzzle game</title>
-<meta name="description" content="Rinny's Prism is a free puzzle game for all ages. Rotate mirrors and crystals to bend beams of light and light up every gem." />
+<title>Rinny's Lumipals: Light Puzzle – free light-bending puzzle game</title>
+<meta name="description" content="Rinny's Lumipals is a free puzzle game for all ages. Rotate mirrors and crystals to bend beams of light and light up every gem." />
 <link rel="icon" type="image/png" href="./logo.png" />
 <link rel="apple-touch-icon" href="./logo.png" />
-<meta property="og:title" content="Rinny's Prism: Light Puzzle" />
+<meta property="og:title" content="Rinny's Lumipals: Light Puzzle" />
 <meta property="og:description" content="Bend the light. Light every gem. A free puzzle game for all ages." />
 <meta property="og:image" content="./logo.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,30 +17,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #FFF8EF; --bg2: #FFEFDC; --ink: #2B2118; --muted: #74645A;
-    --card: rgba(255,255,255,.72); --line: rgba(255,255,255,.95); --shadow: rgba(140,70,20,.18);
-    --a: #FFB000; --b: #FF9F1C; --c: #FF6B5B;
+    --bg: #FAF6EE; --bg2: #F3EDE0; --ink: #2B2118; --muted: #6B5D52;
+    --card: #FFFDF8; --line: rgba(43,33,24,.08); --shadow: rgba(110,80,40,.16);
+    --sage: #58AC82; --sage-ledge: #3F8A65; --sage-label: #10291C; --title: #2E7351;
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #1E1714; --bg2: #2A1E17; --ink: #FFF4E8; --muted: #C9B5A5;
-      --card: rgba(60,42,32,.6); --line: rgba(255,255,255,.12); --shadow: rgba(0,0,0,.5);
+      --bg: #1C1A16; --bg2: #231F1A; --ink: #F6EFE4; --muted: #C8B9A8;
+      --card: #2A2620; --line: rgba(255,255,255,.08); --shadow: rgba(0,0,0,.5); --title: #8FD2AE;
       color-scheme: dark;
     }
   }
   * { box-sizing: border-box; }
   body {
     margin: 0; color: var(--ink); font: 17px/1.6 'DM Sans', system-ui, sans-serif;
-    background: radial-gradient(1200px 700px at 10% -10%, #FFE08A 0, transparent 60%),
-                radial-gradient(1000px 700px at 110% 10%, #FFC9B8 0, transparent 55%),
+    background: radial-gradient(1200px 700px at 10% -10%, #F7E3A8 0, transparent 60%),
+                radial-gradient(1000px 700px at 110% 10%, #D6EBDD 0, transparent 55%),
                 linear-gradient(180deg, var(--bg), var(--bg2));
     min-height: 100vh;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) body {
-      background: radial-gradient(1200px 700px at 10% -10%, #4A3010 0, transparent 60%),
-                  radial-gradient(1000px 700px at 110% 10%, #4A1F18 0, transparent 55%),
+      background: radial-gradient(1200px 700px at 10% -10%, #3A3020 0, transparent 60%),
+                  radial-gradient(1000px 700px at 110% 10%, #1F3328 0, transparent 55%),
                   linear-gradient(180deg, var(--bg), var(--bg2));
     }
   }
@@ -53,12 +53,13 @@
   nav a:hover { color: var(--ink); }
 
   .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; padding: 40px 0 56px; }
-  h1 { font: 700 clamp(44px, 8vw, 76px)/1 'Fredoka', sans-serif; margin: 0 0 16px; letter-spacing: -.02em;
-       background: linear-gradient(120deg, var(--a), var(--b) 45%, var(--c)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  h1 { font: 700 clamp(44px, 8vw, 76px)/1 'Fredoka', sans-serif; margin: 0 0 16px; letter-spacing: -.02em; color: var(--title); }
   .lead { font-size: clamp(18px, 2.4vw, 21px); color: var(--muted); margin: 0 0 28px; max-width: 34ch; }
   .cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   .btn { display: inline-block; padding: 14px 28px; border-radius: 999px; font: 600 19px 'Fredoka', sans-serif; text-decoration: none;
-         color: #fff; background: linear-gradient(180deg, #FF8A7A, var(--c)); box-shadow: 0 6px 0 #D9483A, 0 14px 24px -10px rgba(217,72,58,.6); }
+         color: var(--sage-label); background: var(--sage); box-shadow: 0 6px 0 var(--sage-ledge), 0 14px 24px -10px var(--shadow); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--sage-ledge); }
+  .btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
     .note { color: var(--muted); font-size: 14px; }
   .hero-art { display: grid; place-items: center; }
   .hero-art img { width: min(100%, 380px); border-radius: 22%; box-shadow: 0 40px 70px -30px var(--shadow); animation: float 6s ease-in-out infinite; }
@@ -67,8 +68,7 @@
   section { padding: 24px 0 48px; }
   h2 { font: 700 32px/1.15 'Fredoka', sans-serif; margin: 0 0 18px; }
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 22px;
-          backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 16px 34px -22px var(--shadow); }
+  .card { background: var(--card); border-radius: 22px; padding: 22px; box-shadow: 0 1px 2px var(--line), 0 16px 34px -22px var(--shadow); }
   .card h3 { font: 600 20px 'Fredoka', sans-serif; margin: 8px 0 6px; }
   .card p { margin: 0; color: var(--muted); font-size: 16px; }
   .ico { font-size: 28px; }
@@ -94,7 +94,7 @@
 <body>
   <div class="wrap">
     <header class="top">
-      <a class="brand" href="./"><img src="./logo.png" alt="" /> Prism</a>
+      <a class="brand" href="./"><img src="./logo.png" alt="" /> Lumipals</a>
       <nav>
         <a href="#how">How to play</a>
         <a href="#account">Accounts</a>
@@ -105,14 +105,14 @@
     <main>
       <div class="hero">
         <div>
-          <h1>Rinny's Prism</h1>
-          <p class="lead">Bend the light. Light every gem. Prism is a free puzzle game for all ages, played right in your browser or from your phone’s home screen.</p>
+          <h1>Rinny's Lumipals</h1>
+          <p class="lead">Bend the light. Light every gem. Lumipals is a free puzzle game for all ages, played right in your browser or from your phone’s home screen.</p>
           <div class="cta">
             <a class="btn" href="./play/">Play now</a>
             <span class="note">Free to play · No ads · Works on iPhone, Android and desktop</span>
           </div>
         </div>
-        <div class="hero-art"><img src="./logo.png" alt="Prism logo: a glass crystal cube bending a beam of light" /></div>
+        <div class="hero-art"><img src="./logo.png" alt="Lumi the firefly, the Lumipals mascot, glowing on a green background" /></div>
       </div>
 
       <section id="how">
@@ -136,14 +136,14 @@
       <section id="account" class="account">
         <h2>Accounts</h2>
         <p>You can play right away as a guest, and your progress is saved on your device.</p>
-        <p>If you want to keep your progress across devices, you can optionally sign in with Google. Prism then uses your name, email address and profile picture only to create your account and save your progress. Read the details in our <a href="./privacy.html">Privacy Policy</a>.</p>
+        <p>If you want to keep your progress across devices, you can optionally sign in with Google. Lumipals then uses your name, email address and profile picture only to create your account and save your progress. Read the details in our <a href="./privacy.html">Privacy Policy</a>.</p>
       </section>
     </main>
 
     <footer>
       <div class="row">
         <div><a href="./privacy.html">Privacy Policy</a><a href="./terms.html">Terms</a><a href="https://github.com/ringh0st/prism">Source on GitHub</a></div>
-        <div>© 2026 Prism</div>
+        <div>© 2026 Lumipals</div>
       </div>
     </footer>
   </div>

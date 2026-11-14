@@ -1,4 +1,4 @@
--- Prism social: forgiving daily streaks (shields) and the weekly worldwide top players.
+-- Lumipals social: forgiving daily streaks (shields) and the weekly worldwide top players.
 -- Run in Supabase → SQL Editor AFTER progression.sql. Safe to run more than once.
 --
 -- Privacy: the leaderboard never shows real names or photos. Every player appears under a

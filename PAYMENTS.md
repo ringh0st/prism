@@ -1,6 +1,6 @@
 # Real-money diamonds: setup
 
-Prism sells diamonds through **Lemon Squeezy**, a "merchant of record". It handles payments, receipts, worldwide sales tax/VAT and refunds, and pays out to your bank. Fees are about 5% + 50¢ per order.
+Lumipals sells diamonds through **Lemon Squeezy**, a "merchant of record". It handles payments, receipts, worldwide sales tax/VAT and refunds, and pays out to your bank. Fees are about 5% + 50¢ per order.
 
 How a purchase works:
 
@@ -14,13 +14,13 @@ Never paste API keys, secrets or tokens into a chat, an issue or a commit. They 
 
 ## 1. Lemon Squeezy account (your bank)
 
-1. Sign up at [lemonsqueezy.com](https://www.lemonsqueezy.com) and create a store called **Prism**.
+1. Sign up at [lemonsqueezy.com](https://www.lemonsqueezy.com) and create a store called **Lumipals**.
 2. **Settings → Payouts:** add your bank account and complete identity verification. This is where your money goes.
 3. While you set things up, keep **Test mode** on (toggle at the bottom-left of the dashboard). Before real sales, Lemon Squeezy asks you to activate the store. It reviews your site, so point it to `https://ringh0st.github.io/prism/` and its Terms and Privacy pages.
 
 ## 2. Create the diamond products
 
-**Products → + New product:** create a product called **Prism Diamonds** with 3 variants:
+**Products → + New product:** create a product called **Lumipals Diamonds** with 3 variants:
 
 | Variant name | Price | Pack id in the game |
 | --- | --- | --- |

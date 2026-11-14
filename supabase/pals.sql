@@ -1,4 +1,4 @@
--- Prism Pals: profile characters you pick, collect, grow (one Glow-up per finished world) and dress up.
+-- Lumipals: Pals, profile characters you pick, collect, grow (one Glow-up per finished world) and dress up.
 -- Run in Supabase → SQL Editor AFTER social.sql. Safe to run more than once.
 -- Rules must match src/game/pals.js (a test checks the unlocks and prices).
 
@@ -351,7 +351,7 @@ begin
 end;
 $$;
 
--- Level results: as in social.sql (kept here so all of Prism's level rules stay in one place).
+-- Level results: as in social.sql (kept here so all of Lumipals' level rules stay in one place).
 create or replace function public.record_level_result(p_level_id text, p_stars integer, p_moves integer)
 returns jsonb
 language plpgsql

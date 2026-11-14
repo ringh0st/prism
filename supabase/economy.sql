@@ -1,4 +1,4 @@
--- Prism economy: diamonds, helpers, store and purchases.
+-- Lumipals economy: diamonds, helpers, store and purchases.
 -- Run in Supabase → SQL Editor AFTER schema.sql. Safe to run more than once.
 --
 -- From here on, signed-in players' currencies only change through the functions below,
@@ -57,7 +57,7 @@ alter table public.store_items enable row level security;
 drop policy if exists "Everyone reads the store" on public.store_items;
 create policy "Everyone reads the store" on public.store_items for select using (true);
 
--- Real-money packs, mapped to the Lemon Squeezy product variants ("Prism Diamonds").
+-- Real-money packs, mapped to the Lemon Squeezy product variants ("Lumipals Diamonds").
 create table if not exists public.diamond_packs (
   id text primary key,
   diamonds integer not null check (diamonds > 0),

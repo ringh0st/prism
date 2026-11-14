@@ -1,37 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<defs>
- <linearGradient id="wbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD23F"/><stop offset=".5" stop-color="#FF9F1C"/><stop offset="1" stop-color="#FF5B5B"/></linearGradient>
- <radialGradient id="bhalo" cx=".5" cy=".55" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
- <linearGradient id="btop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#fff1d6" stop-opacity=".8"/></linearGradient>
- <linearGradient id="bleft" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#ffd6a8" stop-opacity=".7"/></linearGradient>
- <linearGradient id="bright" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#ff8f7a" stop-opacity=".75"/></linearGradient>
- <linearGradient id="bout" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#fff27a"/><stop offset="1" stop-color="#ffffff" stop-opacity=".0"/></linearGradient>
- <filter id="bblur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
- <filter id="bsoft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
- <filter id="bds" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#7a2a10" flood-opacity=".35"/></filter>
-</defs>
-<rect width="512" height="512" fill="url(#wbg)"/>
-<circle cx="256" cy="290" r="250" fill="url(#bhalo)"/>
-<!-- outgoing beam (behind top face edge so it emerges from it) -->
-<rect x="236" y="-20" width="40" height="250" rx="20" fill="url(#bout)" filter="url(#bblur)"/>
-<rect x="244" y="-20" width="24" height="250" rx="12" fill="url(#bout)"/>
-<!-- incoming beam -->
-<rect x="-20" y="296" width="190" height="40" rx="20" fill="#ffd27a" filter="url(#bblur)" opacity=".9"/>
-<rect x="-20" y="304" width="190" height="24" rx="12" fill="#fff"/>
-<g filter="url(#bds)">
- <polygon points="130,211 256,284 256,430 130,357" fill="url(#bleft)"/>
- <polygon points="256,284 382,211 382,357 256,430" fill="url(#bright)"/>
- <!-- beam inside the glass -->
- <path d="M150 316 L256 316 L256 210" fill="none" stroke="#fff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" opacity=".55" filter="url(#bsoft)"/>
- <path d="M150 316 L256 316 L256 210" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
- <circle cx="256" cy="316" r="30" fill="#fff" filter="url(#bblur)"/>
- <circle cx="256" cy="316" r="12" fill="#fff"/>
- <polygon points="256,138 382,211 256,284 130,211" fill="url(#btop)"/>
- <ellipse cx="256" cy="211" rx="34" ry="20" fill="#fff" filter="url(#bsoft)"/>
- <polygon points="256,138 382,211 382,357 256,430 130,357 130,211" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round" opacity=".95"/>
- <polyline points="130,211 256,284 382,211" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round" opacity=".8"/>
- <line x1="256" y1="284" x2="256" y2="430" stroke="#fff" stroke-width="5" opacity=".6"/>
- <!-- specular -->
- <polygon points="150,226 176,213 176,300 150,313" fill="#fff" opacity=".45"/>
-</g>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="70%">
+      <stop offset="0" stop-color="#6DBE94"/>
+      <stop offset="1" stop-color="#4E9E76"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FFE9A0" stop-opacity=".9"/>
+      <stop offset=".55" stop-color="#FFE9A0" stop-opacity=".35"/>
+      <stop offset="1" stop-color="#FFE9A0" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="head"><circle cx="50" cy="58" r="30"/></clipPath>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <circle cx="256" cy="372" r="150" fill="url(#glow)"/>
+  <g fill="#FFF3C4">
+    <path d="M118 150l7 17 17 7-17 7-7 17-7-17-17-7 17-7z"/>
+    <path d="M398 120l5 12 12 5-12 5-5 12-5-12-12-5 12-5z"/>
+    <path d="M410 300l4 10 10 4-10 4-4 10-4-10-10-4 10-4z"/>
+  </g>
+  <g transform="translate(91 82) scale(3.3)">
+    <g>
+      <ellipse cx="22" cy="44" rx="20" ry="12" fill="#DDF1EB" transform="rotate(-28 22 44)"/>
+      <ellipse cx="22" cy="44" rx="11" ry="5" fill="#fff" opacity=".75" transform="rotate(-28 22 44)"/>
+      <ellipse cx="78" cy="44" rx="20" ry="12" fill="#DDF1EB" transform="rotate(28 78 44)"/>
+      <ellipse cx="78" cy="44" rx="11" ry="5" fill="#fff" opacity=".75" transform="rotate(28 78 44)"/>
+    </g>
+    <path d="M42 32Q36 16 28 12M58 32Q64 16 72 12" stroke="#5E5047" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <circle cx="27" cy="11" r="5.5" fill="#FFD45E"/>
+    <circle cx="73" cy="11" r="5.5" fill="#FFD45E"/>
+    <ellipse cx="50" cy="92" rx="18" ry="12" fill="#FFD45E"/>
+    <ellipse cx="44" cy="88" rx="6" ry="3" fill="#FFF6C9"/>
+    <circle cx="50" cy="58" r="30" fill="#F2A67E"/>
+    <g clip-path="url(#head)"><circle cx="38" cy="46" r="24" fill="#F8B991"/></g>
+    <ellipse cx="36" cy="38" rx="7" ry="4" fill="#fff" opacity=".55" transform="rotate(-30 36 38)"/>
+    <ellipse cx="29" cy="68" rx="6.5" ry="4" fill="#FF7A6A" opacity=".55"/>
+    <ellipse cx="71" cy="68" rx="6.5" ry="4" fill="#FF7A6A" opacity=".55"/>
+    <ellipse cx="38" cy="54" rx="6" ry="8" fill="#3B1A08"/>
+    <ellipse cx="62" cy="54" rx="6" ry="8" fill="#3B1A08"/>
+    <circle cx="40" cy="51" r="2.4" fill="#fff"/>
+    <circle cx="64" cy="51" r="2.4" fill="#fff"/>
+    <path d="M40 65q10 12 20 0z" fill="#3B1A08"/>
+  </g>
 </svg>

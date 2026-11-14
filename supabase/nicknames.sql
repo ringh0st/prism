@@ -1,4 +1,4 @@
--- Prism nicknames: players type their own Top-board name (checked here) or keep a generated one,
+-- Lumipals nicknames: players type their own Top-board name (checked here) or keep a generated one,
 -- and the weekly board shows nickname, Pal, form and title.
 -- Run in Supabase → SQL Editor AFTER pals.sql. Safe to run more than once.
 

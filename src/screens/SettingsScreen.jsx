@@ -174,7 +174,7 @@ export default function SettingsScreen() {
             Reset progress on this device
           </Button>
           <p className={styles.links}>
-            <a href={HOME_PAGE_URL}>About Prism</a>
+            <a href={HOME_PAGE_URL}>About Lumipals</a>
             <a href={PRIVACY_URL}>Privacy Policy</a>
             <a href={TERMS_URL}>Terms & refunds</a>
           </p>

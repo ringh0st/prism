@@ -215,7 +215,7 @@ test('streak shields cover missed days and are earned every 7 days', async () =>
 test('daily share text is spoiler-free', async () => {
   const { dailyShareText } = await import('./share.js');
   const text = dailyShareText({ dateKey: '2026-01-05', stars: 2, moves: 6, par: 5, streak: 4, url: 'https://example.com/' });
-  assert.equal(text, "Rinny's Prism Daily #5 ★★☆\n🟩🟩🟩🟩🟩🟨 6/5\n🔥 4-day streak\nhttps://example.com/");
+  assert.equal(text, "Rinny's Lumipals Daily #5 ★★☆\n🟩🟩🟩🟩🟩🟨 6/5\n🔥 4-day streak\nhttps://example.com/");
 });
 
 test('weekly rewards in the database match the game catalog', async () => {

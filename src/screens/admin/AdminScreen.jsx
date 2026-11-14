@@ -47,7 +47,7 @@ export default function AdminScreen() {
     <div className={styles.page}>
       <header className={styles.header}>
         <Button as="a" href="#/" variant="secondary" icon="back" label="Back to the game" />
-        <h1>Prism admin</h1>
+        <h1>Lumipals admin</h1>
         <div className={styles.tabs} role="tablist" aria-label="Admin sections">
           {TABS.map((t) => (
             <button

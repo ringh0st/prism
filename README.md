@@ -1,4 +1,4 @@
-# Prism
+# Lumipals
 
 A light-bending puzzle game for all ages. Rotate mirrors and crystals to bend beams of light and light up every gem.
 
