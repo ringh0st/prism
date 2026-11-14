@@ -1,0 +1,119 @@
+/* Your Pal beside the board, reacting to the game */
+.buddy {
+  position: absolute;
+  right: 4px;
+  bottom: 0;
+  z-index: 4;
+  width: clamp(64px, 18vw, 96px);
+  padding: 0;
+  border: 0;
+  background: radial-gradient(ellipse 40% 10% at 50% 94%, rgb(43 33 24 / 0.16), transparent 100%);
+  cursor: pointer;
+}
+
+.body {
+  display: block;
+  transform-origin: 50% 100%;
+}
+
+.body svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.hop {
+  animation: hop 520ms var(--ease-pop);
+}
+
+@keyframes hop {
+  40% {
+    transform: translateY(-22%) scale(0.95, 1.06);
+  }
+  75% {
+    transform: scale(1.06, 0.94);
+  }
+}
+
+.spin {
+  animation: spin 900ms var(--ease-pop);
+}
+
+@keyframes spin {
+  20% {
+    transform: translateY(-18%);
+  }
+  70% {
+    transform: translateY(-18%) rotate(360deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.shake {
+  animation: shake 500ms ease-in-out;
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(-8%) rotate(-6deg);
+  }
+  40%,
+  80% {
+    transform: translateX(8%) rotate(6deg);
+  }
+}
+
+/* Nervous on the last move: a small shiver that keeps going */
+.shiver {
+  animation: shiver 180ms linear infinite;
+}
+
+@keyframes shiver {
+  50% {
+    transform: translateX(2%) rotate(1deg);
+  }
+}
+
+/* Solved! A happy dance that keeps going */
+.dance {
+  animation: dance 900ms ease-in-out infinite;
+}
+
+@keyframes dance {
+  25% {
+    transform: translateY(-14%) rotate(-10deg);
+  }
+  50% {
+    transform: scale(1.05, 0.95);
+  }
+  75% {
+    transform: translateY(-14%) rotate(10deg);
+  }
+}
+
+.droop {
+  animation: droop 1.2s ease-out both;
+}
+
+@keyframes droop {
+  to {
+    transform: scale(1.04, 0.9) rotate(-4deg);
+    filter: saturate(0.7);
+  }
+}
+
+/* On short screens there's no room beside the board */
+@media (max-height: 640px) {
+  .buddy {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body {
+    animation: none !important;
+  }
+}

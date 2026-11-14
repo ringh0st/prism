@@ -34,6 +34,7 @@ import { firstTileOf, newPiecesIn, piecesMetIn } from '../../game/pieces.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import { EVENT_LEVELS, parseEventLevelId } from '../../game/events.js';
 import ComboBurst from './ComboBurst.jsx';
+import PalBuddy from './PalBuddy.jsx';
 import { comboFor } from '../../game/combos.js';
 import styles from './PlayScreen.module.css';
 
@@ -71,6 +72,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const hasRecordedWin = useRef(false);
   const boardAreaRef = useRef(null);
   const [combo, setCombo] = useState(null);
+  const [palReaction, setPalReaction] = useState(null);
+  const react = useCallback((name) => setPalReaction({ name, key: Date.now() }), []);
 
   const modifier = useMemo(() => levelModifierFor(level), [level]);
   const moveLimit = moveLimitFor(level.par, level.difficulty);
@@ -139,17 +142,20 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         sfx.gemLit(litCount);
       }
       say('excited', litCount < gems.length ? (combo ? 'combo' : 'gem') : null);
+      react(combo ? 'spin' : 'hop');
     } else if (shadeCount > lastShadeCount.current) {
       sfx.shade();
       say('worried', 'shade');
+      react('shake');
     } else if (!trace.isSolved && moves === moveLimit - 1) {
       say('worried', 'lastMove');
+      react('shiver');
     } else {
       setLumi((current) => (current.mood === 'sleepy' ? { mood: 'happy', line: '' } : current));
     }
     lastLitCount.current = litCount;
     lastShadeCount.current = shadeCount;
-  }, [trace, moves, gems.length, moveLimit, say]);
+  }, [trace, moves, gems.length, moveLimit, say, react]);
 
   /** Record the result (server-checked when signed in) and celebrate. */
   const completeLevel = useCallback(
@@ -162,6 +168,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       sfx.win({ stars, isBig });
       if (!isSkipped) celebrate({ stars, isBig, from: boardAreaRef.current });
       say(stars === 3 ? 'dance' : 'excited', isSkipped ? null : `win${stars}`);
+      react('dance');
       const worldRefs = mode === 'level' ? levelRefsInWorld(level.world) : [];
       const wasWorldComplete = isWorldComplete(progress, worldRefs);
       const usedHelpers = puzzle.usedHelpers.length > 0;
@@ -199,6 +206,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       eventSpot,
       dateKey,
       say,
+      react,
     ],
   );
 
@@ -212,12 +220,13 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       const timer = setTimeout(() => {
         sfx.outOfMoves();
         say('sad', null);
+        react('droop');
         setIsOutOfMoves(true);
       }, 450);
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [moves, moveLimit, trace.isSolved, say]);
+  }, [moves, moveLimit, trace.isSolved, say, react]);
 
   const onActivate = useCallback(
     (_cell, tileIndex) => {
@@ -240,6 +249,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     setIsOutOfMoves(false);
     hasRecordedWin.current = false;
     say('happy', 'start');
+    setPalReaction(null);
   }, [puzzle, say]);
 
   /** Spend one helper from the inventory (free in playtest) and apply it. */
@@ -348,6 +358,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
       <div className={styles.boardArea} ref={boardAreaRef}>
         {combo && <ComboBurst combo={combo} />}
+        {mode !== 'playtest' && <PalBuddy reaction={palReaction} />}
         <Board
           level={level}
           orients={puzzle.orients}
