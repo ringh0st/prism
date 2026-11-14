@@ -92,7 +92,60 @@
   }
 }
 
+/* The forest breathes: treetops lean in the breeze, a cloud drifts, a butterfly flutters */
+.canopy {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: canopySway 7s ease-in-out infinite;
+}
+
+.canopyNear {
+  animation-duration: 5.5s;
+  animation-delay: -2s;
+}
+
+@keyframes canopySway {
+  50% {
+    transform: rotate(0.8deg) translateX(2px);
+  }
+}
+
+.cloud {
+  animation: cloudDrift 40s linear infinite;
+}
+
+@keyframes cloudDrift {
+  from {
+    transform: translateX(-120px);
+  }
+  to {
+    transform: translateX(420px);
+  }
+}
+
+.wings {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: flap 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes flap {
+  to {
+    transform: scaleX(0.35);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .canopy,
+  .cloud,
+  .wings {
+    animation: none;
+  }
+
+  .butterfly {
+    display: none;
+  }
+
   .fireflies g,
   .pal,
   .hop,

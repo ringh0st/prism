@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
-import Confetti from '../../components/Confetti.jsx';
+import RewardShower from '../../components/RewardShower.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
 import { HELPERS } from '../../game/catalog.js';
 import { sfx } from '../../audio/sfx.js';
@@ -60,7 +60,7 @@ export default function ChestDialog({ opening, onClose }) {
           <Button size="lg" variant="go" onClick={onClose} data-autofocus>
             Awesome!
           </Button>
-          <Confetti />
+          <RewardShower />
         </>
       )}
       {phase === 'error' && (

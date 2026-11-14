@@ -17,12 +17,42 @@
 
 .board.solved {
   --pool: rgba(255, 210, 63, 0.42);
-  animation: solvedPop 520ms var(--ease-pop);
+  animation: solvedPop 700ms var(--ease-wobble);
 }
 
+/* The "camera punch": the board dips, then springs up as the light fills it */
 @keyframes solvedPop {
-  40% {
-    transform: scale(1.025);
+  15% {
+    transform: scale(0.97);
+  }
+  45% {
+    transform: scale(1.04);
+  }
+}
+
+/* A warm wave of light washing over the solved board */
+.board.solved::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 236, 170, 0.75), transparent 60%);
+  animation: lightWave 900ms var(--ease-out) forwards;
+}
+
+@keyframes lightWave {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  35% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.4);
   }
 }
 
@@ -146,7 +176,7 @@
 
 .rotor {
   transform-origin: 50px 50px;
-  transition: transform 320ms var(--ease-pop);
+  transition: transform 460ms var(--ease-wobble);
 }
 
 .pivotBase {
@@ -231,9 +261,20 @@
   }
 }
 
+/* Motes of light drifting along the beams */
+.sparkle {
+  opacity: 0.9;
+  filter: drop-shadow(0 0 0.06px #fff);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .beamCore {
     animation: none;
+  }
+
+  .sparkle,
+  .board.solved::after {
+    display: none;
   }
 }
 

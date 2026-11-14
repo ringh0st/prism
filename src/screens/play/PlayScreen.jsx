@@ -4,7 +4,7 @@ import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
 import ScreenTitle from '../../components/game/ScreenTitle.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
-import Confetti from '../../components/Confetti.jsx';
+import { celebrate } from '../../lib/effects.js';
 import GemShape from '../../components/GemShape.jsx';
 import HelperBar from '../../components/HelperBar.jsx';
 import QuickBuyDialog from '../../components/QuickBuyDialog.jsx';
@@ -43,7 +43,6 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const [result, setResult] = useState(null);
   const [isOutOfMoves, setIsOutOfMoves] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
-  const [showConfetti, setShowConfetti] = useState(false);
   const [lumi, setLumi] = useState({ mood: 'happy', line: '' });
   const [buyingHelper, setBuyingHelper] = useState(null);
   const [isConfirmingSkip, setIsConfirmingSkip] = useState(false);
@@ -51,6 +50,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const lastLitCount = useRef(0);
   const lastShadeCount = useRef(0);
   const hasRecordedWin = useRef(false);
+  const boardAreaRef = useRef(null);
 
   const modifier = useMemo(() => levelModifierFor(level), [level]);
   const moveLimit = moveLimitFor(level.par, level.difficulty);
@@ -69,7 +69,6 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     setResult(null);
     setIsOutOfMoves(false);
     setShowIntro(true);
-    setShowConfetti(false);
     setLumi({ mood: 'happy', line: '' });
     hasRecordedWin.current = false;
   }, [level.id]);
@@ -117,10 +116,11 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     async ({ isSkipped = false } = {}) => {
       if (hasRecordedWin.current) return;
       hasRecordedWin.current = true;
-      setShowConfetti(!isSkipped);
 
       const stars = isSkipped ? 1 : Math.min(starsForMoves(moves, level.par, level.difficulty), puzzle.starCap);
-      sfx.win({ stars, isBig: modifier === 'boss' || level.difficulty === DIFFICULTY.EXTRA });
+      const isBig = modifier === 'boss' || level.difficulty === DIFFICULTY.EXTRA;
+      sfx.win({ stars, isBig });
+      if (!isSkipped) celebrate({ stars, isBig, from: boardAreaRef.current });
       say(stars === 3 ? 'dance' : 'excited', isSkipped ? null : `win${stars}`);
       const worldRefs = mode === 'level' ? levelRefsInWorld(level.world) : [];
       const wasWorldComplete = isWorldComplete(progress, worldRefs);
@@ -128,7 +128,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
       let outcome;
       if (mode === 'level') {
-        outcome = finishLevel(level, isSkipped ? { moves: null, forcedStars: 1, usedHelpers: true } : { moves, starCap: puzzle.starCap, usedHelpers });
+        outcome = finishLevel(
+          level,
+          isSkipped ? { moves: null, forcedStars: 1, usedHelpers: true } : { moves, starCap: puzzle.starCap, usedHelpers },
+        );
       } else if (mode === 'daily') {
         outcome = finishDaily(dateKey).then((daily) => ({ ...daily, stars, isNewBest: false }));
       } else {
@@ -173,7 +176,6 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     puzzle.restart();
     setResult(null);
     setIsOutOfMoves(false);
-    setShowConfetti(false);
     hasRecordedWin.current = false;
     say('happy', 'start');
   }, [puzzle, say]);
@@ -268,7 +270,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         </ul>
       </section>
 
-      <div className={styles.boardArea}>
+      <div className={styles.boardArea} ref={boardAreaRef}>
         <Board
           level={level}
           orients={puzzle.orients}
@@ -349,7 +351,6 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           onMap={() => navigate(backHref)}
         />
       )}
-      {showConfetti && <Confetti key={level.id + moves} />}
       {result && (
         <WinDialog
           result={result}
@@ -359,7 +360,14 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           hasNext={Boolean(nextLevel)}
           shareMessage={
             mode === 'daily' && !result.isSkipped
-              ? dailyShareText({ dateKey, stars: result.stars, moves: result.moves, par: level.par, streak: result.streak ?? progress.daily.streak, url: PUBLIC_GAME_URL })
+              ? dailyShareText({
+                  dateKey,
+                  stars: result.stars,
+                  moves: result.moves,
+                  par: level.par,
+                  streak: result.streak ?? progress.daily.streak,
+                  url: PUBLIC_GAME_URL,
+                })
               : null
           }
           onNext={() => nextLevel && navigate(nextLevel)}

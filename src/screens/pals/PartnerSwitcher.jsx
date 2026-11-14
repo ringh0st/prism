@@ -25,7 +25,7 @@ export default function PartnerSwitcher() {
   return (
     <section className={styles.partnerCard} aria-labelledby="partner-title">
       <button type="button" className={styles.palLook} onClick={() => setIsLooking(true)} aria-label={`See ${partner.name}'s forms`}>
-        <PalArt palId={partner.id} stage={stage.index} wearing={progress.pal.wearing} size={96} className={styles.partnerArt} />
+        <PalArt palId={partner.id} stage={stage.index} wearing={progress.pal.wearing} size={96} className={styles.partnerArt} alive />
       </button>
       {isLooking && <PalDetailDialog pal={partner} onClose={() => setIsLooking(false)} />}
       <div className={styles.partnerInfo}>

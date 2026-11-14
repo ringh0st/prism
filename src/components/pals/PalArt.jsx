@@ -1,5 +1,6 @@
 import { accessoryById, palStage } from '../../game/pals.js';
 import { PAL_GROWTH } from './palGrowth.jsx';
+import styles from './PalArt.module.css';
 
 const SLOT_ORDER = ['neck', 'head', 'hand'];
 const slotOf = (id) => accessoryById(id)?.slot;
@@ -19,10 +20,12 @@ function Face({ y, gap = 10, eyeSize = 1, cx = 50 }) {
   const ry = 7 * eyeSize;
   return (
     <g>
-      <ellipse cx={cx - gap} cy={y} rx={rx} ry={ry} fill={INK} />
-      <ellipse cx={cx + gap} cy={y} rx={rx} ry={ry} fill={INK} />
-      <circle cx={cx - gap + 2} cy={y - 3} r={2.2 * eyeSize} fill="#fff" />
-      <circle cx={cx + gap + 2} cy={y - 3} r={2.2 * eyeSize} fill="#fff" />
+      <g className={styles.eyes}>
+        <ellipse cx={cx - gap} cy={y} rx={rx} ry={ry} fill={INK} />
+        <ellipse cx={cx + gap} cy={y} rx={rx} ry={ry} fill={INK} />
+        <circle cx={cx - gap + 2} cy={y - 3} r={2.2 * eyeSize} fill="#fff" />
+        <circle cx={cx + gap + 2} cy={y - 3} r={2.2 * eyeSize} fill="#fff" />
+      </g>
       <ellipse cx={cx - gap - 9} cy={y + 9} rx="5" ry="3" fill="#ff8f7f" opacity=".55" />
       <ellipse cx={cx + gap + 9} cy={y + 9} rx="5" ry="3" fill="#ff8f7f" opacity=".55" />
       <path d={`M${cx - 5} ${y + 10}q5 6 10 0`} stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
@@ -161,9 +164,7 @@ const ART = {
   maple: {
     hat: [50, 28],
     neck: 80,
-    grown: (
-      <path d="M68 88c12 0 20-6 22-16-4 4-8 4-12 2 2 4 0 8-4 8 0 2-2 5-6 6z" fill="#c96a4f" />
-    ),
+    grown: <path d="M68 88c12 0 20-6 22-16-4 4-8 4-12 2 2 4 0 8-4 8 0 2-2 5-6 6z" fill="#c96a4f" />,
     base: (
       <>
         <circle cx="28" cy="30" r="10" fill="#c96a4f" />
@@ -180,7 +181,6 @@ const ART = {
     ),
   },
 };
-
 
 /* ---------- The parts kit: ears, tails and special shapes for the other 22 Pals ---------- */
 
@@ -246,7 +246,9 @@ function Ears({ type, color, inner }) {
         </>
       );
     case 'crest':
-      return <path d="M44 32c-2-8 0-14 4-16M50 31c0-9 2-15 6-17M56 32c1-6 4-10 8-11" stroke={inner} strokeWidth="5" strokeLinecap="round" fill="none" />;
+      return (
+        <path d="M44 32c-2-8 0-14 4-16M50 31c0-9 2-15 6-17M56 32c1-6 4-10 8-11" stroke={inner} strokeWidth="5" strokeLinecap="round" fill="none" />
+      );
     case 'wool':
       return (
         <g fill={inner}>
@@ -427,7 +429,9 @@ function Marking({ type, color }) {
         </g>
       );
     case 'tigerStripes':
-      return <path d="M44 32l2 7M50 30v8M56 32l-2 7M27 52l7 2M27 60l7 0M73 52l-7 2M73 60l-7 0" stroke="#3b3330" strokeWidth="3" strokeLinecap="round" />;
+      return (
+        <path d="M44 32l2 7M50 30v8M56 32l-2 7M27 52l7 2M27 60l7 0M73 52l-7 2M73 60l-7 0" stroke="#3b3330" strokeWidth="3" strokeLinecap="round" />
+      );
     case 'leopardSpots':
       return (
         <g fill="none" stroke="#8d8278" strokeWidth="2">
@@ -458,7 +462,20 @@ function Marking({ type, color }) {
 }
 
 /** Builds a Pal from parts: head and body colors, ears, a signature tail/feature and face markings. */
-function partsPal({ color, headColor = color, earColor = headColor, inner, belly = null, ears, tail, marks = [], shape = 'chibi', faceY = 54, gap = 10, behind = null }) {
+function partsPal({
+  color,
+  headColor = color,
+  earColor = headColor,
+  inner,
+  belly = null,
+  ears,
+  tail,
+  marks = [],
+  shape = 'chibi',
+  faceY = 54,
+  gap = 10,
+  behind = null,
+}) {
   const head =
     shape === 'cloud' ? (
       <g fill={color}>
@@ -474,7 +491,13 @@ function partsPal({ color, headColor = color, earColor = headColor, inner, belly
     );
   const body =
     shape === 'octopus' ? (
-      <path d="M30 74c-4 10-10 14-14 14M40 78c-2 8-4 12-8 14M50 80v14M60 78c2 8 4 12 8 14M70 74c4 10 10 14 14 14" stroke={color} strokeWidth="7" strokeLinecap="round" fill="none" />
+      <path
+        d="M30 74c-4 10-10 14-14 14M40 78c-2 8-4 12-8 14M50 80v14M60 78c2 8 4 12 8 14M70 74c4 10 10 14 14 14"
+        stroke={color}
+        strokeWidth="7"
+        strokeLinecap="round"
+        fill="none"
+      />
     ) : shape === 'snail' ? (
       <>
         <circle cx="70" cy="60" r="20" fill={inner} />
@@ -669,7 +692,13 @@ function Accessory({ id, hat, neck }) {
     case 'headphones':
       return (
         <g>
-          <path d={`M${hx - 25} ${hy + 24}Q${hx} ${hy - 12} ${hx + 25} ${hy + 24}`} stroke="#4a3e36" strokeWidth="5" fill="none" strokeLinecap="round" />
+          <path
+            d={`M${hx - 25} ${hy + 24}Q${hx} ${hy - 12} ${hx + 25} ${hy + 24}`}
+            stroke="#4a3e36"
+            strokeWidth="5"
+            fill="none"
+            strokeLinecap="round"
+          />
           <rect x={hx - 32} y={hy + 16} width="12" height="18" rx="5" fill="#58ac82" />
           <rect x={hx + 20} y={hy + 16} width="12" height="18" rx="5" fill="#58ac82" />
         </g>
@@ -711,11 +740,14 @@ function viewBoxFor(scale, isPortrait) {
   return `${50 - side / 2} ${100 - side} ${side} ${side}`;
 }
 
+/** A steady, different blink timing for each Pal, so a group never blinks in unison. */
+const blinkDelay = (palId) => `${-([...palId].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 50) / 10}s`;
+
 /**
  * A Pal in one of its five forms, wearing up to one item per slot (head, neck, hand). Decorative unless `label` is given.
- * `portrait` zooms in on the Pal, for round avatars.
+ * `portrait` zooms in on the Pal, for round avatars. `alive` makes it breathe and blink (for big, featured Pals).
  */
-export default function PalArt({ palId, stage = 0, wearing = [], size = 64, portrait = false, label, className }) {
+export default function PalArt({ palId, stage = 0, wearing = [], size = 64, portrait = false, alive = false, label, className = '' }) {
   const art = ART[palId];
   if (!art) return null;
   const stageIndex = palStage(stage).index;
@@ -723,7 +755,8 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
   const growth = growthLayers(palId, art, stageIndex);
   return (
     <svg
-      className={className}
+      className={`${alive ? styles.alive : ''} ${className}`}
+      style={alive ? { '--blink-delay': blinkDelay(palId) } : undefined}
       width={size}
       height={size}
       viewBox={viewBoxFor(scale, portrait)}
@@ -734,12 +767,14 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
     >
       <ellipse cx="50" cy="95" rx="24" ry="4" fill="rgba(60,40,20,.14)" />
       <g transform={`translate(50 94) scale(${scale}) translate(-50 -94)`}>
-        {growth.back}
-        {art.base}
-        {growth.front}
-        {[...wearing].sort(bySlotOrder).map((id) => (
-          <Accessory key={id} id={id} hat={art.hat} neck={art.neck} />
-        ))}
+        <g className={styles.body}>
+          {growth.back}
+          {art.base}
+          {growth.front}
+          {[...wearing].sort(bySlotOrder).map((id) => (
+            <Accessory key={id} id={id} hat={art.hat} neck={art.neck} />
+          ))}
+        </g>
       </g>
       {stageIndex === STAGE_SCALES.length - 1 && (
         <g fill="#f0c14e">

@@ -52,6 +52,7 @@ export default function PalDetailDialog({ pal, onClose }) {
           stage={selected}
           wearing={isPartner && !isFuture ? progress.pal.wearing : []}
           size={150}
+          alive={!isMystery}
           className={isMystery ? styles.mystery : ''}
           label={isMystery ? 'A mystery form' : `${pal.name} as a ${palStage(selected).name}`}
         />

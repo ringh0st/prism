@@ -5,6 +5,7 @@ import Stars from '../../components/Stars.jsx';
 import Icon from '../../components/Icon.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { sfx } from '../../audio/sfx.js';
+import { celebrate } from '../../lib/effects.js';
 import { DIFFICULTY } from '../../game/constants.js';
 import { shareText } from '../../lib/shareText.js';
 import PalArt from '../../components/pals/PalArt.jsx';
@@ -64,6 +65,7 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
     // The big moments get their own sounds once the stars have landed.
     const finale = completesWorld ? sfx.worldComplete : palGrewTo ? sfx.palGrow : isFirstToday ? sfx.reward : null;
     if (finale) timers.push(setTimeout(finale, afterStars + 450));
+    if (completesWorld || palGrewTo) timers.push(setTimeout(() => celebrate({ stars: 3, isBig: true }), afterStars + 450));
     return () => timers.forEach(clearTimeout);
   }, [stars, sparksEarned, diamondsEarned, completesWorld, palGrewTo, isFirstToday]);
 
@@ -119,7 +121,7 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
       </div>
       {partner && !isSkipped && (
         <div className={`${styles.evolved} ${palGrewTo ? styles.grew : ''}`}>
-          <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={64} portrait />
+          <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={64} portrait alive />
           {palGrewTo ? (
             <p role="status">
               <strong>

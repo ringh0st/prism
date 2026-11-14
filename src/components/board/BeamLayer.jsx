@@ -41,6 +41,15 @@ function BeamLayer({ width, height, segments, ghostSegments = null }) {
             <line {...points} stroke={color} strokeWidth="0.32" strokeLinecap="round" filter="url(#beam-glow)" opacity="0.6" />
             <line {...points} stroke={color} strokeWidth="0.15" strokeLinecap="round" />
             <line {...points} className={styles.beamCore} strokeWidth="0.05" strokeLinecap="round" />
+            {/* Motes of light drifting along the beam */}
+            <circle className={styles.sparkle} r="0.07" fill="#fff">
+              <animateMotion
+                dur={`${0.5 + Math.hypot(points.x2 - points.x1, points.y2 - points.y1) * 0.35}s`}
+                begin={`${(i * 0.23) % 1}s`}
+                repeatCount="indefinite"
+                path={`M${points.x1} ${points.y1}L${points.x2} ${points.y2}`}
+              />
+            </circle>
           </g>
         );
       })}

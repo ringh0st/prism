@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
-import Confetti from '../../components/Confetti.jsx';
+import RewardShower from '../../components/RewardShower.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
 import { sfx } from '../../audio/sfx.js';
 import styles from './WeeklyRewardDialog.module.css';
@@ -32,7 +32,7 @@ export default function WeeklyRewardDialog({ reward, onClose }) {
       <Button size="lg" onClick={onClose} data-autofocus>
         Yay!
       </Button>
-      <Confetti />
+      <RewardShower />
     </Dialog>
   );
 }

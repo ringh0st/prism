@@ -30,7 +30,7 @@ export default function PalUnlockNotice() {
 
   return (
     <Dialog title="New Pal unlocked!" tone="celebrate" onClose={close}>
-      <PalArt palId={fresh.id} size={130} className={styles.unlockArt} />
+      <PalArt palId={fresh.id} size={130} alive className={styles.unlockArt} />
       <p className={styles.unlockText}>
         <strong>
           {fresh.name} the {fresh.species}

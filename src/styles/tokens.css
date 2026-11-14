@@ -124,6 +124,8 @@
   --ease-pop: cubic-bezier(0.3, 1.6, 0.5, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* A real spring: overshoots, then settles with a little wobble (falls back to --ease-pop) */
+  --ease-wobble: var(--ease-pop);
   --duration-fast: 140ms;
   --duration-base: 260ms;
 
@@ -209,3 +211,14 @@
   --shadow-lg: 0 2px 4px hsl(0 0% 0% / 0.3), 0 8px 16px hsl(0 0% 0% / 0.35), 0 24px 48px hsl(0 0% 0% / 0.45);
   color-scheme: dark;
 }
+
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-wobble: linear(
+      0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017 18.8%, 1.077 20.8%, 1.121 23%,
+      1.149 25.4%, 1.159 28%, 1.149 30.9%, 1.083 39.3%, 1.04 44.2%, 1.01 48.6%, 0.991 53.5%, 0.986 58.4%, 0.99 66.5%,
+      1.001 79.1%, 1
+    );
+  }
+}
+

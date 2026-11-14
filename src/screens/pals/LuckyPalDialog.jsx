@@ -7,6 +7,7 @@ import RarityBadge from '../../components/pals/RarityBadge.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { LUCKY_PAL_EVERY, palById, rarityOf } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
+import { rewardShower } from '../../lib/effects.js';
 import styles from './LuckyPal.module.css';
 
 /** A Lucky Pal gift (every 200 levels): tap to open the box, then meet who came out. */
@@ -18,6 +19,7 @@ export default function LuckyPalDialog() {
 
   const open = () => {
     setIsOpen(true);
+    rewardShower();
     if (!pal) sfx.reward();
     else if (rarityOf(pal) === 'common') sfx.newPal();
     else sfx.palGrow();
@@ -42,7 +44,7 @@ export default function LuckyPalDialog() {
       ) : pal ? (
         <>
           <div className={styles.reveal}>
-            <PalArt palId={pal.id} size={140} />
+            <PalArt palId={pal.id} size={140} alive />
           </div>
           <p className={styles.text}>
             <strong>

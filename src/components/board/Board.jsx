@@ -1,9 +1,10 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import TileArt, { TileDefs } from './TileArt.jsx';
 import BeamLayer from './BeamLayer.jsx';
 import { describeTile } from '../../game/describe.js';
 import { isRotatable as tileIsRotatable } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
+import { gemBurst } from '../../lib/effects.js';
 import styles from './Board.module.css';
 
 /**
@@ -66,6 +67,22 @@ export default function Board({
     }
   };
 
+  // A little starburst on each gem the moment it lights up (not in the editor, not on the first draw).
+  const litBefore = useRef(null);
+  useEffect(() => {
+    const previous = litBefore.current;
+    litBefore.current = trace.litGems;
+    if (!previous || isEditing) return;
+    for (const tileIndex of trace.litGems) {
+      if (previous.has(tileIndex)) continue;
+      const tile = tiles[tileIndex];
+      const color = getComputedStyle(document.documentElement)
+        .getPropertyValue(`--beam-${tile.color ?? 'sun'}`)
+        .trim();
+      gemBurst(cellRefs.current[tile.y * width + tile.x], color || null);
+    }
+  }, [trace.litGems, tiles, width, isEditing]);
+
   const hasLitShade = trace.litShades.size > 0;
 
   return (
@@ -108,9 +125,7 @@ export default function Board({
                     onKeyDown={(event) => onKeyDown(event, cell)}
                     onClick={() => isActionable && onActivate(cell, tileIndex)}
                   >
-                    {tile && (
-                      <TileArt tile={tile} turns={turns[tileIndex] ?? orients[tileIndex] ?? 0} isLit={isLit} isRotatable={canRotate} />
-                    )}
+                    {tile && <TileArt tile={tile} turns={turns[tileIndex] ?? orients[tileIndex] ?? 0} isLit={isLit} isRotatable={canRotate} />}
                   </button>
                 </div>
               );

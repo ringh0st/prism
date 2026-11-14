@@ -29,14 +29,20 @@ function ForestBackdrop({ hasMoon }) {
     <>
       <rect width="400" height="280" fill={hasMoon ? '#EDE6D6' : '#F6EED9'} />
       {!hasMoon && <circle cx="330" cy="46" r="26" fill="#FBE3A6" />}
-      <g fill="#B9D9B8">
+      <path
+        className={styles.cloud}
+        d="M30 60a10 10 0 0 1 3-19 15 15 0 0 1 28-4 12 12 0 0 1 22 3 11 11 0 0 1 18 10 8 8 0 0 1 5 10z"
+        fill="#FFFDF6"
+        opacity=".85"
+      />
+      <g fill="#B9D9B8" className={styles.canopy}>
         <circle cx="20" cy="120" r="46" />
         <circle cx="90" cy="96" r="40" />
         <circle cx="200" cy="104" r="44" />
         <circle cx="300" cy="100" r="42" />
         <circle cx="380" cy="118" r="44" />
       </g>
-      <g fill="#9CC9A3">
+      <g fill="#9CC9A3" className={`${styles.canopy} ${styles.canopyNear}`}>
         <circle cx="54" cy="142" r="40" />
         <circle cx="150" cy="134" r="36" />
         <circle cx="250" cy="138" r="38" />
@@ -48,6 +54,22 @@ function ForestBackdrop({ hasMoon }) {
         <path d="M40 212l4-10 4 10zM96 236l3-8 3 8zM318 160l4-9 4 9zM228 206l3-8 3 8zM360 228l4-10 4 10z" />
       </g>
     </>
+  );
+}
+
+/** A little butterfly looping around the clearing. */
+function Butterfly() {
+  return (
+    <g className={styles.butterfly} aria-hidden="true">
+      <animateMotion dur="16s" repeatCount="indefinite" path="M60 150C110 90 170 120 200 90S300 60 340 110 300 190 230 170 120 210 60 150z" />
+      <g className={styles.wings}>
+        <ellipse cx="-4" cy="-2" rx="5" ry="4" fill="#F2A67E" />
+        <ellipse cx="4" cy="-2" rx="5" ry="4" fill="#F2A67E" />
+        <ellipse cx="-3" cy="3" rx="3" ry="2.6" fill="#F0C14E" />
+        <ellipse cx="3" cy="3" rx="3" ry="2.6" fill="#F0C14E" />
+      </g>
+      <rect x="-0.8" y="-4" width="1.6" height="9" rx="0.8" fill="#5E5047" />
+    </g>
   );
 }
 
@@ -97,6 +119,7 @@ export default function GroveScene({ placed, partnerId, stage = 0, wearing = [] 
           ) : null,
         )}
         <Fireflies />
+        <Butterfly />
       </svg>
       {partner && (
         <button
@@ -108,7 +131,7 @@ export default function GroveScene({ placed, partnerId, stage = 0, wearing = [] 
         >
           {/* A new key on every hello replays the hop. */}
           <span key={hello?.key ?? 'still'} className={`${styles.body} ${hello ? styles.hop : ''}`}>
-            <PalArt palId={partner.id} stage={stage} wearing={wearing} size="100%" />
+            <PalArt palId={partner.id} stage={stage} wearing={wearing} size="100%" alive />
           </span>
           {hello && (
             <span key={hello.key} className={styles.bubble} role="status">

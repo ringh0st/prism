@@ -19,6 +19,7 @@ import { todayKey } from '../game/daily.js';
 import { startDiamondCheckout } from '../lib/economyApi.js';
 import { PAYMENTS_ENABLED, TERMS_URL } from '../lib/config.js';
 import { sfx } from '../audio/sfx.js';
+import { rewardShower } from '../lib/effects.js';
 import styles from './store/Stall.module.css';
 
 const TABS = [
@@ -334,6 +335,7 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
               <AdoptShelf
                 onAdopted={(pal) => {
                   sfx.newPal();
+                  rewardShower();
                   setLumi({
                     mood: 'dance',
                     line: `Welcome home, ${pal.name}! Find them in Pals.`,
