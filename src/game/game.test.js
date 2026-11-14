@@ -430,6 +430,16 @@ test('pal records: counted per partner, done once, never bought', async () => {
   assert.deepEqual(recordPalFeats({ ...createEmptyProgress() }, { difficulty: 'hard', stars: 3 }).newRecords, [], 'no partner, no records');
 });
 
+test('partner: a choice not yet saved on the account is kept over the account's old partner', async () => {
+  const { createEmptyProgress, withServerState } = await import('./progress.js');
+  const server = { sparks: 0, diamonds: 0, helpers: {}, pal: { id: 'ember', owned: { ember: { stage: 2 }, mossy: { stage: 0 } }, accessories: [], wearing: [] } };
+  const local = { ...createEmptyProgress(), pal: { id: 'mossy', owned: { mossy: { stage: 0 } }, accessories: [], wearing: [], pendingId: 'mossy' } };
+  assert.equal(withServerState(local, server, '2026-03-01').pal.id, 'mossy', 'pending choice wins until saved');
+  assert.equal(withServerState({ ...local, pal: { ...local.pal, pendingId: null } }, server, '2026-03-01').pal.id, 'ember', 'saved: the account is the truth');
+  const saved = withServerState(local, { ...server, pal: { ...server.pal, id: 'mossy' } }, '2026-03-01').pal;
+  assert.equal(saved.pendingId, undefined, 'once the account has it, nothing is pending');
+});
+
 test('pals: starter choice, unlocks, growth and accessories', async () => {
   const { createEmptyProgress } = await import('./progress.js');
   const pals = await import('./pals.js');

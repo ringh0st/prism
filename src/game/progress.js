@@ -218,6 +218,16 @@ export const nextHotStreak = (progress, { stars, usedHelpers, previousStars = 0 
   stars === 3 && !usedHelpers ? progress.hotStreak + (previousStars === 3 ? 0 : 1) : 0;
 
 /** Apply balances returned by the server (signed-in players). */
+/**
+ * The account's Pals win, except a partner chosen on this device that the account hasn't saved yet
+ * (`pendingId`, sent again on every sync until it is), and except when the account has no Pal yet.
+ */
+function palFromServer(local, server) {
+  if (!server?.id) return local;
+  if (local.pendingId && local.pendingId !== server.id) return { ...server, id: local.pendingId, pendingId: local.pendingId };
+  return server;
+}
+
 export function withServerState(progress, state, today) {
   return {
     ...progress,
@@ -231,8 +241,7 @@ export function withServerState(progress, state, today) {
     giftDays: state.giftDays ?? progress.giftDays,
     presents: { opened: state.presentsOpened ?? progress.presents.opened },
     winGifts: state.winGiftDate !== undefined ? { date: state.winGiftDate, opened: state.winGiftsOpened ?? 0 } : progress.winGifts,
-    // The account's Pals win, unless the account has none yet (then keep this device's choice).
-    pal: state.pal?.id ? state.pal : progress.pal,
+    pal: palFromServer(progress.pal, state.pal),
     grove: state.grove ?? progress.grove,
     luckyPals: { claimed: state.luckyPalsClaimed ?? progress.luckyPals.claimed },
     events: state.events ?? progress.events,

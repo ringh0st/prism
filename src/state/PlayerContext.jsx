@@ -26,6 +26,7 @@ import {
   claimWeeklyRewardOnServer,
   consumeHelperOnServer,
   fetchEconomyState,
+  OFFLINE_MESSAGE,
   fetchRemoteLevels,
   mergeGuestProgress,
   recordDailyOnServer,
@@ -99,6 +100,26 @@ export function PlayerProvider({ children }) {
 
   const applyServerState = useCallback((state) => setProgress(withServerState(progressRef.current, state, todayKey())), [setProgress]);
 
+  /** Saves a partner chosen on this device to the account. Kept pending when offline; dropped if the account says no. */
+  const savePendingPal = useCallback(async () => {
+    const pending = progressRef.current.pal.pendingId;
+    if (!userId || !pending) return;
+    try {
+      const state = await choosePalOnServer(pending);
+      setProgress(withServerState({ ...progressRef.current, pal: { ...progressRef.current.pal, pendingId: null } }, state, todayKey()));
+    } catch (error) {
+      if (error.message === OFFLINE_MESSAGE) {
+        setSyncStatus('error');
+        return;
+      }
+      // The account can't use this Pal (a rule it checks): go back to the account's partner.
+      setProgress({ ...progressRef.current, pal: { ...progressRef.current.pal, pendingId: null } });
+      await fetchEconomyState()
+        .then(applyServerState)
+        .catch(() => {});
+    }
+  }, [userId, setProgress, applyServerState]);
+
   /** Open every Lucky Pal gift that's waiting (the server draws them for accounts) and queue the reveals. */
   const openLuckyPals = useCallback(async () => {
     const opened = [];
@@ -136,13 +157,10 @@ export function PlayerProvider({ children }) {
       const levels = await fetchRemoteLevels(userId);
       setProgress({ ...withServerState(progressRef.current, state, todayKey()), levels });
       setSyncStatus('synced');
-      // A Pal picked while offline (or before the account knew about Pals) is saved now.
+      // A partner picked while offline, signed out or before the account knew about Pals is saved now.
       const localPal = progressRef.current.pal.id;
-      if (localPal && !state.pal?.id) {
-        await choosePalOnServer(localPal)
-          .then(applyServerState)
-          .catch(() => {});
-      }
+      if (localPal && !state.pal?.id) setProgress({ ...progressRef.current, pal: { ...progressRef.current.pal, pendingId: localPal } });
+      await savePendingPal();
       // The nickname chosen on this device is the one the board should show.
       if (progressRef.current.nickname) await setNicknameOnServer(progressRef.current.nickname).catch(() => {});
       // Weekend event results saved on the account.
@@ -162,7 +180,7 @@ export function PlayerProvider({ children }) {
     } catch {
       setSyncStatus('error');
     }
-  }, [userId, setProgress, applyServerState, openLuckyPals]);
+  }, [userId, setProgress, applyServerState, openLuckyPals, savePendingPal]);
 
   useEffect(() => {
     if (userId) syncWithServer();
@@ -333,15 +351,12 @@ export function PlayerProvider({ children }) {
 
       /** Pick your partner Pal. @throws EconomyError */
       async choosePal(palId) {
-        // Applied on the device right away, so the choice never waits on the network.
-        setProgress(choosePalLocally(progressRef.current, palId));
+        // Applied on the device right away, so the choice never waits on the network. Until the account has
+        // saved it, it's marked pending: kept over the account's old partner and sent again on every sync.
+        const chosen = choosePalLocally(progressRef.current, palId);
+        setProgress({ ...chosen, pal: { ...chosen.pal, pendingId: palId } });
         if (!userId) return;
-        try {
-          applyServerState(await choosePalOnServer(palId));
-        } catch {
-          // Kept on this device and sent again on the next sync.
-          setSyncStatus('error');
-        }
+        await savePendingPal();
       },
 
       /** Set the public nickname: saved here at once, then on the account. @throws EconomyError if it breaks the rules */
@@ -490,7 +505,7 @@ export function PlayerProvider({ children }) {
         setProgress(createEmptyProgress());
       },
     }),
-    [progress, settings, syncStatus, userId, weeklyReward, luckyGifts, setProgress, applyServerState, syncWithServer, openLuckyPals],
+    [progress, settings, syncStatus, userId, weeklyReward, luckyGifts, setProgress, applyServerState, syncWithServer, openLuckyPals, savePendingPal],
   );
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;

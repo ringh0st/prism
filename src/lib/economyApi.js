@@ -1,10 +1,13 @@
 import { supabase } from './supabase.js';
 import { EconomyError } from '../game/progress.js';
 
+/** The message for a request that never reached the server. */
+export const OFFLINE_MESSAGE = 'You seem to be offline. Please try again.';
+
 /** Turn database/network errors into short messages players can understand. */
 function friendlyError(error) {
   const message = error?.message ?? '';
-  if (/fetch|network|timeout/i.test(message)) return new EconomyError('You seem to be offline. Please try again.');
+  if (/fetch|network|timeout/i.test(message)) return new EconomyError(OFFLINE_MESSAGE);
   // The database is missing a newer function (its SQL script hasn't been run yet).
   if (/could not find the function|schema cache/i.test(message)) {
     return new EconomyError('This isn’t ready on our server yet. Please try again a bit later!');
