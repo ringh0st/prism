@@ -84,7 +84,7 @@ export default function WinDialog({
   }, [stars, sparksEarned, diamondsEarned, completesWorld, palGrewTo, isFirstToday]);
 
   return (
-    <Dialog title={headlineFor(result, difficulty)} tone="celebrate" onClose={onMap}>
+    <Dialog title={headlineFor(result, difficulty)} tone="celebrate" onClose={onMap} closesOnBackdrop={false}>
       <Stars count={stars} size={46} animate className={styles.stars} />
       {isSkipped ? (
         <p className={styles.summary}>Come back any time to earn all three stars.</p>
