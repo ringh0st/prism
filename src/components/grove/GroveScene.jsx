@@ -12,6 +12,8 @@ import { FRIEND_LINES, isNapTime, seasonOf, timeOfDay, visitingFriend } from '..
 import { palById, stageOf } from '../../game/pals.js';
 import { rewardShower } from '../../lib/effects.js';
 import { sfx } from '../../audio/sfx.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { decorName } from '../../i18n/groveText.js';
 import styles from './GroveScene.module.css';
 
 /** Where each spot's decor stands in the 400×280 scene (its 100×100 box is moved and scaled). */
@@ -35,6 +37,7 @@ const FRIEND_START = { left: 34, top: 82 };
  * one of your other Pals drops by, and after you finish a world there's a party. Tap a Pal to pet it.
  */
 export default function GroveScene({ placed, partnerId, owned = {}, wearing = [], worldsFinished = 0 }) {
+  const { t, lang } = useI18n();
   const now = useGroveClock();
   const time = timeOfDay(now);
   const season = seasonOf(now);
@@ -61,7 +64,7 @@ export default function GroveScene({ placed, partnerId, owned = {}, wearing = []
         className={styles.art}
         viewBox="0 0 400 280"
         role="img"
-        aria-label={sceneLabel({ bySpot, partner, friend, isNapping, season, partyWorld })}
+        aria-label={sceneLabel({ t, lang, bySpot, partner, friend, isNapping, season, partyWorld })}
         focusable="false"
       >
         <ForestBackdrop time={time} season={season} hasMoon={bySpot.sky === 'moonStars'} />
@@ -85,7 +88,8 @@ export default function GroveScene({ placed, partnerId, owned = {}, wearing = []
           size={22}
           start={FRIEND_START}
           petLines={FRIEND_LINES}
-          label={`Pet ${friend.name}, visiting today`}
+          petLinesKey="quips.groveVisitor"
+          label={t('grove.petVisitor', { name: t(`palName.${friend.id}`, {}, friend.name) })}
         />
       )}
       {partner && (
@@ -96,17 +100,20 @@ export default function GroveScene({ placed, partnerId, owned = {}, wearing = []
           spots={spots}
           isNapping={isNapping}
           petLines={HELLOS}
-          greeting={partyWorld ? `Party! We finished World ${partyWorld}!` : null}
+          petLinesKey="quips.grovePet"
+          greeting={partyWorld ? t('grove.party', { world: partyWorld }) : null}
         />
       )}
     </div>
   );
 }
 
-function sceneLabel({ bySpot, partner, friend, isNapping, season, partyWorld }) {
-  const decor = Object.values(bySpot).map((id) => groveItemById(id).name.toLowerCase());
-  const living = partner ? `${partner.name} lives here${isNapping ? ' and is napping' : ''}` : 'Choose a Pal to live here';
-  const visit = friend && !isNapping ? ` ${friend.name} is visiting.` : '';
-  const party = partyWorld ? ` It’s a party for finishing World ${partyWorld}!` : '';
-  return `Your Grove in the enchanted forest, in ${season}. ${living}${decor.length ? `, with a ${decor.join(', a ')}` : ''}.${visit}${party}`;
+function sceneLabel({ t, lang, bySpot, partner, friend, isNapping, season, partyWorld }) {
+  const nameOf = (pal) => t(`palName.${pal.id}`, {}, pal.name);
+  const decor = Object.values(bySpot).map((id) => decorName(lang, groveItemById(id)).toLocaleLowerCase(lang));
+  const living = partner ? t(isNapping ? 'grove.scene.livesNapping' : 'grove.scene.lives', { name: nameOf(partner) }) : t('grove.scene.choose');
+  const visit = friend && !isNapping ? ` ${t('grove.scene.visiting', { name: nameOf(friend) })}` : '';
+  const party = partyWorld ? ` ${t('grove.scene.party', { world: partyWorld })}` : '';
+  const withDecor = decor.length ? t('grove.scene.with', { list: decor.join(t('grove.scene.joiner')) }) : '';
+  return `${t('grove.scene.intro', { season: t(`grove.season.${season}`) })} ${living}${withDecor}.${visit}${party}`;
 }

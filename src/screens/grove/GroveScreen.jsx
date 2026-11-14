@@ -9,12 +9,16 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { ALL_DECOR, GROVE_ITEMS, GROVE_SPOTS } from '../../game/grove.js';
 import { finishedWorldCount } from '../../game/titles.js';
 import { sfx } from '../../audio/sfx.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { decorName, spotName } from '../../i18n/groveText.js';
 import styles from './Grove.module.css';
 
 /** One piece of decor: buy it, place it, or put it away. */
 function DecorItem({ item, onDone, onError }) {
   const { progress, buyGroveItem, placeGroveItem } = usePlayer();
+  const { t, lang } = useI18n();
   const [isBusy, setIsBusy] = useState(false);
+  const name = decorName(lang, item);
   const isOwned = progress.grove.items.includes(item.id);
   const isPlaced = progress.grove.placed.includes(item.id);
 
@@ -34,14 +38,14 @@ function DecorItem({ item, onDone, onError }) {
   return (
     <li className={`${styles.item} ${isPlaced ? styles.placed : ''}`}>
       <GroveItemArt id={item.id} size={64} />
-      <span className={styles.itemName}>{item.name}</span>
+      <span className={styles.itemName}>{name}</span>
       {!isOwned ? (
         <Button
           size="sm"
           variant="gold"
           disabled={isBusy || progress.sparks < item.price}
-          onClick={() => act(() => buyGroveItem(item.id), `${item.name}: yours! Now place it.`, sfx.coin)}
-          aria-label={`Buy ${item.name} for ${item.price} sparks`}
+          onClick={() => act(() => buyGroveItem(item.id), t('grove.bought', { name }), sfx.coin)}
+          aria-label={t('grove.buy', { name, price: item.price })}
         >
           <Icon name="spark" size={16} />
           <span>{item.price}</span>
@@ -55,12 +59,12 @@ function DecorItem({ item, onDone, onError }) {
           onClick={() =>
             act(
               () => placeGroveItem(item.id, !isPlaced),
-              isPlaced ? `${item.name} put away.` : `${item.name} placed!`,
+              isPlaced ? t('grove.putAwayDone', { name }) : t('grove.placed', { name }),
               isPlaced ? sfx.tap : sfx.place,
             )
           }
         >
-          {isPlaced ? 'Put away' : 'Place'}
+          {isPlaced ? t('grove.putAway') : t('grove.place')}
         </Button>
       )}
     </li>
@@ -70,11 +74,12 @@ function DecorItem({ item, onDone, onError }) {
 /** Decorate the Grove: a live preview on top, every piece of decor below, grouped by where it goes. */
 export default function GroveScreen() {
   const { progress } = usePlayer();
+  const { t, lang } = useI18n();
   const [message, setMessage] = useState({ text: '', isError: false });
 
   return (
     <div className={styles.page}>
-      <ScreenHeader title="Decorate" backHref="#/pals/grove" />
+      <ScreenHeader title={t('grove.decorate')} backHref="#/pals/grove" />
       <main className={styles.main}>
         <div className={styles.preview}>
           <GroveScene
@@ -86,12 +91,12 @@ export default function GroveScreen() {
           />
         </div>
         <p className={message.isError ? styles.error : styles.status} role={message.isError ? 'alert' : 'status'}>
-          {message.text || 'One piece per spot. Decor is yours forever, and you can swap any time.'}
+          {message.text || t('grove.decorateHelp')}
         </p>
         {GROVE_SPOTS.map((spot) => (
           <section key={spot.id} className={styles.spot} aria-labelledby={`spot-${spot.id}`}>
             <h2 id={`spot-${spot.id}`} className={`game-title ${styles.spotTitle}`}>
-              {spot.name}
+              {spotName(lang, spot)}
             </h2>
             <ul className={styles.items}>
               {ALL_DECOR.filter((item) => item.spot === spot.id && (GROVE_ITEMS.includes(item) || progress.grove.items.includes(item.id))).map(

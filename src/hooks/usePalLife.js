@@ -55,7 +55,7 @@ export function usePalLife({ spots, isNapping = false, start = { left: 50, top: 
         later(() => setIsWalking(false), WALK_MS);
       }
       const arrive = moves ? WALK_MS : 0;
-      if (activity.emote) later(() => show({ symbol: activity.emote, line: activity.line, key: Date.now() }), arrive);
+      if (activity.emote) later(() => show({ symbol: activity.emote, line: activity.line, spot: activity.spot, key: Date.now() }), arrive);
       // Then do something there: sit on the bench, splash, jump, spin, dance…
       if (activity.action && !reducedMotion()) {
         later(() => setAction({ name: activity.action, key: Date.now() }), arrive);

@@ -6,6 +6,8 @@ import Button from '../../components/Button.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { GLOWBUGS, rescuedGlowbugs } from '../../game/glowbugs.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { glowbugBio, glowbugName, glowbugTitle, splitAround } from '../../i18n/groveText.js';
 import styles from './GlowbugGarden.module.css';
 
 /**
@@ -14,17 +16,22 @@ import styles from './GlowbugGarden.module.css';
  */
 export default function GlowbugGarden() {
   const { progress } = usePlayer();
+  const { t, lang } = useI18n();
   const [meeting, setMeeting] = useState(null);
   const rescued = rescuedGlowbugs(progress.levels);
   const found = GLOWBUGS.filter((bug) => rescued.has(bug.id)).length;
+  const [foundBefore, foundAfter] = splitAround(t('garden.found', { found: '\u0000', total: GLOWBUGS.length }));
+  const meetingName = meeting && glowbugName(lang, meeting);
 
   return (
     <div className={styles.page}>
-      <ScreenHeader title="Glowbug Garden" backHref="#/pals/team" />
+      <ScreenHeader title={t('garden.title')} backHref="#/pals/team" />
       <main className={styles.main}>
         <section className={styles.intro}>
           <p className={styles.count}>
-            <strong className="game-title">{found}</strong> of {GLOWBUGS.length} Glowbugs found
+            {foundBefore}
+            <strong className="game-title">{found}</strong>
+            {foundAfter}
           </p>
           <div
             className={styles.meter}
@@ -32,17 +39,17 @@ export default function GlowbugGarden() {
             aria-valuemin={0}
             aria-valuemax={GLOWBUGS.length}
             aria-valuenow={found}
-            aria-label="Glowbugs found"
+            aria-label={t('garden.meter')}
           >
             <span style={{ width: `${(found / GLOWBUGS.length) * 100}%` }} />
           </div>
-          <p className={styles.how}>
-            Glowbugs nap on some levels (look for them on the map). Get ★★★ there to rescue them. The rare ones hide in Hard and boss levels.
-          </p>
+          <p className={styles.how}>{t('garden.how')}</p>
         </section>
         <ul className={styles.grid}>
           {GLOWBUGS.map((bug) => {
             const times = rescued.get(bug.id) ?? 0;
+            const name = glowbugName(lang, bug);
+            const title = glowbugTitle(lang, bug);
             return (
               <li key={bug.id}>
                 {times ? (
@@ -50,16 +57,20 @@ export default function GlowbugGarden() {
                     type="button"
                     className={styles.bug}
                     onClick={() => setMeeting(bug)}
-                    aria-label={`${bug.name} the ${bug.title}${times > 1 ? `, rescued ${times} times` : ''}`}
+                    aria-label={t(times > 1 ? 'garden.bugLabelTimes' : 'garden.bugLabel', { name, title, times })}
                   >
                     <GlowbugArt id={bug.id} size={64} />
-                    <span className={styles.name}>{bug.name}</span>
+                    <span className={styles.name}>{name}</span>
                     {times > 1 && <span className={styles.times}>×{times}</span>}
                   </button>
                 ) : (
-                  <span className={`${styles.bug} ${styles.missing}`} role="img" aria-label={`Not found yet${bug.rare ? ', a rare one' : ''}`}>
+                  <span
+                    className={`${styles.bug} ${styles.missing}`}
+                    role="img"
+                    aria-label={bug.rare ? t('garden.missingRare') : t('garden.missing')}
+                  >
                     <GlowbugArt id={bug.id} size={64} isSilhouette />
-                    <span className={styles.name}>{bug.rare ? '★ Rare' : '?'}</span>
+                    <span className={styles.name}>{bug.rare ? t('garden.rare') : '?'}</span>
                   </span>
                 )}
               </li>
@@ -69,17 +80,17 @@ export default function GlowbugGarden() {
       </main>
       <BottomNav active="pals" />
       {meeting && (
-        <Dialog title={meeting.name} tone="celebrate" onClose={() => setMeeting(null)}>
+        <Dialog title={meetingName} tone="celebrate" onClose={() => setMeeting(null)}>
           <div className={styles.meet}>
             <GlowbugArt id={meeting.id} size={140} />
           </div>
           <p className={styles.title}>
-            {meeting.title}
-            {meeting.rare && <span className={styles.rare}> · ★ Rare</span>}
+            {glowbugTitle(lang, meeting)}
+            {meeting.rare && <span className={styles.rare}> · {t('garden.rare')}</span>}
           </p>
-          <p className={styles.bio}>{meeting.bio}</p>
+          <p className={styles.bio}>{glowbugBio(lang, meeting)}</p>
           <Button onClick={() => setMeeting(null)} data-autofocus>
-            Hi, {meeting.name}!
+            {t('garden.hi', { name: meetingName })}
           </Button>
         </Dialog>
       )}

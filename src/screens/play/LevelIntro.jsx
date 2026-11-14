@@ -6,6 +6,7 @@ import LumiSays from '../../components/game/LumiSays.jsx';
 import GemShape from '../../components/GemShape.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import { glowbugById } from '../../game/glowbugs.js';
+import { glowbugName } from '../../i18n/groveText.js';
 import { moveLimitFor } from '../../game/scoring.js';
 import { TILE } from '../../game/constants.js';
 import styles from './LevelIntro.module.css';
@@ -49,7 +50,7 @@ export default function LevelIntro({
     return () => clearTimeout(timer);
   }, [onDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const gems = level.tiles.filter((tile) => tile.type === TILE.GEM);
   const limit = moveLimit ?? moveLimitFor(level.par, level.difficulty);
   // Hard and Extra Hard levels get their own stamp, so a tougher level is never a surprise.
@@ -79,7 +80,7 @@ export default function LevelIntro({
         {glowbugId && (
           <p className={styles.glowbug}>
             <GlowbugArt id={glowbugId} size={40} isAwake={false} />
-            <span>{t('intro.rescue', { name: glowbugById(glowbugId).name })}</span>
+            <span>{t('intro.rescue', { name: glowbugName(lang, glowbugById(glowbugId)) })}</span>
           </p>
         )}
         <div className={styles.lumi}>

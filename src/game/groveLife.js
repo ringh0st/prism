@@ -17,12 +17,12 @@ export const isNapTime = (date = new Date()) => date.getHours() >= 23 || date.ge
 
 /** Where the Pal goes to use each spot's decor (% of the scene, by its feet), and how it reacts there. */
 export const SPOT_VISITS = {
-  home: { left: 26, top: 74, emote: '🏠', line: 'Home sweet home!', action: 'wave' },
-  seat: { left: 80, top: 68, emote: '♪', line: 'Ahh, comfy.', action: 'sit' },
-  light: { left: 56, top: 64, emote: '✨', line: 'So pretty and glowy!', action: 'lookUp' },
-  garden: { left: 16, top: 88, emote: '🌸', line: 'Mmm, smells lovely!', action: 'sniff' },
-  water: { left: 78, top: 88, emote: '💧', line: 'Splish splash!', action: 'splash' },
-  sky: { left: 50, top: 72, emote: '☁️', line: 'Look up there!', action: 'lookUp' },
+  home: { spot: 'home', left: 26, top: 74, emote: '🏠', line: 'Home sweet home!', action: 'wave' },
+  seat: { spot: 'seat', left: 80, top: 68, emote: '♪', line: 'Ahh, comfy.', action: 'sit' },
+  light: { spot: 'light', left: 56, top: 64, emote: '✨', line: 'So pretty and glowy!', action: 'lookUp' },
+  garden: { spot: 'garden', left: 16, top: 88, emote: '🌸', line: 'Mmm, smells lovely!', action: 'sniff' },
+  water: { spot: 'water', left: 78, top: 88, emote: '💧', line: 'Splish splash!', action: 'splash' },
+  sky: { spot: 'sky', left: 50, top: 72, emote: '☁️', line: 'Look up there!', action: 'lookUp' },
 };
 
 /** Things a Pal does on the spot, just for fun. */
@@ -40,7 +40,7 @@ export const napSpot = (spots) => (spots.includes('home') ? SPOT_VISITS.home : {
  * dance…), or wander somewhere, sometimes with a mood.
  * @param spots the Grove spots that have decor
  * @param roll  random numbers in [0, 1) (injected so tests are predictable)
- * @returns {{ left?, top?, emote, line, action }} no left/top means it stays where it is
+ * @returns {{ spot?, left?, top?, emote, line, action }} no left/top means it stays where it is; `spot` names the decor it visits
  */
 export function nextActivity(spots, [kind, pick, x, y] = [Math.random(), Math.random(), Math.random(), Math.random()]) {
   if (spots.length && kind < 0.4) {

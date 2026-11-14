@@ -3,13 +3,28 @@ import PalArt from '../pals/PalArt.jsx';
 import { usePalLife } from '../../hooks/usePalLife.js';
 import { palById, palStage } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './GroveScene.module.css';
 
 /**
  * One Pal living in the Grove: it wanders, visits decor, shows moods and naps at night. Tap to pet it.
- * `greeting` is said once when it appears (a celebration, say).
+ * `greeting` is said once when it appears (a celebration, say). `petLines` are its English lines when tapped,
+ * `petLinesKey` their translations.
  */
-export default function GrovePal({ palId, stage = 0, wearing = [], spots, isNapping = false, size = 30, start, petLines, greeting = null, label }) {
+export default function GrovePal({
+  palId,
+  stage = 0,
+  wearing = [],
+  spots,
+  isNapping = false,
+  size = 30,
+  start,
+  petLines,
+  petLinesKey,
+  greeting = null,
+  label,
+}) {
+  const { t, line } = useI18n();
   const pal = palById(palId);
   const life = usePalLife({ spots, isNapping, start });
   const [pet, setPet] = useState(() => (greeting ? { line: greeting, key: 'greeting' } : null));
@@ -21,10 +36,13 @@ export default function GrovePal({ palId, stage = 0, wearing = [], spots, isNapp
   }, [pet]);
 
   const petPal = () => {
-    setPet({ line: isNapping ? 'Five more minutes…' : petLines[Date.now() % petLines.length], key: Date.now() });
+    setPet({ line: isNapping ? t('grove.sleepy') : line(petLinesKey, petLines), key: Date.now() });
     sfx.hello();
   };
-  const talk = pet?.line ?? life.emote?.line;
+  const visitLine = life.emote?.line && t(`grove.visit.${life.emote.spot}`, {}, life.emote.line);
+  const talk = pet?.line ?? visitLine;
+  const palName = t(`palName.${pal.id}`, {}, pal.name);
+  const stageName = t(`stage.${palStage(stage).id}`, {}, palStage(stage).name);
 
   return (
     <button
@@ -38,7 +56,7 @@ export default function GrovePal({ palId, stage = 0, wearing = [], spots, isNapp
         transitionDuration: `${life.walkMs}ms`,
       }}
       onClick={petPal}
-      aria-label={label ?? `Pet ${pal.name}, ${palStage(stage).name}${isNapping ? ' (napping)' : ''}`}
+      aria-label={label ?? t(isNapping ? 'grove.petPalNapping' : 'grove.petPal', { name: palName, stage: stageName })}
     >
       {/* A new key on every pet or action replays its animation (keys are prefixed so siblings never clash). */}
       <span
