@@ -432,3 +432,20 @@ button.goods:active .goodsArt {
   font-size: 18px;
   color: var(--text-soft);
 }
+
+.adoptOwned {
+  cursor: default;
+  background: color-mix(in srgb, var(--color-sage) 18%, var(--paper));
+}
+
+.ownedChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--action-label);
+  background: color-mix(in srgb, var(--color-sage) 40%, var(--surface-raised));
+}

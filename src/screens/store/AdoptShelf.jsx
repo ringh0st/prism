@@ -4,7 +4,7 @@ import Dialog from '../../components/Dialog.jsx';
 import Icon from '../../components/Icon.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { ADOPT_PAL_DIAMONDS, PALS } from '../../game/pals.js';
+import { ADOPT_PAL_DIAMONDS, PALS, stageOf } from '../../game/pals.js';
 import styles from './Stall.module.css';
 
 /** Adopt a Pal you choose (never a random one) for diamonds. You always see exactly what you get. */
@@ -13,6 +13,8 @@ export default function AdoptShelf({ onAdopted, onError }) {
   const [choice, setChoice] = useState(null);
   const [isBusy, setIsBusy] = useState(false);
   const waiting = PALS.filter((pal) => !progress.pal.owned[pal.id]);
+  // Pals you don't have come first; yours stay visible, marked Owned, and can't be bought again.
+  const shelf = [...waiting, ...PALS.filter((pal) => progress.pal.owned[pal.id])];
 
   const confirm = async () => {
     setIsBusy(true);
@@ -35,15 +37,25 @@ export default function AdoptShelf({ onAdopted, onError }) {
         {!isSignedIn && <> Diamonds need an account: <a href="#/settings">sign in</a>.</>}
       </p>
       <ul className={styles.adoptGrid}>
-        {waiting.map((pal) => (
+        {shelf.map((pal) => (
           <li key={pal.id}>
-            <button type="button" className={styles.adoptPal} onClick={() => setChoice(pal)} aria-label={`Adopt ${pal.name} the ${pal.species}`}>
-              <PalArt palId={pal.id} size={64} />
-              <span className="game-title">{pal.name}</span>
-              <span className={styles.adoptPrice}>
-                <Icon name="diamond" size={13} /> {ADOPT_PAL_DIAMONDS}
-              </span>
-            </button>
+            {progress.pal.owned[pal.id] ? (
+              <div className={`${styles.adoptPal} ${styles.adoptOwned}`} aria-label={`${pal.name} the ${pal.species}: owned`}>
+                <PalArt palId={pal.id} stage={stageOf(progress.pal.owned[pal.id])} size={64} />
+                <span className="game-title">{pal.name}</span>
+                <span className={styles.ownedChip}>
+                  <Icon name="check" size={13} /> Owned
+                </span>
+              </div>
+            ) : (
+              <button type="button" className={styles.adoptPal} onClick={() => setChoice(pal)} aria-label={`Adopt ${pal.name} the ${pal.species}`}>
+                <PalArt palId={pal.id} size={64} />
+                <span className="game-title">{pal.name}</span>
+                <span className={styles.adoptPrice}>
+                  <Icon name="diamond" size={13} /> {ADOPT_PAL_DIAMONDS}
+                </span>
+              </button>
+            )}
           </li>
         ))}
       </ul>
