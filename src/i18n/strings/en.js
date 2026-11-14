@@ -183,11 +183,12 @@ export const en = {
   'share.copied': 'Copied! Paste it anywhere.',
   'share.failed': 'Sharing isn’t available here.',
 
-  'rank.up': 'Rank up!',
+  'rank.up': 'Glow up!',
+  'glow.badge': 'Glow {n}, {title}',
   'rank.newTitle': 'New title!',
-  'rank.reached': 'You reached rank {n}',
+  'rank.reached': 'You reached Glow {n}',
   'rank.nowTitle': 'You are now a {title}',
-  'rank.label': 'Rank {n}',
+  'rank.label': 'Glow {n}',
 
   'glowbug.shy': '{name} is still a bit shy… Get ★★★ to rescue it!',
   'glowbug.rescued': 'You rescued {name}!',

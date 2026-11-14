@@ -9,6 +9,9 @@
 
 /* The level number sits in its own darker pill at the front, so it reads as a number, not part of the name. */
 .level {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15em;
   padding: 0 0.45em;
   border-radius: var(--radius-pill);
   background: rgba(43, 33, 24, 0.14);

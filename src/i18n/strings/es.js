@@ -179,11 +179,12 @@ export const es = {
   'share.copied': '¡Copiado! Pégalo donde quieras.',
   'share.failed': 'Aquí no se puede compartir.',
 
-  'rank.up': '¡Subes de rango!',
+  'rank.up': '¡Más brillo!',
+  'glow.badge': 'Brillo {n}, {title}',
   'rank.newTitle': '¡Nuevo título!',
-  'rank.reached': 'Llegaste al rango {n}',
+  'rank.reached': 'Llegaste a Brillo {n}',
   'rank.nowTitle': 'Ahora eres {title}',
-  'rank.label': 'Rango {n}',
+  'rank.label': 'Brillo {n}',
 
   'glowbug.shy': '{name} todavía es tímido… ¡Consigue ★★★ para rescatarlo!',
   'glowbug.rescued': '¡Rescataste a {name}!',

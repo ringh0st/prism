@@ -180,11 +180,12 @@ export const he = {
   'share.copied': 'הועתק! אפשר להדביק בכל מקום.',
   'share.failed': 'אי אפשר לשתף כאן.',
 
-  'rank.up': 'עליתם בדרגה!',
+  'rank.up': 'הזוהר עלה!',
+  'glow.badge': 'זוהר {n}, {title}',
   'rank.newTitle': 'תואר חדש!',
-  'rank.reached': 'הגעתם לדרגה {n}',
+  'rank.reached': 'הגעתם לזוהר {n}',
   'rank.nowTitle': 'עכשיו אתם {title}',
-  'rank.label': 'דרגה {n}',
+  'rank.label': 'זוהר {n}',
 
   'glowbug.shy': '{name} עדיין קצת ביישן… השיגו ★★★ כדי להציל אותו!',
   'glowbug.rescued': 'הצלתם את {name}!',
