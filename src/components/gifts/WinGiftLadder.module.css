@@ -1,22 +1,20 @@
 .ladder {
-  display: grid;
-  justify-items: center;
-  gap: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
   margin-bottom: var(--space-3);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   background: var(--surface-sunken);
 }
 
-.title,
-.next {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.next {
-  color: var(--text-soft);
+.wins {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 18px;
+  color: var(--text-strong);
 }
 
 .steps {
@@ -32,7 +30,9 @@
   align-items: center;
   gap: 4px;
   padding: 4px 10px;
+  border: 0;
   border-radius: var(--radius-pill);
+  font: inherit;
   font-size: 15px;
   color: var(--text-soft);
   background: var(--surface-raised);
@@ -43,10 +43,19 @@
   background: var(--calm-bottom);
 }
 
+/* A gift that's ready: big, golden and wiggling — tap it */
 .ready {
+  padding: 8px 14px;
+  font-size: 18px;
   color: var(--reward-label);
   background: var(--reward-bottom);
+  box-shadow: var(--shadow-button);
+  cursor: pointer;
   animation: wiggle 1.6s ease-in-out infinite;
+}
+
+.ready:active {
+  transform: scale(0.94);
 }
 
 @keyframes wiggle {
@@ -56,10 +65,10 @@
     transform: none;
   }
   80% {
-    transform: rotate(-8deg) scale(1.1);
+    transform: rotate(-8deg) scale(1.12);
   }
   90% {
-    transform: rotate(6deg) scale(1.1);
+    transform: rotate(6deg) scale(1.12);
   }
 }
 

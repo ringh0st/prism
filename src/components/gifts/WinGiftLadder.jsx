@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import Icon from '../Icon.jsx';
-import Button from '../Button.jsx';
 import GiftReveal from './GiftReveal.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { WIN_GIFTS, readyWinGift, winGiftsOpened, winsToday } from '../../game/gifts.js';
+import { WIN_GIFTS, readyWinGiftCount, winGiftsOpened, winsToday } from '../../game/gifts.js';
 import { todayKey } from '../../game/daily.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './WinGiftLadder.module.css';
 
 /**
- * On the win screen: today's win gifts (1st, 3rd and 6th level won). Opened ones are ticked, a ready one
- * wiggles and opens with the gift moment, and the next shows how many wins it needs.
+ * On the win screen: today's wins (a trophy and a number) and the win gifts for the 1st, 3rd and 6th win.
+ * Opened ones are ticked; ready ones wiggle and are tapped to open (all that are ready, together); the rest
+ * show how many wins they need.
  */
 export default function WinGiftLadder() {
   const { progress, claimWinGift } = usePlayer();
@@ -18,38 +18,46 @@ export default function WinGiftLadder() {
   const today = todayKey();
   const wins = winsToday(progress, today);
   const opened = winGiftsOpened(progress, today);
-  const ready = readyWinGift(progress, today);
-  const [opening, setOpening] = useState(null);
+  const ready = readyWinGiftCount(progress, today);
+  const [opening, setOpening] = useState(0);
   if (wins === 0) return null;
 
   return (
     <section className={styles.ladder} aria-label={t('winGift.label', { count: wins })}>
-      <p className={styles.title}>{t('winGift.title', { count: wins })}</p>
+      <span className={`game-title ${styles.wins}`} aria-hidden="true">
+        <Icon name="trophy" size={18} /> {wins}
+      </span>
       <ol className={styles.steps}>
         {WIN_GIFTS.map((tier, i) => {
-          const state = i < opened ? 'done' : tier === ready ? 'ready' : 'later';
-          return (
-            <li key={tier.wins} className={`${styles.step} ${styles[state]}`}>
-              <Icon name={state === 'done' ? 'check' : 'gift'} size={20} strokeWidth={state === 'done' ? 3 : 2} />
+          const isDone = i < opened;
+          const isReady = !isDone && i < opened + ready;
+          const content = (
+            <>
+              <Icon name={isDone ? 'check' : 'gift'} size={isReady ? 24 : 20} strokeWidth={isDone ? 3 : 2} />
               <span className="game-title">{tier.wins}</span>
+            </>
+          );
+          return (
+            <li key={tier.wins}>
+              {isReady ? (
+                <button type="button" className={`${styles.step} ${styles.ready}`} onClick={() => setOpening(ready)} aria-label={t('winGift.open')}>
+                  {content}
+                </button>
+              ) : (
+                <span className={`${styles.step} ${isDone ? styles.done : ''}`}>{content}</span>
+              )}
             </li>
           );
         })}
       </ol>
-      {ready ? (
-        <Button size="sm" variant="gold" icon="gift" onClick={() => setOpening(ready)}>
-          {t('winGift.open')}
-        </Button>
-      ) : (
-        WIN_GIFTS[opened] && <p className={styles.next}>{t('winGift.next', { count: WIN_GIFTS[opened].wins - wins })}</p>
-      )}
-      {opening && (
+      {opening > 0 && (
         <GiftReveal
-          title={t('winGift.giftTitle', { count: opening.wins })}
+          title={t('winGift.giftTitle', { count: wins })}
           doneTitle={t('ui.gift.title')}
-          wrapping={{ kind: 'box', tone: opening.wins >= 6 ? 'peach' : 'honey' }}
+          wrapping={{ kind: 'box', tone: 'honey' }}
           open={claimWinGift}
-          onClose={() => setOpening(null)}
+          count={opening}
+          onClose={() => setOpening(0)}
         />
       )}
     </section>

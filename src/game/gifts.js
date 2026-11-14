@@ -192,6 +192,12 @@ export function readyWinGift(progress, today) {
   return next && winsToday(progress, today) >= next.wins ? next : null;
 }
 
+/** How many win gifts are ready to open now (they can be opened together). */
+export function readyWinGiftCount(progress, today) {
+  const wins = winsToday(progress, today);
+  return WIN_GIFTS.slice(winGiftsOpened(progress, today)).filter((tier) => wins >= tier.wins).length;
+}
+
 /** Opens today's next win gift on this device (guests). @returns { progress, gift } @throws EconomyError */
 export function claimWinGiftLocally(progress, today) {
   const tier = readyWinGift(progress, today);
