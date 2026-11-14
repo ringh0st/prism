@@ -97,30 +97,61 @@ export function presentProgress(progress) {
   return { have: Math.max(0, Math.min(PRESENT_EVERY_STARS, stars)), need: PRESENT_EVERY_STARS };
 }
 
+/**
+ * How special a present turns out. While it opens, a plain present can glow up a level at a time
+ * (like a light growing brighter); the odds are shown before opening. A brighter present holds more:
+ * extra sparks, and from Epic up a sure outfit piece or decor (when there's one you don't own yet).
+ * A Legendary one also holds a diamond for accounts (guests get 40 more sparks instead).
+ */
+export const PRESENT_RARITIES = [
+  { id: 'plain', chance: 65, bonusSparks: 0 },
+  { id: 'rare', chance: 23, bonusSparks: 20 },
+  { id: 'epic', chance: 9, bonusSparks: 40, sureItem: true },
+  { id: 'legendary', chance: 3, bonusSparks: 80, sureItem: true, diamonds: 1 },
+];
+export const LEGENDARY_GUEST_SPARKS = 40;
+
+/** Which rarity a 0–1 roll lands on. */
+export function presentRarityFor(roll) {
+  let edge = 0;
+  for (const rarity of PRESENT_RARITIES) {
+    edge += rarity.chance / 100;
+    if (roll < edge) return rarity;
+  }
+  return PRESENT_RARITIES.at(-1);
+}
+
 const ownsItem = (progress, item) => (item.type === 'outfit' ? progress.pal.accessories : progress.grove.items).includes(item.id);
 
 /**
- * What's inside a present. `roll` picks the surprise by PRESENT_ODDS, `pick` which one. When the surprise
- * can't be given (every helper full, every item owned), it becomes the sparks bag instead.
- * @returns { sparks, helper?, item? }
+ * What's inside a present. `rarityRoll` picks how special it is, `roll` the surprise by PRESENT_ODDS (Epic and
+ * Legendary always hold an item when one is left), `pick` which one. A surprise that can't be given (every helper
+ * full, every item owned) becomes the sparks bag instead.
+ * @returns { rarity, sparks, helper?, item?, diamonds? }
  */
-export function drawPresent(progress, roll = Math.random(), pick = Math.random()) {
-  const gift = { sparks: PRESENT_BASE_SPARKS };
-  const sparksBag = { sparks: PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks };
-  const score = roll * 100;
-  if (score < PRESENT_ODDS[0].chance) {
-    const helpers = PRESENT_HELPERS.filter((id) => (progress.helpers[id] ?? 0) < INVENTORY_CAP);
-    return helpers.length ? { ...gift, helper: helpers[Math.floor(pick * helpers.length)] } : sparksBag;
-  }
-  if (score < PRESENT_ODDS[0].chance + PRESENT_ODDS[1].chance) return sparksBag;
+export function drawPresent(progress, { rarityRoll = Math.random(), roll = Math.random(), pick = Math.random(), isSignedIn = false } = {}) {
+  const rarity = presentRarityFor(rarityRoll);
+  const sparksBag = PRESENT_ODDS[1].sparks;
   const items = PRESENT_ITEMS.filter((item) => !ownsItem(progress, item));
-  return items.length ? { ...gift, item: items[Math.floor(pick * items.length)] } : sparksBag;
+  const helpers = PRESENT_HELPERS.filter((id) => (progress.helpers[id] ?? 0) < INVENTORY_CAP);
+  const score = roll * 100;
+  let surprise;
+  if (rarity.sureItem || score >= PRESENT_ODDS[0].chance + PRESENT_ODDS[1].chance) {
+    surprise = items.length ? { item: items[Math.floor(pick * items.length)] } : { sparks: sparksBag };
+  } else if (score < PRESENT_ODDS[0].chance) {
+    surprise = helpers.length ? { helper: helpers[Math.floor(pick * helpers.length)] } : { sparks: sparksBag };
+  } else {
+    surprise = { sparks: sparksBag };
+  }
+  const legendaryExtra = rarity.diamonds ? (isSignedIn ? { diamonds: rarity.diamonds } : { sparks: LEGENDARY_GUEST_SPARKS }) : {};
+  const sparks = PRESENT_BASE_SPARKS + rarity.bonusSparks + (surprise.sparks ?? 0) + (legendaryExtra.sparks ?? 0);
+  return { rarity: rarity.id, ...surprise, ...legendaryExtra, sparks };
 }
 
 /** Opens one present on this device (guests). @returns { progress, gift } @throws EconomyError */
-export function openPresentLocally(progress, roll, pick) {
+export function openPresentLocally(progress, rolls) {
   if (presentsWaiting(progress) < 1) throw new EconomyError('No present yet.');
-  const gift = drawPresent(progress, roll, pick);
+  const gift = drawPresent(progress, rolls);
   const next = { ...progress, sparks: progress.sparks + gift.sparks, presents: { opened: progress.presents.opened + 1 } };
   if (gift.helper) next.helpers = { ...progress.helpers, [gift.helper]: (progress.helpers[gift.helper] ?? 0) + 1 };
   if (gift.item?.type === 'outfit') next.pal = { ...progress.pal, accessories: [...progress.pal.accessories, gift.item.id] };

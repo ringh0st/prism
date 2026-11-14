@@ -6,12 +6,23 @@ import RewardShower from '../RewardShower.jsx';
 import GiftBoxArt from './GiftBoxArt.jsx';
 import GiftItemArt from './GiftItemArt.jsx';
 import { giftItems } from '../../i18n/giftText.js';
+import { PRESENT_RARITIES } from '../../game/gifts.js';
+import { gemBurst } from '../../lib/effects.js';
 import { errorText } from '../../i18n/meText.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { sfx } from '../../audio/sfx.js';
 import styles from './GiftReveal.module.css';
 
 const SHAKE_MS = 900;
+const GLOW_STEP_MS = 750;
+/** Each step a present glows up to, plain → rare → epic → legendary: its color and a symbol (never color alone). */
+const GLOW_LOOKS = [
+  { tone: 'mint', symbol: '' },
+  { tone: 'peach', symbol: '◆' },
+  { tone: 'honey', symbol: '★' },
+  { tone: 'gold', symbol: '✦' },
+];
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const ITEM_GAP_MS = 380;
 const prefersCalm = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
@@ -27,7 +38,9 @@ const prefersCalm = () => typeof window !== 'undefined' && window.matchMedia?.('
  */
 export default function GiftReveal({ title, doneTitle, wrapping = { kind: 'box', tone: 'honey' }, open, partner = null, onClose, children }) {
   const { t, lang } = useI18n();
-  const [phase, setPhase] = useState('wrapped'); // wrapped | shaking | open | error
+  const [phase, setPhase] = useState('wrapped'); // wrapped | shaking | glowing | open | error
+  const [glow, setGlow] = useState(0);
+  const boxRef = useRef(null);
   const [items, setItems] = useState([]);
   const [shown, setShown] = useState(0);
   const [error, setError] = useState('');
@@ -45,10 +58,22 @@ export default function GiftReveal({ title, doneTitle, wrapping = { kind: 'box',
     const calm = prefersCalm();
     try {
       const [gift] = await Promise.all([open(), new Promise((resolve) => setTimeout(resolve, calm ? 0 : SHAKE_MS))]);
+      // A present that turned out special glows up a step at a time before it opens (decided already: this is the reveal).
+      const steps = Math.max(
+        0,
+        PRESENT_RARITIES.findIndex((rarity) => rarity.id === gift.rarity),
+      );
+      for (let step = 1; step <= steps; step++) {
+        setPhase('glowing');
+        setGlow(step);
+        sfx.glowUp(step);
+        gemBurst(boxRef.current, null);
+        await wait(calm ? 0 : GLOW_STEP_MS);
+      }
       const list = giftItems(lang, gift, partner);
       setItems(list);
       setPhase('open');
-      sfx.giftOpen({ isBig });
+      sfx.giftOpen({ isBig: isBig || steps >= 2 });
       list.forEach((_, i) =>
         later(
           () => {
@@ -78,6 +103,7 @@ export default function GiftReveal({ title, doneTitle, wrapping = { kind: 'box',
       <div className={styles.stage} onClick={showAll}>
         <button
           type="button"
+          ref={boxRef}
           className={`${styles.wrapped} ${styles[phase]}`}
           onClick={start}
           disabled={phase !== 'wrapped'}
@@ -89,9 +115,19 @@ export default function GiftReveal({ title, doneTitle, wrapping = { kind: 'box',
               <Icon name="chest" size={isBig ? 120 : 104} />
             </span>
           ) : (
-            <GiftBoxArt tone={wrapping.tone} phase={phase === 'error' ? 'wrapped' : phase} size={isBig ? 150 : 124} isBig={isBig} />
+            <GiftBoxArt
+              tone={glow > 0 ? GLOW_LOOKS[glow].tone : wrapping.tone}
+              phase={phase === 'error' ? 'wrapped' : phase === 'glowing' ? 'shaking' : phase}
+              size={isBig || glow >= 3 ? 150 : 124}
+              isBig={isBig}
+            />
           )}
         </button>
+        {glow > 0 && (
+          <p key={glow} className={`game-title ${styles.glowBadge} ${styles[`glow${glow}`]}`} role="status">
+            <span aria-hidden="true">{GLOW_LOOKS[glow].symbol}</span> {t(`present.rarity.${PRESENT_RARITIES[glow].id}`)}
+          </p>
+        )}
         {phase === 'wrapped' && (
           <p className={`game-title ${styles.prompt}`} aria-hidden="true">
             {t('gift.tapToOpen')}

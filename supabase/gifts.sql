@@ -125,7 +125,8 @@ $$;
 -- The partner Pal's presents: one per 10 stars from built-in levels. Each holds 20 sparks plus a surprise:
 -- 45% a helper, 30% a bag of 40 more sparks, 25% an outfit piece or Grove decor the player doesn't own.
 -- A surprise that can't be given (helpers full, everything owned) becomes the sparks bag.
--- Must match PRESENT_* in src/game/gifts.js.
+-- How special it is (shown as it opens): Plain 65%, Rare 23% (+20 sparks), Epic 9% (+40 sparks, a sure item),
+-- Legendary 3% (+80 sparks, a sure item and a diamond). Must match PRESENT_* in src/game/gifts.js.
 -- ---------------------------------------------------------------------------
 create or replace function public._present_items()
 returns text[]
@@ -146,10 +147,16 @@ declare
   v_user uuid := public._require_user();
   v_profile public.profiles;
   v_stars integer;
+  v_rarity_roll double precision := random() * 100;
   v_roll double precision := random() * 100;
+  v_rarity text;
+  v_bonus integer;
+  v_sure_item boolean;
+  v_diamonds integer := 0;
   v_helper text;
   v_item text;
-  v_gift jsonb := '{"sparks": 20}'::jsonb;
+  v_sparks integer := 20;
+  v_gift jsonb;
 begin
   select * into v_profile from public.profiles where id = v_user for update;
   select coalesce(sum(stars), 0)::integer into v_stars from public.progress
@@ -158,17 +165,24 @@ begin
     raise exception using message = 'No present yet.';
   end if;
 
-  if v_roll < 45 then
-    select h into v_helper from unnest(array['hint', 'lens', 'autoturn']) as h
-      where coalesce((v_profile.helpers ->> h)::integer, 0) < 5
-      order by random() limit 1;
-  elsif v_roll >= 75 then
+  if v_rarity_roll < 65 then v_rarity := 'plain'; v_bonus := 0; v_sure_item := false;
+  elsif v_rarity_roll < 88 then v_rarity := 'rare'; v_bonus := 20; v_sure_item := false;
+  elsif v_rarity_roll < 97 then v_rarity := 'epic'; v_bonus := 40; v_sure_item := true;
+  else v_rarity := 'legendary'; v_bonus := 80; v_sure_item := true; v_diamonds := 1;
+  end if;
+
+  if v_sure_item or v_roll >= 75 then
     select i into v_item from unnest(public._present_items()) as i
       where not (split_part(i, ':', 1) = 'outfit' and split_part(i, ':', 2) = any (v_profile.pal_accessories))
         and not (split_part(i, ':', 1) = 'decor' and split_part(i, ':', 2) = any (v_profile.grove_items))
       order by random() limit 1;
+  elsif v_roll < 45 then
+    select h into v_helper from unnest(array['hint', 'lens', 'autoturn']) as h
+      where coalesce((v_profile.helpers ->> h)::integer, 0) < 5
+      order by random() limit 1;
   end if;
 
+  v_gift := jsonb_build_object('rarity', v_rarity);
   if v_helper is not null then
     v_gift := v_gift || jsonb_build_object('helper', v_helper);
     update public.profiles set helpers = jsonb_set(helpers, array[v_helper], to_jsonb(coalesce((helpers ->> v_helper)::integer, 0) + 1))
@@ -181,11 +195,17 @@ begin
       update public.profiles set grove_items = array_append(grove_items, split_part(v_item, ':', 2)) where id = v_user;
     end if;
   else
-    v_gift := '{"sparks": 60}'::jsonb;
+    v_sparks := v_sparks + 40; -- the bag of sparks
   end if;
+  v_sparks := v_sparks + v_bonus;
+  if v_diamonds > 0 then
+    v_gift := v_gift || jsonb_build_object('diamonds', v_diamonds);
+  end if;
+  v_gift := v_gift || jsonb_build_object('sparks', v_sparks);
 
   update public.profiles set
-    sparks = sparks + (v_gift ->> 'sparks')::integer,
+    sparks = sparks + v_sparks,
+    diamonds = diamonds + v_diamonds,
     presents_opened = presents_opened + 1
   where id = v_user;
   return public._economy_state(v_user) || jsonb_build_object('gift', v_gift);

@@ -298,9 +298,20 @@ test('gift calendar: one a day, grows through the week, pauses when a day is mis
   assert.deepEqual(claimCalendarGiftLocally(full, '2026-03-05').gift, { sparks: 30, helper: null, isBig: false });
 });
 
-test('pal presents: one per 10 stars, odds shown, never something you own, matches the database', async () => {
-  const { PRESENT_BASE_SPARKS, PRESENT_EVERY_STARS, PRESENT_ITEMS, PRESENT_ODDS, drawPresent, openPresentLocally, presentProgress, presentsWaiting } =
-    await import('./gifts.js');
+test('pal presents: one per 10 stars, odds shown, glow up by rarity, never something you own, matches the database', async () => {
+  const {
+    PRESENT_BASE_SPARKS,
+    PRESENT_EVERY_STARS,
+    PRESENT_ITEMS,
+    PRESENT_ODDS,
+    PRESENT_RARITIES,
+    LEGENDARY_GUEST_SPARKS,
+    drawPresent,
+    openPresentLocally,
+    presentProgress,
+    presentRarityFor,
+    presentsWaiting,
+  } = await import('./gifts.js');
   const { accessoryById } = await import('./pals.js');
   const { groveItemById } = await import('./grove.js');
   const { createEmptyProgress } = await import('./progress.js');
@@ -309,36 +320,70 @@ test('pal presents: one per 10 stars, odds shown, never something you own, match
     PRESENT_ODDS.reduce((sum, odd) => sum + odd.chance, 0),
     100,
   );
+  assert.equal(
+    PRESENT_RARITIES.reduce((sum, rarity) => sum + rarity.chance, 0),
+    100,
+  );
   assert.match(sql, new RegExp(`v_stars / ${PRESENT_EVERY_STARS} <= v_profile.presents_opened`));
-  assert.match(sql, new RegExp(`'\\{"sparks": ${PRESENT_BASE_SPARKS}\\}'::jsonb`));
-  assert.match(sql, new RegExp(`'\\{"sparks": ${PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks}\\}'::jsonb`));
-  assert.match(sql, new RegExp(`v_roll < ${PRESENT_ODDS[0].chance}\\b`));
+  assert.match(sql, new RegExp(`v_sparks integer := ${PRESENT_BASE_SPARKS};`));
+  assert.match(sql, new RegExp(`v_sparks := v_sparks \\+ ${PRESENT_ODDS[1].sparks};`));
   assert.match(sql, new RegExp(`v_roll >= ${PRESENT_ODDS[0].chance + PRESENT_ODDS[1].chance}\\b`));
+  assert.match(sql, new RegExp(`v_roll < ${PRESENT_ODDS[0].chance}\\b`));
+  // Each rarity's edge, bonus, sure item and diamond, in order.
+  let edge = 0;
+  PRESENT_RARITIES.forEach((rarity, i) => {
+    edge += rarity.chance;
+    const bonus = `v_rarity := '${rarity.id}'; v_bonus := ${rarity.bonusSparks}; v_sure_item := ${Boolean(rarity.sureItem)};${rarity.diamonds ? ` v_diamonds := ${rarity.diamonds};` : ''}`;
+    assert.ok(sql.includes(bonus), `${rarity.id} matches`);
+    if (i < PRESENT_RARITIES.length - 1) assert.ok(sql.includes(`v_rarity_roll < ${edge} then ${bonus}`), `${rarity.id} edge`);
+  });
   assert.deepEqual(
     [...sql.match(/'(outfit|decor):(\w+)'/g)].map((entry) => entry.slice(1, -1)),
     PRESENT_ITEMS.map((item) => `${item.type}:${item.id}`),
   );
   PRESENT_ITEMS.forEach((item) => assert.ok(item.type === 'outfit' ? accessoryById(item.id) : groveItemById(item.id), item.id));
+  assert.equal(presentRarityFor(0).id, 'plain');
+  assert.equal(presentRarityFor(0.66).id, 'rare');
+  assert.equal(presentRarityFor(0.9).id, 'epic');
+  assert.equal(presentRarityFor(0.99).id, 'legendary');
 
   const levels = Object.fromEntries(Array.from({ length: 9 }, (_, i) => [`w1-0${i + 1}`, { stars: 3, bestMoves: 3 }]));
   let progress = { ...createEmptyProgress(), levels: { ...levels, 'event-x': { stars: 3 } } };
   assert.equal(presentsWaiting(progress), 2, "27 stars from built-in levels (events don't count)");
   assert.deepEqual(presentProgress(progress), { have: 10, need: 10 }, 'full while a present waits');
 
-  assert.deepEqual(drawPresent(progress, 0.1, 0), { sparks: PRESENT_BASE_SPARKS, helper: 'hint' });
-  assert.deepEqual(drawPresent(progress, 0.5, 0), { sparks: PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks });
-  const withItem = openPresentLocally(progress, 0.9, 0);
+  const plain = { rarityRoll: 0 };
+  assert.deepEqual(drawPresent(progress, { ...plain, roll: 0.1, pick: 0 }), { rarity: 'plain', sparks: PRESENT_BASE_SPARKS, helper: 'hint' });
+  assert.deepEqual(drawPresent(progress, { ...plain, roll: 0.5, pick: 0 }), {
+    rarity: 'plain',
+    sparks: PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks,
+  });
+  assert.deepEqual(drawPresent(progress, { rarityRoll: 0.7, roll: 0.5 }), {
+    rarity: 'rare',
+    sparks: PRESENT_BASE_SPARKS + 20 + PRESENT_ODDS[1].sparks,
+  });
+  // Epic and Legendary always hold an item; Legendary adds a diamond for accounts, sparks for guests.
+  assert.equal(drawPresent(progress, { rarityRoll: 0.9, roll: 0.1, pick: 0 }).item.id, PRESENT_ITEMS[0].id);
+  assert.deepEqual(drawPresent(progress, { rarityRoll: 0.995, roll: 0.1, pick: 0, isSignedIn: true }), {
+    rarity: 'legendary',
+    item: PRESENT_ITEMS[0],
+    diamonds: 1,
+    sparks: PRESENT_BASE_SPARKS + 80,
+  });
+  assert.equal(drawPresent(progress, { rarityRoll: 0.995, roll: 0.1, pick: 0 }).sparks, PRESENT_BASE_SPARKS + 80 + LEGENDARY_GUEST_SPARKS);
+
+  const withItem = openPresentLocally(progress, { rarityRoll: 0, roll: 0.9, pick: 0 });
   assert.equal(withItem.gift.item.id, PRESENT_ITEMS[0].id);
   assert.ok(withItem.progress.pal.accessories.includes(PRESENT_ITEMS[0].id));
-  assert.notEqual(drawPresent(withItem.progress, 0.9, 0).item.id, PRESENT_ITEMS[0].id, 'never something you own');
+  assert.notEqual(drawPresent(withItem.progress, { rarityRoll: 0, roll: 0.9, pick: 0 }).item.id, PRESENT_ITEMS[0].id, 'never something you own');
   progress = withItem.progress;
-  ({ progress } = openPresentLocally(progress, 0.5, 0));
+  ({ progress } = openPresentLocally(progress, { rarityRoll: 0, roll: 0.5 }));
   assert.equal(presentsWaiting(progress), 0);
   assert.deepEqual(presentProgress(progress), { have: 7, need: 10 });
   assert.throws(() => openPresentLocally(progress));
   // Every helper full: the helper surprise becomes the sparks bag.
   const full = { ...progress, helpers: { hint: 5, lens: 5, autoturn: 5, skip: 0 } };
-  assert.deepEqual(drawPresent(full, 0.1, 0), { sparks: PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks });
+  assert.equal(drawPresent(full, { rarityRoll: 0, roll: 0.1 }).sparks, PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks);
 });
 
 test('pals: starter choice, unlocks, growth and accessories', async () => {

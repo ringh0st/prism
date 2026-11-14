@@ -1,5 +1,13 @@
 /* Texts for gifts (the gift moment, the daily gift calendar, the partner Pal's presents), in every language. */
 export const en = {
+  'present.rarity.title': 'How special will it be?',
+  'present.rarity.plain': 'Plain',
+  'present.rarity.rare': 'Rare!',
+  'present.rarity.epic': 'Epic!',
+  'present.rarity.legendary': 'Legendary!',
+  'present.rarity.bonus': '+{n} sparks',
+  'present.rarity.item': 'a sure outfit or decor',
+  'present.rarity.diamond': 'a diamond (with an account)',
   'gift.tapToOpen': 'Tap to open!',
   'gift.sparks.one': '+{count} spark',
   'gift.sparks.other': '+{count} sparks',
@@ -39,7 +47,7 @@ export const en = {
   'present.odds.helper': 'A helper',
   'present.odds.sparks': 'A bag of {n} more sparks',
   'present.odds.item': 'Clothes or decor you don’t have yet',
-  'present.odds.note': 'Free, earned by playing. If a surprise can’t be given, you get the bag of sparks.',
+  'present.odds.note': 'Free, earned by playing. It shows how special it is as it opens. If a surprise can’t be given, you get the bag of sparks.',
   'present.win.ready': '{name} has a present for you on the map!',
   'present.win.toGo.one': '{count} more ★ until {name}’s present',
   'present.win.toGo.other': '{count} more ★ until {name}’s present',
@@ -47,6 +55,14 @@ export const en = {
 };
 
 export const es = {
+  'present.rarity.title': '¿Qué tan especial será?',
+  'present.rarity.plain': 'Normal',
+  'present.rarity.rare': '¡Raro!',
+  'present.rarity.epic': '¡Épico!',
+  'present.rarity.legendary': '¡Legendario!',
+  'present.rarity.bonus': '+{n} chispas',
+  'present.rarity.item': 'ropa o decoración seguro',
+  'present.rarity.diamond': 'un diamante (con cuenta)',
   'gift.tapToOpen': '¡Toca para abrir!',
   'gift.sparks.one': '+{count} chispa',
   'gift.sparks.other': '+{count} chispas',
@@ -86,7 +102,7 @@ export const es = {
   'present.odds.helper': 'Una ayuda',
   'present.odds.sparks': 'Una bolsa con {n} chispas más',
   'present.odds.item': 'Ropa o decoración que aún no tienes',
-  'present.odds.note': 'Gratis, ganado jugando. Si una sorpresa no se puede dar, recibes la bolsa de chispas.',
+  'present.odds.note': 'Gratis, ganado jugando. Al abrirlo verás lo especial que es. Si una sorpresa no se puede dar, recibes la bolsa de chispas.',
   'present.win.ready': '¡{name} tiene un regalo para ti en el mapa!',
   'present.win.toGo.one': 'Falta {count} ★ para el regalo de {name}',
   'present.win.toGo.other': 'Faltan {count} ★ para el regalo de {name}',
@@ -94,6 +110,14 @@ export const es = {
 };
 
 export const he = {
+  'present.rarity.title': 'כמה מיוחדת היא תהיה?',
+  'present.rarity.plain': 'רגילה',
+  'present.rarity.rare': 'נדירה!',
+  'present.rarity.epic': 'מיוחדת!',
+  'present.rarity.legendary': 'אגדית!',
+  'present.rarity.bonus': '\u2066+{n}\u2069 ניצוצות',
+  'present.rarity.item': 'בגד או קישוט בטוח',
+  'present.rarity.diamond': 'יהלום (עם חשבון)',
   'gift.tapToOpen': 'הקישו כדי לפתוח!',
   'gift.sparks.one': '\u2066+1\u2069 ניצוץ',
   'gift.sparks.other': '\u2066+{count}\u2069 ניצוצות',
@@ -133,7 +157,7 @@ export const he = {
   'present.odds.helper': 'עזר',
   'present.odds.sparks': 'שקית עם עוד {n} ניצוצות',
   'present.odds.item': 'בגד או קישוט שעוד אין לכם',
-  'present.odds.note': 'בחינם, מרוויחים במשחק. אם אי אפשר לתת את ההפתעה, מקבלים את שקית הניצוצות.',
+  'present.odds.note': 'בחינם, מרוויחים במשחק. כשהיא נפתחת רואים כמה היא מיוחדת. אם אי אפשר לתת את ההפתעה, מקבלים את שקית הניצוצות.',
   'present.win.ready': '{name} מחכה לכם עם מתנה במפה!',
   'present.win.toGo.one': 'עוד כוכב ★ אחד עד המתנה של {name}',
   'present.win.toGo.other': 'עוד {count} ★ עד המתנה של {name}',

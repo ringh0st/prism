@@ -173,55 +173,58 @@ export default function WinDialog({
           )}
         </div>
       </div>
-      {partner && !isSkipped && (
-        <div className={`${styles.evolved} ${palGrewTo ? styles.grew : ''}`}>
-          {/* Your partner cheers along: a happy bounce, and a big jump for the big moments. */}
-          <span className={`${styles.cheerPal} ${cheer.isBig || palGrewTo ? styles.bigCheer : ''}`}>
-            <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={64} portrait alive />
-          </span>
-          <div className={styles.cheerText}>
-            {palGrewTo ? (
-              <p role="status">
-                <strong>{t('win.grew', { name: palName(lang, partner), stage: t(`stage.${palGrewTo.id}`, {}, palGrewTo.name) })}</strong>
-              </p>
-            ) : (
-              <>
-                <p className={styles.cheerLine}>
-                  {t('win.cheer', { name: palName(lang, partner), line: lang === 'en' ? cheer.line : t('win.cheerLine') })}
-                </p>
-                <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
-                <PresentNote partner={partner} />
-              </>
-            )}
-          </div>
-        </div>
-      )}
-      {result.glowbug && !isSkipped && <GlowbugRescue glowbug={result.glowbug} />}
-      {(result.levelUp || result.newTitle) && <LevelUp level={result.levelUp} title={result.newTitle} />}
-      {(result.treat || result.newStickers?.length > 0) && (
-        <div className={styles.finds}>
-          {result.treat && partner && (
-            <span className={styles.find}>
-              <span aria-hidden="true">{result.treat.emoji}</span>{' '}
-              {t('win.treat', { name: palName(lang, partner), treat: t(`treat.${result.treat.id}`, {}, withArticle(result.treat)) })}
+      {/* The extras pop in one by one once the stars and sparks have landed, so the result reads first. */}
+      <div className={styles.extras} style={{ '--extras-at': `${rewardsAt + 700}ms` }}>
+        {partner && !isSkipped && (
+          <div className={`${styles.evolved} ${palGrewTo ? styles.grew : ''}`}>
+            {/* Your partner cheers along: a happy bounce, and a big jump for the big moments. */}
+            <span className={`${styles.cheerPal} ${cheer.isBig || palGrewTo ? styles.bigCheer : ''}`}>
+              <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={64} portrait alive />
             </span>
-          )}
-          {result.newStickers?.map(({ world, sticker }) => (
-            <a key={sticker.id} href="#/stickers" className={styles.find}>
-              <StickerBadge sticker={sticker} world={world} size={30} />{' '}
-              {t('win.sticker', { name: t(`sticker.${sticker.id}`, {}, sticker.name), world })}
-            </a>
-          ))}
-        </div>
-      )}
-      {shareMessage && <ShareResult text={shareMessage} />}
-      {challenge && <ChallengeShare {...challenge} />}
-      {replay && !isSkipped && <ReplayShare replay={{ ...replay, stars, moves }} />}
-      {completesWorld && !isSignedIn && (
-        <p className={styles.nudge}>
-          <Icon name="diamond" size={16} /> {t('win.worldDiamond')} <a href="#/settings">{t('common.signIn')}</a>
-        </p>
-      )}
+            <div className={styles.cheerText}>
+              {palGrewTo ? (
+                <p role="status">
+                  <strong>{t('win.grew', { name: palName(lang, partner), stage: t(`stage.${palGrewTo.id}`, {}, palGrewTo.name) })}</strong>
+                </p>
+              ) : (
+                <>
+                  <p className={styles.cheerLine}>
+                    {t('win.cheer', { name: palName(lang, partner), line: lang === 'en' ? cheer.line : t('win.cheerLine') })}
+                  </p>
+                  <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
+                  <PresentNote partner={partner} />
+                </>
+              )}
+            </div>
+          </div>
+        )}
+        {result.glowbug && !isSkipped && <GlowbugRescue glowbug={result.glowbug} />}
+        {(result.levelUp || result.newTitle) && <LevelUp level={result.levelUp} title={result.newTitle} />}
+        {(result.treat || result.newStickers?.length > 0) && (
+          <div className={styles.finds}>
+            {result.treat && partner && (
+              <span className={styles.find}>
+                <span aria-hidden="true">{result.treat.emoji}</span>{' '}
+                {t('win.treat', { name: palName(lang, partner), treat: t(`treat.${result.treat.id}`, {}, withArticle(result.treat)) })}
+              </span>
+            )}
+            {result.newStickers?.map(({ world, sticker }) => (
+              <a key={sticker.id} href="#/stickers" className={styles.find}>
+                <StickerBadge sticker={sticker} world={world} size={30} />{' '}
+                {t('win.sticker', { name: t(`sticker.${sticker.id}`, {}, sticker.name), world })}
+              </a>
+            ))}
+          </div>
+        )}
+        {shareMessage && <ShareResult text={shareMessage} />}
+        {challenge && <ChallengeShare {...challenge} />}
+        {replay && !isSkipped && <ReplayShare replay={{ ...replay, stars, moves }} />}
+        {completesWorld && !isSignedIn && (
+          <p className={styles.nudge}>
+            <Icon name="diamond" size={16} /> {t('win.worldDiamond')} <a href="#/settings">{t('common.signIn')}</a>
+          </p>
+        )}
+      </div>
     </Dialog>
   );
 }

@@ -41,6 +41,17 @@
   animation-duration: 1.6s;
 }
 
+.body rect,
+.lid rect,
+.lid path {
+  transition: fill 300ms ease;
+}
+
+/* The brightest present shines */
+.gold {
+  filter: drop-shadow(0 0 10px rgba(240, 193, 78, 0.9));
+}
+
 @keyframes bob {
   0%,
   70%,

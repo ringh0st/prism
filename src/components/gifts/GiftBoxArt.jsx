@@ -4,6 +4,7 @@ const TONES = {
   honey: { box: '#f0c14e', shade: '#d9a73a', ribbon: '#df7458' },
   peach: { box: '#f2a67e', shade: '#d98a62', ribbon: '#58ac82' },
   mint: { box: '#4fbfad', shade: '#3a9e8e', ribbon: '#f0c14e' },
+  gold: { box: '#f7d06a', shade: '#c99a2e', ribbon: '#df7458' },
 };
 
 /**
@@ -14,7 +15,7 @@ export default function GiftBoxArt({ tone = 'honey', phase = 'wrapped', size = 1
   const colors = TONES[tone];
   return (
     <svg
-      className={`${styles.art} ${styles[phase]} ${isBig ? styles.big : ''}`}
+      className={`${styles.art} ${styles[phase]} ${isBig ? styles.big : ''} ${tone === 'gold' ? styles.gold : ''}`}
       width={size}
       height={size}
       viewBox="0 0 120 120"

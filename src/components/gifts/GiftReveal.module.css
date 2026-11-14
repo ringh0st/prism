@@ -58,6 +58,30 @@
   animation: pop 500ms var(--ease-pop) both;
 }
 
+.glowBadge {
+  margin: 0;
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 20px;
+  animation: pop 500ms var(--ease-pop) both;
+}
+
+.glow1 {
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+}
+
+.glow2,
+.glow3 {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.glow3 {
+  font-size: 24px;
+  box-shadow: 0 0 18px rgba(240, 193, 78, 0.8);
+}
+
 .items {
   display: grid;
   gap: var(--space-2);
@@ -149,6 +173,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .prompt,
+  .glowBadge,
   .chest-wrapped,
   .chest-shaking,
   .chest-open,

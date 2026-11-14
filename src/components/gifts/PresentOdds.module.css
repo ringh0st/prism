@@ -42,3 +42,28 @@
   font-size: 15px;
   color: var(--text-strong);
 }
+
+.symbol {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 13px;
+  background: var(--surface-raised);
+}
+
+.rare .symbol {
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+}
+
+.epic .symbol,
+.legendary .symbol {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.what {
+  font-weight: 400;
+}

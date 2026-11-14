@@ -267,6 +267,12 @@ export const sfx = {
     steps.forEach((step, i) => bell(note(step), { delay: 0.1 + i * 0.06, volume: 0.07, duration: 0.5 }));
     feel('success');
   },
+  /** A present glows up to a more special kind: a bright shimmer that climbs higher at each step. */
+  glowUp(step) {
+    [0, 2, 4].forEach((offset, i) => bell(note(6 + step * 2 + offset), { delay: i * 0.05, volume: 0.07 + step * 0.01, duration: 0.5 }));
+    tone(600 + step * 150, 1600 + step * 200, 0.18, { volume: 0.03 });
+    feel(step >= 3 ? 'celebrate' : 'success');
+  },
   /** Each thing that comes out of a gift: one chime, a step higher every time. */
   giftItem(index) {
     bell(note(7 + index * 2), { volume: 0.08, duration: 0.45 });
