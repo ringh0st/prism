@@ -1,0 +1,132 @@
+.road {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.heading {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-strong);
+  text-align: start;
+}
+
+/* A horizontal road of stops; scrolls sideways on narrow phones, and starts near the current stop. */
+.steps {
+  position: relative;
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 4px 2px 8px;
+  overflow-x: auto;
+  list-style: none;
+  scroll-snap-type: x proximity;
+}
+
+.step {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  flex: 0 0 92px;
+  padding: var(--space-2) 6px;
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  text-align: center;
+  scroll-snap-align: center;
+}
+
+/* The road between stops */
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 26px;
+  right: calc(-1 * var(--space-2));
+  width: var(--space-2);
+  height: 4px;
+  background: var(--surface-cell-edge);
+}
+
+.earned:not(:last-child)::after {
+  background: var(--color-honey);
+}
+
+.current {
+  background: var(--surface-raised);
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 0 0 3px var(--color-honey);
+}
+
+.dot {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+}
+
+.ahead .dot {
+  color: var(--text-soft);
+  background: var(--surface-cell-edge);
+}
+
+.name {
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--text-strong);
+}
+
+.need {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.ahead .name {
+  color: var(--text-soft);
+}
+
+/* Each title's own color, as on its badge */
+.earned .scout,
+.current .scout {
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--color-sage) 30%, var(--surface-raised));
+}
+
+.earned .bender,
+.current .bender {
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+}
+
+.earned .mender,
+.current .mender {
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+}
+
+.earned .pro,
+.current .pro {
+  color: var(--action-label);
+  background: var(--action-bottom);
+}
+
+.earned .legend,
+.current .legend {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.earned .sage,
+.current .sage {
+  color: var(--alert-label);
+  background: var(--alert-bottom);
+}
+
+.earned .master,
+.current .master {
+  color: #f0c14e;
+  background: #2b2118;
+}

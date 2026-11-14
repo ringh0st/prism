@@ -251,6 +251,24 @@ test('player titles and finished worlds', async () => {
   assert.equal(finishedWorldCount({ ...levels, 'w2-01': { stars: 3 } }), 1);
 });
 
+test('player levels climb with stars, fast at first', async () => {
+  const { playerLevelFor } = await import('./titles.js');
+  assert.equal(playerLevelFor(0).level, 1);
+  assert.equal(playerLevelFor(4).level, 1);
+  assert.equal(playerLevelFor(5).level, 2);
+  assert.deepEqual(playerLevelFor(20), { level: 3, from: 15, to: 30, progress: 1 / 3 });
+  assert.equal(playerLevelFor(3000).level, 35);
+});
+
+test('a solve reports a level-up and a new title only when it crosses one', async () => {
+  const { climbFor } = await import('./titles.js');
+  const levels = Object.fromEntries(Array.from({ length: 9 }, (_, i) => [`w1-0${i + 1}`, { stars: 3 }])); // 27 stars, Lv 3
+  assert.deepEqual(climbFor(levels, { ...levels, 'w1-10': { stars: 1 } }), { levelUp: null, newTitle: null });
+  const climb = climbFor(levels, { ...levels, 'w1-10': { stars: 3 } }); // 30 stars
+  assert.equal(climb.levelUp, 4);
+  assert.equal(climb.newTitle.name, 'Beam Bender');
+});
+
 test('daily gift: once a day, same amount as the database', async () => {
   const { DAILY_GIFT_SPARKS } = await import('./catalog.js');
   const { claimDailyGiftLocally, createEmptyProgress, isDailyGiftReady } = await import('./progress.js');
@@ -715,6 +733,8 @@ test('stickers: six per world, earned from stars', async () => {
   const almost = { ...allThree, 'w2-20': { stars: 2 } };
   assert.deepEqual(
     newStickersFor(2, almost, allThree).map(({ sticker }) => sticker.id),
-    ['bossBeater', 'perfect'].concat(stickersForWorld(2, almost).find((s) => s.id === 'bugBuddy').isEarned ? [] : ['bugBuddy']).sort((a, b) => ['bossBeater', 'bugBuddy', 'perfect'].indexOf(a) - ['bossBeater', 'bugBuddy', 'perfect'].indexOf(b)),
+    ['bossBeater', 'perfect']
+      .concat(stickersForWorld(2, almost).find((s) => s.id === 'bugBuddy').isEarned ? [] : ['bugBuddy'])
+      .sort((a, b) => ['bossBeater', 'bugBuddy', 'perfect'].indexOf(a) - ['bossBeater', 'bugBuddy', 'perfect'].indexOf(b)),
   );
 });

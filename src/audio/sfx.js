@@ -185,6 +185,12 @@ export const sfx = {
     [5, 7, 9, 10].forEach((step) => bell(note(step), { delay: 0.55, volume: 0.07, duration: 1.4 }));
     feel('celebrate');
   },
+  /** The player reaches a new level: a quick climbing sparkle that lands on a bright chord. */
+  levelUp() {
+    [0, 2, 4, 5, 7].forEach((step, i) => bell(note(step), { delay: i * 0.05, volume: 0.06, duration: 0.35 }));
+    [7, 9].forEach((step) => bell(note(step), { delay: 0.3, volume: 0.07, duration: 1 }));
+    feel('success');
+  },
   /** A new Pal joins the team. */
   newPal() {
     tone(900, 1300, 0.08, { volume: 0.05 });

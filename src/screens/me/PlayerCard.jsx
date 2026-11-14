@@ -6,11 +6,12 @@ import Icon from '../../components/Icon.jsx';
 import { useAuth } from '../../state/AuthContext.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { currentStreak, totalStars } from '../../game/progress.js';
-import { finishedWorldCount, titleFor } from '../../game/titles.js';
+import { finishedWorldCount, playerLevelFor, titleFor } from '../../game/titles.js';
 import { todayKey } from '../../game/daily.js';
 import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
 import NicknameDialog from './NicknameDialog.jsx';
 import TitleBadge from '../../components/game/TitleBadge.jsx';
+import TitleRoad from './TitleRoad.jsx';
 import styles from './PlayerCard.module.css';
 import { earnedStickers } from '../../game/stickers.js';
 import { rescuedGlowbugs } from '../../game/glowbugs.js';
@@ -42,7 +43,8 @@ export default function PlayerCard() {
   const [isEditingNickname, setIsEditingNickname] = useState(false);
   const shownNickname = progress.nickname ?? nickname;
   const stars = totalStars(progress);
-  const { current, next, progress: toNext } = titleFor(stars);
+  const { next } = titleFor(stars);
+  const playerLevel = playerLevelFor(stars);
   const solved = Object.values(progress.levels).filter((entry) => entry.stars > 0).length;
   const streak = currentStreak(progress, todayKey());
   const shields = progress.daily.shields ?? 0;
@@ -97,26 +99,27 @@ export default function PlayerCard() {
 
       <div className={styles.title}>
         <TitleBadge stars={stars} size="lg" className={styles.titleChip} />
-        {next ? (
-          <>
-            <div
-              className={styles.track}
-              role="progressbar"
-              aria-label={`Progress to ${next.name}`}
-              aria-valuemin={current.stars}
-              aria-valuemax={next.stars}
-              aria-valuenow={stars}
-            >
-              <span className={styles.fill} style={{ width: `${Math.round(toNext * 100)}%` }} />
-            </div>
-            <p className={styles.nextTitle}>
-              {next.stars - stars} more ★ to become <strong>{next.name}</strong>
-            </p>
-          </>
-        ) : (
-          <p className={styles.nextTitle}>The highest title there is. Legendary!</p>
-        )}
+        <div
+          className={styles.track}
+          role="progressbar"
+          aria-label={`Progress to level ${playerLevel.level + 1}`}
+          aria-valuemin={playerLevel.from}
+          aria-valuemax={playerLevel.to}
+          aria-valuenow={stars}
+        >
+          <span className={styles.fill} style={{ width: `${Math.round(playerLevel.progress * 100)}%` }} />
+        </div>
+        <p className={styles.nextTitle}>
+          {playerLevel.to - stars} more ★ to reach <strong>Lv {playerLevel.level + 1}</strong>
+          {next && (
+            <>
+              {' '}
+              · {next.stars - stars} to become <strong>{next.name}</strong>
+            </>
+          )}
+        </p>
       </div>
+      <TitleRoad stars={stars} />
 
       <ul className={styles.stats}>
         <Stat icon="star" tone="honey" value={stars} label="stars" />

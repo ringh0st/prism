@@ -37,6 +37,7 @@ import { EVENT_LEVELS, parseEventLevelId } from '../../game/events.js';
 import ComboBurst from './ComboBurst.jsx';
 import { treatFoundBy } from '../../game/treats.js';
 import { newStickersFor } from '../../game/stickers.js';
+import { climbFor } from '../../game/titles.js';
 import { glowbugCellOf, glowbugForLevel, rescuedGlowbugs } from '../../game/glowbugs.js';
 import { cellsOnBeams } from '../../game/beam.js';
 import PalBuddy from './PalBuddy.jsx';
@@ -227,7 +228,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       };
       const treat = mode === 'level' ? treatFoundBy(progress.levels, levelsAfter) : null;
       const newStickers = mode === 'level' ? newStickersFor(level.world, progress.levels, levelsAfter) : [];
-      setResult({ ...finished, moves: isSkipped ? null : moves, isSkipped, completesWorld, glowbug: glowbugResult, treat, newStickers });
+      const climb = mode === 'level' ? climbFor(progress.levels, levelsAfter) : {};
+      setResult({ ...finished, moves: isSkipped ? null : moves, isSkipped, completesWorld, glowbug: glowbugResult, treat, newStickers, ...climb });
     },
     [
       moves,

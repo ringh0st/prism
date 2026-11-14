@@ -16,6 +16,7 @@ import GlowbugRescue from './GlowbugRescue.jsx';
 import StickerBadge from '../../components/stickers/StickerBadge.jsx';
 import { withArticle } from '../../game/treats.js';
 import { cheerFor } from '../../game/palCheers.js';
+import LevelUp from './LevelUp.jsx';
 import styles from './WinDialog.module.css';
 
 function headlineFor({ stars, isSkipped, completesWorld, isFirstToday }, difficulty) {
@@ -166,6 +167,7 @@ export default function WinDialog({
         </div>
       )}
       {result.glowbug && !isSkipped && <GlowbugRescue glowbug={result.glowbug} />}
+      {(result.levelUp || result.newTitle) && <LevelUp level={result.levelUp} title={result.newTitle} />}
       {(result.treat || result.newStickers?.length > 0) && (
         <div className={styles.finds}>
           {result.treat && partner && (

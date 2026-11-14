@@ -18,6 +18,38 @@ export function titleFor(stars) {
   return { current, next, progress };
 }
 
+/*
+ * Player level: a number that climbs with stars, quickly at first (Lv 2 at 5 ★, Lv 5 at 50 ★) and
+ * slower later (Lv 20 at 950 ★, Lv 35 at 2975 ★), so there is always a next level in sight.
+ */
+const STARS_PER_LEVEL_STEP = 5;
+
+/** Stars needed to reach a player level. */
+export const starsForPlayerLevel = (level) => (STARS_PER_LEVEL_STEP * (level - 1) * level) / 2;
+
+/** The player level for a star total, the stars it started at, the stars the next one needs, and progress (0 to 1). */
+export function playerLevelFor(stars) {
+  let level = 1;
+  while (stars >= starsForPlayerLevel(level + 1)) level += 1;
+  const from = starsForPlayerLevel(level);
+  const to = starsForPlayerLevel(level + 1);
+  return { level, from, to, progress: (stars - from) / (to - from) };
+}
+
+const starsIn = (levels) => Object.values(levels).reduce((sum, entry) => sum + (entry.stars ?? 0), 0);
+
+/** What a solve climbed to: { levelUp: new player level or null, newTitle: new title or null }. */
+export function climbFor(levelsBefore, levelsAfter) {
+  const before = starsIn(levelsBefore);
+  const after = starsIn(levelsAfter);
+  const levelAfter = playerLevelFor(after).level;
+  const titleAfter = titleFor(after).current;
+  return {
+    levelUp: levelAfter > playerLevelFor(before).level ? levelAfter : null,
+    newTitle: titleAfter !== titleFor(before).current ? titleAfter : null,
+  };
+}
+
 /** Solved built-in levels ("w3-01" … "w3-20", at least one star) per world number. */
 function solvedCountByWorld(levels) {
   const solvedPerWorld = new Map();

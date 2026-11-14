@@ -1,0 +1,53 @@
+/* A honey ribbon that pops in after the stars. */
+.levelUp {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  padding: 8px 14px;
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: var(--shadow-sm);
+  animation: levelPop 520ms var(--ease-pop) 500ms both;
+}
+
+.badge {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 52px;
+  height: 52px;
+  padding: 0 6px;
+  border-radius: 50%;
+  font-size: 18px;
+  color: #f0c14e;
+  background: #2b2118;
+}
+
+.text {
+  display: grid;
+  text-align: start;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.text strong {
+  font-size: 20px;
+}
+
+@keyframes levelPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .levelUp {
+    animation: none;
+  }
+}
