@@ -1,5 +1,6 @@
 import Icon from './Icon.jsx';
 import { helperText } from '../i18n/gameText.js';
+import { HELPERS } from '../game/catalog.js';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import styles from './HelperBar.module.css';
 
@@ -28,7 +29,7 @@ export default function HelperBar({ helperIds, inventory, usedCount, allowed, di
               aria-label={`${helper.name}: ${helper.description} ${isFree ? t('helpers.freeHere') : owned > 0 ? t('helpers.left', { count: owned }) : t('helpers.none')}`}
             >
               <span className={styles.icon} aria-hidden="true">
-                <Icon name={helper.icon} size={22} />
+                <Icon name={HELPERS[id].icon} size={22} />
               </span>
               <span className={styles.name}>{helper.name}</span>
               <span className={`${styles.count} ${isFree ? styles.free : ''}`} aria-hidden="true">

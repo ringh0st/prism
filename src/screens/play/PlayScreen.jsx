@@ -188,7 +188,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
             : t('play.challengeFromFriend')
           : mode === 'rush'
             ? t('play.rushSpot', { n: rush.number, total: RUSH_LENGTH })
-            : `${world ? `${worldName(lang, world)} · ` : ''}${level.world}-${level.index}`;
+            : world && lang !== 'en'
+              ? worldName(lang, world) // the title already says "שלב 5-16"
+              : `${world ? `${worldName(lang, world)} · ` : ''}${level.world}-${level.index}`;
   const introLine = useMemo(
     () =>
       challenge

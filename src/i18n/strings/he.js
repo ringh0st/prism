@@ -95,7 +95,7 @@ export const he = {
   'coach.firstMove': 'ראיתם? המראה הסתובבה והאור קפץ! תמשיכו לעקוב אחרי היד.',
 
   'lumi.name': 'לומי',
-  'lumi.says': 'לומי: ”{line}“',
+  'lumi.says': 'לומי: "{line}"',
   'lumi.lookHere': 'פססט… תסתכלו ליד המקום הזוהר. עדיין תקועים? הקישו על רמז!',
   'lumi.stuckHint': 'תקועים? הקישו על רמז!',
   'lumi.blocked.mirror': 'המראה הזאת מוברגת. סובבו את האחרות!',
@@ -175,7 +175,7 @@ export const he = {
   'win.next': 'לשלב הבא',
   'win.playAgain': 'לשחק שוב',
   'win.grew': '{name} גדל ועכשיו הוא {stage}!',
-  'win.cheer': '{name}: ”{line}“',
+  'win.cheer': '{name}: "{line}"',
   'win.cheerLine': 'יש! הצלחתם!',
   'win.treat': '{name} מצא {treat}! אפשר להאכיל אותו בחברים.',
   'win.sticker': 'מדבקה חדשה: {name} (עולם {world})',
