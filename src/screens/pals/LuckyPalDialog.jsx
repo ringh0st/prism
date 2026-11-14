@@ -2,10 +2,9 @@ import { useState } from 'react';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
-import PalArt from '../../components/pals/PalArt.jsx';
-import RarityBadge from '../../components/pals/RarityBadge.jsx';
+import PalReveal from '../../components/pals/PalReveal.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { LUCKY_PAL_EVERY, palById, rarityOf } from '../../game/pals.js';
+import { LUCKY_PAL_EVERY, palById } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
 import { rewardShower } from '../../lib/effects.js';
 import styles from './LuckyPal.module.css';
@@ -23,9 +22,8 @@ export default function LuckyPalDialog() {
   const open = () => {
     setIsOpen(true);
     rewardShower();
+    // A Pal plays its own reveal (PalReveal); a sparks gift just chimes.
     if (!pal) sfx.reward();
-    else if (rarityOf(pal) === 'common') sfx.newPal();
-    else sfx.palGrow();
   };
   const close = () => {
     setIsOpen(false);
@@ -51,10 +49,10 @@ export default function LuckyPalDialog() {
       ) : pal ? (
         <>
           <div className={styles.reveal}>
-            <PalArt palId={pal.id} size={140} alive />
+            <PalReveal pal={pal} size={140} />
           </div>
           <p className={styles.text}>
-            <strong>{palWithSpecies(lang, pal)}</strong> <RarityBadge pal={pal} />
+            <strong>{palWithSpecies(lang, pal)}</strong>
           </p>
           <div className={styles.actions}>
             <Button

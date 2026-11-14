@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
-import PalArt from '../../components/pals/PalArt.jsx';
+import PalReveal from '../../components/pals/PalReveal.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, isPalUnlocked } from '../../game/pals.js';
 import { readJson, writeJson } from '../../lib/storage.js';
-import { sfx } from '../../audio/sfx.js';
 import styles from './Pals.module.css';
 import { palName, palWithSpecies } from '../../i18n/palText.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
@@ -18,11 +17,6 @@ export default function PalUnlockNotice() {
   const { t, lang } = useI18n();
   const [seen, setSeen] = useState(() => readJson(SEEN_KEY, []));
   const fresh = progress.pal.id ? PALS.find((pal) => !progress.pal.owned[pal.id] && !seen.includes(pal.id) && isPalUnlocked(progress, pal)) : null;
-  // A little fanfare once for each new Pal.
-  const freshId = fresh?.id;
-  useEffect(() => {
-    if (freshId) sfx.newPal();
-  }, [freshId]);
   if (!fresh) return null;
 
   const close = () => {
@@ -33,7 +27,7 @@ export default function PalUnlockNotice() {
 
   return (
     <Dialog title={t('pals.unlocked.title')} tone="celebrate" onClose={close}>
-      <PalArt palId={fresh.id} size={130} alive className={styles.unlockArt} />
+      <PalReveal key={fresh.id} pal={fresh} size={130} />
       <p className={styles.unlockText}>
         <strong>{palWithSpecies(lang, fresh)}</strong> {t('pals.unlocked.wants')}
       </p>

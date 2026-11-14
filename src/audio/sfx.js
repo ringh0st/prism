@@ -215,6 +215,11 @@ export const sfx = {
     feel('success');
   },
   /** A new Pal joins the team. */
+  /** A new Pal's silhouette fills with light: a soft rising shimmer. */
+  palFill() {
+    tone(400, 900, 0.6, { volume: 0.04 });
+    [2, 4, 6].forEach((step, i) => bell(note(step), { delay: 0.15 + i * 0.15, volume: 0.04, duration: 0.4 }));
+  },
   newPal() {
     tone(900, 1300, 0.08, { volume: 0.05 });
     tone(1000, 1500, 0.08, { volume: 0.05, delay: 0.1 });

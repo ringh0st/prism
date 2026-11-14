@@ -1,0 +1,87 @@
+.reveal {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  transition: filter 700ms ease;
+}
+
+/* A dark shape first: who could it be? */
+.shadow {
+  filter: brightness(0) opacity(0.55);
+  animation: wobble 650ms ease-in-out;
+}
+
+/* A beam of light sweeps across, filling the shape in */
+.filling {
+  filter: brightness(0.6);
+}
+
+.filling .beam {
+  animation: sweep 700ms ease-in-out both;
+}
+
+.shown {
+  filter: none;
+  animation: pop 520ms var(--ease-pop);
+}
+
+.beam {
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(100deg, transparent 35%, rgba(255, 246, 201, 0.95) 50%, transparent 65%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.stamp {
+  animation: stamp 420ms var(--ease-pop) both;
+}
+
+@keyframes sweep {
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes wobble {
+  30% {
+    transform: rotate(-4deg);
+  }
+  70% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes pop {
+  40% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: scale(2) rotate(-12deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shadow,
+  .shown,
+  .filling .beam,
+  .stamp {
+    animation: none;
+  }
+  .art {
+    transition: none;
+  }
+}

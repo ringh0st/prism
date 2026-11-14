@@ -11,11 +11,6 @@
   color: var(--text-accent);
 }
 
-.unlockArt {
-  display: block;
-  margin: 0 auto var(--space-2);
-}
-
 .unlockText {
   margin-bottom: var(--space-4);
   font-size: 17px;
