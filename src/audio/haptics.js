@@ -1,5 +1,8 @@
-// Vibration by importance. Android uses the Vibration API; iPhone Safari has none, but iOS 18+
-// gives a light haptic tick when a native switch toggles, so we toggle a hidden one instead.
+// Vibration by importance. In the app, the phone's real haptic engine (Capacitor Haptics). On the
+// website, Android uses the Vibration API; iPhone Safari has none, but iOS 18+ gives a light haptic
+// tick when a native switch toggles, so we toggle a hidden one instead.
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { isNativeApp } from '../lib/platform.js';
 
 const PATTERNS = {
   light: { android: 8, ticks: 1 },
@@ -37,8 +40,29 @@ function iosTick() {
   iosSwitchLabel.click();
 }
 
+/** The app's haptics: crisp taps for small things, the system's success feel for big moments. */
+const NATIVE = {
+  light: () => Haptics.impact({ style: ImpactStyle.Light }),
+  medium: () => Haptics.impact({ style: ImpactStyle.Medium }),
+  soft: () => Haptics.notification({ type: NotificationType.Warning }),
+  double: () => {
+    Haptics.impact({ style: ImpactStyle.Light });
+    setTimeout(() => Haptics.impact({ style: ImpactStyle.Light }), TICK_GAP_MS);
+  },
+  success: () => Haptics.notification({ type: NotificationType.Success }),
+  celebrate: () => {
+    Haptics.notification({ type: NotificationType.Success });
+    setTimeout(() => Haptics.impact({ style: ImpactStyle.Heavy }), 260);
+    setTimeout(() => Haptics.impact({ style: ImpactStyle.Light }), 420);
+  },
+};
+
 /** strength: light | medium | soft | double | success | celebrate */
 export function haptic(strength) {
+  if (isNativeApp) {
+    Promise.resolve(NATIVE[strength]?.()).catch(() => {});
+    return;
+  }
   const pattern = PATTERNS[strength];
   if (!pattern || typeof navigator === 'undefined') return;
   try {

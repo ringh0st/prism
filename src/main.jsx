@@ -10,6 +10,7 @@ import './styles/tokens.css';
 import './styles/global.css';
 import App from './App.jsx';
 import { startAutoUpdate } from './lib/autoUpdate.js';
+import { isNativeApp } from './lib/platform.js';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -17,8 +18,10 @@ createRoot(document.getElementById('root')).render(
   </StrictMode>,
 );
 
-if (import.meta.env.PROD) startAutoUpdate();
+// The app ships its own copy of the game (updated through the App Store), so only the website
+// checks for new versions and caches itself for offline play.
+if (import.meta.env.PROD && !isNativeApp) startAutoUpdate();
 
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+if (import.meta.env.PROD && !isNativeApp && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
 }

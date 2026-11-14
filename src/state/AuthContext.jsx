@@ -1,5 +1,23 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { App as NativeApp } from '@capacitor/app';
+import { Browser } from '@capacitor/browser';
 import { authRedirectUrl, supabase } from '../lib/supabase.js';
+import { NATIVE_AUTH_REDIRECT, isNativeApp } from '../lib/platform.js';
+
+/**
+ * Sign in with Google or Apple. On the website the page goes to the provider and comes back. In the app,
+ * the provider opens in a secure Safari sheet and returns through the app's own link (see the listener below).
+ */
+async function signInWith(provider) {
+  if (!isNativeApp) return supabase.auth.signInWithOAuth({ provider, options: { redirectTo: authRedirectUrl() } });
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: NATIVE_AUTH_REDIRECT, skipBrowserRedirect: true },
+  });
+  if (error) return { error };
+  await Browser.open({ url: data.url, presentationStyle: 'popover' });
+  return { error: null };
+}
 
 const AuthContext = createContext(null);
 
@@ -18,6 +36,20 @@ export function AuthProvider({ children }) {
     return () => data.subscription.unsubscribe();
   }, []);
 
+  // In the app, sign-in comes back as app.lumipals://auth?code=…: finish it and close the Safari sheet.
+  useEffect(() => {
+    if (!isNativeApp) return undefined;
+    const listener = NativeApp.addListener('appUrlOpen', async ({ url }) => {
+      if (!url.startsWith(NATIVE_AUTH_REDIRECT)) return;
+      const code = new URL(url).searchParams.get('code');
+      if (code) await supabase.auth.exchangeCodeForSession(code).catch(() => {});
+      Browser.close().catch(() => {});
+    });
+    return () => {
+      listener.then((handle) => handle.remove());
+    };
+  }, []);
+
   // After Google sends the player back, remove ?code=… from the address bar.
   useEffect(() => {
     if (session && window.location.search.includes('code=')) {
@@ -30,11 +62,7 @@ export function AuthProvider({ children }) {
       setProfile(null);
       return;
     }
-    const { data } = await supabase
-      .from('profiles')
-      .select('display_name, avatar_url, is_admin')
-      .eq('id', userId)
-      .maybeSingle();
+    const { data } = await supabase.from('profiles').select('display_name, avatar_url, is_admin').eq('id', userId).maybeSingle();
     setProfile(data ?? null);
   }, [userId]);
 
@@ -52,8 +80,8 @@ export function AuthProvider({ children }) {
       avatarUrl: profile?.avatar_url ?? meta.avatar_url ?? null,
       isAdmin: Boolean(profile?.is_admin),
       refreshProfile,
-      signInWithGoogle: () =>
-        supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: authRedirectUrl() } }),
+      signInWithGoogle: () => signInWith('google'),
+      signInWithApple: () => signInWith('apple'),
       signOut: () => supabase.auth.signOut(),
       deleteAccount: async () => {
         const { error } = await supabase.rpc('delete_my_account');

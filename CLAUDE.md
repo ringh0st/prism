@@ -50,4 +50,5 @@ Style: "Sunlit Paper". Matte surfaces, warm layered shadows and solid "ledge" bu
 - Names describe intent: `traceBeam`, `isLevelSolved`, `starsForMoves`, not `doStuff` or `helper`.
 - Sound and haptics live in `src/audio/` (generated music-box tones, no files). Each moment has its own named sound (`sfx.outOfMoves`, `sfx.palGrow`…) and a haptic strength; keep failure sounds kind, never harsh. iPhone haptics use the hidden-switch trick in `haptics.js`.
 - Level data is versioned JSON validated by one schema shared by the game and the editor.
+- **iPhone app** (IOS.md): Capacitor wraps the built game (`ios/`, bundle id `app.lumipals`, `npm run ios`). Use `isNativeApp` from `src/lib/platform.js` for app-only behavior: no web purchases or auto-update in the app, native haptics, sign-in via a Safari sheet returning to `app.lumipals://auth`, and Sign in with Apple.
 - Never commit secrets. Only the Supabase URL and publishable (anon) key may appear in client code. Payment keys live in GitHub secrets and Supabase function secrets.

@@ -223,32 +223,37 @@ function DiamondsShelf({ onError }) {
 
       {!isSignedIn && <SignInNote />}
 
-      <ul className={styles.shelf}>
-        {DIAMOND_PACKS.map((pack, i) => (
-          <ShelfItem
-            key={pack.id}
-            art={`diamonds${i}`}
-            title={`${pack.diamonds + pack.bonus}`}
-            subtitle={pack.bonus > 0 ? `diamonds (+${pack.bonus} bonus)` : 'diamonds'}
-            tag={pack.tag}
-          >
-            <Button
-              size="sm"
-              className={styles.moneyTag}
-              disabled={!PAYMENTS_ENABLED || !isSignedIn || busyPack !== null}
-              onClick={() => buyPack(pack.id)}
-              aria-label={`Buy ${pack.diamonds + pack.bonus} diamonds for ${pack.displayPrice}`}
-            >
-              {PAYMENTS_ENABLED ? (busyPack === pack.id ? 'Opening…' : pack.displayPrice) : 'Coming soon'}
-            </Button>
-          </ShelfItem>
-        ))}
-      </ul>
+      {/* Diamond packs are sold on the website only; in the app, diamonds are earned by playing. */}
+      {PAYMENTS_ENABLED && (
+        <>
+          <ul className={styles.shelf}>
+            {DIAMOND_PACKS.map((pack, i) => (
+              <ShelfItem
+                key={pack.id}
+                art={`diamonds${i}`}
+                title={`${pack.diamonds + pack.bonus}`}
+                subtitle={pack.bonus > 0 ? `diamonds (+${pack.bonus} bonus)` : 'diamonds'}
+                tag={pack.tag}
+              >
+                <Button
+                  size="sm"
+                  className={styles.moneyTag}
+                  disabled={!isSignedIn || busyPack !== null}
+                  onClick={() => buyPack(pack.id)}
+                  aria-label={`Buy ${pack.diamonds + pack.bonus} diamonds for ${pack.displayPrice}`}
+                >
+                  {busyPack === pack.id ? 'Opening…' : pack.displayPrice}
+                </Button>
+              </ShelfItem>
+            ))}
+          </ul>
 
-      <p className={styles.legal}>
-        <strong>Under 18? Ask a parent or guardian before buying.</strong> One-time purchases, no subscriptions, no random rewards. Payments by our
-        partner Lemon Squeezy. <a href={TERMS_URL}>Terms & refunds</a>
-      </p>
+          <p className={styles.legal}>
+            <strong>Under 18? Ask a parent or guardian before buying.</strong> One-time purchases, no subscriptions, no random rewards. Payments by
+            our partner Lemon Squeezy. <a href={TERMS_URL}>Terms & refunds</a>
+          </p>
+        </>
+      )}
     </>
   );
 }

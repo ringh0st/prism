@@ -1,0 +1,10 @@
+{
+  "appId": "app.lumipals",
+  "appName": "Lumipals",
+  "webDir": "dist/play",
+  "ios": {
+    "contentInset": "never",
+    "backgroundColor": "#FAF6EE",
+    "scheme": "Lumipals"
+  }
+}
