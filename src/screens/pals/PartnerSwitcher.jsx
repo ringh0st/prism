@@ -1,73 +1,76 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PalArt from '../../components/pals/PalArt.jsx';
-import { usePlayer } from '../../state/PlayerContext.jsx';
-import { PALS, PAL_STAGES, palById, palStage, stageOf } from '../../game/pals.js';
 import StageBadge from '../../components/pals/StageBadge.jsx';
-import stageStyles from '../../components/pals/PalStage.module.css';
-import PalDetailDialog from './PalDetailDialog.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
+import PalDetailDialog from './PalDetailDialog.jsx';
+import { usePlayer } from '../../state/PlayerContext.jsx';
+import { palById, palStage, stageOf } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
-import styles from './Pals.module.css';
+import styles from './PartnerSwitcher.module.css';
 
-/** Your partner Pal, how close it is to its next form, and your other Pals to switch to. */
+const PET_LINES = ['Hehe, that tickles!', 'Do I look good?', 'Let’s play!', 'Wheee!', 'Best friends!', '*happy wiggle*'];
+const OUTFIT_LINES = ['Ooh, fancy!', 'How do I look?', 'Snazzy!', 'Strike a pose!'];
+
+/**
+ * Your partner Pal, big on a little stage (tap it for a hop and a word; it twirls when its outfit
+ * changes), and how close it is to its next form. Switching partner is in the Team tab (TeamSwitcher).
+ */
 export default function PartnerSwitcher() {
-  const { progress, choosePal } = usePlayer();
+  const { progress } = usePlayer();
   const [isLooking, setIsLooking] = useState(false);
+  const [moment, setMoment] = useState(null);
   const partner = palById(progress.pal.id);
+  const outfit = progress.pal.wearing.join(',');
+  const lastOutfit = useRef(outfit);
+
+  // A new outfit: a little twirl to show it off.
+  useEffect(() => {
+    if (lastOutfit.current === outfit) return;
+    lastOutfit.current = outfit;
+    setMoment({ kind: 'twirl', line: OUTFIT_LINES[Date.now() % OUTFIT_LINES.length], key: Date.now() });
+  }, [outfit]);
+
+  useEffect(() => {
+    if (!moment) return undefined;
+    const timer = setTimeout(() => setMoment(null), 2200);
+    return () => clearTimeout(timer);
+  }, [moment]);
+
   if (!partner) return null;
   const stage = palStage(stageOf(progress.pal.owned[partner.id]));
-  const team = PALS.filter((pal) => progress.pal.owned[pal.id]);
 
-  const switchTo = async (palId) => {
-    if (palId === partner.id) return;
-    await choosePal(palId);
-    sfx.sparkle();
+  const pet = () => {
+    sfx.hello();
+    setMoment({ kind: 'hop', line: PET_LINES[Date.now() % PET_LINES.length], key: Date.now() });
   };
 
   return (
-    <section className={styles.partnerCard} aria-labelledby="partner-title">
-      <button type="button" className={styles.palLook} onClick={() => setIsLooking(true)} aria-label={`See ${partner.name}'s forms`}>
-        <PalArt
-          palId={partner.id}
-          stage={stage.index}
-          wearing={progress.pal.wearing}
-          size={96}
-          className={`${styles.partnerArt} ${stageStyles.backdrop} ${stageStyles[stage.id]}`}
-          alive
-        />
-      </button>
-      {isLooking && <PalDetailDialog pal={partner} onClose={() => setIsLooking(false)} />}
-      <div className={styles.partnerInfo}>
-        <h2 id="partner-title" className={`game-title ${styles.partnerName}`}>
+    <section className={styles.hero} aria-labelledby="partner-title">
+      <div className={styles.stage}>
+        <button type="button" className={styles.pal} onClick={pet} aria-label={`Pet ${partner.name}`}>
+          <span key={moment?.key ?? 'still'} className={`${styles.body} ${moment ? styles[moment.kind] : ''}`}>
+            <PalArt palId={partner.id} stage={stage.index} wearing={progress.pal.wearing} size="100%" alive />
+          </span>
+        </button>
+        {moment && (
+          <span key={moment.key} className={styles.bubble} role="status">
+            {moment.line}
+          </span>
+        )}
+      </div>
+
+      <div className={styles.info}>
+        <h2 id="partner-title" className={`game-title ${styles.name}`}>
           {partner.name} <StageBadge stage={stage} className={styles.stageChip} />
         </h2>
-        <div className={styles.stageDots} role="img" aria-label={`Form ${stage.index + 1} of 5`}>
-          {[0, 1, 2, 3, 4].map((i) => (
-            <span
-              key={i}
-              className={i <= stage.index ? `${styles.stageDotOn} ${stageStyles.dot} ${stageStyles[PAL_STAGES[i].id]}` : styles.stageDot}
-            />
-          ))}
+        <div className={styles.growth}>
+          <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
         </div>
-        <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} />
+        <button type="button" className={styles.forms} onClick={() => setIsLooking(true)}>
+          See all forms
+        </button>
       </div>
-      {team.length > 1 && (
-        <div className={styles.team} role="radiogroup" aria-label="Play with">
-          {team.map((pal) => (
-            <button
-              key={pal.id}
-              type="button"
-              role="radio"
-              aria-checked={pal.id === partner.id}
-              aria-label={`${pal.name} the ${pal.species}`}
-              className={`${styles.teamPal} ${stageStyles.backdrop} ${stageStyles[palStage(stageOf(progress.pal.owned[pal.id])).id]} ${pal.id === partner.id ? styles.teamPalActive : ''}`}
-              onClick={() => switchTo(pal.id)}
-            >
-              <PalArt palId={pal.id} stage={stageOf(progress.pal.owned[pal.id])} size={48} portrait />
-            </button>
-          ))}
-        </div>
-      )}
+      {isLooking && <PalDetailDialog pal={partner} onClose={() => setIsLooking(false)} />}
     </section>
   );
 }

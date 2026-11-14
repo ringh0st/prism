@@ -119,3 +119,18 @@
 .avatar svg {
   border-radius: 50%;
 }
+
+/* The whole place is tappable (opens the player's card) */
+.place {
+  position: relative;
+}
+
+.open {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+}

@@ -3,6 +3,7 @@ import Icon from '../../components/Icon.jsx';
 import PalCard from '../../components/pals/PalCard.jsx';
 import PalDetailDialog from './PalDetailDialog.jsx';
 import LuckyPalProgress from './LuckyPalProgress.jsx';
+import TeamSwitcher from './TeamSwitcher.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, isPalUnlocked, palStage, stageOf, unlockText } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
@@ -61,11 +62,12 @@ function Collection({ onError }) {
   );
 }
 
-/** The Pals tab's Team: every Pal (pick a partner, see their forms) and the next Lucky Pal gift. */
+/** The Pals tab's Team: switch partner, the next Lucky Pal gift, and every Pal (pick one, see their forms). */
 export default function PalTeam() {
   const [message, setMessage] = useState('');
   return (
     <>
+      <TeamSwitcher />
       <LuckyPalProgress />
       <section className={styles.section} aria-label="Your team">
         <Collection onError={setMessage} />

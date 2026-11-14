@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Lumi from '../../components/game/Lumi.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
-import { palById, palStage, stageOf } from '../../game/pals.js';
+import { PALS, palById, palStage, stageOf } from '../../game/pals.js';
 import Icon from '../../components/Icon.jsx';
 import { useAuth } from '../../state/AuthContext.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
@@ -90,11 +90,7 @@ export default function PlayerCard() {
         <Icon name="edit" size={14} />
       </button>
       {isEditingNickname && (
-        <NicknameDialog
-          current={shownNickname}
-          onSaved={() => setIsEditingNickname(false)}
-          onClose={() => setIsEditingNickname(false)}
-        />
+        <NicknameDialog current={shownNickname} onSaved={() => setIsEditingNickname(false)} onClose={() => setIsEditingNickname(false)} />
       )}
 
       <div className={styles.title}>
@@ -124,7 +120,14 @@ export default function PlayerCard() {
         <Stat icon="star" tone="honey" value={stars} label="stars" />
         <Stat icon="check" tone="sage" value={solved} label="levels solved" />
         <Stat icon="map" tone="peach" value={finishedWorldCount(progress.levels)} label="worlds finished" />
-        <Stat icon="flame" tone="terracotta" value={streak} label="day streak" note={shields > 0 ? `${shields} ${shields === 1 ? 'shield' : 'shields'}` : null} />
+        <Stat icon="paw" tone="mint" value={`${Object.keys(progress.pal.owned).length}/${PALS.length}`} label="Pals collected" />
+        <Stat
+          icon="flame"
+          tone="terracotta"
+          value={streak}
+          label="day streak"
+          note={shields > 0 ? `${shields} ${shields === 1 ? 'shield' : 'shields'}` : null}
+        />
       </ul>
     </section>
   );

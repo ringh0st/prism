@@ -8,8 +8,8 @@ import styles from './Podium.module.css';
 const PLACE_ORDER = [2, 1, 3];
 const PLACE_CLASS = { 1: 'first', 2: 'second', 3: 'third' };
 
-/** The winners' podium for this week's top three (empty steps wait for a winner). */
-export default function Podium({ top }) {
+/** The winners' podium for this week's top three (empty steps wait for a winner). Tap a winner to see their card. */
+export default function Podium({ top, onOpen }) {
   return (
     <ol className={styles.podium} aria-label="This week's top three">
       {PLACE_ORDER.map((rank) => {
@@ -17,6 +17,14 @@ export default function Podium({ top }) {
         const reward = weeklyRewardFor(rank);
         return (
           <li key={rank} className={`${styles.place} ${styles[PLACE_CLASS[rank]]} ${row?.isMe ? styles.me : ''}`} value={rank}>
+            {row && (
+              <button
+                type="button"
+                className={styles.open}
+                onClick={() => onOpen(row)}
+                aria-label={`${row.nickname}, place ${rank}, ${row.score} points. See their card`}
+              />
+            )}
             <span className={styles.avatar} aria-hidden="true">
               {row?.pal ? (
                 <PalArt palId={row.pal} stage={row.palStage} wearing={row.wearing ?? []} size={rank === 1 ? 72 : 58} portrait />

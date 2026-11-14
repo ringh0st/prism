@@ -1,0 +1,57 @@
+/* Your other Pals, to switch partner */
+.team {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-2) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.pals {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-bottom: 6px;
+}
+
+.teamPal {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 18px;
+  background: var(--surface-tonal);
+  cursor: pointer;
+  transition: transform 220ms var(--ease-spring);
+}
+
+.teamPal:active {
+  transform: scale(0.92);
+}
+
+.teamPalActive {
+  position: relative;
+  background: color-mix(in srgb, var(--color-sage) 30%, var(--surface-raised));
+  transform: scale(1.1);
+}
+
+.teamPalActive::after {
+  content: '';
+  position: absolute;
+  bottom: -9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-sage);
+}

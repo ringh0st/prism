@@ -11,6 +11,7 @@ import { stageOf } from '../../game/pals.js';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { palById } from '../../game/pals.js';
 import RankRow from './RankRow.jsx';
+import PlayerCardDialog from './PlayerCardDialog.jsx';
 import styles from './LeaderboardScreen.module.css';
 
 const SPARKS_FOR_TOP_TEN = WEEKLY_REWARDS.find((reward) => reward.rank === 4).sparks;
@@ -71,6 +72,7 @@ export default function LeaderboardScreen() {
         ? { ...row, nickname: progress.nickname }
         : row;
   const top = board?.top.map(withMyPal) ?? [];
+  const [openRow, setOpenRow] = useState(null);
   const rest = top.filter((row) => row.rank > 3);
   const partner = palById(progress.pal.id);
   const isMeListed = top.some((row) => row.isMe);
@@ -103,19 +105,19 @@ export default function LeaderboardScreen() {
         )}
         {error && <p className={styles.empty}>{error}</p>}
         {!board && !error && <p className={styles.empty}>Loading the board…</p>}
-        {board && <Podium top={top} />}
+        {board && <Podium top={top} onOpen={setOpenRow} />}
 
         <div className={styles.below}>
           {rest.length > 0 && (
             <ol className={styles.list} aria-label="Places 4 and below">
               {rest.map((row) => (
-                <RankRow key={row.rank} row={row} />
+                <RankRow key={row.rank} row={row} onOpen={setOpenRow} />
               ))}
             </ol>
           )}
           {board?.me && !isMeListed && (
             <ol className={styles.list} aria-label="Your place">
-              <RankRow row={withMyPal({ ...board.me, isMe: true })} />
+              <RankRow row={withMyPal({ ...board.me, isMe: true })} onOpen={setOpenRow} />
             </ol>
           )}
           {isSignedIn && board?.myNickname && !board.me && (
@@ -157,6 +159,7 @@ export default function LeaderboardScreen() {
         </div>
       </main>
       <BottomNav active="top" />
+      {openRow && <PlayerCardDialog row={openRow} myScore={board?.me?.score ?? 0} onClose={() => setOpenRow(null)} />}
     </div>
   );
 }

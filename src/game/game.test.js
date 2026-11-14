@@ -630,3 +630,15 @@ test('the solve replay plays the winning taps back in order and ends solved', as
   assert.deepEqual(end.orients, target);
   assert.ok(replayDuration(replayTimeline(level, Array(60).fill(history[0]))) < 15000, 'long solves are sped up');
 });
+
+test('player card stats: stars and levels from built-in levels only, worlds and Pals counted', async () => {
+  const { playerStatsOf, TOTAL_PALS } = await import('./playerStats.js');
+  const levels = { 'event-2026-11-14-1': { stars: 3 } };
+  for (let i = 1; i <= 20; i++) levels[`w1-${String(i).padStart(2, '0')}`] = { stars: 2 };
+  levels['w2-01'] = { stars: 3 };
+  const stats = playerStatsOf({ levels, pal: { owned: { mossy: {}, ember: {} } } });
+  assert.deepEqual(stats, { stars: 43, levelsSolved: 21, worldsFinished: 1, palsCount: 2 });
+  assert.equal(TOTAL_PALS, 48);
+  const sql = readFileSync(new URL('../../supabase/player_cards.sql', import.meta.url), 'utf8');
+  for (const key of ['palsCount', 'stars', 'levelsSolved', 'worldsFinished']) assert.match(sql, new RegExp(`'${key}'`), key);
+});

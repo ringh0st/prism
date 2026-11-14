@@ -97,3 +97,6 @@ export const fetchMyEvents = () => rpc('my_events');
 export const fetchMyQuests = () => rpc('my_quests');
 
 export const claimQuestOnServer = (questId) => rpc('claim_pal_quest', { p_quest: questId });
+
+/** A player's card from this week's Top board (supabase/player_cards.sql), looked up by their place. */
+export const fetchPlayerCard = (rank) => rpc('player_card', { p_rank: rank });

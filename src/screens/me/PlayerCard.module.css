@@ -19,8 +19,7 @@
   background:
     radial-gradient(circle at 18% 30%, rgba(255, 255, 255, 0.35) 0 14px, transparent 15px),
     radial-gradient(circle at 82% 60%, rgba(255, 255, 255, 0.25) 0 22px, transparent 23px),
-    radial-gradient(circle at 60% 15%, rgba(255, 255, 255, 0.2) 0 8px, transparent 9px),
-    var(--color-sage);
+    radial-gradient(circle at 60% 15%, rgba(255, 255, 255, 0.2) 0 8px, transparent 9px), var(--color-sage);
 }
 
 .avatar {
@@ -32,7 +31,9 @@
   overflow: hidden;
   border-radius: 50%;
   background: var(--surface-tonal);
-  box-shadow: 0 0 0 5px var(--surface-raised), var(--shadow-md);
+  box-shadow:
+    0 0 0 5px var(--surface-raised),
+    var(--shadow-md);
 }
 
 .avatar img {
@@ -144,6 +145,11 @@
   background: var(--alert-bottom);
 }
 
+.mint {
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+}
+
 .statValue {
   font-size: 22px;
   line-height: 1;
@@ -182,4 +188,9 @@
 
 .nicknameButton strong {
   color: var(--text-strong);
+}
+
+/* An odd number of stats: the last one spans the row */
+.stats > li:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }

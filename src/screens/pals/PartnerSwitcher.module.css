@@ -1,0 +1,140 @@
+/* Your partner Pal, big on a little stage */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 46%) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(ellipse 45% 75% at 24% 50%, color-mix(in srgb, var(--color-honey) 24%, transparent), transparent 70%), var(--surface-raised);
+  box-shadow: var(--shadow-md);
+}
+
+/* The stage: a soft pool of light and a little ground shadow, no frame */
+.stage {
+  position: relative;
+  display: grid;
+  place-items: end center;
+  width: 100%;
+  aspect-ratio: 1;
+  background: radial-gradient(ellipse 42% 9% at 50% 93%, color-mix(in srgb, var(--color-sage) 34%, transparent), transparent 100%);
+}
+
+.pal {
+  width: 92%;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: none;
+  cursor: pointer;
+}
+
+.body {
+  display: block;
+  transform-origin: 50% 100%;
+}
+
+.body svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.hop {
+  animation: hop 600ms var(--ease-pop);
+}
+
+@keyframes hop {
+  40% {
+    transform: translateY(-14%) scale(0.95, 1.06);
+  }
+  75% {
+    transform: scale(1.06, 0.94);
+  }
+}
+
+/* Showing off a new outfit */
+.twirl {
+  animation: twirl 900ms var(--ease-pop);
+}
+
+@keyframes twirl {
+  30% {
+    transform: translateY(-10%) scaleX(-1);
+  }
+  60% {
+    transform: translateY(-10%) scaleX(1);
+  }
+  85% {
+    transform: scale(1.06, 0.94);
+  }
+}
+
+.bubble {
+  position: absolute;
+  top: -4px;
+  left: 4%;
+  z-index: 2;
+  padding: 6px 12px;
+  border-radius: 16px 16px 16px 4px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  white-space: nowrap;
+  color: var(--text-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-md);
+  animation: pop 300ms var(--ease-pop) both;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+.info {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 24px;
+}
+
+.stageChip {
+  padding: 2px 10px;
+  font-size: 13px;
+}
+
+.growth {
+  width: 100%;
+}
+
+.forms {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--text-soft);
+  background: var(--surface-sunken);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hop,
+  .twirl,
+  .bubble {
+    animation: none;
+  }
+}
