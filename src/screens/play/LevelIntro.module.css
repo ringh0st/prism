@@ -53,6 +53,11 @@
   animation: stamp 500ms var(--ease-pop) 250ms both;
 }
 
+.hard .sticker {
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+}
+
 .boss .sticker {
   color: var(--alert-label);
   background: var(--alert-bottom);

@@ -9,6 +9,10 @@ import { moveLimitFor } from '../../game/scoring.js';
 import { TILE } from '../../game/constants.js';
 import styles from './LevelIntro.module.css';
 
+const DIFFICULTY_STICKERS = {
+  hard: { text: 'HARD LEVEL', className: 'hard' },
+};
+
 const STICKERS = {
   boss: { text: 'BOSS LEVEL!', className: 'boss' },
   disco: { text: 'DISCO LEVEL!', className: 'disco' },
@@ -16,7 +20,7 @@ const STICKERS = {
 };
 
 /** How long the intro stays before the level starts by itself (any tap starts it sooner). */
-const INTRO_MS = 2400;
+const INTRO_MS = 3500;
 /** Levels with a flavor stay up longer, so there's time to read what's different. */
 const FLAVOR_INTRO_MS = 4500;
 
@@ -32,6 +36,7 @@ export default function LevelIntro({
   modifier,
   lumiLine,
   moveLimit,
+  showsStarTarget = true,
   flavor = null,
   waitsForTap = false,
   glowbugId = null,
@@ -45,7 +50,8 @@ export default function LevelIntro({
 
   const gems = level.tiles.filter((tile) => tile.type === TILE.GEM);
   const limit = moveLimit ?? moveLimitFor(level.par, level.difficulty);
-  const sticker = STICKERS[modifier];
+  // Hard and Extra Hard levels get their own stamp, so a tougher level is never a surprise.
+  const sticker = STICKERS[modifier] ?? DIFFICULTY_STICKERS[level.difficulty];
 
   return (
     // Clicking anywhere also starts; the button is the keyboard and screen-reader path.
@@ -65,14 +71,22 @@ export default function LevelIntro({
             ))}
           </span>
           <span className={styles.together}>
-            in <strong>{limit}</strong> moves
+            {showsStarTarget ? (
+              <>
+                ★★★ in <strong>{level.par}</strong> {level.par === 1 ? 'move' : 'moves'}
+              </>
+            ) : (
+              <>
+                in <strong>{limit}</strong> moves
+              </>
+            )}
           </span>
         </p>
         {glowbugId && (
           <p className={styles.glowbug}>
             <GlowbugArt id={glowbugId} size={40} isAwake={false} />
             <span>
-              Shh… <strong>{glowbugById(glowbugId).name}</strong> the Glowbug is napping here. Get ★★★ to rescue it!
+              Get ★★★ to rescue <strong>{glowbugById(glowbugId).name}</strong>!
             </span>
           </p>
         )}

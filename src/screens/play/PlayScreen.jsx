@@ -40,7 +40,8 @@ import { levelModifierFor } from '../../game/surprises.js';
 import { quipFor } from '../../game/quips.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
 import { firstTileOf, newPiecesIn, piecesMetIn } from '../../game/pieces.js';
-import { findHint } from '../../game/solver.js';
+import { findHint, tapsLeft } from '../../game/solver.js';
+import { isRotatable } from '../../game/beam.js';
 import { recipeOf } from '../../game/recipes.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import { EVENT_LEVELS, parseEventLevelId } from '../../game/events.js';
@@ -49,16 +50,19 @@ import { treatFoundBy } from '../../game/treats.js';
 import { newStickersFor } from '../../game/stickers.js';
 import { climbFor } from '../../game/titles.js';
 import { usePlayStats } from '../../hooks/usePlayStats.js';
+import { useAvailableHeight } from '../../hooks/useAvailableHeight.js';
 import { glowbugCellOf, glowbugForLevel, rescuedGlowbugs } from '../../game/glowbugs.js';
 import { cellsOnBeams } from '../../game/beam.js';
 import PalBuddy from './PalBuddy.jsx';
 import { comboFor } from '../../game/combos.js';
 import styles from './PlayScreen.module.css';
 
-const WIN_DIALOG_DELAY_MS = 900;
+const WIN_DIALOG_DELAY_MS = 1300;
 const IDLE_AFTER_MS = 30000;
 /** Taps in a row that light no new gem before Lumi suggests a Hint. */
 const STUCK_AFTER_MOVES = 6;
+/** In 1-2 and 1-3 the pointing hand only comes back if the player hasn't tapped for a moment. */
+const COACH_AFTER_MS = 3500;
 /** Worlds where running out of moves offers "Keep going" (for 1 star) instead of a fail. */
 const KEEP_GOING_WORLDS = 2;
 const KEEP_GOING_MOVES = 5;
@@ -103,6 +107,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const { progress, settings, finishLevel, finishDaily, finishEventLevel, consumeHelper } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
+  // Worlds 1–2: the first Hint in each level is free (beginners shouldn't run out of help).
+  const hasFreeHint = mode === 'level' && level.world <= KEEP_GOING_WORLDS && !puzzle.usedHelpers.includes('hint');
   const { trace, moves } = puzzle;
   const [result, setResult] = useState(null);
   const [solvedStars, setSolvedStars] = useState(0);
@@ -144,6 +150,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const lastShadeCount = useRef(0);
   const hasRecordedWin = useRef(false);
   const boardAreaRef = useRef(null);
+  // The board grows to fill the free height between the meter and Lumi (big cells, easy to tap).
+  const boardRoom = useAvailableHeight(boardAreaRef);
   const [combo, setCombo] = useState(null);
   const [palReaction, setPalReaction] = useState(null);
   const react = useCallback((name) => setPalReaction({ name, key: Date.now() }), []);
@@ -157,8 +165,15 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const gems = level.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
   const helpersAllowed = helpersAllowedFor(level.difficulty);
   // Daily and event puzzles can't be skipped.
+  // World 1 offers just Hint (fewer buttons to take in); the others join from World 2.
   const offeredHelpers =
-    mode === 'challenge' || mode === 'rush' ? [] : mode === 'daily' || mode === 'event' ? HELPER_IDS.filter((id) => id !== 'skip') : HELPER_IDS;
+    mode === 'challenge' || mode === 'rush'
+      ? []
+      : mode === 'level' && level.world === 1
+        ? ['hint']
+        : mode === 'daily' || mode === 'event'
+          ? HELPER_IDS.filter((id) => id !== 'skip')
+          : HELPER_IDS;
   const levelName = title || levelNameFor(level);
   const levelLabel = `${level.world}-${level.index}`;
   // Built-in worlds have their own look (board colors and landscape) and show their name.
@@ -374,6 +389,26 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     return undefined;
   }, [moves, moveLimit, trace.isSolved, say, react, playStats]);
 
+  // Tapping a piece that can't turn says why (a little shake, a soft "nope" and a word from Lumi).
+  const [nudgedCell, setNudgedCell] = useState(null);
+  const onBlocked = useCallback(
+    (cell, tileIndex) => {
+      if (isOver) return;
+      const tile = level.tiles[tileIndex];
+      const lines = {
+        mirror: 'That one’s bolted down. Turn the others!',
+        wall: 'Walls stay put. Bend the light around them!',
+        emitter: 'That’s the lamp. Turn the mirrors to steer its light!',
+        gem: 'That’s a gem. Bend the light into it!',
+      };
+      sfx.locked();
+      setNudgedCell(null);
+      requestAnimationFrame(() => setNudgedCell(cell));
+      setLumi({ mood: 'happy', line: lines[tile.type] ?? 'That piece can’t turn. Try a mirror!' });
+    },
+    [isOver, level.tiles],
+  );
+
   const onActivate = useCallback(
     (_cell, tileIndex) => {
       if (isOver || tileIndex < 0 || moves >= moveLimit) return;
@@ -406,17 +441,18 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const spendHelper = useCallback(
     async (helperId) => {
       try {
-        if (mode !== 'playtest') await consumeHelper(helperId);
+        if (mode !== 'playtest' && !(helperId === 'hint' && hasFreeHint)) await consumeHelper(helperId);
       } catch (error) {
         setLumi({ mood: 'worried', line: error.message });
         return;
       }
       puzzle.applyHelper(helperId);
       sfx.helper();
+      // Say plainly what a helper costs: the best result left for this try.
       const lines = {
-        hint: 'Psst! Rotate the glowing one.',
-        lens: 'Follow the dotted path. Quick!',
-        autoturn: 'Zap! I turned one for you.',
+        hint: 'Turn the glowing one! (Best now: ★★)',
+        lens: 'Follow the dotted path! (Best now: ★★)',
+        autoturn: 'Zap! I turned one for you. (Best now: ★)',
       };
       if (lines[helperId]) setLumi({ mood: 'excited', line: lines[helperId] });
       if (helperId === 'skip') completeLevel({ isSkipped: true });
@@ -433,7 +469,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       }
       if (helperId === 'autoturn' && moves >= moveLimit) return;
       const owned = progress.helpers[helperId] ?? 0;
-      if (mode !== 'playtest' && owned < 1) {
+      if (mode !== 'playtest' && owned < 1 && !(helperId === 'hint' && hasFreeHint)) {
         setBuyingHelper(helperId);
         return;
       }
@@ -483,7 +519,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       };
     });
     const showsTips = ['level', 'daily', 'event'].includes(mode) && !isFirstSteps && pieceSteps.length === 0;
-    const tipSteps = showsTips ? unseenTips(readJson(SEEN_TIPS_KEY, []), { hasHelpers: offeredHelpers.length > 0 }) : [];
+    const tipSteps = showsTips ? unseenTips(readJson(SEEN_TIPS_KEY, [])) : [];
     return [...pieceSteps, ...tipSteps];
   };
 
@@ -491,7 +527,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     if (newPieces.length) {
       writeJson(SEEN_PIECES_KEY, [...seenPieces(progress), ...newPieces.map((piece) => piece.id)]);
       // Keep a soft glow on the newest piece until the first move.
-      setSpotlightTile(firstTileOf(level, newPieces[newPieces.length - 1].id));
+      const tileIndex = firstTileOf(level, newPieces[newPieces.length - 1].id);
+      if (tileIndex >= 0 && isRotatable(level.tiles[tileIndex])) setSpotlightTile(tileIndex);
       setNewPieces([]);
     }
     const tipIds = tour.steps.filter((step) => !step.id.startsWith('piece-')).map((step) => step.id);
@@ -545,9 +582,17 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   }, [playStats, isFirstSteps, flavor, progress, newPieces, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // First levels: a hand points at the next mirror to turn.
+  const [isCoachDue, setIsCoachDue] = useState(level.index === 1);
+  useEffect(() => {
+    if (!isFirstSteps || showIntro || isCoachDue) return undefined;
+    const timer = setTimeout(() => setIsCoachDue(true), COACH_AFTER_MS);
+    return () => clearTimeout(timer);
+  }, [isFirstSteps, showIntro, isCoachDue, moves]);
+  // How many taps the best finish still needs, so the meter can drop a star the moment it's out of reach.
+  const minTapsLeft = useMemo(() => (trace.isSolved ? 0 : tapsLeft(level, puzzle.orients)), [level, puzzle.orients, trace.isSolved]);
   const coachTile = useMemo(
-    () => (isFirstSteps && !showIntro && !isOver ? findHint(level, puzzle.orients) : null),
-    [isFirstSteps, showIntro, isOver, level, puzzle.orients],
+    () => (isFirstSteps && isCoachDue && !showIntro && !isOver ? findHint(level, puzzle.orients) : null),
+    [isFirstSteps, isCoachDue, showIntro, isOver, level, puzzle.orients],
   );
 
   return (
@@ -563,11 +608,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
             {levelName}
           </ScreenTitle>
         </div>
-        <span className={styles.headerSpacer} aria-hidden="true" />
+        {/* The partner Pal watches from the header, so the board can use all the room below. */}
+        <span className={styles.headerSpacer}>{mode !== 'playtest' && <PalBuddy reaction={palReaction} />}</span>
       </header>
 
       <section className={styles.status} aria-label="Level status" data-tour="meter">
-        {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} />}
+        {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} />}
         <ul className={styles.gems} aria-label={`${trace.litGems.size} of ${gems.length} gems lit`}>
           {gems.map(({ tile, i }) => (
             <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff}>
@@ -582,9 +628,13 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         </ul>
       </section>
 
-      <div className={styles.boardArea} ref={boardAreaRef} data-tour="board">
+      <div
+        className={styles.boardArea}
+        ref={boardAreaRef}
+        data-tour="board"
+        style={boardRoom ? { '--board-max-height': `${boardRoom}px` } : undefined}
+      >
         {combo && <ComboBurst combo={combo} />}
-        {mode !== 'playtest' && <PalBuddy reaction={palReaction} />}
         <Board
           level={level}
           orients={puzzle.orients}
@@ -595,6 +645,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           spotlightTile={moves === 0 && spotlightTile >= 0 ? spotlightTile : null}
           ghostSegments={puzzle.ghostSegments}
           coach={isFirstSteps ? { tile: coachTile, labels: true } : null}
+          onBlocked={onBlocked}
+          nudgedCell={nudgedCell}
           lookHere={isOver || puzzle.hintTile !== null ? null : lookHere}
           turnsLeft={puzzle.turnsLeft}
           revealedCells={puzzle.revealedCells}
@@ -624,6 +676,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
                 disabled={isOver}
                 onUse={requestHelper}
                 nudgeId={isNudgingHint ? 'hint' : null}
+                freeIds={hasFreeHint ? ['hint'] : []}
               />
             </div>
           )}
@@ -641,6 +694,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           modifier={modifier}
           lumiLine={introLine}
           moveLimit={moveLimit}
+          showsStarTarget={mode !== 'rush'}
           flavor={flavor}
           waitsForTap={isFirstSteps}
           glowbugId={glowbug?.id}
@@ -696,6 +750,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         <OutOfMovesDialog
           backName={backName}
           gemsLeft={gems.length - trace.litGems.size}
+          gemsLit={trace.litGems.size}
           lumiLine={quipFor('outOfMoves')}
           hintsOwned={progress.helpers.hint ?? 0}
           onRetry={restart}

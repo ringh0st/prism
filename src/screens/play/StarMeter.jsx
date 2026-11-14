@@ -2,22 +2,24 @@ import Icon from '../../components/Icon.jsx';
 import styles from './StarMeter.module.css';
 
 /**
- * Moves left, a bar that drains with every move, and the stars you'd get if you solved it now:
- * ★★★ while you're within par, then a star drops off each time you pass a threshold. `isSimple`
+ * Moves left, a bar that drains with every move, and the best stars still possible: a star drops off
+ * the moment it can't be reached any more (moves so far plus the fewest taps left), never later. `isSimple`
  * (the first levels) leaves the stars out, so there's less to take in.
  */
-export default function StarMeter({ moves, par, limit, starCap, isSimple = false }) {
+export default function StarMeter({ moves, par, limit, starCap, tapsLeft = 0, isSimple = false }) {
   const twoStarLimit = par + Math.ceil((limit - par) / 2);
   const left = Math.max(0, limit - moves);
   const fill = (left / limit) * 100;
   const tone = left <= 1 ? styles.danger : left <= Math.ceil(limit * 0.34) ? styles.warn : styles.good;
-  const stars = Math.min(starCap, moves <= par ? 3 : moves <= twoStarLimit ? 2 : 1);
+  // The best you can still get: your moves so far plus the fewest taps that can finish it.
+  const finish = moves + (tapsLeft ?? 0);
+  const stars = Math.min(starCap, finish <= par ? 3 : finish <= twoStarLimit ? 2 : 1);
 
   return (
     <div
       className={styles.meter}
       role="group"
-      aria-label={`${left} moves left of ${limit}${isSimple ? '' : `. Solve it now for ${stars} ${stars === 1 ? 'star' : 'stars'}`}`}
+      aria-label={`${left} moves left of ${limit}${isSimple ? '' : `. Best still possible: ${stars} ${stars === 1 ? 'star' : 'stars'}`}`}
     >
       <div className={styles.movesLeft}>
         <span className={`game-title ${styles.count}`} key={left}>

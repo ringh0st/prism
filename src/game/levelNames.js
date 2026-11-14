@@ -86,7 +86,12 @@ const HARD_NAMES = [
 export function levelNameFor(level) {
   if (level.name) return level.name;
   const hash = hashString(level.id);
-  if (level.difficulty === DIFFICULTY.EXTRA) return BOSS_NAMES[hash % BOSS_NAMES.length];
-  if (level.difficulty === DIFFICULTY.HARD) return HARD_NAMES[hash % HARD_NAMES.length];
-  return `The ${ADJECTIVES[hash % ADJECTIVES.length]} ${NOUNS[(hash >>> 8) % NOUNS.length]}`;
+  // Built-in levels step through the lists from a per-world start (steps coprime with the list sizes),
+  // so no two levels in a world share a name.
+  const isBuiltIn = Number.isInteger(level.world) && Number.isInteger(level.index);
+  const start = isBuiltIn ? hashString(`world-${level.world}`) : hash;
+  const step = isBuiltIn ? level.index : 0;
+  if (level.difficulty === DIFFICULTY.EXTRA) return BOSS_NAMES[(isBuiltIn ? start : hash) % BOSS_NAMES.length];
+  if (level.difficulty === DIFFICULTY.HARD) return HARD_NAMES[(start + step) % HARD_NAMES.length];
+  return `The ${ADJECTIVES[(start + step * 5) % ADJECTIVES.length]} ${NOUNS[((start >>> 8) + step * 7) % NOUNS.length]}`;
 }

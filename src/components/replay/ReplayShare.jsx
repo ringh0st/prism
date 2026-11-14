@@ -70,7 +70,7 @@ export default function ReplayShare({ replay }) {
         </div>
       ) : (
         <Button variant="secondary" icon="play" onClick={make}>
-          Share replay
+          Share video
         </Button>
       )}
       {status && (

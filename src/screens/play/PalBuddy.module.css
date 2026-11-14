@@ -1,10 +1,10 @@
-/* Your Pal beside the board, reacting to the game */
+/* Your Pal in the header corner, reacting to the game */
 .buddy {
   position: absolute;
-  right: 4px;
-  bottom: 0;
+  right: -4px;
+  bottom: -6px;
   z-index: 4;
-  width: clamp(64px, 18vw, 96px);
+  width: 60px;
   padding: 0;
   border: 0;
   background: radial-gradient(ellipse 40% 10% at 50% 94%, rgb(43 33 24 / 0.16), transparent 100%);

@@ -102,7 +102,7 @@ export default function PlayerCard() {
         <div
           className={styles.track}
           role="progressbar"
-          aria-label={`Progress to level ${playerLevel.level + 1}`}
+          aria-label={`Progress to rank ${playerLevel.level + 1}`}
           aria-valuemin={playerLevel.from}
           aria-valuemax={playerLevel.to}
           aria-valuenow={stars}
@@ -110,7 +110,7 @@ export default function PlayerCard() {
           <span className={styles.fill} style={{ width: `${Math.round(playerLevel.progress * 100)}%` }} />
         </div>
         <p className={styles.nextTitle}>
-          {playerLevel.to - stars} more ★ to reach <strong>Lv {playerLevel.level + 1}</strong>
+          {playerLevel.to - stars} more ★ to reach <strong>Rank {playerLevel.level + 1}</strong>
           {next && (
             <>
               {' '}

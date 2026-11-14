@@ -6,7 +6,7 @@ import { sfx } from '../../audio/sfx.js';
 import styles from './PalBuddy.module.css';
 
 /**
- * Your partner Pal, in its outfit, watching you play beside the board. It reacts to what happens:
+ * Your partner Pal, in its outfit, watching you play from the corner of the level header. It reacts to what happens:
  * a hop for each gem, a spin for a combo, a shake at a shadow crystal, a shiver on the last move, a dance
  * when you solve and a droop when moves run out. Tap it for a hop.
  * @param reaction { name: hop | spin | shake | shiver | dance | droop, key }

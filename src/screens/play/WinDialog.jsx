@@ -162,7 +162,7 @@ export default function WinDialog({
         )}
         <div className={styles.secondary}>
           <Button variant="secondary" icon="restart" onClick={onReplay}>
-            Replay
+            Play again
           </Button>
           {hasNext && (
             <Button variant="secondary" onClick={onMap}>

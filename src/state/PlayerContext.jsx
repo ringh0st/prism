@@ -185,7 +185,11 @@ export function PlayerProvider({ children }) {
       /** @returns Promise<{ stars, previousStars, sparksEarned, diamondsEarned, isNewBest }> */
       async finishLevel(level, result) {
         const local = recordLevelResult(progressRef.current, level, result);
-        const hotStreak = nextHotStreak(progressRef.current, { stars: local.stars, usedHelpers: result.usedHelpers });
+        const hotStreak = nextHotStreak(progressRef.current, {
+          stars: local.stars,
+          usedHelpers: result.usedHelpers,
+          previousStars: local.previousStars,
+        });
         local.progress = { ...local.progress, hotStreak };
         // Counts toward this week's Pal quests (the server counts the same from its own results).
         local.progress = recordQuestProgress(local.progress, level.id, local.progress.levels[level.id].stars, questWeekOf());

@@ -1,5 +1,5 @@
 .screen {
-  --board-reserved: 460px;
+  --board-reserved: 400px;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -17,7 +17,9 @@
 }
 
 .headerSpacer {
-  width: 48px;
+  position: relative;
+  width: 52px;
+  height: 52px;
 }
 
 .titleBlock {
@@ -84,6 +86,7 @@
   flex: 1;
   display: grid;
   align-items: center;
+  min-height: 240px;
 }
 
 .speech {

@@ -150,7 +150,7 @@ export function generatorPresetFor(world, index) {
   // Worlds 1–3: each level has its own flavor (two lamps, one tap wonder, long road…; see recipes.js),
   // on top of the world's pieces. Levels that introduce a piece keep it simple.
   const recipe = recipeFor(world, index);
-  const flavored = (base) => (recipe ? { ...recipePreset(recipe, base, { world, spike }), recipe } : base);
+  const flavored = (base) => (recipe ? { ...recipePreset(recipe, base, { world, index, spike }), recipe } : base);
 
   // World 1 after the tutorial: walls (from 1-4), then fixed mirrors from level 10.
   if (world === 1) {

@@ -52,3 +52,17 @@ setting, Lumi's sing-song voice on instructions, and the first Pal as a surprise
 Text slides before playing, hint timers that feel like a countdown, hard fails before the rules click, a Hard level
 right after a new piece, big empty boards with many useless mirrors, screens piling up between levels, color as the
 only signal, motion while the player is thinking, and sounds or haptics on every single event.
+
+## AI playtest round (Noa 10, Rina 69, Dan 34 with ADHD): 7, 7 and 6 out of 10
+
+Fixed after it: live stars that drop the moment ★★★ is out of reach (all three felt "tricked"), the intro goal as
+"★★★ in N moves", a bigger board (about 45% bigger cells on phones; the Pal moved to the header), feedback when a
+bolted piece is tapped, no lingering glow on pieces that can't turn, World 1 shows only Hint and the first Hint per level
+is free in Worlds 1–2, Lumi says what a helper costs, HARD LEVEL stamp, the coach hand in 1-2 and 1-3 only when needed,
+unique level names per world and varied flavor lines, harder second half of each world, "Rank" instead of "Level up",
+"Play again"/"Share video", honest out-of-moves text, "New best" only when beating an earlier result, replays don't pad
+the perfect streak, the treat shown on the win screen is the one fed next, no event talk before events are open, and the
+solved board stays visible a moment longer before the win screen.
+
+Still open from that round: the PLAY button covers map nodes, the night board's mirror contrast, and chests that only
+wiggle until they can be opened.

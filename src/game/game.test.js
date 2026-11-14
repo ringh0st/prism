@@ -577,7 +577,10 @@ test('Pal of the day leads with news, otherwise says hello for the time of day',
   const almost = { ...base, pal: { ...base.pal, id: 'mossy', owned: { mossy: { stage: 1, growth: 18 } } } };
   assert.match(palGreetingFor(almost, new Date(2026, 10, 18, 9), 0), /2 more levels and I grow into a Buddy/);
   const fresh = { ...base, pal: { ...base.pal, id: 'mossy', owned: { mossy: { stage: 0, growth: 3 } } } };
-  assert.match(palGreetingFor(fresh, new Date(2026, 10, 14, 15), 0), /weekend/);
+  // No event talk before the player can join events (World 1 finished).
+  assert.doesNotMatch(palGreetingFor(fresh, new Date(2026, 10, 14, 15), 0), /weekend/);
+  const worldOne = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`w1-${String(i + 1).padStart(2, '0')}`, { stars: 1 }]));
+  assert.match(palGreetingFor({ ...fresh, levels: worldOne }, new Date(2026, 10, 14, 15), 0), /weekend/);
   assert.match(palGreetingFor(fresh, new Date(2026, 10, 18, 8), 0), /morning/i);
 });
 
@@ -716,8 +719,10 @@ test('treats: one every three solved levels, fed one at a time', async () => {
   const treats = await import('./treats.js');
   const levels = Object.fromEntries(Array.from({ length: 7 }, (_, i) => [`w1-0${i + 1}`, { stars: 1 }]));
   assert.equal(treats.treatsFound(levels), 2);
-  const fed = treats.feedTreat({ levels, treatsFed: 1 }, 0);
-  assert.deepEqual([fed.treat.id, fed.progress.treatsFed, fed.trick], ['berry', 2, 'backflip']);
+  // The newest treat is fed first (the one the win screen just showed), then the older one.
+  const fed = treats.feedTreat({ levels, treatsFed: 0 }, 0);
+  assert.deepEqual([fed.treat.id, fed.progress.treatsFed, fed.trick], ['berry', 1, 'backflip']);
+  assert.equal(treats.feedTreat({ levels, treatsFed: 1 }, 0).treat.id, 'cookie');
   assert.equal(treats.feedTreat({ levels, treatsFed: 2 }), null);
   const eight = { ...levels, 'w1-08': { stars: 2 } };
   const nine = { ...eight, 'w1-09': { stars: 2 } };
@@ -833,5 +838,21 @@ test('worlds 1–3: every flavored level is built as its flavor, and no two in a
       if (level.recipe === 'oneTap') assert.notEqual(level.difficulty, 'hard', level.id);
       if ([6, 11, 16].includes(level.index) && level.recipe) assert.ok(REST_RECIPES.includes(level.recipe), `${level.id} should be a breather`);
     });
+  }
+});
+
+test('taps left: the fewest taps that still solve a level', async () => {
+  const { tapsLeft } = await import('./solver.js');
+  const level = JSON.parse(readFileSync(new URL('../data/worlds/world-001.json', import.meta.url), 'utf8'))[1];
+  const start = level.tiles.map((t) => t.orient ?? 0);
+  assert.equal(tapsLeft(level, start), level.par);
+});
+
+test('level names never repeat within a built-in world', async () => {
+  const { levelNameFor } = await import('./levelNames.js');
+  for (const world of [1, 2, 3, 17]) {
+    const file = new URL(`../data/worlds/world-${String(world).padStart(3, '0')}.json`, import.meta.url);
+    const names = JSON.parse(readFileSync(file, 'utf8')).map(levelNameFor);
+    assert.equal(new Set(names).size, names.length, `world ${world}: ${names.join(', ')}`);
   }
 });

@@ -17,14 +17,7 @@ export function shapePathFor(color) {
 /** Standalone gem icon for legends and the editor palette. */
 export default function GemShape({ color, size = 18, label }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 100 100"
-      role={label ? 'img' : undefined}
-      aria-label={label}
-      aria-hidden={label ? undefined : true}
-    >
+    <svg width={size} height={size} viewBox="0 0 100 100" role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : true}>
       <path d={shapePathFor(color)} fill={beamColorVar(color)} stroke="rgba(0,0,0,.25)" strokeWidth="6" strokeLinejoin="round" />
       <path d={shapePathFor(color)} fill="#fff" opacity=".35" transform="translate(50 50) scale(.45) translate(-50 -58)" />
     </svg>

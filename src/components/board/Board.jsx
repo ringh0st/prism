@@ -30,6 +30,8 @@ const COACH_LABELS = { [TILE.EMITTER]: 'Lamp', [TILE.GEM]: 'Gem' };
  * @param turnsLeft    turns each cracking mirror has left (a cracked one can't turn)
  * @param revealedCells cells the light has reached (fog lifts there); null shows everything (editor)
  * @param glowbug      { id, cell, isAwake, isFreed }: a Glowbug sleeping on a cell (it wakes in the light)
+ * @param onBlocked    (cellIndex, tileIndex) when a piece that can't turn is tapped (so it can say why)
+ * @param nudgedCell   cell to give a little "nope" shake
  * @param lookHere     Set of cells to softly glow: the free "look around here" step of the hint ladder
  * @param coach        first-levels coaching: { tile: tile index the hand points at, or null; labels: show Lamp/Gem tags }
  */
@@ -51,6 +53,8 @@ export default function Board({
   glowbug = null,
   coach = null,
   lookHere = null,
+  onBlocked = null,
+  nudgedCell = null,
 }) {
   const { width, height, tiles } = level;
   const [focusedCell, setFocusedCell] = useState(0);
@@ -141,13 +145,13 @@ export default function Board({
                       highlightTile === tileIndex && tileIndex >= 0 ? styles.hint : ''
                     } ${
                       spotlightTile === tileIndex && tileIndex >= 0 ? styles.spotlight : ''
-                    } ${coach?.tile === tileIndex && tileIndex >= 0 ? styles.coached : ''} ${lookHere?.has(cell) ? styles.lookHere : ''} ${tile?.type === TILE.SHADE && isLit ? styles.shake : ''}`}
+                    } ${coach?.tile === tileIndex && tileIndex >= 0 ? styles.coached : ''} ${lookHere?.has(cell) ? styles.lookHere : ''} ${(tile?.type === TILE.SHADE && isLit) || nudgedCell === cell ? styles.shake : ''}`}
                     tabIndex={cell === focusedCell ? 0 : -1}
                     aria-label={`${description}${glowbug?.cell === cell ? `. ${glowbugById(glowbug.id).name} the Glowbug is ${glowbug.isAwake ? 'awake' : 'asleep'} here` : ''}. Row ${row + 1}, column ${col + 1}`}
                     aria-disabled={!isActionable || undefined}
                     onFocus={() => setFocusedCell(cell)}
                     onKeyDown={(event) => onKeyDown(event, cell)}
-                    onClick={() => isActionable && onActivate(cell, tileIndex)}
+                    onClick={() => (isActionable ? onActivate(cell, tileIndex) : !isLocked && tile && onBlocked?.(cell, tileIndex))}
                   >
                     {glowbug?.cell === cell && (
                       <span className={`${styles.glowbug} ${tile ? styles.glowbugOnTile : ''} ${glowbug.isFreed ? styles.glowbugFreed : ''}`}>

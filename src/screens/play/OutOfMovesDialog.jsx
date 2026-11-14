@@ -9,6 +9,7 @@ import styles from './OutOfMovesDialog.module.css';
  */
 export default function OutOfMovesDialog({
   gemsLeft,
+  gemsLit = 0,
   lumiLine,
   hintsOwned = 0,
   backName = 'map',
@@ -17,11 +18,12 @@ export default function OutOfMovesDialog({
   onRetryWithHint = null,
   onMap,
 }) {
-  const isClose = gemsLeft <= 1;
+  const isClose = gemsLit > 0 && gemsLeft === 1;
   return (
     <Dialog title={isClose ? 'So close!' : 'Out of moves'} tone="gentle" onClose={onMap} closesOnBackdrop={false}>
       <p className={styles.progress}>
-        {gemsLeft === 1 ? 'Just 1 gem to go.' : `${gemsLeft} gems to go.`} <span className={styles.quip}>Lumi: “{lumiLine}”</span>
+        {gemsLit === 0 ? 'No gems lit yet. Try another way!' : gemsLeft === 1 ? 'Just 1 gem to go.' : `${gemsLeft} gems to go.`}{' '}
+        <span className={styles.quip}>Lumi: “{lumiLine}”</span>
       </p>
       <div className={styles.actions}>
         {onKeepGoing && (

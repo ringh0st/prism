@@ -5,14 +5,29 @@
  * player sees when the level opens. Levels that introduce a new piece keep their simple setup.
  */
 export const RECIPES = {
-  twoLamps: { name: 'Two lamps', goal: 'Two lamps, two gems. Light them both!' },
-  lightShow: { name: 'Light show', goal: 'Three lamps! Get every gem glowing.' },
-  oneTap: { name: 'One tap wonder', goal: 'Only one mirror is wrong. Can you spot it?' },
-  longRoad: { name: 'Long road', goal: 'The light has a long way to go. Guide it all the way!' },
-  tiny: { name: 'Tiny but tricky', goal: 'A little board packed with mirrors.' },
-  wallMaze: { name: 'Wall maze', goal: 'Walls everywhere! Find the way through.' },
-  gemShower: { name: 'Gem shower', goal: 'Split the light to reach every gem.' },
-  rainbow: { name: 'Rainbow', goal: 'Every gem wants its own color.' },
+  twoLamps: {
+    name: 'Two lamps',
+    goals: ['Two lamps, two gems. Light them both!', 'Double trouble: two beams to steer!', 'Each lamp needs its own path.'],
+  },
+  lightShow: {
+    name: 'Light show',
+    goals: ['Three lamps! Get every gem glowing.', 'Three beams at once. Can you juggle them?', 'Light show time: every gem on!'],
+  },
+  oneTap: {
+    name: 'One tap wonder',
+    goals: ['Only one mirror is wrong. Can you spot it?', 'One tap fixes it all. Which one?', 'Spot the odd mirror out!'],
+  },
+  longRoad: {
+    name: 'Long road',
+    goals: ['The light has a long way to go. Guide it all the way!', 'A long, winding path. Follow the beam!', 'Bounce it across the whole board!'],
+  },
+  tiny: { name: 'Tiny but tricky', goals: ['A little board packed with mirrors.', 'Small board, big think!', 'Every mirror counts here.'] },
+  wallMaze: {
+    name: 'Wall maze',
+    goals: ['Walls everywhere! Find the way through.', 'Sneak the light past the walls!', 'A maze of bricks. Find the gap!'],
+  },
+  gemShower: { name: 'Gem shower', goals: ['Split the light to reach every gem.', 'One beam, many gems. Split it!', 'Share the light around!'] },
+  rainbow: { name: 'Rainbow', goals: ['Every gem wants its own color.', 'Paint the light to match each gem!', 'Colors first, then aim!'] },
 };
 
 // Index 1–20 in each world; null keeps the world's usual level (tutorials, piece introductions, bosses).
@@ -93,14 +108,25 @@ export const REST_RECIPES = ['oneTap', 'tiny'];
 /** The flavor of a built-in level (an id from RECIPES), or null for a plain one. */
 export const recipeFor = (world, index) => SEQUENCES[world]?.[index - 1] ?? null;
 
-/** The flavor's name and goal for a level, or null. */
-export const recipeOf = (level) => (level?.recipe ? (RECIPES[level.recipe] ?? null) : null);
+/** The flavor's name and one of its goal lines (a different one level to level), or null. */
+export function recipeOf(level) {
+  const recipe = level?.recipe ? RECIPES[level.recipe] : null;
+  if (!recipe) return null;
+  return { name: recipe.name, goal: recipe.goals[(level.index ?? 0) % recipe.goals.length] };
+}
 
 /**
  * Generator settings for a flavor, on top of the world's own (which keep its pieces: walls, fixed
  * mirrors, splitters, color glass). `spike` is 1 on Hard levels.
  */
-export function recipePreset(recipe, base, { world, spike }) {
+export function recipePreset(recipe, base, { world, index, spike }) {
+  const preset = flavorPreset(recipe, base, { world, spike });
+  // The second half of each world bites harder (playtesters breezed through it): one more move needed.
+  if (index > 10 && !REST_RECIPES.includes(recipe)) return { ...preset, minPar: preset.minPar + 1, maxPar: preset.maxPar + 1 };
+  return preset;
+}
+
+function flavorPreset(recipe, base, { world, spike }) {
   const bigger = (size) => Math.min(8, size + spike);
   switch (recipe) {
     case 'twoLamps':

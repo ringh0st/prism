@@ -27,8 +27,8 @@ export const treatNumber = (n) => TREATS[(n - 1) % TREATS.length];
 /** Treats waiting to be eaten. */
 export const treatsWaiting = (progress) => Math.max(0, treatsFound(progress.levels) - (progress.treatsFed ?? 0));
 
-/** The next treat in the bag (the oldest one not eaten yet). */
-export const nextTreat = (progress) => treatNumber((progress.treatsFed ?? 0) + 1);
+/** The treat to feed next: the newest one found, so it's always the treat the win screen just showed. */
+export const nextTreat = (progress) => treatNumber(Math.max(1, treatsFound(progress.levels) - (progress.treatsFed ?? 0)));
 
 /** The treat this solve found, if solving it made the count reach the next treat (else null). */
 export function treatFoundBy(levelsBefore, levelsAfter) {

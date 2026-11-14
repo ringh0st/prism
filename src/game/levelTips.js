@@ -5,8 +5,7 @@
  */
 export const LEVEL_TIPS = [
   { id: 'stars', target: '[data-tour="meter"]', title: 'Fewer moves, more stars', text: 'Solve it in just a few taps for ★★★.' },
-  { id: 'helpers', target: '[data-tour="helpers"]', title: 'Stuck?', text: 'Helpers show you the way.' },
 ];
 
-/** The tips still to show, in order. */
-export const unseenTips = (seenIds, { hasHelpers }) => LEVEL_TIPS.filter((tip) => !seenIds.includes(tip.id) && (tip.id !== 'helpers' || hasHelpers));
+/** The tips still to show, in order. (Helpers are taught when the player gets stuck, not up front.) */
+export const unseenTips = (seenIds) => LEVEL_TIPS.filter((tip) => !seenIds.includes(tip.id));

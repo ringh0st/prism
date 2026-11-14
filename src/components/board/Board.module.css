@@ -1,7 +1,8 @@
 .board {
   --pad: clamp(6px, 2vw, 12px);
   position: relative;
-  width: min(100%, 560px, calc((100dvh - var(--board-reserved, 300px)) * var(--cols) / var(--rows)));
+  /* As big as the room allows: --board-max-height is the real space (levels), else the screen minus the rest. */
+  width: min(100%, 560px, calc(var(--board-max-height, 100dvh - var(--board-reserved, 300px)) * var(--cols) / var(--rows)));
   aspect-ratio: var(--cols) / var(--rows);
   margin: 0 auto;
   padding: var(--pad);

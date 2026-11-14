@@ -35,10 +35,7 @@ function simplifications(preset) {
 
 /** Tutorials, piece introductions and quick "rest" flavors may be easy; everything else needs a catch. */
 const needsCatchFor = (world, index, preset) =>
-  world <= CATCH_WORLDS &&
-  !(world === 1 && index <= 3) &&
-  !INTRO_LEVELS.has(levelId(world, index)) &&
-  !REST_RECIPES.includes(preset.recipe);
+  world <= CATCH_WORLDS && !(world === 1 && index <= 3) && !INTRO_LEVELS.has(levelId(world, index)) && !REST_RECIPES.includes(preset.recipe);
 /** Levels that teach a new piece stay gentle. */
 const INTRO_LEVELS = new Set(Object.values(PIECE_FIRST_LEVEL));
 /** Worlds built with the catch check so far (later worlds keep their earlier boards until regenerated). */

@@ -87,6 +87,13 @@ export function nearestSolution(level, currentOrients) {
   return orientsFor(currentOrients, groups, best);
 }
 
+/** The fewest taps that can still solve the level from here (twins count once), or null if it can't be solved. */
+export function tapsLeft(level, currentOrients) {
+  const { isSolvable, solutionMasks } = analyzeLevel(level, currentOrients);
+  if (!isSolvable) return null;
+  return Math.min(...solutionMasks.map(popcount));
+}
+
 /**
  * Suggest one tile to rotate that moves the player closer to the nearest solution.
  * @returns tile index, or null if already solved / unsolvable

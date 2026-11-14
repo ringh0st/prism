@@ -5,16 +5,7 @@ import Icon from './Icon.jsx';
  * Tactile button. variant: primary | secondary | ghost. Use `as="a"` with href for links.
  * Icon-only buttons must pass `label` for screen readers.
  */
-export default function Button({
-  variant = 'primary',
-  size = 'md',
-  icon,
-  label,
-  children,
-  as: Component = 'button',
-  className = '',
-  ...rest
-}) {
+export default function Button({ variant = 'primary', size = 'md', icon, label, children, as: Component = 'button', className = '', ...rest }) {
   const isIconOnly = icon && !children;
   return (
     <Component

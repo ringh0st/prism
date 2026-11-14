@@ -1,5 +1,6 @@
 import { PAL_GROWTH_LEVELS, growthOf, palStage, stageOf } from './pals.js';
-import { eventProgressOf, eventThemeFor, eventWeekendOf, isEventPrizeReady, solvedEventCount } from './events.js';
+import { EVENT_UNLOCK_WORLDS, eventProgressOf, eventThemeFor, eventWeekendOf, isEventPrizeReady, solvedEventCount } from './events.js';
+import { finishedWorldCount } from './titles.js';
 import { currentStreak } from './progress.js';
 import { todayKey } from './daily.js';
 
@@ -30,7 +31,8 @@ export function palGreetingsFor(progress, date = new Date()) {
   const toGrow = PAL_GROWTH_LEVELS - growthOf(owned);
   if (stage.next && toGrow <= 3) lines.push(`Just ${toGrow} more ${toGrow === 1 ? 'level' : 'levels'} and I grow into a ${stage.next.name}!`);
 
-  const weekend = eventWeekendOf(date);
+  // Only talk about the weekend event once the player can actually join it.
+  const weekend = finishedWorldCount(progress.levels) >= EVENT_UNLOCK_WORLDS ? eventWeekendOf(date) : null;
   if (weekend) {
     const eventProgress = eventProgressOf(progress, weekend);
     if (isEventPrizeReady(eventProgress)) lines.push('We finished the weekend event! Let’s open the prize!');

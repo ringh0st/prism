@@ -84,7 +84,8 @@ export function recordLevelResult(progress, level, { moves, starCap = 3, forcedS
   const previousStars = previous?.stars ?? 0;
   const sparksEarned = sparksForNewStars(previousStars, stars, level.difficulty);
   const bestMoves = [previous?.bestMoves, moves].filter((m) => Number.isFinite(m));
-  const isNewBest = Number.isFinite(moves) && (!previous || !Number.isFinite(previous.bestMoves) || moves < previous.bestMoves);
+  // Only beating an earlier result counts as a new best (a first clear is just a clear).
+  const isNewBest = Number.isFinite(moves) && Boolean(previous) && Number.isFinite(previous.bestMoves) && moves < previous.bestMoves;
   const next = {
     ...progress,
     sparks: progress.sparks + sparksEarned,
@@ -209,7 +210,9 @@ export function claimDailyGiftLocally(progress, today) {
 }
 
 /** Consecutive levels solved with three stars and no helpers (just for fun and bragging). */
-export const nextHotStreak = (progress, { stars, usedHelpers }) => (stars === 3 && !usedHelpers ? progress.hotStreak + 1 : 0);
+/** Perfect solves in a row; replaying a level that already had ★★★ keeps the streak but doesn't add to it. */
+export const nextHotStreak = (progress, { stars, usedHelpers, previousStars = 0 }) =>
+  stars === 3 && !usedHelpers ? progress.hotStreak + (previousStars === 3 ? 0 : 1) : 0;
 
 /** Apply balances returned by the server (signed-in players). */
 export function withServerState(progress, state, today) {

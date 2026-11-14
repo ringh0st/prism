@@ -117,3 +117,11 @@
     transform: rotate(8deg) scale(1.06);
   }
 }
+
+.free {
+  width: auto;
+  padding: 0 7px;
+  font-size: 11px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
