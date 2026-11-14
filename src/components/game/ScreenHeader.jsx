@@ -1,5 +1,5 @@
 import Button from '../Button.jsx';
-import Ribbon from './Ribbon.jsx';
+import ScreenTitle from './ScreenTitle.jsx';
 import CurrencyHud from './CurrencyHud.jsx';
 import styles from './ScreenHeader.module.css';
 
@@ -8,9 +8,9 @@ export default function ScreenHeader({ title, backHref = '#/', showCurrencies = 
   return (
     <header className={styles.header}>
       <Button as="a" href={backHref} variant="secondary" icon="back" label="Back" />
-      <Ribbon as="h1" size="sm">
+      <ScreenTitle as="h1" size="sm">
         {title}
-      </Ribbon>
+      </ScreenTitle>
       {showCurrencies ? <CurrencyHud showStars={false} /> : <span />}
     </header>
   );

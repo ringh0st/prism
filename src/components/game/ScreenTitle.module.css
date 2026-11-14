@@ -1,0 +1,46 @@
+.title {
+  display: grid;
+  justify-items: center;
+  min-width: 0;
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--text-strong);
+  --underline: var(--color-honey);
+}
+
+.text {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.underline {
+  width: min(70%, 84px);
+  height: 7px;
+  margin-top: 2px;
+}
+
+.underline path {
+  fill: none;
+  stroke: var(--underline);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.sm {
+  font-size: 19px;
+}
+
+.lg {
+  font-size: clamp(26px, 7vw, 34px);
+}
+
+.lg .underline {
+  width: min(60%, 140px);
+  height: 10px;
+}
+
+.boss {
+  --underline: var(--color-terracotta);
+}

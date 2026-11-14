@@ -7,7 +7,7 @@ import GroveScene from '../../components/grove/GroveScene.jsx';
 import GroveItemArt from '../../components/grove/GroveItemArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { GROVE_ITEMS, GROVE_SPOTS } from '../../game/grove.js';
-import { useGroveTeam } from './GroveHome.jsx';
+import { stageOf } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Grove.module.css';
 
@@ -64,7 +64,6 @@ function DecorItem({ item, onDone, onError }) {
 /** Decorate the Grove: a live preview on top, every piece of decor below, grouped by where it goes. */
 export default function GroveScreen() {
   const { progress } = usePlayer();
-  const team = useGroveTeam();
   const [message, setMessage] = useState({ text: '', isError: false });
 
   return (
@@ -72,7 +71,7 @@ export default function GroveScreen() {
       <ScreenHeader title="Decorate" backHref="#/pals" />
       <main className={styles.main}>
         <div className={styles.preview}>
-          <GroveScene placed={progress.grove.placed} team={team} partnerId={progress.pal.id} wearing={progress.pal.wearing} />
+          <GroveScene placed={progress.grove.placed} partnerId={progress.pal.id} stage={stageOf(progress.pal.owned[progress.pal.id])} wearing={progress.pal.wearing} />
         </div>
         <p className={message.isError ? styles.error : styles.status} role={message.isError ? 'alert' : 'status'}>
           {message.text || 'One piece per spot. Decor is yours forever, and you can swap any time.'}

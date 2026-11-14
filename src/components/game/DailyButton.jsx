@@ -4,17 +4,20 @@ import { currentStreak } from '../../game/progress.js';
 import { todayKey } from '../../game/daily.js';
 import styles from './DailyButton.module.css';
 
-/** The daily puzzle, on the map's top bar: a dot when today's puzzle is waiting, and the day streak. */
+/**
+ * Today's daily puzzle, on the map's top bar, with the day streak. Like the gift, it's a once-a-day
+ * mission: once solved it leaves the bar until tomorrow.
+ */
 export default function DailyButton() {
   const { progress } = usePlayer();
   const today = todayKey();
-  const isWaiting = progress.daily.lastDate !== today;
+  if (progress.daily.lastDate === today) return null;
   const streak = currentStreak(progress, today);
-  const label = `Daily puzzle${isWaiting ? ', new puzzle waiting' : ', done today'}${streak > 1 ? `, ${streak} day streak` : ''}`;
+  const label = `Daily puzzle: a new puzzle and reward are waiting${streak > 1 ? `, ${streak} day streak` : ''}`;
   return (
-    <a href="#/daily" className={`${styles.button} ${isWaiting ? styles.waiting : ''}`} aria-label={label}>
+    <a href="#/daily" className={styles.button} aria-label={label}>
       <Icon name="calendar" size={24} strokeWidth={2.4} />
-      {isWaiting && <span className={styles.dot} aria-hidden="true" />}
+      <span className={styles.dot} aria-hidden="true" />
       {streak > 1 && (
         <span className={`game-title ${styles.streak}`} aria-hidden="true">
           <Icon name="flame" size={10} />

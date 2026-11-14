@@ -3,7 +3,7 @@ import { finishedWorldCount } from './titles.js';
 
 /**
  * Pals: profile characters. You pick one starter on your first game, then unlock the rest by playing.
- * Every finished world earns a Glow-up, and you choose which Pal grows into its next form. Must match supabase/pals.sql.
+ * Only the partner Pal grows: 20 solved levels per form. Must match supabase/pals.sql.
  *
  * unlock: what makes a Pal available (starters can also be picked as your very first Pal).
  * animal: the word used in your public nickname ("Sunny Fox 42").
@@ -39,12 +39,23 @@ export const PALS = [
   { id: 'twinkle', name: 'Twinkle', species: 'Star', animal: 'Star', unlock: { stars: 1800 } },
   { id: 'starla', name: 'Starla', species: 'Unicorn', animal: 'Unicorn', unlock: { stars: 2400 } },
   { id: 'ziggy', name: 'Ziggy', species: 'Dragon', animal: 'Dragon', unlock: { stars: 3000 } },
+  // Mythic Pals, from myths and legends around the world. They join late in the adventure.
+  { id: 'sol', name: 'Sol', species: 'Phoenix', animal: 'Phoenix', isMythic: true, unlock: { worlds: 15 } },
+  { id: 'kiri', name: 'Kiri', species: 'Qilin', animal: 'Qilin', isMythic: true, unlock: { worlds: 18 } },
+  { id: 'gryff', name: 'Gryff', species: 'Griffin', animal: 'Griffin', isMythic: true, unlock: { worlds: 20 } },
+  { id: 'nessa', name: 'Nessa', species: 'Loch Ness monster', animal: 'Nessie', isMythic: true, unlock: { streak: 21 } },
+  { id: 'dozy', name: 'Dozy', species: 'Baku dream-eater', animal: 'Baku', isMythic: true, unlock: { worlds: 22 } },
+  { id: 'nimbus', name: 'Nimbus', species: 'Pegasus', animal: 'Pegasus', isMythic: true, unlock: { worlds: 25 } },
+  { id: 'hopscotch', name: 'Hopscotch', species: 'Jackalope', animal: 'Jackalope', isMythic: true, unlock: { streak: 45 } },
+  { id: 'frosty', name: 'Frosty', species: 'Yeti', animal: 'Yeti', isMythic: true, unlock: { worlds: 30 } },
+  { id: 'fen', name: 'Fen', species: 'Fenrir wolf pup', animal: 'Wolf', isMythic: true, unlock: { worlds: 35 } },
+  { id: 'riddle', name: 'Riddle', species: 'Sphinx kitten', animal: 'Sphinx', isMythic: true, unlock: { worlds: 40 } },
 ];
 
 export const STARTER_PALS = PALS.filter((pal) => pal.isStarter);
 export const palById = (id) => PALS.find((pal) => pal.id === id) ?? null;
 
-/** Each Pal has five forms. It grows one form each time you spend a Glow-up (earned per finished world) on it. */
+/** Each Pal has five forms, Baby to Legend. */
 export const PAL_STAGES = [
   { id: 'baby', name: 'Baby' },
   { id: 'junior', name: 'Junior' },

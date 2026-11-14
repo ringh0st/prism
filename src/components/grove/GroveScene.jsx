@@ -2,7 +2,7 @@ import { useState } from 'react';
 import PalArt from '../pals/PalArt.jsx';
 import GroveItemShape from './GroveItemShape.jsx';
 import { groveItemById } from '../../game/grove.js';
-import { palById, palStage, stageOf } from '../../game/pals.js';
+import { palById, palStage } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './GroveScene.module.css';
 
@@ -18,16 +18,8 @@ const SPOT_PLACES = {
 /** Draw order: far things first. */
 const DRAW_ORDER = ['sky', 'home', 'light', 'seat', 'garden', 'water'];
 
-/** Where Pals stand, as % of the scene: the partner front and center, the rest of the team around. */
-const PAL_PLACES = [
-  { left: 50, top: 70, size: 25 },
-  { left: 26, top: 64, size: 17 },
-  { left: 74, top: 62, size: 17 },
-  { left: 13, top: 78, size: 15 },
-  { left: 87, top: 79, size: 15 },
-  { left: 38, top: 86, size: 14 },
-  { left: 64, top: 87, size: 14 },
-];
+/** Where your partner stands, as % of the scene (by its feet), and how wide it is. */
+const PARTNER_PLACE = { left: 50, top: 74, size: 30 };
 
 const HELLOS = ['Hi there!', 'I love it here!', 'Let’s play!', 'Wheee!', 'So cozy!', '*happy wiggle*'];
 
@@ -80,22 +72,22 @@ function Fireflies() {
 }
 
 /**
- * The Grove: the Pals' home in the enchanted forest, with the player's placed decor and their team.
- * Tap a Pal to say hello.
+ * The Grove: your partner Pal's home in the enchanted forest, with the decor you placed.
+ * Tap the Pal to say hello.
  */
-export default function GroveScene({ placed, team, partnerId, wearing = [] }) {
+export default function GroveScene({ placed, partnerId, stage = 0, wearing = [] }) {
   const [hello, setHello] = useState(null);
   const bySpot = Object.fromEntries(placed.map((id) => [groveItemById(id)?.spot, id]).filter(([spot]) => spot));
-  const ordered = [partnerId, ...team.map((pal) => pal.id).filter((id) => id !== partnerId)].filter(Boolean).slice(0, PAL_PLACES.length);
+  const partner = palById(partnerId);
 
-  const sayHello = (palId, index) => {
-    setHello({ palId, line: HELLOS[(index + Date.now()) % HELLOS.length], key: Date.now() });
+  const sayHello = () => {
+    setHello({ line: HELLOS[Date.now() % HELLOS.length], key: Date.now() });
     sfx.sparkle();
   };
 
   return (
     <div className={styles.scene}>
-      <svg className={styles.art} viewBox="0 0 400 280" role="img" aria-label={sceneLabel(bySpot, ordered)} focusable="false">
+      <svg className={styles.art} viewBox="0 0 400 280" role="img" aria-label={sceneLabel(bySpot, partner)} focusable="false">
         <ForestBackdrop hasMoon={bySpot.sky === 'moonStars'} />
         {DRAW_ORDER.map((spot) =>
           bySpot[spot] ? (
@@ -106,35 +98,31 @@ export default function GroveScene({ placed, team, partnerId, wearing = [] }) {
         )}
         <Fireflies />
       </svg>
-      {ordered.map((palId, index) => {
-        const pal = palById(palId);
-        const owned = team.find((member) => member.id === palId)?.owned;
-        const place = PAL_PLACES[index];
-        return (
-          <button
-            key={palId}
-            type="button"
-            className={`${styles.pal} ${hello?.palId === palId ? styles.hop : ''}`}
-            style={{ left: `${place.left}%`, top: `${place.top}%`, width: `${place.size}%`, animationDelay: `${index * -0.6}s` }}
-            onClick={() => sayHello(palId, index)}
-            aria-label={`Say hi to ${pal.name}, ${palStage(stageOf(owned)).name}`}
-          >
-            <PalArt palId={palId} stage={stageOf(owned)} wearing={palId === partnerId ? wearing : []} size="100%" />
-            {hello?.palId === palId && (
-              <span key={hello.key} className={styles.bubble} role="status">
-                {hello.line}
-              </span>
-            )}
-          </button>
-        );
-      })}
+      {partner && (
+        <button
+          type="button"
+          className={styles.pal}
+          style={{ left: `${PARTNER_PLACE.left}%`, top: `${PARTNER_PLACE.top}%`, width: `${PARTNER_PLACE.size}%` }}
+          onClick={sayHello}
+          aria-label={`Say hi to ${partner.name}, ${palStage(stage).name}`}
+        >
+          {/* A new key on every hello replays the hop. */}
+          <span key={hello?.key ?? 'still'} className={`${styles.body} ${hello ? styles.hop : ''}`}>
+            <PalArt palId={partner.id} stage={stage} wearing={wearing} size="100%" />
+          </span>
+          {hello && (
+            <span key={hello.key} className={styles.bubble} role="status">
+              {hello.line}
+            </span>
+          )}
+        </button>
+      )}
     </div>
   );
 }
 
-function sceneLabel(bySpot, palIds) {
+function sceneLabel(bySpot, partner) {
   const decor = Object.values(bySpot).map((id) => groveItemById(id).name.toLowerCase());
-  const pals = palIds.map((id) => palById(id).name);
-  const living = pals.length ? `${pals.join(', ')} ${pals.length === 1 ? 'lives' : 'live'} here` : 'No Pals live here yet';
+  const living = partner ? `${partner.name} lives here` : 'Choose a Pal to live here';
   return `Your Grove in the enchanted forest. ${living}${decor.length ? `, with a ${decor.join(', a ')}` : ''}.`;
 }

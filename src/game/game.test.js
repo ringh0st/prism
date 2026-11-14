@@ -280,7 +280,7 @@ test('pals: starter choice, unlocks, growth and accessories', async () => {
   assert.equal(pals.growPartnerLocally(legend).progress, legend);
   assert.equal(pals.palStage(pals.stageOf(progress.pal.owned.mossy)).name, 'Junior');
   assert.equal(pals.palStage(4).name, 'Legend');
-  assert.equal(pals.PALS.length, 30);
+  assert.equal(pals.PALS.length, 40);
   // Accessories cost sparks and must be owned to wear.
   assert.throws(() => pals.wearAccessoryLocally(progress, 'scarf', true));
   const rich = { ...progress, sparks: 100 };

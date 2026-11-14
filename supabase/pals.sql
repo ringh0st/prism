@@ -51,6 +51,16 @@ as $$
     when 'twinkle' then '{"stars": 1800}'::jsonb
     when 'starla' then '{"stars": 2400}'::jsonb
     when 'ziggy' then '{"stars": 3000}'::jsonb
+    when 'sol' then '{"worlds": 15}'::jsonb
+    when 'kiri' then '{"worlds": 18}'::jsonb
+    when 'gryff' then '{"worlds": 20}'::jsonb
+    when 'nessa' then '{"streak": 21}'::jsonb
+    when 'dozy' then '{"worlds": 22}'::jsonb
+    when 'nimbus' then '{"worlds": 25}'::jsonb
+    when 'hopscotch' then '{"streak": 45}'::jsonb
+    when 'frosty' then '{"worlds": 30}'::jsonb
+    when 'fen' then '{"worlds": 35}'::jsonb
+    when 'riddle' then '{"worlds": 40}'::jsonb
     else null
   end;
 $$;
@@ -91,6 +101,16 @@ as $$
     when 'twinkle' then 'Star'
     when 'starla' then 'Unicorn'
     when 'ziggy' then 'Dragon'
+    when 'sol' then 'Phoenix'
+    when 'kiri' then 'Qilin'
+    when 'gryff' then 'Griffin'
+    when 'nessa' then 'Nessie'
+    when 'dozy' then 'Baku'
+    when 'nimbus' then 'Pegasus'
+    when 'hopscotch' then 'Jackalope'
+    when 'frosty' then 'Yeti'
+    when 'fen' then 'Wolf'
+    when 'riddle' then 'Sphinx'
     else null
   end;
 $$;

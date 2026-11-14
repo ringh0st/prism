@@ -12,8 +12,9 @@ import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import { palById, stageOf } from '../../game/pals.js';
 import styles from './WinDialog.module.css';
 
-function headlineFor({ stars, isSkipped, completesWorld }, difficulty) {
+function headlineFor({ stars, isSkipped, completesWorld, isFirstToday }, difficulty) {
   if (isSkipped) return 'Skipped';
+  if (isFirstToday) return 'Daily done!';
   if (completesWorld) return 'World complete!';
   if (stars === 3 && difficulty === DIFFICULTY.EXTRA) return 'Legendary!';
   if (stars === 3) return 'Brilliant!';
@@ -62,6 +63,11 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
       )}
       {!isSkipped && stars < 3 && <p className={styles.tip}>Match par ({par} moves) without helpers for all three stars.</p>}
 
+      {result.isFirstToday && (
+        <p className={`game-title ${styles.dailyReward}`}>
+          <Icon name="gift" size={22} /> Daily reward collected
+        </p>
+      )}
       <div className={styles.rewards}>
         {sparksEarned > 0 && (
           <span className={styles.reward}>

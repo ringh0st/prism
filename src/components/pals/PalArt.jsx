@@ -1,4 +1,5 @@
 import { accessoryById, palStage } from '../../game/pals.js';
+import { PAL_GROWTH } from './palGrowth.jsx';
 
 const SLOT_ORDER = ['neck', 'head', 'hand'];
 const slotOf = (id) => accessoryById(id)?.slot;
@@ -6,8 +7,8 @@ const bySlotOrder = (a, b) => SLOT_ORDER.indexOf(slotOf(a)) - SLOT_ORDER.indexOf
 
 /*
  * Pals (inline SVG, 100×100, standing on y≈94). Eight are hand-drawn; the other 22 are built from a
- * kit of parts below. Every Pal has five forms that add to its look: Baby, Junior (signature feature),
- * Buddy (forehead gem), Champ (warm aura) and Legend (light wings, halo and sparkles).
+ * kit of parts below. Every Pal has five forms, each adding its own visible growth (see palGrowth.jsx);
+ * `grown` is the Junior feature for Pals whose growth list keeps it.
  * `hat` and `neck` say where accessories sit on that Pal.
  */
 
@@ -261,6 +262,34 @@ function Ears({ type, color, inner }) {
           <circle cx="64" cy="34" r="12" fill={color} />
         </>
       );
+    case 'bunny':
+      return (
+        <>
+          <ellipse cx="38" cy="22" rx="7" ry="18" fill={color} />
+          <ellipse cx="62" cy="22" rx="7" ry="18" fill={color} />
+          <ellipse cx="38" cy="22" rx="3.5" ry="12" fill={inner} />
+          <ellipse cx="62" cy="22" rx="3.5" ry="12" fill={inner} />
+        </>
+      );
+    case 'pony':
+      return <path d="M31 38 33 20l12 12zM69 38 67 20 55 32z" fill={color} />;
+    case 'kirin':
+      return (
+        <>
+          <ellipse cx="25" cy="40" rx="11" ry="6" fill={color} transform="rotate(-25 25 40)" />
+          <ellipse cx="75" cy="40" rx="11" ry="6" fill={color} transform="rotate(25 75 40)" />
+          <path d="M46 32 50 14l4 18z" fill={inner} />
+        </>
+      );
+    case 'tufts':
+      return <path d="M30 42l-8-22 16 12zM70 42l8-22-16 12z" fill={inner} />;
+    case 'nubs':
+      return (
+        <>
+          <circle cx="40" cy="32" r="5" fill={inner} />
+          <circle cx="60" cy="32" r="5" fill={inner} />
+        </>
+      );
     case 'cap':
       return (
         <>
@@ -328,6 +357,19 @@ function Tail({ type, color, inner }) {
           <circle cx="84" cy="68" r="5" />
         </g>
       );
+    case 'humps':
+      return (
+        <g fill={color}>
+          <path d="M66 90a9 9 0 0 1 16 0zM82 90a6 6 0 0 1 11 0z" />
+        </g>
+      );
+    case 'tuftTail':
+      return (
+        <g>
+          <path d="M66 88c14 0 20-8 18-20" stroke={color} strokeWidth="4" strokeLinecap="round" fill="none" />
+          <circle cx="84" cy="66" r="6" fill={inner} />
+        </g>
+      );
     case 'twinkles':
       return (
         <g fill="#f2a67e">
@@ -368,6 +410,10 @@ function Marking({ type, color }) {
       );
     case 'belly':
       return <ellipse cx="50" cy="66" rx="14" ry="10" fill={color} />;
+    case 'trunk':
+      return <path d="M45 59h10v11a5 5 0 0 1-10 0z" fill="#857a6e" />;
+    case 'muzzle':
+      return <ellipse cx="50" cy="66" rx="12" ry="8" fill={color} />;
     case 'whiskers':
       return <path d="M24 62h10M24 68l10-2M76 62H66M76 68l-10-2" stroke="#7d6e63" strokeWidth="1.8" strokeLinecap="round" />;
     default:
@@ -376,7 +422,7 @@ function Marking({ type, color }) {
 }
 
 /** Builds a Pal from parts: head and body colors, ears, a signature tail/feature and face markings. */
-function partsPal({ color, inner, belly = null, ears, tail, marks = [], shape = 'chibi', faceY = 54, gap = 10 }) {
+function partsPal({ color, headColor = color, inner, belly = null, ears, tail, marks = [], shape = 'chibi', faceY = 54, gap = 10, behind = null }) {
   const head =
     shape === 'cloud' ? (
       <g fill={color}>
@@ -388,7 +434,7 @@ function partsPal({ color, inner, belly = null, ears, tail, marks = [], shape = 
     ) : shape === 'star' ? (
       <path d="M50 18l10 20 22 3-16 15 4 22-20-11-20 11 4-22-16-15 22-3z" fill={color} stroke={color} strokeWidth="6" strokeLinejoin="round" />
     ) : (
-      <circle cx="50" cy="56" r="26" fill={color} />
+      <circle cx="50" cy="56" r="26" fill={headColor} />
     );
   const body =
     shape === 'octopus' ? (
@@ -407,8 +453,9 @@ function partsPal({ color, inner, belly = null, ears, tail, marks = [], shape = 
     grown: <Tail type={tail} color={color} inner={inner} />,
     base: (
       <>
+        {behind}
         {body}
-        <Ears type={ears} color={color} inner={inner} />
+        <Ears type={ears} color={headColor} inner={inner} />
         {head}
         {belly && <Marking type="belly" color={belly} />}
         {marks.map((mark) => (
@@ -418,6 +465,7 @@ function partsPal({ color, inner, belly = null, ears, tail, marks = [], shape = 
         <Face y={faceY} gap={gap} />
         {marks.includes('snout') && <Marking type="snout" />}
         {marks.includes('beak') && <Marking type="beak" />}
+        {marks.includes('trunk') && <Marking type="trunk" />}
         {marks.includes('nose') && <Marking type="nose" />}
       </>
     ),
@@ -447,6 +495,17 @@ const PARTS_PALS = {
   twinkle: { color: '#ffd45e', inner: '#f2a67e', ears: 'none', tail: 'twinkles', shape: 'star', faceY: 50, gap: 8 },
   starla: { color: '#fffaf2', inner: '#f6c3b2', ears: 'unicorn', tail: 'mane' },
   ziggy: { color: '#7cc8b5', inner: '#3f8a64', ears: 'dragon', tail: 'batWings', belly: '#dcefe9' },
+  // Mythic Pals
+  sol: { color: '#f2a67e', inner: '#f0c14e', ears: 'crest', tail: 'wings', belly: '#fbe3a6', marks: ['beak'] },
+  kiri: { color: '#9fd8cf', inner: '#f0c14e', ears: 'kirin', tail: 'tuftTail', belly: '#fff6ea', marks: ['nose'] },
+  gryff: { color: '#d8a65e', headColor: '#fff6ea', inner: '#a8734a', ears: 'tufts', tail: 'tuftTail', marks: ['beak'] },
+  nessa: { color: '#6db58c', inner: '#4f9a72', ears: 'nubs', tail: 'humps', belly: '#cfe9c4', faceY: 52 },
+  dozy: { color: '#9a8d80', inner: '#f6c3b2', ears: 'bear', tail: 'fluffy', belly: '#f4f0e8', marks: ['trunk'], faceY: 50 },
+  nimbus: { color: '#efe6d8', inner: '#bfe6dc', ears: 'pony', tail: 'wings', marks: ['nose'] },
+  hopscotch: { color: '#d8b48a', inner: '#f6c3b2', ears: 'bunny', tail: 'fluffy', marks: ['nose'] },
+  frosty: { color: '#e4ded4', headColor: '#e4ded4', inner: '#fffaf2', ears: 'wool', tail: 'puffs', marks: ['muzzle', 'nose'], belly: '#cfe9e2' },
+  fen: { color: '#a99c8e', inner: '#fffaf2', ears: 'cat', tail: 'fluffy', belly: '#fffaf2', marks: ['nose'] },
+  riddle: { color: '#e2c08d', inner: '#f0c14e', ears: 'cat', tail: 'long', marks: ['nose', 'whiskers'] },
 };
 
 for (const [id, parts] of Object.entries(PARTS_PALS)) ART[id] = partsPal(parts);
@@ -583,14 +642,22 @@ function Accessory({ id, hat, neck }) {
   }
 }
 
-/** Stage looks: size, and which extras each form adds (see PAL_STAGES in src/game/pals.js). */
-const STAGE_LOOKS = [
-  { scale: 0.72 },
-  { scale: 0.84, feature: true },
-  { scale: 0.94, feature: true, gem: true },
-  { scale: 1, feature: true, gem: true, aura: 0.22 },
-  { scale: 1.04, feature: true, gem: true, aura: 0.38, wings: true, halo: true, sparkles: true },
-];
+/** Each form is a little bigger; Legends also sparkle. */
+const STAGE_SCALES = [0.72, 0.84, 0.94, 1, 1.04];
+
+/** What a Pal's forms up to `stageIndex` add, split into the layers behind and in front of it. */
+function growthLayers(palId, art, stageIndex) {
+  const forms = PAL_GROWTH[palId] ?? [];
+  const back = [];
+  const front = [];
+  for (let i = 0; i < stageIndex; i++) {
+    const added = forms[i] ?? (i === 0 ? { back: [art.grown], front: [] } : null);
+    if (!added) continue;
+    back.push(...added.back.map((part, n) => <g key={`b${i}-${n}`}>{part}</g>));
+    front.push(...added.front.map((part, n) => <g key={`f${i}-${n}`}>{part}</g>));
+  }
+  return { back, front };
+}
 
 /** The square to show: the whole stage, or (as a portrait) just the Pal, so small forms still fill a round avatar. */
 function viewBoxFor(scale, isPortrait) {
@@ -606,41 +673,33 @@ function viewBoxFor(scale, isPortrait) {
 export default function PalArt({ palId, stage = 0, wearing = [], size = 64, portrait = false, label, className }) {
   const art = ART[palId];
   if (!art) return null;
-  const look = STAGE_LOOKS[palStage(stage).index];
-  const [hx, hy] = art.hat;
+  const stageIndex = palStage(stage).index;
+  const scale = STAGE_SCALES[stageIndex];
+  const growth = growthLayers(palId, art, stageIndex);
   return (
     <svg
       className={className}
       width={size}
       height={size}
-      viewBox={viewBoxFor(look.scale, portrait)}
+      viewBox={viewBoxFor(scale, portrait)}
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
       focusable="false"
     >
-      {look.aura && <circle cx="50" cy="56" r="46" fill="#ffe27a" opacity={look.aura} />}
       <ellipse cx="50" cy="95" rx="24" ry="4" fill="rgba(60,40,20,.14)" />
-      <g transform={`translate(50 94) scale(${look.scale}) translate(-50 -94)`}>
-        {look.wings && (
-          <g fill="#fffaf2" opacity=".9">
-            <ellipse cx="18" cy="56" rx="18" ry="9" transform="rotate(-30 18 56)" />
-            <ellipse cx="82" cy="56" rx="18" ry="9" transform="rotate(30 82 56)" />
-          </g>
-        )}
-        {look.feature && art.grown}
+      <g transform={`translate(50 94) scale(${scale}) translate(-50 -94)`}>
+        {growth.back}
         {art.base}
-        {look.gem && <path d={`M${hx} ${hy + 6}l4 5-4 5-4-5z`} fill="#f0c14e" />}
+        {growth.front}
         {[...wearing].sort(bySlotOrder).map((id) => (
           <Accessory key={id} id={id} hat={art.hat} neck={art.neck} />
         ))}
-        {look.halo && !wearing.some((id) => slotOf(id) === 'head') && <ellipse cx={hx} cy={hy - 10} rx="14" ry="4" fill="none" stroke="#f0c14e" strokeWidth="3" />}
       </g>
-      {look.sparkles && (
+      {stageIndex === STAGE_SCALES.length - 1 && (
         <g fill="#f0c14e">
           <path d={RADIANT_SPARKLES} transform="translate(4 8) scale(.6)" />
           <path d={RADIANT_SPARKLES} transform="translate(80 14) scale(.5)" />
-          <path d={RADIANT_SPARKLES} transform="translate(84 62) scale(.4)" />
         </g>
       )}
     </svg>

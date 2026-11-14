@@ -143,3 +143,14 @@
 .grew {
   background: color-mix(in srgb, var(--color-honey) 32%, var(--surface-raised));
 }
+
+/* Today's daily puzzle pays out like the daily gift */
+.dailyReward {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: var(--space-2);
+  font-size: 17px;
+  color: var(--text-strong);
+}

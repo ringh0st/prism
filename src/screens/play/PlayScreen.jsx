@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Board from '../../components/board/Board.jsx';
 import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
-import Ribbon from '../../components/game/Ribbon.jsx';
+import ScreenTitle from '../../components/game/ScreenTitle.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
 import Confetti from '../../components/Confetti.jsx';
 import GemShape from '../../components/GemShape.jsx';
@@ -249,9 +249,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         <Button as="a" href={backHref} variant="secondary" icon="back" label="Back to map" />
         <div className={styles.titleBlock}>
           <p className={styles.subtitle}>{subtitle}</p>
-          <Ribbon as="h1" size="sm" tone={modifier === 'boss' ? 'alert' : 'sage'}>
+          <ScreenTitle as="h1" size="sm" tone={modifier === 'boss' ? 'boss' : 'calm'}>
             {levelName}
-          </Ribbon>
+          </ScreenTitle>
         </div>
         <span className={styles.headerSpacer} aria-hidden="true" />
       </header>
@@ -284,7 +284,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
       <div className={styles.bottom}>
         <div className={styles.lumi}>
-          <Lumi mood={lumi.mood} size={96} line={lumi.line} bubbleSide="right" />
+          <Lumi mood={lumi.mood} size={96} line={lumi.line} bubbleSide="above" />
         </div>
         <div className={styles.controls}>
           <Button variant="secondary" icon="restart" label="Restart level" onClick={restart} />

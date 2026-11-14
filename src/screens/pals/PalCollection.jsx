@@ -47,6 +47,7 @@ function Collection({ onError }) {
               </span>
             )}
             {owned && <span className={styles.stage}>{stage.name}</span>}
+            {pal.isMythic && <span className={styles.mythic}>✦ Mythic</span>}
           </li>
         );
       })}

@@ -83,18 +83,21 @@ export default function DailyGift({ look = 'button', className = '' }) {
     );
   }
 
+  // On the map, the box leaves once today's gift is opened (its dialog stays until closed).
   return (
     <>
-      <button
-        type="button"
-        className={`${styles.button} ${isReady ? styles.ready : ''} ${className}`}
-        onClick={open}
-        disabled={!isReady || isOpening}
-        aria-label={isReady ? `Open your daily gift: ${DAILY_GIFT_SPARKS} sparks` : 'Daily gift collected. Come back tomorrow'}
-      >
-        <Icon name="gift" size={24} />
-        {isReady && <span className={styles.dot} aria-hidden="true" />}
-      </button>
+      {isReady && (
+        <button
+          type="button"
+          className={`${styles.button} ${styles.ready} ${className}`}
+          onClick={open}
+          disabled={isOpening}
+          aria-label={`Open your daily gift: ${DAILY_GIFT_SPARKS} sparks`}
+        >
+          <Icon name="gift" size={24} />
+          <span className={styles.dot} aria-hidden="true" />
+        </button>
+      )}
       {dialog}
     </>
   );

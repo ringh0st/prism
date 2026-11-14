@@ -92,6 +92,8 @@
 .bubble {
   position: absolute;
   bottom: calc(var(--size) * 0.7);
+  /* Just words: taps go through to whatever is underneath. */
+  pointer-events: none;
   max-width: min(240px, 60vw);
   width: max-content;
   padding: 9px 14px;
@@ -132,6 +134,16 @@
 
 .left::after {
   right: 14px;
+}
+
+/* Above Lumi, lined up with its left edge (for tight corners, like next to the level's helper buttons) */
+.above {
+  left: 0;
+  bottom: calc(var(--size) * 1.25);
+}
+
+.above::after {
+  left: 24px;
 }
 
 .top {

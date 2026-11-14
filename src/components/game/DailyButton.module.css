@@ -6,9 +6,9 @@
   height: 46px;
   border-radius: 16px;
   text-decoration: none;
-  color: var(--text-strong);
-  background: var(--surface-raised);
-  box-shadow: var(--shadow-sm);
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+  box-shadow: var(--shadow-button);
   transition: transform 220ms var(--ease-spring);
 }
 
@@ -16,11 +16,6 @@
   transform: scale(0.92);
 }
 
-.waiting {
-  color: var(--calm-label);
-  background: var(--calm-bottom);
-  box-shadow: var(--shadow-button);
-}
 
 .dot {
   position: absolute;

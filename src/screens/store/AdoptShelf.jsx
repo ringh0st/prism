@@ -3,6 +3,7 @@ import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
 import Icon from '../../components/Icon.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
+import PalFormsStrip from '../../components/pals/PalFormsStrip.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { ADOPT_PAL_DIAMONDS, PALS, stageOf } from '../../game/pals.js';
 import styles from './Stall.module.css';
@@ -63,8 +64,9 @@ export default function AdoptShelf({ onAdopted, onError }) {
         <Dialog title={`Adopt ${choice.name}?`} onClose={() => setChoice(null)}>
           <PalArt palId={choice.id} size={120} className={styles.infoArt} />
           <p className={styles.infoText}>
-            {choice.name} the {choice.species} joins your team as a Baby, ready to grow with Glow-ups.
+            {choice.name} the {choice.species} joins your team as a Baby. Play with it as your partner and it grows into a Legend!
           </p>
+          <PalFormsStrip palId={choice.id} />
           <p className={styles.legal}>Diamonds can be bought with real money. Under 18? Ask a parent first.</p>
           <div className={styles.adoptActions}>
             <Button size="lg" disabled={!isSignedIn || isBusy || progress.diamonds < ADOPT_PAL_DIAMONDS} onClick={confirm} data-autofocus>

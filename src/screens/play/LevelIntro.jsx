@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import Ribbon from '../../components/game/Ribbon.jsx';
+import ScreenTitle from '../../components/game/ScreenTitle.jsx';
 import Button from '../../components/Button.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
 import GemShape from '../../components/GemShape.jsx';
@@ -32,9 +32,9 @@ export default function LevelIntro({ level, title, subtitle, modifier, lumiLine,
     <div className={`${styles.overlay} ${sticker ? styles[sticker.className] : ''}`} onClick={onDone} role="presentation">
       <div className={styles.card}>
         <p className={styles.subtitle}>{subtitle}</p>
-        <Ribbon as="h1" size="lg" tone={modifier === 'boss' ? 'alert' : 'sage'}>
+        <ScreenTitle as="h1" size="lg" tone={modifier === 'boss' ? 'boss' : 'calm'}>
           {title}
-        </Ribbon>
+        </ScreenTitle>
         {sticker && <p className={`game-title ${styles.sticker}`}>{sticker.text}</p>}
         <p className={styles.goal}>
           Light {gems.length === 1 ? 'the gem' : `all ${gems.length} gems`}
