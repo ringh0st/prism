@@ -1,36 +1,16 @@
 // Tiny Web Audio synth: every sound is generated, so there are no files to load.
 // One soft "music box" family: bell tones in a pentatonic scale through a warm low-pass,
 // so even many sounds in a row stay calm. Each moment has its own sound and haptic strength.
+import { mainOutput, sharedAudio } from './audioContext.js';
 import { haptic } from './haptics.js';
 import { DEFAULT_VOICE, voiceFor } from './worldVoices.js';
 
-let context = null;
-let output = null;
 let enabled = true;
 let hapticsEnabled = true;
 
+/** The shared audio context, or null while sound effects are off. */
 function audio() {
-  if (!enabled) return null;
-  try {
-    if (!context) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContext) return null;
-      context = new AudioContext();
-      // Warm everything a little and keep stacked sounds from getting loud.
-      const warmth = context.createBiquadFilter();
-      warmth.type = 'lowpass';
-      warmth.frequency.value = 5200;
-      const limiter = context.createDynamicsCompressor();
-      limiter.threshold.value = -14;
-      limiter.ratio.value = 6;
-      warmth.connect(limiter).connect(context.destination);
-      output = warmth;
-    }
-    if (context.state === 'suspended') context.resume();
-    return context;
-  } catch {
-    return null;
-  }
+  return enabled ? sharedAudio() : null;
 }
 
 /** A single gliding tone. */
@@ -46,7 +26,7 @@ function tone(from, to, duration, { type = 'sine', volume = 0.12, delay = 0, att
   gain.gain.setValueAtTime(0.0001, start);
   gain.gain.exponentialRampToValueAtTime(volume, start + attack);
   gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
-  osc.connect(gain).connect(output);
+  osc.connect(gain).connect(mainOutput());
   osc.start(start);
   osc.stop(start + duration + 0.05);
 }

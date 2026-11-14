@@ -20,6 +20,7 @@ import { usePuzzle } from '../../hooks/usePuzzle.js';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { navigate } from '../../hooks/useHashRoute.js';
+import { music } from '../../audio/music.js';
 import { sfx } from '../../audio/sfx.js';
 import { moveLimitFor, starsForMoves } from '../../game/scoring.js';
 import { HELPER_IDS, HELPERS, LENS_DURATION_MS, helpersAllowedFor } from '../../game/catalog.js';
@@ -363,6 +364,14 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     sfx.setWorldVoice(world?.theme ?? null);
     return () => sfx.setWorldVoice(null);
   }, [world?.theme]);
+
+  // Soft background music in this world's voice while the level is being played; it fades out for the win.
+  const isMusicPlaying = !showIntro && !isOver;
+  useEffect(() => {
+    if (!isMusicPlaying) return undefined;
+    music.play(world?.theme ?? null);
+    return () => music.stop();
+  }, [isMusicPlaying, world?.theme]);
 
   const dismissIntro = useCallback(() => {
     sfx.unlock();

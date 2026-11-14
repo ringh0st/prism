@@ -45,14 +45,22 @@ function AppleLogo() {
   );
 }
 
-function Toggle({ id, label, description, checked, onChange }) {
+function Toggle({ id, label, description, checked, disabled = false, onChange }) {
   return (
     <label className={styles.toggleRow} htmlFor={id}>
       <span>
         <span className={styles.rowTitle}>{label}</span>
         {description && <span className={styles.rowHint}>{description}</span>}
       </span>
-      <input id={id} type="checkbox" role="switch" className={styles.switch} checked={checked} onChange={(e) => onChange(e.target.checked)} />
+      <input
+        id={id}
+        type="checkbox"
+        role="switch"
+        className={styles.switch}
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
+      />
     </label>
   );
 }
@@ -153,6 +161,14 @@ export default function SettingsScreen() {
         <section className={styles.card} aria-labelledby="feel-title">
           <h2 id="feel-title">Sound & feel</h2>
           <Toggle id="sound" label="Sound effects" checked={settings.sound} onChange={(sound) => updateSettings({ sound })} />
+          <Toggle
+            id="music"
+            label="Music"
+            description={settings.sound ? 'Soft background music in levels' : 'Turn on sound effects to hear music'}
+            checked={settings.music && settings.sound}
+            disabled={!settings.sound}
+            onChange={(isOn) => updateSettings({ music: isOn })}
+          />
           <Toggle
             id="haptics"
             label="Vibration"

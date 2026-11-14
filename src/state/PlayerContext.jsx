@@ -60,11 +60,12 @@ import {
 import { buyGroveItemLocally, placeGroveItemLocally } from '../game/grove.js';
 import { buyThemeItemLocally } from '../game/themes.js';
 import { feedTreat } from '../game/treats.js';
+import { music } from '../audio/music.js';
 import { sfx } from '../audio/sfx.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
 const SETTINGS_KEY = 'prism.settings.v1';
-const DEFAULT_SETTINGS = { sound: true, haptics: true };
+const DEFAULT_SETTINGS = { sound: true, music: true, haptics: true };
 
 const PlayerContext = createContext(null);
 
@@ -116,6 +117,7 @@ export function PlayerProvider({ children }) {
   useEffect(() => {
     writeJson(SETTINGS_KEY, settings);
     sfx.configure(settings);
+    music.configure(settings);
   }, [settings]);
 
   // Signing in moves guest stars into the account, then loads the account.
