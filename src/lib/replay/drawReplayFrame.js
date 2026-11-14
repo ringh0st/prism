@@ -235,11 +235,14 @@ function centerText(ctx, text, y, font, color) {
   ctx.font = font;
   ctx.fillStyle = color;
   ctx.textAlign = 'center';
+  // Hebrew texts read right to left (the canvas isn't on the page, so it can't inherit the direction).
+  ctx.direction = document.documentElement.dir === 'rtl' ? 'rtl' : 'ltr';
   ctx.fillText(text, VIDEO_SIZE.width / 2, y);
 }
 
 /**
- * @param info { title, subtitle, par, stars, moves, icon (an Image, optional) }
+ * @param info { title, subtitle, stars, icon (an Image, optional), words: the texts in the player's language
+ *   { intro, moves(n), solved, playFree } }
  * @param turnsUsed taps per tile so far (for cracking mirrors)
  */
 export function drawReplayFrame(ctx, level, state, info, turnsUsed) {
@@ -259,16 +262,16 @@ export function drawReplayFrame(ctx, level, state, info, turnsUsed) {
 
   if (state.phase === 'intro') {
     centerText(ctx, info.title, 1010, FONT(700, 44), INK);
-    centerText(ctx, `Can you solve it in ${info.par} moves?`, 1066, FONT(600, 32), SOFT);
+    centerText(ctx, info.words.intro, 1066, FONT(600, 32), SOFT);
   } else if (state.phase === 'play') {
-    centerText(ctx, `Moves: ${state.movesDone}`, 1030, FONT(700, 48), INK);
+    centerText(ctx, info.words.moves(state.movesDone), 1030, FONT(700, 48), INK);
   } else {
     const t = Math.min(1, state.outroT / 600);
     ctx.globalAlpha = t;
-    centerText(ctx, `Solved in ${info.moves} ${info.moves === 1 ? 'move' : 'moves'}!`, 1010, FONT(700, 48), '#2f7a55');
+    centerText(ctx, info.words.solved, 1010, FONT(700, 48), '#2f7a55');
     for (let i = 0; i < 3; i++)
       drawStar(ctx, width / 2 + (i - 1) * 76, 1080, 30 * (0.6 + 0.4 * ease(Math.min(1, (state.outroT - i * 150) / 400))), i < info.stars);
-    centerText(ctx, 'Play free at lumipals.app', 1190, FONT(600, 32), INK);
+    centerText(ctx, info.words.playFree, 1190, FONT(600, 32), INK);
     ctx.globalAlpha = 1;
   }
 }

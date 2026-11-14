@@ -10,19 +10,22 @@ import { RUSH_BONUS_EVERY, RUSH_BONUS_SPARE, RUSH_LENGTH, RUSH_START_SPARE, RUSH
 import { finishedWorldCount } from '../../game/titles.js';
 import RushMilestones from './RushMilestones.jsx';
 import RushBoard from './RushBoard.jsx';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { withParts } from '../../i18n/extrasText.js';
 import styles from './Rush.module.css';
 
 const RULES = [
-  { icon: 'map', text: `${RUSH_LENGTH} puzzles in a row, from easy to tough. Same ones for everyone this week.` },
-  { icon: 'bolt', text: `${RUSH_START_SPARE} spare moves for the whole run. Solve in par and it costs nothing; every extra move uses one.` },
-  { icon: 'gift', text: `+${RUSH_BONUS_SPARE} spare moves every ${RUSH_BONUS_EVERY} puzzles. Restarting uses up the moves you made.` },
-  { icon: 'lock', text: 'No helpers. Just you and the light!' },
+  { icon: 'map', key: 'rush.rule.length', params: { total: RUSH_LENGTH } },
+  { icon: 'bolt', key: 'rush.rule.spare', params: { spare: RUSH_START_SPARE } },
+  { icon: 'gift', key: 'rush.rule.bonus', params: { bonus: RUSH_BONUS_SPARE, every: RUSH_BONUS_EVERY } },
+  { icon: 'lock', key: 'rush.rule.noHelpers', params: {} },
 ];
 
 /** Light Rush: this week's run, the rules, milestone rewards and the board. New puzzles every Monday. */
 export default function RushScreen() {
   const { progress, recordRushRun } = usePlayer();
   const rush = useRushRun();
+  const { t } = useI18n();
   const record = rushRecordFor(progress, rushWeekOf());
   const isUnlocked = finishedWorldCount(progress.levels) >= RUSH_UNLOCK_WORLDS;
 
@@ -35,44 +38,47 @@ export default function RushScreen() {
 
   return (
     <div className={styles.page}>
-      <ScreenHeader title="Light Rush" />
+      <ScreenHeader title={t('rush.title')} />
       <main className={styles.main}>
         <section className={styles.hero} aria-labelledby="rush-title">
           <span className={styles.heroIcon} aria-hidden="true">
             <Icon name="bolt" size={40} strokeWidth={2.4} />
           </span>
           <div>
-            <p className={styles.kicker}>This week</p>
+            <p className={styles.kicker}>{t('rush.thisWeek')}</p>
             <h2 id="rush-title" className={`game-title ${styles.heroTitle}`}>
-              How far can you go?
+              {t('rush.heroTitle')}
             </h2>
             <p className={styles.best}>
-              Your best: <strong className="game-title">{record.best}</strong> / {RUSH_LENGTH}
+              {withParts(t('rush.yourBest', { total: RUSH_LENGTH }), { best: <strong className="game-title">{record.best}</strong> })}
             </p>
           </div>
         </section>
 
         {!isUnlocked ? (
           <section className={styles.card}>
-            <LumiSays mood="happy" size={72} line={`Finish World ${RUSH_UNLOCK_WORLDS} to unlock Light Rush. It’s a real brain workout!`} />
+            <LumiSays mood="happy" size={72} line={t('rush.locked', { n: RUSH_UNLOCK_WORLDS })} />
           </section>
         ) : (
-          <section className={styles.card} aria-label="Play">
+          <section className={styles.card} aria-label={t('rush.playLabel')}>
             {rush.run ? (
               <>
                 <p className={styles.runStatus}>
-                  Run in progress: puzzle <strong>{rush.run.cleared + 1}</strong> of {RUSH_LENGTH}, <strong>{rush.run.spare}</strong> spare moves
+                  {withParts(t('rush.inProgress', { total: RUSH_LENGTH }), {
+                    n: <strong>{rush.run.cleared + 1}</strong>,
+                    spare: <strong>{rush.run.spare}</strong>,
+                  })}
                 </p>
                 <Button size="lg" icon="play" onClick={() => navigate('#/rush/play')}>
-                  Continue run
+                  {t('rush.continue')}
                 </Button>
                 <Button variant="ghost" icon="restart" onClick={startRun}>
-                  Start a new run
+                  {t('rush.newRun')}
                 </Button>
               </>
             ) : (
               <Button size="lg" icon="bolt" onClick={startRun}>
-                Start a run
+                {t('rush.start')}
               </Button>
             )}
             <ul className={styles.rules}>
@@ -81,7 +87,7 @@ export default function RushScreen() {
                   <span className={styles.ruleIcon} aria-hidden="true">
                     <Icon name={rule.icon} size={18} />
                   </span>
-                  {rule.text}
+                  {t(rule.key, rule.params)}
                 </li>
               ))}
             </ul>
@@ -90,7 +96,7 @@ export default function RushScreen() {
 
         <RushMilestones record={record} />
         <RushBoard />
-        <p className={styles.footnote}>New puzzles every Monday. Your best run of the week counts.</p>
+        <p className={styles.footnote}>{t('rush.footnote')}</p>
       </main>
       <BottomNav active="map" />
     </div>

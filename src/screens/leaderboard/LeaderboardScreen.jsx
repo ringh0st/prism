@@ -12,6 +12,8 @@ import PalArt from '../../components/pals/PalArt.jsx';
 import { palById } from '../../game/pals.js';
 import RankRow from './RankRow.jsx';
 import PlayerCardDialog from './PlayerCardDialog.jsx';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { withParts } from '../../i18n/extrasText.js';
 import styles from './LeaderboardScreen.module.css';
 
 const SPARKS_FOR_TOP_TEN = WEEKLY_REWARDS.find((reward) => reward.rank === 4).sparks;
@@ -19,11 +21,11 @@ const BUNTING = ['var(--color-sage)', 'var(--color-honey)', 'var(--color-peach)'
 const FLAGS = 12;
 
 /** "in 3 days" / "in 5 hours": when the week resets. */
-function timeUntil(endsAt) {
+function timeUntil(endsAt, t) {
   const hours = Math.max(0, Math.round((new Date(endsAt) - Date.now()) / 3_600_000));
-  if (hours >= 48) return `in ${Math.round(hours / 24)} days`;
-  if (hours >= 1) return `in ${hours} ${hours === 1 ? 'hour' : 'hours'}`;
-  return 'soon';
+  if (hours >= 48) return t('top.inDays', { count: Math.round(hours / 24) });
+  if (hours >= 1) return t('top.inHours', { count: hours });
+  return t('top.soon');
 }
 
 function Bunting() {
@@ -43,6 +45,7 @@ function Bunting() {
 /** This week's top players worldwide: a winners' podium, then the rest of the board. */
 export default function LeaderboardScreen() {
   const { isSignedIn, progress } = usePlayer();
+  const { t } = useI18n();
   const [board, setBoard] = useState(null);
   const [error, setError] = useState('');
 
@@ -76,11 +79,11 @@ export default function LeaderboardScreen() {
   const rest = top.filter((row) => row.rank > 3);
   const partner = palById(progress.pal.id);
   const isMeListed = top.some((row) => row.isMe);
-  const lumiLine = board?.me ? `You’re #${board.me.rank} this week. Keep shining!` : 'Who will shine brightest this week?';
+  const lumiLine = board?.me ? t('top.lumiRank', { rank: board.me.rank }) : t('top.lumiAsk');
 
   return (
     <div className={styles.page}>
-      <ScreenHeader title="Top players" />
+      <ScreenHeader title={t('top.title')} />
       <main className={styles.arena}>
         <Bunting />
         <div className={styles.host}>
@@ -97,61 +100,55 @@ export default function LeaderboardScreen() {
               portrait
               className={styles.playingArt}
             />
-            <span>
-              Playing with <strong>{partner.name}</strong>
-            </span>
-            <span className={styles.change}>Change</span>
+            <span>{withParts(t('top.playingWith'), { name: <strong>{t(`palName.${partner.id}`, {}, partner.name)}</strong> })}</span>
+            <span className={styles.change}>{t('top.change')}</span>
           </a>
         )}
         {error && <p className={styles.empty}>{error}</p>}
-        {!board && !error && <p className={styles.empty}>Loading the board…</p>}
+        {!board && !error && <p className={styles.empty}>{t('top.loading')}</p>}
         {board && <Podium top={top} onOpen={setOpenRow} />}
 
         <div className={styles.below}>
           {rest.length > 0 && (
-            <ol className={styles.list} aria-label="Places 4 and below">
+            <ol className={styles.list} aria-label={t('top.restLabel')}>
               {rest.map((row) => (
                 <RankRow key={row.rank} row={row} onOpen={setOpenRow} />
               ))}
             </ol>
           )}
           {board?.me && !isMeListed && (
-            <ol className={styles.list} aria-label="Your place">
+            <ol className={styles.list} aria-label={t('top.myPlaceLabel')}>
               <RankRow row={withMyPal({ ...board.me, isMe: true })} onOpen={setOpenRow} />
             </ol>
           )}
           {isSignedIn && board?.myNickname && !board.me && (
-            <p className={styles.empty}>
-              You’re <strong>{board.myNickname}</strong>. Earn a star to get on the board!
-            </p>
+            <p className={styles.empty}>{withParts(t('top.youAre'), { name: <strong>{board.myNickname}</strong> })}</p>
           )}
 
           {!isSignedIn && (
             <div className={styles.note}>
               <p className={styles.noteRow}>
                 <Icon name="user" size={20} />
-                <span>
-                  <a href="#/settings">Sign in with Google</a> to join. You appear under a fun nickname, never your real name.
-                </span>
+                <span>{withParts(t('top.signIn'), { link: <a href="#/settings">{t('top.signInLink')}</a> })}</span>
               </p>
             </div>
           )}
 
           <div className={styles.note}>
-            <h2 className="game-title">How points work</h2>
+            <h2 className="game-title">{t('top.how')}</h2>
             <ul className={styles.rules}>
               <li>
-                <Icon name="star" size={16} /> +{WEEKLY_POINTS.perNewStar} for every new star
+                <Icon name="star" size={16} /> {t('top.perStar', { n: WEEKLY_POINTS.perNewStar })}
               </li>
               <li>
-                <Icon name="calendar" size={16} /> +{WEEKLY_POINTS.perDaily} for each daily puzzle
+                <Icon name="calendar" size={16} /> {t('top.perDaily', { n: WEEKLY_POINTS.perDaily })}
               </li>
               <li>
-                <Icon name="spark" size={16} /> Places 4–10 win {SPARKS_FOR_TOP_TEN} sparks
+                <Icon name="spark" size={16} /> {t('top.topTen', { n: SPARKS_FOR_TOP_TEN })}
               </li>
               {board && (
                 <li>
-                  <Icon name="restart" size={16} /> New week {timeUntil(board.endsAt)} (Monday, 00:00 UTC)
+                  <Icon name="restart" size={16} /> {t('top.newWeek', { when: timeUntil(board.endsAt, t) })}
                 </li>
               )}
             </ul>

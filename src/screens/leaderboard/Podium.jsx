@@ -3,6 +3,7 @@ import { weeklyRewardFor } from '../../game/catalog.js';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { animalAvatar } from './animalAvatar.js';
 import TitleBadge from '../../components/game/TitleBadge.jsx';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './Podium.module.css';
 
 const PLACE_ORDER = [2, 1, 3];
@@ -10,8 +11,9 @@ const PLACE_CLASS = { 1: 'first', 2: 'second', 3: 'third' };
 
 /** The winners' podium for this week's top three (empty steps wait for a winner). Tap a winner to see their card. */
 export default function Podium({ top, onOpen }) {
+  const { t } = useI18n();
   return (
-    <ol className={styles.podium} aria-label="This week's top three">
+    <ol className={styles.podium} aria-label={t('top.podiumLabel')}>
       {PLACE_ORDER.map((rank) => {
         const row = top.find((entry) => entry.rank === rank);
         const reward = weeklyRewardFor(rank);
@@ -22,7 +24,7 @@ export default function Podium({ top, onOpen }) {
                 type="button"
                 className={styles.open}
                 onClick={() => onOpen(row)}
-                aria-label={`${row.nickname}, place ${rank}, ${row.score} points. See their card`}
+                aria-label={t('top.rowLabel', { name: row.nickname, rank, score: row.score })}
               />
             )}
             <span className={styles.avatar} aria-hidden="true">
@@ -35,16 +37,16 @@ export default function Podium({ top, onOpen }) {
               )}
               {rank === 1 && <Icon name="crown" size={26} className={styles.crown} />}
             </span>
-            <span className={styles.name}>{row ? row.nickname : 'Up for grabs'}</span>
+            <span className={styles.name}>{row ? row.nickname : t('top.upForGrabs')}</span>
             {row?.stars != null && <TitleBadge stars={row.stars} />}
             {row && (
               <span className={`game-title ${styles.score}`}>
-                {row.score} <span className={styles.points}>pts</span>
+                {row.score} <span className={styles.points}>{t('top.pts')}</span>
               </span>
             )}
             <span className={styles.step}>
               <span className={`game-title ${styles.rank}`}>{rank}</span>
-              <span className={styles.prize} aria-label={`Prize: ${reward.diamonds} diamonds and ${reward.sparks} sparks`}>
+              <span className={styles.prize} aria-label={t('top.prizeLabel', { diamonds: reward.diamonds, sparks: reward.sparks })}>
                 <Icon name="diamond" size={13} /> {reward.diamonds} <Icon name="spark" size={13} /> {reward.sparks}
               </span>
             </span>

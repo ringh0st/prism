@@ -788,6 +788,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           shareMessage={
             mode === 'daily' && !result.isSkipped
               ? dailyShareText({
+                  t,
                   dateKey,
                   stars: result.stars,
                   moves: result.moves,

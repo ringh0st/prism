@@ -7,10 +7,14 @@ import EventStamps from './EventStamps.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { EVENT_UNLOCK_WORLDS, eventProgressOf, eventThemeFor, eventWeekendOf, isEventPrizeReady, nextEventWeekend } from '../../game/events.js';
 import { finishedWorldCount } from '../../game/titles.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { eventThemeText } from '../../i18n/extrasText.js';
 import styles from './Event.module.css';
 
 /** The theme's banner: its symbol, name and tagline. */
 function ThemeBanner({ theme, note }) {
+  const { lang } = useI18n();
+  const { name, tagline } = eventThemeText(lang, theme);
   return (
     <div className={styles.banner}>
       <span className={styles.bannerIcon} aria-hidden="true">
@@ -18,8 +22,8 @@ function ThemeBanner({ theme, note }) {
       </span>
       <div>
         <p className={styles.kicker}>{note}</p>
-        <h2 className={`game-title ${styles.themeName}`}>{theme.name}</h2>
-        <p className={styles.tagline}>{theme.tagline}</p>
+        <h2 className={`game-title ${styles.themeName}`}>{name}</h2>
+        <p className={styles.tagline}>{tagline}</p>
       </div>
     </div>
   );
@@ -31,6 +35,7 @@ function ThemeBanner({ theme, note }) {
  */
 export default function EventScreen() {
   const { progress } = usePlayer();
+  const { t } = useI18n();
   const weekend = eventWeekendOf();
   const isUnlocked = finishedWorldCount(progress.levels) >= EVENT_UNLOCK_WORLDS;
   // A finished event whose prize is still waiting (say, from last weekend) can be opened any time.
@@ -40,24 +45,24 @@ export default function EventScreen() {
 
   return (
     <div className={styles.page}>
-      <ScreenHeader title="Weekend event" />
+      <ScreenHeader title={t('event.title')} />
       <main className={styles.main}>
         {!isUnlocked ? (
           <section className={styles.card}>
-            <LumiSays mood="happy" size={72} line="Finish World 1 and you can join the weekend events. They’re really fun!" />
+            <LumiSays mood="happy" size={72} line={t('event.locked')} />
           </section>
         ) : weekend ? (
           <>
-            <section className={styles.card} aria-label="This weekend's event">
-              <ThemeBanner theme={eventThemeFor(weekend)} note="This weekend" />
+            <section className={styles.card} aria-label={t('event.thisWeekendLabel')}>
+              <ThemeBanner theme={eventThemeFor(weekend)} note={t('event.thisWeekend')} />
               <EventPuzzles stars={eventProgressOf(progress, weekend).stars} />
             </section>
             <EventPrize weekend={weekend} theme={eventThemeFor(weekend)} eventProgress={eventProgressOf(progress, weekend)} />
           </>
         ) : (
-          <section className={styles.card} aria-label="Next weekend's event">
-            <ThemeBanner theme={eventThemeFor(nextEventWeekend())} note="Coming this Saturday" />
-            <p className={styles.muted}>Ten themed puzzles every Saturday and Sunday, with a prize and a stamp for finishing them all.</p>
+          <section className={styles.card} aria-label={t('event.nextLabel')}>
+            <ThemeBanner theme={eventThemeFor(nextEventWeekend())} note={t('event.comingSaturday')} />
+            <p className={styles.muted}>{t('event.about')}</p>
           </section>
         )}
         {waitingPrize && (

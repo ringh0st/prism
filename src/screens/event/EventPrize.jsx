@@ -5,11 +5,15 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { EVENT_LEVELS, EVENT_PRIZE_SPARKS, isEventPrizeReady, solvedEventCount } from '../../game/events.js';
 import { rewardShower } from '../../lib/effects.js';
 import { sfx } from '../../audio/sfx.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { eventThemeText } from '../../i18n/extrasText.js';
 import styles from './Event.module.css';
 
 /** The prize for finishing all 10: sparks plus the event's stamp. Opens with a shower of stars. */
 export default function EventPrize({ weekend, theme, eventProgress }) {
   const { claimEventPrize } = usePlayer();
+  const { t, lang } = useI18n();
+  const themeName = eventThemeText(lang, theme).name;
   const [message, setMessage] = useState('');
   const cardRef = useRef(null);
   const solved = solvedEventCount(eventProgress);
@@ -33,12 +37,12 @@ export default function EventPrize({ weekend, theme, eventProgress }) {
       </span>
       <div>
         <h2 id="prize-title" className="game-title">
-          {eventProgress.claimed ? 'Prize collected!' : 'Weekend prize'}
+          {eventProgress.claimed ? t('event.prize.collected') : t('event.prize.title')}
         </h2>
         <p>
           {eventProgress.claimed
-            ? `The ${theme.name} stamp is in your collection.`
-            : `Finish all ${EVENT_LEVELS} puzzles: +${EVENT_PRIZE_SPARKS} sparks and the ${theme.name} stamp.`}
+            ? t('event.prize.stampOwned', { theme: themeName })
+            : t('event.prize.goal', { total: EVENT_LEVELS, sparks: EVENT_PRIZE_SPARKS, theme: themeName })}
         </p>
         {!eventProgress.claimed && (
           <div
@@ -47,14 +51,14 @@ export default function EventPrize({ weekend, theme, eventProgress }) {
             aria-valuemin={0}
             aria-valuemax={EVENT_LEVELS}
             aria-valuenow={solved}
-            aria-label="Puzzles solved"
+            aria-label={t('event.prize.meter')}
           >
             <span style={{ width: `${(solved / EVENT_LEVELS) * 100}%` }} />
           </div>
         )}
         {isReady && (
           <Button icon="gift" onClick={open}>
-            Open the prize
+            {t('event.prize.open')}
           </Button>
         )}
         <p className={styles.prizeMessage} role="alert">

@@ -1,4 +1,5 @@
 import { nicknameProblem } from './nicknames.js';
+import { translate } from '../i18n/translate.js';
 
 /*
  * "Beat my score" challenges: a link to one built-in level with the sender's moves and (optionally)
@@ -25,5 +26,7 @@ export function parseChallenge([levelId, rawMoves, rawName] = []) {
 /** 'win' (fewer moves than the challenger), 'tie' or 'lose'. */
 export const challengeOutcome = (myMoves, theirMoves) => (myMoves < theirMoves ? 'win' : myMoves === theirMoves ? 'tie' : 'lose');
 
-/** The message sent with a challenge link. */
-export const challengeMessage = (levelLabel, moves, url) => `I solved Lumipals level ${levelLabel} in ${moves} moves. Can you beat me? 💡 ${url}`;
+const english = (key, params) => translate('en', key, params);
+
+/** The message sent with a challenge link, in the sender's language (`t` from useI18n; English by default). */
+export const challengeMessage = (levelLabel, moves, url, t = english) => t('challenge.message', { level: levelLabel, moves, url });

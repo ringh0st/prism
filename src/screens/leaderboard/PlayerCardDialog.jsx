@@ -8,13 +8,14 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { fetchPlayerCard } from '../../lib/economyApi.js';
 import { palById, palStage } from '../../game/pals.js';
 import { playerStatsOf, TOTAL_PALS } from '../../game/playerStats.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './PlayerCardDialog.module.css';
 
 const STATS = [
-  { key: 'score', icon: 'trophy', label: 'points this week' },
-  { key: 'stars', icon: 'star', label: 'stars' },
-  { key: 'worldsFinished', icon: 'map', label: 'worlds finished' },
-  { key: 'palsCount', icon: 'paw', label: `Pals of ${TOTAL_PALS}` },
+  { key: 'score', icon: 'trophy', label: 'top.card.score' },
+  { key: 'stars', icon: 'star', label: 'top.card.stars' },
+  { key: 'worldsFinished', icon: 'map', label: 'top.card.worlds' },
+  { key: 'palsCount', icon: 'paw', label: 'top.card.pals' },
 ];
 
 /**
@@ -23,6 +24,7 @@ const STATS = [
  */
 export default function PlayerCardDialog({ row, myScore = null, onClose }) {
   const { progress } = usePlayer();
+  const { t } = useI18n();
   const mine = { ...playerStatsOf(progress), score: myScore };
   const [card, setCard] = useState(row.isMe ? { ...row, ...mine } : null);
   const [error, setError] = useState('');
@@ -31,16 +33,17 @@ export default function PlayerCardDialog({ row, myScore = null, onClose }) {
     if (row.isMe) return;
     let isCurrent = true;
     fetchPlayerCard(row.rank)
-      .then((data) => isCurrent && (data ? setCard(data) : setError('This player isn’t on the board anymore.')))
+      .then((data) => isCurrent && (data ? setCard(data) : setError(t('top.card.gone'))))
       .catch((failure) => isCurrent && setError(failure.message));
     return () => {
       isCurrent = false;
     };
-  }, [row]);
+  }, [row, t]);
 
   const pal = palById(card?.pal ?? row.pal);
+  const stage = palStage(card?.palStage ?? row.palStage ?? 0);
   return (
-    <Dialog title={row.isMe ? 'Your card' : row.nickname} tone="celebrate" onClose={onClose}>
+    <Dialog title={row.isMe ? t('top.card.mine') : row.nickname} tone="celebrate" onClose={onClose}>
       <div className={styles.hero}>
         <span className={`game-title ${styles.rank}`}>#{row.rank}</span>
         <div className={styles.stage}>
@@ -50,14 +53,15 @@ export default function PlayerCardDialog({ row, myScore = null, onClose }) {
         </div>
         {pal && (
           <p className={styles.pal}>
-            {row.isMe ? 'Playing with' : 'Partner:'} <strong>{pal.name}</strong> · {palStage(card?.palStage ?? row.palStage ?? 0).name}
+            {row.isMe ? t('top.card.playingWith') : t('top.card.partner')} <strong>{t(`palName.${pal.id}`, {}, pal.name)}</strong> ·{' '}
+            {t(`stage.${stage.id}`, {}, stage.name)}
           </p>
         )}
         {card && <TitleBadge stars={card.stars} size="lg" />}
       </div>
 
       {error && <p className={styles.error}>{error}</p>}
-      {!card && !error && <p className={styles.loading}>Loading…</p>}
+      {!card && !error && <p className={styles.loading}>{t('top.card.loading')}</p>}
       {card && (
         <ul className={styles.stats}>
           {STATS.map(({ key, icon, label }) => {
@@ -70,10 +74,10 @@ export default function PlayerCardDialog({ row, myScore = null, onClose }) {
                   <Icon name={icon} size={18} />
                 </span>
                 <span className={`game-title ${styles.value}`}>{theirs ?? '–'}</span>
-                <span className={styles.label}>{label}</span>
+                <span className={styles.label}>{t(label, { total: TOTAL_PALS })}</span>
                 {!row.isMe && Number.isFinite(yours) && (
                   <span className={`${styles.you} ${isAhead ? styles.ahead : ''}`}>
-                    You: {yours}
+                    {t('top.card.you', { n: yours })}
                     {isAhead ? ' 🎉' : ''}
                   </span>
                 )}
@@ -83,7 +87,7 @@ export default function PlayerCardDialog({ row, myScore = null, onClose }) {
         </ul>
       )}
       <Button onClick={onClose} data-autofocus>
-        {row.isMe ? 'Nice!' : 'Challenge accepted!'}
+        {row.isMe ? t('top.card.nice') : t('top.card.accept')}
       </Button>
     </Dialog>
   );

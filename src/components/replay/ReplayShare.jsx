@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import Button from '../Button.jsx';
 import { canRecordReplay, recordReplay } from '../../lib/replay/recordReplay.js';
 import { sfx } from '../../audio/sfx.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './ReplayShare.module.css';
 
 /** Share the video file with the system share sheet (TikTok, Reels, messages…), or download it. */
-async function shareVideo(file) {
+async function shareVideo(file, text) {
   if (navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], title: 'Lumipals', text: 'Can you solve it? Play free at lumipals.app' });
+      await navigator.share({ files: [file], title: 'Lumipals', text });
       return 'shared';
     } catch (error) {
       if (error?.name === 'AbortError') return 'cancelled';
@@ -21,7 +22,7 @@ async function shareVideo(file) {
   return 'saved';
 }
 
-const STATUS = { shared: 'Shared! 🎉', saved: 'Saved to your downloads.', cancelled: '' };
+const STATUS = { shared: 'replay.shared', saved: 'replay.saved' };
 
 /**
  * "Share replay" on the win screen: turns this solve into a short vertical video (the board, every tap,
@@ -29,6 +30,7 @@ const STATUS = { shared: 'Shared! 🎉', saved: 'Saved to your downloads.', canc
  * @param replay { level, history, title, subtitle, stars, moves }
  */
 export default function ReplayShare({ replay }) {
+  const { t } = useI18n();
   const [video, setVideo] = useState(null);
   const [progress, setProgress] = useState(null);
   const [status, setStatus] = useState('');
@@ -40,37 +42,46 @@ export default function ReplayShare({ replay }) {
     setStatus('');
     setProgress(0);
     try {
-      const file = await recordReplay(replay.level, replay.history, { ...replay, par: replay.level.par }, setProgress);
+      const words = {
+        intro: t('replay.intro', { par: replay.level.par }),
+        moves: (n) => t('replay.moves', { n }),
+        solved: t('replay.solved', { count: replay.moves }),
+        playFree: t('replay.playFree'),
+      };
+      const file = await recordReplay(replay.level, replay.history, { ...replay, words }, setProgress);
       setVideo(file);
       sfx.sparkle();
     } catch {
-      setStatus('Sorry, the video couldn’t be made on this device.');
+      setStatus(t('replay.failed'));
     } finally {
       setProgress(null);
     }
   };
 
-  const share = async () => setStatus(STATUS[await shareVideo(video)] ?? '');
+  const share = async () => {
+    const result = await shareVideo(video, t('replay.shareText'));
+    setStatus(STATUS[result] ? t(STATUS[result]) : '');
+  };
 
   return (
     <div className={styles.replay}>
       {video ? (
         <>
-          <video className={styles.preview} src={previewUrl} autoPlay loop muted playsInline aria-label="Your solve replay" />
+          <video className={styles.preview} src={previewUrl} autoPlay loop muted playsInline aria-label={t('replay.previewLabel')} />
           <Button icon="share" onClick={share}>
-            Share video
+            {t('replay.share')}
           </Button>
         </>
       ) : progress !== null ? (
         <div className={styles.making} role="status">
-          <span>Making your video…</span>
+          <span>{t('replay.making')}</span>
           <span className={styles.bar}>
             <span style={{ width: `${Math.round(progress * 100)}%` }} />
           </span>
         </div>
       ) : (
         <Button variant="secondary" icon="play" onClick={make}>
-          Share video
+          {t('replay.share')}
         </Button>
       )}
       {status && (

@@ -21,7 +21,7 @@ const loadImage = (src) =>
 
 /**
  * Records the solve as a short vertical video. Plays in real time (a few seconds), reporting progress.
- * @param info { title, subtitle, par, stars, moves }
+ * @param info { title, subtitle, stars, moves, words } (words: the video's texts, see drawReplayFrame)
  * @returns Promise<File>
  */
 export async function recordReplay(level, history, info, onProgress = () => {}) {
