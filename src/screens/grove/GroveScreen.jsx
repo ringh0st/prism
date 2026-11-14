@@ -5,6 +5,7 @@ import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import GroveScene from '../../components/grove/GroveScene.jsx';
 import GroveItemArt from '../../components/grove/GroveItemArt.jsx';
+import HowTip from '../../components/pals/HowTip.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { ALL_DECOR, GROVE_ITEMS, GROVE_SPOTS } from '../../game/grove.js';
 import { finishedWorldCount } from '../../game/titles.js';
@@ -38,7 +39,14 @@ function DecorItem({ item, onDone, onError }) {
 
   return (
     <li className={`${styles.item} ${isPlaced ? styles.placed : ''}`}>
-      <GroveItemArt id={item.id} size={64} />
+      <span className={styles.itemArt}>
+        <GroveItemArt id={item.id} size={64} />
+        {isPlaced && (
+          <span className={styles.placedMark} aria-hidden="true">
+            <Icon name="check" size={14} strokeWidth={3} />
+          </span>
+        )}
+      </span>
       <span className={styles.itemName}>{name}</span>
       {!isOwned ? (
         <Button
@@ -72,7 +80,7 @@ function DecorItem({ item, onDone, onError }) {
   );
 }
 
-/** Decorate the Grove: a live preview on top, every piece of decor below, grouped by where it goes. */
+/** Decorate the Grove: a live preview on top ("?" for how it works), every piece of decor below, grouped by spot. */
 export default function GroveScreen() {
   const { progress } = usePlayer();
   const { t, lang } = useI18n();
@@ -83,6 +91,9 @@ export default function GroveScreen() {
       <ScreenHeader title={t('grove.decorate')} backHref="#/pals/grove" />
       <main className={styles.main}>
         <div className={styles.preview}>
+          <HowTip title={t('grove.decorate')} className={styles.how}>
+            <p>{t('grove.decorateHelp')}</p>
+          </HowTip>
           <GroveScene
             placed={progress.grove.placed}
             partnerId={progress.pal.id}
@@ -92,11 +103,14 @@ export default function GroveScreen() {
           />
         </div>
         <p className={message.isError ? styles.error : styles.status} role={message.isError ? 'alert' : 'status'}>
-          {message.text || t('grove.decorateHelp')}
+          {message.text}
         </p>
         {GROVE_SPOTS.map((spot) => (
           <section key={spot.id} className={styles.spot} aria-labelledby={`spot-${spot.id}`}>
             <h2 id={`spot-${spot.id}`} className={`game-title ${styles.spotTitle}`}>
+              <span className={styles.spotIcon} aria-hidden="true">
+                <GroveItemArt id={ALL_DECOR.find((item) => item.spot === spot.id).id} size={30} />
+              </span>
               {spotName(lang, spot)}
             </h2>
             <ul className={styles.items}>

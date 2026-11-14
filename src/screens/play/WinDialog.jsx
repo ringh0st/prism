@@ -216,7 +216,7 @@ export default function WinDialog({
                 </p>
               ) : (
                 <>
-                  <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
+                  <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} />
                   <PresentNote />
                 </>
               )}

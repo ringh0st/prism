@@ -31,7 +31,18 @@
 }
 
 .go {
+  display: inline-block;
   font-size: 30px;
   font-weight: 800;
   line-height: 1;
+}
+
+.count {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.go:dir(rtl) {
+  transform: scaleX(-1);
 }

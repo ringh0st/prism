@@ -1,8 +1,6 @@
 /* Texts for the grove screens, in every language. Keys match across en/es/he (a test checks). */
 export const en = {
   'grove.title': 'The Grove',
-  'grove.leadBare': 'Your partner’s home in the enchanted forest. Make it cozy!',
-  'grove.lead': 'Your partner’s home in the enchanted forest. Tap to say hi.',
   'grove.decorate': 'Decorate',
   'grove.decorateHelp': 'One piece per spot. Decor is yours forever, and you can swap any time.',
   'grove.bought': '{name}: yours! Now place it.',
@@ -55,8 +53,6 @@ export const en = {
 
 export const es = {
   'grove.title': 'El Bosquecito',
-  'grove.leadBare': 'La casa de tu compañero en el bosque encantado. ¡Hazla acogedora!',
-  'grove.lead': 'La casa de tu compañero en el bosque encantado. Toca para saludar.',
   'grove.decorate': 'Decorar',
   'grove.decorateHelp': 'Una pieza por lugar. Las decoraciones son tuyas para siempre y puedes cambiarlas cuando quieras.',
   'grove.bought': '{name}: ¡es tuyo! Ahora colócalo.',
@@ -189,8 +185,6 @@ export const es = {
 
 export const he = {
   'grove.title': 'החורשה',
-  'grove.leadBare': 'הבית של החבר שלכם ביער הקסום. בואו נעשה אותו נעים!',
-  'grove.lead': 'הבית של החבר שלכם ביער הקסום. הקישו כדי להגיד שלום.',
   'grove.decorate': 'לקשט',
   'grove.decorateHelp': 'קישוט אחד בכל מקום. הקישוטים שלכם לתמיד, ואפשר להחליף מתי שרוצים.',
   'grove.bought': '{name}: שלכם! עכשיו אפשר להניח אותו.',

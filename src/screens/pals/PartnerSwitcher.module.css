@@ -121,30 +121,14 @@
   width: 100%;
 }
 
-.forms {
-  padding: 4px 10px;
-  border: 0;
-  border-radius: var(--radius-pill);
-  font-weight: 800;
-  font-size: 13px;
-  color: var(--text-soft);
-  background: var(--surface-sunken);
-  cursor: pointer;
-}
-
 /* ---------- Treats and tricks ---------- */
-.buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
 .feed {
-  padding: 4px 12px;
+  padding: 6px 14px;
   border: 0;
   border-radius: var(--radius-pill);
-  font-weight: 800;
-  font-size: 13px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
   color: var(--reward-label);
   background: var(--reward-bottom);
   cursor: pointer;

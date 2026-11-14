@@ -10,43 +10,44 @@
 }
 
 .intro {
-  display: grid;
-  gap: var(--space-2);
-  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
   background: linear-gradient(color-mix(in srgb, var(--color-honey) 22%, var(--surface-raised)), var(--surface-raised));
   box-shadow: var(--shadow-md);
 }
 
-.count {
-  margin: 0;
-  font-weight: 700;
-}
-
-.count strong {
-  font-size: 28px;
+.intro > svg {
+  flex: none;
 }
 
 .meter {
-  height: 12px;
-  padding: 2px;
+  position: relative;
+  flex: 1;
+  height: 24px;
+  overflow: hidden;
   border-radius: var(--radius-pill);
   background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
 }
 
-.meter span {
+.fill {
   display: block;
   height: 100%;
-  min-width: 8px;
+  min-width: 24px;
   border-radius: inherit;
   background: var(--color-honey);
 }
 
-.how {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-soft);
+.count {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  line-height: 1;
 }
 
 /* The garden: soft grass, every Glowbug in its own little spot */

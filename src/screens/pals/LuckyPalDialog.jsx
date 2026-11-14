@@ -4,7 +4,7 @@ import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import PalReveal from '../../components/pals/PalReveal.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { LUCKY_PAL_EVERY, palById } from '../../game/pals.js';
+import { palById } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
 import { rewardShower } from '../../lib/effects.js';
 import styles from './LuckyPal.module.css';
@@ -41,7 +41,6 @@ export default function LuckyPalDialog() {
           <button type="button" className={styles.box} onClick={open} aria-label={t('pals.lucky.openLabel')}>
             <Icon name="gift" size={96} strokeWidth={1.6} />
           </button>
-          <p className={styles.text}>{t('pals.lucky.wiggling', { n: LUCKY_PAL_EVERY })}</p>
           <Button size="lg" onClick={open} data-autofocus>
             {t('pals.lucky.open')}
           </Button>

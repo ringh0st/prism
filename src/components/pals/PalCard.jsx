@@ -40,13 +40,11 @@ export default function PalCard({ pal, stage = null, isUnlocked = true, isPartne
         {rarityName(lang, rarity)}
       </span>
       <span className={`game-title ${styles.name}`}>{isUnlocked ? name : '???'}</span>
-      {stage ? (
+      {stage && (
         <span className={styles.form}>
           <GrowthPips stageIndex={stage.index} />
           <span className={`${styles.formName} ${styles.ageTag} ${styles[stage.id]}`}>{stageName(lang, stage)}</span>
         </span>
-      ) : (
-        isUnlocked && <span className={styles.formName}>{t('pals.card.notYet')}</span>
       )}
       {children}
     </li>

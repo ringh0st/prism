@@ -6,6 +6,8 @@ import PalFormsStrip from '../../components/pals/PalFormsStrip.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import PalRecords from '../../components/pals/PalRecords.jsx';
 import RarityBadge from '../../components/pals/RarityBadge.jsx';
+import StageBadge from '../../components/pals/StageBadge.jsx';
+import Icon from '../../components/Icon.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PAL_GROWTH_LEVELS, PAL_STAGES, growthOf, palStage, stageOf } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
@@ -39,12 +41,23 @@ export default function PalDetailDialog({ pal, onClose }) {
     sfx.tap();
   };
 
+  // The words are for screen readers; on screen the caption is a picture: the form's tag, levels to go, or a lock.
   let caption;
-  if (!isFuture) caption = t(selected === current ? 'pals.detail.isNow' : 'pals.detail.was', { name, stage: formName(selected) });
-  else if (!owned) caption = t('pals.detail.addToWatch', { name });
-  else {
+  let shown;
+  if (!isFuture) {
+    caption = t(selected === current ? 'pals.detail.isNow' : 'pals.detail.was', { name, stage: formName(selected) });
+    shown = <StageBadge stage={palStage(selected)} />;
+  } else if (!owned) {
+    caption = t('pals.detail.addToWatch', { name });
+    shown = <Icon name="lock" size={22} />;
+  } else {
     const count = levelsUntil(owned, selected);
     caption = isMystery ? t('pals.detail.growIntoMystery', { count }) : t('pals.detail.growInto', { count, stage: formName(selected) });
+    shown = (
+      <span className={`game-title ${styles.toGo}`}>
+        <Icon name="play" size={18} /> {count}
+      </span>
+    );
   }
 
   return (
@@ -67,21 +80,23 @@ export default function PalDetailDialog({ pal, onClose }) {
         />
       </div>
       <p className={styles.caption} role="status">
-        {caption}
+        <span aria-hidden="true">{shown}</span>
+        <span className="visually-hidden">{caption}</span>
       </p>
       <PalFormsStrip palId={pal.id} current={current} revealedUpTo={revealedUpTo} selected={selected} onSelect={select} />
       {owned && isPartner && <PalGrowthBar pal={pal} owned={owned} />}
       {owned && !isPartner && (
         <div className={styles.actions}>
-          <p className={styles.note}>{t('pals.detail.onlyPartner', { name })}</p>
           <Button
+            icon="heart"
+            aria-label={t('pals.detail.makePartner', { name })}
             onClick={() => {
               choosePal(pal.id);
               sfx.sparkle();
               onClose();
             }}
           >
-            {t('pals.detail.makePartner', { name })}
+            {t('pals.team.partnerUp')}
           </Button>
         </div>
       )}

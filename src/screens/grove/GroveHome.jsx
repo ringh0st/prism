@@ -9,16 +9,12 @@ import styles from './Grove.module.css';
 export default function GroveHome() {
   const { progress } = usePlayer();
   const { t } = useI18n();
-  const isBare = progress.grove.placed.length === 0;
   return (
     <section className={styles.home} aria-labelledby="grove-title">
       <div className={styles.homeHead}>
-        <div>
-          <h2 id="grove-title" className="game-title">
-            {t('grove.title')}
-          </h2>
-          <p className={styles.lead}>{isBare ? t('grove.leadBare') : t('grove.lead')}</p>
-        </div>
+        <h2 id="grove-title" className="game-title">
+          {t('grove.title')}
+        </h2>
         <Button as="a" href="#/grove" size="sm" icon="home">
           {t('grove.decorate')}
         </Button>

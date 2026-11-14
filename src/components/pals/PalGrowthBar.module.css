@@ -1,25 +1,15 @@
+/* A bar that ends in the next form's silhouette */
 .box {
-  display: grid;
+  display: flex;
+  align-items: center;
   gap: 6px;
   width: 100%;
 }
 
-.head {
-  display: flex;
-  justify-content: space-between;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text-soft);
-}
-
-.count {
-  font-variant-numeric: tabular-nums;
-  color: var(--text-strong);
-}
-
 .track {
-  height: 14px;
+  position: relative;
+  flex: 1;
+  height: 18px;
   overflow: hidden;
   border-radius: var(--radius-pill);
   background: var(--surface-sunken);
@@ -29,18 +19,77 @@
 .fill {
   display: block;
   height: 100%;
-  min-width: 14px;
+  min-width: 18px;
   border-radius: inherit;
   background: var(--color-sage);
   transition: width 600ms var(--ease-out);
 }
 
-.full .fill {
-  background: var(--color-honey);
+.count {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-strong);
+  direction: ltr;
 }
 
-.line {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-soft);
+.next {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+}
+
+.silhouette {
+  filter: brightness(0) opacity(0.35);
+}
+
+.nextButton {
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-pop);
+}
+
+.nextButton:hover {
+  transform: scale(1.08);
+}
+
+.nextButton:active {
+  transform: scale(0.94);
+}
+
+/* Fully grown: a crown, no bar */
+.grown {
+  display: flex;
+  justify-content: center;
+}
+
+.crown {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill,
+  .nextButton {
+    transition: none;
+  }
 }

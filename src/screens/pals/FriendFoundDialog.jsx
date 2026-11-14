@@ -11,7 +11,8 @@ import { palName } from '../../i18n/palText.js';
 
 /**
  * "You found a friend!": after a few solved levels a Pal turns up as a reward and joins the player.
- * One tap, no decision needed (a different one can be picked any time in Pals).
+ * One tap, no decision needed (a different one can be picked any time in Pals). The Pal says it all; the
+ * sentences are for screen readers.
  */
 export default function FriendFoundDialog({ onDone }) {
   const { progress, choosePal } = usePlayer();
@@ -40,11 +41,11 @@ export default function FriendFoundDialog({ onDone }) {
       <div className={styles.friend}>
         <PalReveal pal={friend} size={150} label={palName(lang, friend)} />
       </div>
-      <p className={styles.text}>{t('friend.text', { name: palName(lang, friend) })}</p>
+      <p className="visually-hidden">{t('friend.text', { name: palName(lang, friend) })}</p>
       <Button size="lg" icon="heart" onClick={welcome} disabled={isSaving} data-autofocus>
         {t('friend.welcome', { name: palName(lang, friend) })}
       </Button>
-      <p className={styles.note}>{t('friend.note')}</p>
+      <p className="visually-hidden">{t('friend.note')}</p>
     </Dialog>
   );
 }

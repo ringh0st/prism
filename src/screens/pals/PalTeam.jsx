@@ -13,6 +13,28 @@ import { sfx } from '../../audio/sfx.js';
 import styles from './Pals.module.css';
 import { errorText } from '../../i18n/meText.js';
 
+/** A locked Pal's goal as a picture and a number: ★ 90, a map and 2 worlds, a flame and a 7-day streak, or a gift. */
+const UNLOCK_ICONS = { stars: 'star', worlds: 'map', streak: 'flame', lucky: 'gift' };
+const unlockGoal = (unlock) => {
+  const kind = Object.keys(UNLOCK_ICONS).find((key) => unlock[key]);
+  return { icon: UNLOCK_ICONS[kind], n: kind === 'lucky' ? null : unlock[kind] };
+};
+
+/** The lock line on a locked Pal card (the full sentence for screen readers). */
+function LockHint({ unlock, label }) {
+  const goal = unlockGoal(unlock);
+  return (
+    <span className={styles.lockHint}>
+      <span aria-hidden="true" className={styles.lockGoal}>
+        <Icon name="lock" size={12} />
+        <Icon name={goal.icon} size={16} />
+        {goal.n !== null && <span className="game-title">{goal.n}</span>}
+      </span>
+      <span className="visually-hidden">{label}</span>
+    </span>
+  );
+}
+
 /** All Pals: yours (pick a partner), unlocked ones waiting to join, and locked ones with how to get them. */
 function Collection({ onError }) {
   const { progress, choosePal } = usePlayer();
@@ -54,11 +76,7 @@ function Collection({ onError }) {
                 {progress.pal.id ? t('pals.team.add') : t('pals.team.choose')}
               </button>
             )}
-            {!isUnlocked && (
-              <span className={styles.lockHint}>
-                <Icon name="lock" size={12} /> {unlockText(lang, pal.unlock)}
-              </span>
-            )}
+            {!isUnlocked && <LockHint unlock={pal.unlock} label={unlockText(lang, pal.unlock)} />}
           </PalCard>
         );
       })}

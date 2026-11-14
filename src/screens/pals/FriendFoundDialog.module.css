@@ -1,7 +1,7 @@
 .friend {
   display: grid;
   place-items: center;
-  margin-bottom: var(--space-3);
+  margin-bottom: var(--space-4);
   animation: arrive 700ms var(--ease-pop) both;
 }
 
@@ -12,17 +12,8 @@
   }
 }
 
-.text {
-  margin: 0 0 var(--space-4);
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.note {
-  margin: var(--space-3) 0 0;
-  font-size: 14px;
-  font-weight: 700;
-  text-align: center;
-  color: var(--text-soft);
+@media (prefers-reduced-motion: reduce) {
+  .friend {
+    animation: none;
+  }
 }

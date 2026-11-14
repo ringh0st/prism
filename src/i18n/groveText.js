@@ -31,12 +31,3 @@ export function glowbugBio(lang, bug) {
   if (lang === 'en') return bug.bio;
   return translate(lang, 'bug.bio', { name: glowbugName(lang, bug), bio: translate(lang, `bug.bio.${bug.kind}`) });
 }
-
-/**
- * A sentence split around one of its placeholders, so the screen can show that part big:
- * "{found} of 60 Glowbugs found" → ['', ' of 60 Glowbugs found']. Word order follows the language.
- */
-export function splitAround(text, marker = '\u0000') {
-  const [before = '', after = ''] = text.split(marker);
-  return [before, after];
-}

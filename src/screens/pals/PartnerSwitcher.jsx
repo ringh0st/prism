@@ -13,7 +13,8 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 
 /**
  * Your partner Pal, big on a little stage (tap it for a hop and a word; it twirls when its outfit
- * changes), and how close it is to its next form. Switching partner is in the Team tab (TeamSwitcher).
+ * changes), how close it is to its next form (tap the silhouette for all forms) and its treats.
+ * Switching partner is in the Team tab (TeamSwitcher).
  */
 export default function PartnerSwitcher() {
   const player = usePlayer();
@@ -92,23 +93,20 @@ export default function PartnerSwitcher() {
           {name} <StageBadge stage={stage} className={styles.stageChip} />
         </h2>
         <div className={styles.growth}>
-          <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
+          <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} onNext={() => setIsLooking(true)} />
         </div>
-        <div className={styles.buttons}>
-          {waiting > 0 && (
-            <button
-              type="button"
-              className={styles.feed}
-              onClick={feed}
-              aria-label={t('pals.partner.feedLabel', { name, treat: treatName(lang, nextTreat(progress)), n: waiting })}
-            >
-              <span aria-hidden="true">{nextTreat(progress).emoji}</span> {t('pals.partner.feed', { n: waiting })}
-            </button>
-          )}
-          <button type="button" className={styles.forms} onClick={() => setIsLooking(true)}>
-            {t('pals.partner.forms')}
+        {waiting > 0 && (
+          <button
+            type="button"
+            className={styles.feed}
+            onClick={feed}
+            aria-label={t('pals.partner.feedLabel', { name, treat: treatName(lang, nextTreat(progress)), n: waiting })}
+          >
+            <span aria-hidden="true" dir="ltr">
+              {nextTreat(progress).emoji} ×{waiting}
+            </span>
           </button>
-        </div>
+        )}
       </div>
       {isLooking && <PalDetailDialog pal={partner} onClose={() => setIsLooking(false)} />}
     </section>

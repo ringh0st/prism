@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Button from '../../components/Button.jsx';
+import Icon from '../../components/Icon.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { ALL_OUTFITS, PAL_SLOTS, stageOf } from '../../game/pals.js';
@@ -25,13 +26,15 @@ function Wardrobe({ onError }) {
   };
 
   if (owned.length === 0) {
-    const [before, after] = t('pals.wardrobe.empty').split('{shop}');
     return (
-      <p className={styles.growth}>
-        {before}
-        <a href="#/store">{t('pals.wardrobe.shop')}</a>
-        {after}
-      </p>
+      <div className={styles.emptyWardrobe}>
+        <span className={styles.emptyIcon}>
+          <Icon name="shirt" size={44} label={t('pals.wardrobe.none')} />
+        </span>
+        <Button as="a" href="#/store" icon="bag">
+          {t('pals.wardrobe.shop')}
+        </Button>
+      </div>
     );
   }
   return PAL_SLOTS.map((slot) => {
@@ -67,7 +70,6 @@ export default function PalWardrobe() {
   if (!progress.pal.id) return null;
   return (
     <section className={styles.section} aria-label={t('pals.tab.wardrobe')}>
-      <p className={styles.growth}>{t('pals.wardrobe.intro')}</p>
       <Wardrobe onError={setMessage} />
       {message && (
         <p className={styles.error} role="alert">

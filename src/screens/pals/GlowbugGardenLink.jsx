@@ -19,7 +19,10 @@ export default function GlowbugGardenLink() {
       </span>
       <span className={styles.text}>
         <strong className="game-title">{t('pals.garden.title')}</strong>
-        <span>{t('pals.garden.found', { n: rescued.size, total: GLOWBUGS.length })}</span>
+        <span className={styles.count} aria-hidden="true">
+          {rescued.size}/{GLOWBUGS.length}
+        </span>
+        <span className="visually-hidden">{t('pals.garden.found', { n: rescued.size, total: GLOWBUGS.length })}</span>
       </span>
       <span className={styles.go} aria-hidden="true">
         ›

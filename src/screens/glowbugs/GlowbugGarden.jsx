@@ -4,15 +4,16 @@ import BottomNav from '../../components/game/BottomNav.jsx';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
+import HowTip from '../../components/pals/HowTip.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { GLOWBUGS, rescuedGlowbugs } from '../../game/glowbugs.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
-import { glowbugBio, glowbugName, glowbugTitle, splitAround } from '../../i18n/groveText.js';
+import { glowbugBio, glowbugName, glowbugTitle } from '../../i18n/groveText.js';
 import styles from './GlowbugGarden.module.css';
 
 /**
  * The Glowbug Garden: every Glowbug you've rescued (by three-starring the level it napped on), with the
- * ones still out there as gentle silhouettes. Tap a rescued one to meet it.
+ * ones still out there as gentle silhouettes (★ for rare ones). Tap a rescued one to meet it; "?" says how.
  */
 export default function GlowbugGarden() {
   const { progress } = usePlayer();
@@ -20,19 +21,14 @@ export default function GlowbugGarden() {
   const [meeting, setMeeting] = useState(null);
   const rescued = rescuedGlowbugs(progress.levels);
   const found = GLOWBUGS.filter((bug) => rescued.has(bug.id)).length;
-  const [foundBefore, foundAfter] = splitAround(t('garden.found', { found: '\u0000', total: GLOWBUGS.length }));
   const meetingName = meeting && glowbugName(lang, meeting);
 
   return (
     <div className={styles.page}>
       <ScreenHeader title={t('garden.title')} backHref="#/pals/team" />
       <main className={styles.main}>
-        <section className={styles.intro}>
-          <p className={styles.count}>
-            {foundBefore}
-            <strong className="game-title">{found}</strong>
-            {foundAfter}
-          </p>
+        <section className={styles.intro} aria-label={t('garden.found', { found, total: GLOWBUGS.length })}>
+          <GlowbugArt id={GLOWBUGS[0].id} size={44} isAwake={found > 0} />
           <div
             className={styles.meter}
             role="progressbar"
@@ -41,9 +37,14 @@ export default function GlowbugGarden() {
             aria-valuenow={found}
             aria-label={t('garden.meter')}
           >
-            <span style={{ width: `${(found / GLOWBUGS.length) * 100}%` }} />
+            <span className={styles.fill} style={{ width: `${(found / GLOWBUGS.length) * 100}%` }} />
+            <span className={`game-title ${styles.count}`} aria-hidden="true">
+              {found}/{GLOWBUGS.length}
+            </span>
           </div>
-          <p className={styles.how}>{t('garden.how')}</p>
+          <HowTip title={t('garden.title')}>
+            <p>{t('garden.how')}</p>
+          </HowTip>
         </section>
         <ul className={styles.grid}>
           {GLOWBUGS.map((bug) => {
@@ -70,7 +71,9 @@ export default function GlowbugGarden() {
                     aria-label={bug.rare ? t('garden.missingRare') : t('garden.missing')}
                   >
                     <GlowbugArt id={bug.id} size={64} isSilhouette />
-                    <span className={styles.name}>{bug.rare ? t('garden.rare') : '?'}</span>
+                    <span className={styles.name} aria-hidden="true">
+                      {bug.rare ? '★' : '?'}
+                    </span>
                   </span>
                 )}
               </li>

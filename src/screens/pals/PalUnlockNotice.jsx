@@ -29,7 +29,8 @@ export default function PalUnlockNotice() {
     <Dialog title={t('pals.unlocked.title')} tone="celebrate" onClose={close}>
       <PalReveal key={fresh.id} pal={fresh} size={130} />
       <p className={styles.unlockText}>
-        <strong>{palWithSpecies(lang, fresh)}</strong> {t('pals.unlocked.wants')}
+        <strong>{palWithSpecies(lang, fresh)}</strong>
+        <span className="visually-hidden"> {t('pals.unlocked.wants')}</span>
       </p>
       <div className={styles.pickerActions}>
         <Button size="lg" as="a" href="#/pals" onClick={close} data-autofocus>
