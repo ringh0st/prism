@@ -1,0 +1,61 @@
+/* A world's landscape along the bottom of the level screen, behind everything */
+.backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  height: 30vh;
+  pointer-events: none;
+}
+
+.hills {
+  position: absolute;
+  inset: auto 0 0;
+  width: 100%;
+  height: 70%;
+}
+
+.far {
+  fill: color-mix(in srgb, var(--world-tint) 30%, var(--scene-hill-far));
+}
+
+.near {
+  fill: color-mix(in srgb, var(--world-tint) 40%, var(--scene-hill-near));
+}
+
+.piece {
+  position: absolute;
+  bottom: 26%;
+  overflow: visible;
+  opacity: 0.9;
+}
+
+.sway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: sway 6s ease-in-out infinite;
+}
+
+@keyframes sway {
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+/* Night-time version, like the map */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .backdrop {
+    filter: brightness(0.55) saturate(0.85);
+  }
+}
+
+:root[data-theme='dark'] .backdrop {
+  filter: brightness(0.55) saturate(0.85);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sway {
+    animation: none;
+  }
+}

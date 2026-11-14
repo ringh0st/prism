@@ -56,7 +56,9 @@
   --surface-overlay: #fffdf9;
   --surface-sunken: #f1ebe0;
   --surface-board: #e2d8c6;
+  --board-base: #e2d8c6;
   --surface-cell: #fffdf8;
+  --cell-base: #fffdf8;
   --surface-cell-edge: #e6dccb;
   --surface-locked: #e4d8c6;
   --pivot-fill: rgba(88, 172, 130, 0.16);
@@ -139,7 +141,9 @@
     --surface-overlay: #322e28;
     --surface-sunken: #171210;
     --surface-board: #1a1814;
+    --board-base: #1a1814;
     --surface-cell: #36322b;
+    --cell-base: #36322b;
     --surface-cell-edge: #241913;
     --surface-locked: #4a3a2e;
     --pivot-fill: rgba(108, 189, 148, 0.16);
@@ -179,7 +183,9 @@
   --surface-overlay: #322e28;
   --surface-sunken: #171210;
   --surface-board: #1a1814;
+  --board-base: #1a1814;
   --surface-cell: #36322b;
+  --cell-base: #36322b;
   --surface-cell-edge: #241913;
   --surface-locked: #4a3a2e;
   --pivot-fill: rgba(108, 189, 148, 0.16);

@@ -122,3 +122,41 @@
     transform: translateX(4px) rotate(0.4deg);
   }
 }
+
+/* ---------- Each world's own look: board and cells take on the world's colors ---------- */
+.themed {
+  --surface-board: color-mix(in srgb, var(--world-tint) 30%, var(--board-base));
+  --surface-cell: color-mix(in srgb, var(--world-tint) 7%, var(--cell-base));
+}
+
+.sunshine {
+  --world-tint: #9fcf9a;
+}
+
+.tangerine {
+  --world-tint: #f2a67e;
+}
+
+.coral {
+  --world-tint: #df9078;
+}
+
+.mint {
+  --world-tint: #7cc8b5;
+}
+
+.ember {
+  --world-tint: #d8946a;
+}
+
+.lime {
+  --world-tint: #a9cf7c;
+}
+
+.peach {
+  --world-tint: #e9b393;
+}
+
+.gold {
+  --world-tint: #d9bb63;
+}

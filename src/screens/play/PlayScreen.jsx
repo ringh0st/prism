@@ -11,6 +11,8 @@ import QuickBuyDialog from '../../components/QuickBuyDialog.jsx';
 import StarMeter from './StarMeter.jsx';
 import LevelIntro from './LevelIntro.jsx';
 import NewPieceDialog from './NewPieceDialog.jsx';
+import WorldBackdrop from './WorldBackdrop.jsx';
+import { WORLDS } from '../../game/worlds.js';
 import OutOfMovesDialog from './OutOfMovesDialog.jsx';
 import WinDialog from './WinDialog.jsx';
 import { usePuzzle } from '../../hooks/usePuzzle.js';
@@ -73,7 +75,13 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const helpersAllowed = helpersAllowedFor(level.difficulty);
   const offeredHelpers = mode === 'daily' ? HELPER_IDS.filter((id) => id !== 'skip') : HELPER_IDS;
   const levelName = title || levelNameFor(level);
-  const subtitle = level.isDaily ? 'Daily puzzle' : mode === 'playtest' ? 'Test play' : `Level ${level.world}-${level.index}`;
+  // Built-in worlds have their own look (board colors and landscape) and show their name.
+  const world = !level.isDaily && mode !== 'playtest' ? WORLDS[level.world - 1] : null;
+  const subtitle = level.isDaily
+    ? 'Daily puzzle'
+    : mode === 'playtest'
+      ? 'Test play'
+      : `${world ? `${world.name} · ` : ''}${level.world}-${level.index}`;
   const introLine = useMemo(() => quipFor(modifier === 'normal' ? 'start' : modifier), [modifier]);
   const isOver = trace.isSolved || isOutOfMoves || Boolean(result);
 
@@ -271,7 +279,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   }, []);
 
   return (
-    <main className={`${styles.screen} ${styles[modifier] ?? ''}`}>
+    <main className={`${styles.screen} ${styles[modifier] ?? ''} ${world ? `${styles.themed} ${styles[world.theme]}` : ''}`}>
+      {world && <WorldBackdrop worldId={world.id} theme={world.theme} />}
       <header className={styles.header}>
         <Button as="a" href={backHref} variant="secondary" icon="back" label="Back to map" />
         <div className={styles.titleBlock}>
