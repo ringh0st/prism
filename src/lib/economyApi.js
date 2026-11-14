@@ -92,3 +92,8 @@ export const recordEventLevelOnServer = (weekend, number, stars) =>
 export const claimEventPrizeOnServer = (weekend) => rpc('claim_event_prize', { p_weekend: weekend });
 
 export const fetchMyEvents = () => rpc('my_events');
+
+/** Pal quests (supabase/quests.sql): this week's counts, and collecting a finished quest's sparks. */
+export const fetchMyQuests = () => rpc('my_quests');
+
+export const claimQuestOnServer = (questId) => rpc('claim_pal_quest', { p_quest: questId });

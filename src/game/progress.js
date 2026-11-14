@@ -36,6 +36,8 @@ export function createEmptyProgress() {
     luckyPals: { claimed: 0 },
     // Weekend events: { [saturday]: { stars: { [number]: stars }, claimed } } (see events.js).
     events: {},
+    // This week's Pal quests: { week, solved, perfect, hard, claimed } (see quests.js).
+    quests: null,
     // A guest's number for their daily Shop picks (accounts use their id instead).
     shopSeed: Math.floor(Math.random() * 1000),
     nickname: null,
@@ -221,5 +223,6 @@ export function withServerState(progress, state, today) {
     grove: state.grove ?? progress.grove,
     luckyPals: { claimed: state.luckyPalsClaimed ?? progress.luckyPals.claimed },
     events: state.events ?? progress.events,
+    quests: state.quests ?? progress.quests,
   };
 }

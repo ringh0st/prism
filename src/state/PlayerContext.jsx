@@ -6,6 +6,8 @@ import {
   claimChestOnServer,
   claimEventPrizeOnServer,
   fetchMyEvents,
+  fetchMyQuests,
+  claimQuestOnServer,
   recordEventLevelOnServer,
   claimDailyGiftOnServer,
   choosePalOnServer,
@@ -41,6 +43,7 @@ import {
 import { todayKey } from '../game/daily.js';
 import { claimEventPrizeLocally, EVENT_PRIZE_SPARKS, recordEventLevelLocally } from '../game/events.js';
 import { starsForMoves } from '../game/scoring.js';
+import { claimQuestLocally, questWeekOf, questsForWeek, recordQuestProgress } from '../game/quests.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
 import { DAILY_GIFT_SPARKS } from '../game/catalog.js';
 import { nicknameProblem } from '../game/nicknames.js';
@@ -134,6 +137,8 @@ export function PlayerProvider({ children }) {
       // Weekend event results saved on the account.
       const events = await fetchMyEvents().catch(() => null);
       if (events?.events) setProgress({ ...progressRef.current, events: events.events });
+      const quests = await fetchMyQuests().catch(() => null);
+      if (quests?.quests) setProgress({ ...progressRef.current, quests: quests.quests });
       // Finished last week in the top 10? Collect the reward (the server pays it only once).
       const claimed = await claimWeeklyRewardOnServer().catch(() => null);
       if (claimed?.reward) {
@@ -172,6 +177,8 @@ export function PlayerProvider({ children }) {
         const local = recordLevelResult(progressRef.current, level, result);
         const hotStreak = nextHotStreak(progressRef.current, { stars: local.stars, usedHelpers: result.usedHelpers });
         local.progress = { ...local.progress, hotStreak };
+        // Counts toward this week's Pal quests (the server counts the same from its own results).
+        local.progress = recordQuestProgress(local.progress, level.id, local.progress.levels[level.id].stars, questWeekOf());
         local.hotStreak = hotStreak;
         // The partner Pal grows with every solved level (a Skip doesn't count). The server does the same.
         if (Number.isFinite(result.moves)) {
@@ -214,6 +221,22 @@ export function PlayerProvider({ children }) {
           setSyncStatus('error');
         }
         return outcome;
+      },
+
+      /** Collect a finished Pal quest. @returns sparks won. @throws EconomyError */
+      async claimQuest(questId) {
+        const week = questWeekOf();
+        const sparks = questsForWeek(week).find((quest) => quest.id === questId)?.sparks ?? 0;
+        if (!userId) {
+          try {
+            setProgress(claimQuestLocally(progressRef.current, questId, week));
+          } catch (error) {
+            throw new EconomyError(error.message);
+          }
+          return sparks;
+        }
+        applyServerState(await claimQuestOnServer(questId));
+        return sparks;
       },
 
       /** Open the prize for finishing a weekend's 10 puzzles. @returns sparks won. @throws EconomyError */

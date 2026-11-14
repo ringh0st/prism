@@ -574,3 +574,26 @@ test('every world theme has its own musical voice', async () => {
     voice.motif.forEach((step) => assert.ok(step < voice.notes.length));
   }
 });
+
+test('Pal quests: three a week, counted per level, paid once, and the same on the server', async () => {
+  const quests = await import('./quests.js');
+  assert.equal(quests.questWeekOf(new Date(Date.UTC(2026, 10, 14, 12))), '2026-11-09');
+  assert.equal(quests.questWeekOf(new Date(Date.UTC(2026, 10, 16, 1))), '2026-11-16');
+  assert.deepEqual(quests.questsForWeek('2026-11-09').map((q) => q.id), ['solve5', 'perfect6', 'hard1']);
+
+  const week = '2026-11-09';
+  let progress = { sparks: 0, quests: null };
+  for (const [id, stars] of [['w1-05', 3], ['w1-05', 3], ['w1-06', 1], ['daily-x', 3], ['w2-10', 2]]) progress = quests.recordQuestProgress(progress, id, stars, week);
+  const log = quests.questLogFor(progress, week);
+  assert.deepEqual([log.solved.length, log.perfect.length, log.hard.length], [3, 1, 2], 'each level once, daily puzzles don’t count');
+  progress = quests.claimQuestLocally(progress, 'hard1', week);
+  assert.equal(progress.sparks, 30);
+  assert.throws(() => quests.claimQuestLocally(progress, 'hard1', week));
+  assert.throws(() => quests.claimQuestLocally(progress, 'solve5', week));
+  assert.equal(quests.questLogFor(progress, '2026-11-16').solved.length, 0, 'a new week starts fresh');
+
+  const sql = readFileSync(new URL('../../supabase/quests.sql', import.meta.url), 'utf8');
+  for (const quest of quests.QUESTS) {
+    assert.match(sql, new RegExp(`'${quest.id}' then '\\{"kind": "${quest.kind}", "target": ${quest.target}, "sparks": ${quest.sparks}\\}'`), quest.id);
+  }
+});

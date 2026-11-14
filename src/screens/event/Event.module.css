@@ -120,9 +120,12 @@ a.puzzle:active {
   animation: glow 1.8s ease-in-out infinite;
 }
 
+/* A soft pulse of light (it never moves, so it's easy to tap) */
 @keyframes glow {
   50% {
-    transform: translateY(-3px);
+    box-shadow:
+      0 4px 0 color-mix(in srgb, var(--action-bottom) 70%, #000),
+      0 0 0 5px color-mix(in srgb, var(--color-sage) 30%, transparent);
   }
 }
 

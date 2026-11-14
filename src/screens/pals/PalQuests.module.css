@@ -1,0 +1,110 @@
+/* The partner Pal's weekly quests */
+.card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.head svg {
+  flex: none;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-sage) 22%, var(--surface-raised));
+}
+
+.head h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.sub {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quest {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.ready {
+  background: color-mix(in srgb, var(--color-honey) 30%, var(--surface-raised));
+}
+
+.claimed {
+  opacity: 0.7;
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--action-label);
+  background: var(--action-bottom);
+}
+
+.body {
+  min-width: 0;
+}
+
+.text {
+  margin: 0 0 5px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.meter {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-strong) 10%, transparent);
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-sage);
+  transition: width 500ms var(--ease-out);
+}
+
+.reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  color: var(--text-soft);
+}
+
+.error {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-accent);
+}
