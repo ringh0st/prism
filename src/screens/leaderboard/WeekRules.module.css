@@ -1,44 +1,54 @@
-.rules {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
+/* "How points work", on a little paper note pinned under the board */
+.note {
+  position: relative;
+  padding: var(--space-4);
+  border-radius: 6px;
+  font-weight: 700;
+  background: var(--paper);
+  box-shadow: var(--shadow-md);
+  transform: rotate(-0.5deg);
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2);
+.note::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  /* Physical left on purpose: the pin sits in the middle in both reading directions */
+  left: calc(50% - 7px);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-terracotta);
+  box-shadow: 0 2px 3px rgba(60, 40, 20, 0.35);
+}
+
+.note h2 {
+  margin-bottom: var(--space-2);
+  font-size: 20px;
+  text-align: center;
+}
+
+.rules {
+  display: grid;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.chip {
-  display: inline-flex;
+.rules li {
+  display: flex;
   align-items: center;
-  gap: 4px;
-  min-height: 32px;
-  padding: 2px 12px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 700;
-  /* "+1" stays left to right in Hebrew too */
-  direction: ltr;
-  color: var(--reward-label);
-  background: var(--reward-bottom);
-  box-shadow: var(--shadow-sm);
+  gap: var(--space-2);
 }
 
-.chip:nth-child(2) {
-  color: var(--calm-label);
-  background: var(--calm-bottom);
+.rules svg {
+  flex: none;
+  color: var(--color-mint-deep);
 }
 
-.clock {
-  direction: inherit;
-  color: var(--text-strong);
-  background: var(--surface-raised);
+.small {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-soft);
 }
