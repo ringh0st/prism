@@ -14,4 +14,4 @@ export const TERMS_URL = '../terms.html';
 export const PAYMENTS_ENABLED = true;
 
 /** Public address of the game, used in share messages. */
-export const PUBLIC_GAME_URL = 'https://ringh0st.github.io/prism/';
+export const PUBLIC_GAME_URL = 'https://lumipals.app/';

@@ -2,9 +2,9 @@
 
 A light-bending puzzle game for all ages. Rotate mirrors and crystals to bend beams of light and light up every gem.
 
-- **Play:** https://ringh0st.github.io/prism/play/
-- **Home page:** https://ringh0st.github.io/prism/
-- **Privacy Policy:** https://ringh0st.github.io/prism/privacy.html
+- **Play:** https://lumipals.app/play/
+- **Home page:** https://lumipals.app/
+- **Privacy Policy:** https://lumipals.app/privacy.html
 
 ## Features
 

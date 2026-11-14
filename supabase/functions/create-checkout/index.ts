@@ -6,9 +6,9 @@ import { corsHeaders, json, requireEnv } from '../_shared/http.ts';
 // Lemon Squeezy store "Ringhost games" (ringhost.lemonsqueezy.com). Not a secret.
 const STORE_ID = '523117';
 
-// Players may only be sent back to the game's own site after paying.
-const ALLOWED_RETURN_PREFIX = 'https://ringh0st.github.io/prism/';
-const DEFAULT_RETURN_URL = `${ALLOWED_RETURN_PREFIX}play/#/store/thanks`;
+// Players may only be sent back to the game's own site after paying (the old GitHub address still works).
+const ALLOWED_RETURN_PREFIXES = ['https://lumipals.app/', 'https://ringh0st.github.io/prism/'];
+const DEFAULT_RETURN_URL = 'https://lumipals.app/play/#/store/thanks';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     if (!pack?.variant_id) return json({ error: 'That pack is not available.' }, 400);
 
     const redirectUrl =
-      typeof returnUrl === 'string' && returnUrl.startsWith(ALLOWED_RETURN_PREFIX) ? returnUrl : DEFAULT_RETURN_URL;
+      typeof returnUrl === 'string' && ALLOWED_RETURN_PREFIXES.some((prefix) => returnUrl.startsWith(prefix)) ? returnUrl : DEFAULT_RETURN_URL;
 
     const response = await fetch('https://api.lemonsqueezy.com/v1/checkouts', {
       method: 'POST',
