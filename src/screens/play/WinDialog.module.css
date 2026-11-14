@@ -134,10 +134,60 @@
   animation: pop 500ms var(--ease-pop) 1.2s both;
 }
 
-.evolved > svg {
+.cheerPal {
   flex: none;
+  display: block;
   border-radius: 50%;
   background: var(--surface-raised);
+  transform-origin: 50% 100%;
+  animation: cheerHop 700ms var(--ease-pop) 1.5s 2 both;
+}
+
+.cheerPal > svg {
+  display: block;
+}
+
+.bigCheer {
+  animation: bigCheer 1.1s var(--ease-pop) 1.5s 2 both;
+}
+
+@keyframes cheerHop {
+  40% {
+    transform: translateY(-16%) scale(0.96, 1.06);
+  }
+  70% {
+    transform: scale(1.06, 0.94);
+  }
+}
+
+@keyframes bigCheer {
+  30% {
+    transform: translateY(-28%) rotate(-8deg) scale(0.95, 1.08);
+  }
+  55% {
+    transform: translateY(-28%) rotate(8deg);
+  }
+  80% {
+    transform: scale(1.08, 0.92);
+  }
+}
+
+.cheerText {
+  min-width: 0;
+  flex: 1;
+}
+
+.cheerLine {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cheerPal {
+    animation: none;
+  }
 }
 
 .grew {

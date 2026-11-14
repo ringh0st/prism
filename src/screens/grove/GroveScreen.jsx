@@ -7,7 +7,7 @@ import GroveScene from '../../components/grove/GroveScene.jsx';
 import GroveItemArt from '../../components/grove/GroveItemArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { GROVE_ITEMS, GROVE_SPOTS } from '../../game/grove.js';
-import { stageOf } from '../../game/pals.js';
+import { finishedWorldCount } from '../../game/titles.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Grove.module.css';
 
@@ -52,7 +52,13 @@ function DecorItem({ item, onDone, onError }) {
           variant={isPlaced ? 'secondary' : 'primary'}
           disabled={isBusy}
           aria-pressed={isPlaced}
-          onClick={() => act(() => placeGroveItem(item.id, !isPlaced), isPlaced ? `${item.name} put away.` : `${item.name} placed!`, isPlaced ? sfx.tap : sfx.place)}
+          onClick={() =>
+            act(
+              () => placeGroveItem(item.id, !isPlaced),
+              isPlaced ? `${item.name} put away.` : `${item.name} placed!`,
+              isPlaced ? sfx.tap : sfx.place,
+            )
+          }
         >
           {isPlaced ? 'Put away' : 'Place'}
         </Button>
@@ -71,7 +77,13 @@ export default function GroveScreen() {
       <ScreenHeader title="Decorate" backHref="#/pals" />
       <main className={styles.main}>
         <div className={styles.preview}>
-          <GroveScene placed={progress.grove.placed} partnerId={progress.pal.id} stage={stageOf(progress.pal.owned[progress.pal.id])} wearing={progress.pal.wearing} />
+          <GroveScene
+            placed={progress.grove.placed}
+            partnerId={progress.pal.id}
+            owned={progress.pal.owned}
+            wearing={progress.pal.wearing}
+            worldsFinished={finishedWorldCount(progress.levels)}
+          />
         </div>
         <p className={message.isError ? styles.error : styles.status} role={message.isError ? 'alert' : 'status'}>
           {message.text || 'One piece per spot. Decor is yours forever, and you can swap any time.'}

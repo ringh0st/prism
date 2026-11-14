@@ -466,7 +466,35 @@ test('grove life: time of day, naps and what the Pal does next', async () => {
   assert.equal(isNapTime(at(14)), false);
   // A low roll visits a placed piece of decor; otherwise it wanders inside the clearing.
   assert.deepEqual(nextActivity(['seat', 'water'], [0.1, 0.9, 0, 0]), SPOT_VISITS.water);
-  const wander = nextActivity([], [0.5, 0, 0.5, 0.5]);
+  assert.equal(nextActivity([], [0.5, 0, 0, 0]).action, 'jump');
+  assert.equal(nextActivity([], [0.5, 0, 0, 0]).left, undefined);
+  const wander = nextActivity([], [0.7, 0, 0.5, 0.5]);
   assert.ok(wander.left >= 24 && wander.left <= 76 && wander.top >= 70 && wander.top <= 84);
   assert.deepEqual(napSpot(['home']), SPOT_VISITS.home);
+});
+
+test('grove life: seasons and friends who visit', async () => {
+  const { seasonOf, visitingFriend } = await import('./groveLife.js');
+  assert.equal(seasonOf(new Date(2026, 0, 10)), 'winter');
+  assert.equal(seasonOf(new Date(2026, 3, 10)), 'spring');
+  assert.equal(seasonOf(new Date(2026, 6, 10)), 'summer');
+  assert.equal(seasonOf(new Date(2026, 9, 10)), 'autumn');
+  const noon = new Date(2026, 5, 1, 13, 0);
+  assert.equal(visitingFriend(['ember'], 'ember', noon), null);
+  assert.ok(['mossy', 'coral'].includes(visitingFriend(['ember', 'mossy', 'coral'], 'ember', noon)));
+  assert.equal(visitingFriend(['ember', 'mossy'], 'ember', new Date(2026, 5, 1, 12, 0)), null);
+  assert.equal(visitingFriend(['ember', 'mossy'], 'ember', new Date(2026, 5, 1, 23, 30)), null);
+});
+
+test('the partner Pal cheers louder for bigger wins', async () => {
+  const { cheerFor, cheerKindFor } = await import('./palCheers.js');
+  assert.equal(cheerKindFor({ stars: 3, completesWorld: true }), 'world');
+  assert.equal(cheerKindFor({ stars: 1, isFirstToday: true }), 'daily');
+  assert.equal(cheerKindFor({ stars: 3 }, 4), 'streak');
+  assert.equal(cheerKindFor({ stars: 3 }), 'perfect');
+  assert.equal(cheerKindFor({ stars: 2 }), 'good');
+  assert.equal(cheerKindFor({ stars: 1 }), 'solved');
+  assert.equal(cheerFor({ stars: 3 }, 0, 0).isBig, true);
+  assert.equal(cheerFor({ stars: 1 }, 0, 0.99).isBig, false);
+  assert.ok(cheerFor({ stars: 1 }, 0, 0.99).line);
 });

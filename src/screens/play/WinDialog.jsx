@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import Stars from '../../components/Stars.jsx';
@@ -11,6 +11,7 @@ import { shareText } from '../../lib/shareText.js';
 import PalArt from '../../components/pals/PalArt.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import { palById, stageOf } from '../../game/pals.js';
+import { cheerFor } from '../../game/palCheers.js';
 import styles from './WinDialog.module.css';
 
 function headlineFor({ stars, isSkipped, completesWorld, isFirstToday }, difficulty) {
@@ -57,6 +58,7 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
     palGrewTo = null,
     isFirstToday = false,
   } = result;
+  const cheer = useMemo(() => cheerFor(result, hotStreak), [result, hotStreak]);
 
   useEffect(() => {
     const timers = Array.from({ length: stars }, (_, i) => setTimeout(() => sfx.star(i), 350 + i * 260));
@@ -121,16 +123,26 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
       </div>
       {partner && !isSkipped && (
         <div className={`${styles.evolved} ${palGrewTo ? styles.grew : ''}`}>
-          <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={64} portrait alive />
-          {palGrewTo ? (
-            <p role="status">
-              <strong>
-                {partner.name} grew into a {palGrewTo.name}!
-              </strong>
-            </p>
-          ) : (
-            <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
-          )}
+          {/* Your partner cheers along: a happy bounce, and a big jump for the big moments. */}
+          <span className={`${styles.cheerPal} ${cheer.isBig || palGrewTo ? styles.bigCheer : ''}`}>
+            <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={64} portrait alive />
+          </span>
+          <div className={styles.cheerText}>
+            {palGrewTo ? (
+              <p role="status">
+                <strong>
+                  {partner.name} grew into a {palGrewTo.name}!
+                </strong>
+              </p>
+            ) : (
+              <>
+                <p className={styles.cheerLine}>
+                  {partner.name}: “{cheer.line}”
+                </p>
+                <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
+              </>
+            )}
+          </div>
         </div>
       )}
       {shareMessage && <ShareResult text={shareMessage} />}

@@ -1,7 +1,7 @@
 import Button from '../../components/Button.jsx';
 import GroveScene from '../../components/grove/GroveScene.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { stageOf } from '../../game/pals.js';
+import { finishedWorldCount } from '../../game/titles.js';
 import styles from './Grove.module.css';
 
 /** The Grove on the Pals screen: where your Pals live, and the way into decorating it. */
@@ -23,7 +23,13 @@ export default function GroveHome() {
           Decorate
         </Button>
       </div>
-      <GroveScene placed={progress.grove.placed} partnerId={progress.pal.id} stage={stageOf(progress.pal.owned[progress.pal.id])} wearing={progress.pal.wearing} />
+      <GroveScene
+        placed={progress.grove.placed}
+        partnerId={progress.pal.id}
+        owned={progress.pal.owned}
+        wearing={progress.pal.wearing}
+        worldsFinished={finishedWorldCount(progress.levels)}
+      />
     </section>
   );
 }

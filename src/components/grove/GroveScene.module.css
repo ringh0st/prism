@@ -32,10 +32,14 @@
   border: 0;
   background: none;
   cursor: pointer;
+  top: 0;
+  left: 0;
+  /* Stands at (--x %, --y %) of the scene; the scene is 400×280, so 1% of its height is 0.7cqi */
+  translate: calc(var(--x) * 1cqi) calc(var(--y) * 0.7cqi);
   transform: translate(-50%, -78%);
   animation: idle 3.4s ease-in-out infinite;
   /* Walking: glide to the next spot (the duration is set from the hook) */
-  transition-property: left, top;
+  transition-property: translate;
   transition-timing-function: ease-in-out;
 }
 
@@ -190,6 +194,27 @@
   }
 }
 
+/* Near the scene's edges, the speech bubble leans inwards so it's never cut off */
+.nearLeft .bubble {
+  left: 0;
+  transform: none;
+  animation-name: popEdge;
+}
+
+.nearRight .bubble {
+  right: 0;
+  left: auto;
+  transform: none;
+  animation-name: popEdge;
+}
+
+@keyframes popEdge {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
 /* The forest breathes: treetops lean in the breeze, a cloud drifts, a butterfly flutters */
 .canopy {
   transform-box: fill-box;
@@ -315,5 +340,305 @@
 
   .pal {
     transition: none;
+  }
+}
+
+/*
+ * Things Pals do: on the spot for fun (jump, spin, dance, stretch, look around, wiggle) or with decor
+ * (wave at home, sit on the seat, look up at the lights, sniff flowers, splash in water). Every move keeps
+ * the way the Pal faces (--facing).
+ */
+.jump,
+.spin,
+.dance,
+.stretch,
+.lookAround,
+.wiggle,
+.wave,
+.sit,
+.lookUp,
+.sniff,
+.splash {
+  transform-origin: 50% 100%;
+  animation-duration: 1.8s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
+.jump {
+  animation-name: jump;
+}
+
+@keyframes jump {
+  0%,
+  100% {
+    transform: scaleX(var(--facing, 1));
+  }
+  12%,
+  52% {
+    transform: scaleX(var(--facing, 1)) scale(1.08, 0.9);
+  }
+  28%,
+  68% {
+    transform: scaleX(var(--facing, 1)) translateY(-26%) scale(0.95, 1.06);
+  }
+  42%,
+  82% {
+    transform: scaleX(var(--facing, 1)) scale(1.06, 0.94);
+  }
+}
+
+.spin {
+  animation-name: spin;
+  transform-origin: 50% 60%;
+}
+
+@keyframes spin {
+  0% {
+    transform: scaleX(var(--facing, 1)) translateY(0) rotate(0);
+  }
+  20% {
+    transform: scaleX(var(--facing, 1)) translateY(-14%) rotate(0);
+  }
+  70% {
+    transform: scaleX(var(--facing, 1)) translateY(-14%) rotate(360deg);
+  }
+  85% {
+    transform: scaleX(var(--facing, 1)) scale(1.06, 0.94) rotate(360deg);
+  }
+  100% {
+    transform: scaleX(var(--facing, 1)) rotate(360deg);
+  }
+}
+
+.dance {
+  animation-name: dance;
+}
+
+@keyframes dance {
+  0%,
+  100% {
+    transform: scaleX(var(--facing, 1));
+  }
+  12.5%,
+  62.5% {
+    transform: scaleX(var(--facing, 1)) rotate(-10deg) translateY(-8%);
+  }
+  25%,
+  75% {
+    transform: scaleX(var(--facing, 1)) scale(1.04, 0.96);
+  }
+  37.5%,
+  87.5% {
+    transform: scaleX(var(--facing, 1)) rotate(10deg) translateY(-8%);
+  }
+  50% {
+    transform: scaleX(calc(var(--facing, 1) * -1));
+  }
+}
+
+.stretch {
+  animation-name: stretch;
+}
+
+@keyframes stretch {
+  0%,
+  100% {
+    transform: scaleX(var(--facing, 1));
+  }
+  30%,
+  65% {
+    transform: scaleX(var(--facing, 1)) scale(0.9, 1.14);
+  }
+  80% {
+    transform: scaleX(var(--facing, 1)) scale(1.06, 0.94);
+  }
+}
+
+.lookAround {
+  animation-name: lookAround;
+}
+
+@keyframes lookAround {
+  0%,
+  22%,
+  78%,
+  100% {
+    transform: scaleX(var(--facing, 1));
+  }
+  30%,
+  70% {
+    transform: scaleX(calc(var(--facing, 1) * -1)) rotate(-4deg);
+  }
+}
+
+.wiggle {
+  animation-name: wiggle;
+  animation-timing-function: linear;
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: scaleX(var(--facing, 1));
+  }
+  10%,
+  30%,
+  50%,
+  70% {
+    transform: scaleX(var(--facing, 1)) rotate(-7deg);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: scaleX(var(--facing, 1)) rotate(7deg);
+  }
+}
+
+.wave {
+  animation-name: wave;
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleX(var(--facing, 1));
+  }
+  20%,
+  60% {
+    transform: scaleX(var(--facing, 1)) rotate(-8deg) translateY(-5%);
+  }
+  40%,
+  80% {
+    transform: scaleX(var(--facing, 1)) rotate(4deg);
+  }
+}
+
+.sit {
+  animation-name: sit;
+}
+
+@keyframes sit {
+  0%,
+  100% {
+    transform: scaleX(var(--facing, 1));
+  }
+  15% {
+    transform: scaleX(var(--facing, 1)) translateY(-8%);
+  }
+  30%,
+  80% {
+    transform: scaleX(var(--facing, 1)) translateY(6%) scale(1.06, 0.88);
+  }
+}
+
+.lookUp {
+  animation-name: lookUp;
+}
+
+@keyframes lookUp {
+  0%,
+  100% {
+    transform: scaleX(var(--facing, 1));
+  }
+  25%,
+  75% {
+    transform: scaleX(var(--facing, 1)) rotate(-12deg) scale(0.97, 1.05);
+  }
+  50% {
+    transform: scaleX(var(--facing, 1)) rotate(-14deg) translateY(-4%) scale(0.97, 1.05);
+  }
+}
+
+.sniff {
+  animation-name: sniff;
+}
+
+@keyframes sniff {
+  0%,
+  100% {
+    transform: scaleX(var(--facing, 1));
+  }
+  20%,
+  40%,
+  60% {
+    transform: scaleX(var(--facing, 1)) rotate(12deg) translateY(5%);
+  }
+  30%,
+  50%,
+  70% {
+    transform: scaleX(var(--facing, 1)) rotate(9deg) translateY(3%);
+  }
+}
+
+.splash {
+  animation-name: splash;
+}
+
+@keyframes splash {
+  0%,
+  100% {
+    transform: scaleX(var(--facing, 1));
+  }
+  15%,
+  45%,
+  75% {
+    transform: scaleX(var(--facing, 1)) translateY(-14%) rotate(-5deg);
+  }
+  30%,
+  60%,
+  90% {
+    transform: scaleX(var(--facing, 1)) scale(1.1, 0.88);
+  }
+}
+
+/* Seasons: snow, blossom petals or leaves drifting down */
+.drifter {
+  animation: drift 10s linear infinite;
+}
+
+@keyframes drift {
+  from {
+    transform: translate(0, -12px) rotate(0);
+  }
+  25% {
+    transform: translate(10px, 60px) rotate(90deg);
+  }
+  50% {
+    transform: translate(-6px, 140px) rotate(180deg);
+  }
+  75% {
+    transform: translate(8px, 210px) rotate(270deg);
+  }
+  to {
+    transform: translate(0, 292px) rotate(360deg);
+  }
+}
+
+/* A world-finish party: the flags flutter */
+.flag {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: flutter 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes flutter {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .body,
+  .flag {
+    animation: none !important;
+  }
+
+  .fall {
+    display: none;
   }
 }
