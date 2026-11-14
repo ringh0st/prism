@@ -29,7 +29,7 @@ export default function ClothesShelf({ slotId, onBought, onError }) {
   return (
     <>
       <p className={styles.shelfIntro}>
-        Clothes and gear are yours forever. Put them on in <a href="#/pals">Pals → Wardrobe</a>.
+        Clothes and gear are yours forever. Put them on in <a href="#/pals/wardrobe">Pals → Wardrobe</a>.
       </p>
       <ul className={styles.shelf}>
         {PAL_ACCESSORIES.filter((item) => item.slot === slotId).map((item) => {

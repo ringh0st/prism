@@ -74,7 +74,7 @@ export default function GroveScreen() {
 
   return (
     <div className={styles.page}>
-      <ScreenHeader title="Decorate" backHref="#/pals" />
+      <ScreenHeader title="Decorate" backHref="#/pals/grove" />
       <main className={styles.main}>
         <div className={styles.preview}>
           <GroveScene

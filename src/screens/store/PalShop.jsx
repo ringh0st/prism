@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Icon from '../../components/Icon.jsx';
+import ChipTabs from '../../components/game/ChipTabs.jsx';
 import AdoptShelf from './AdoptShelf.jsx';
 import ClothesShelf from './ClothesShelf.jsx';
 import GroveShelf from './GroveShelf.jsx';
@@ -39,32 +39,17 @@ export default function PalShop({ onLumi }) {
 
   return (
     <>
-      <div className={styles.chips} role="tablist" aria-label="Pal shop">
-        {SECTIONS.map(({ id, label, icon, owned }) => {
+      <ChipTabs
+        label="Pal shop"
+        idPrefix="pal-shop"
+        active={section}
+        onChange={setSection}
+        className={styles.palShopTabs}
+        tabs={SECTIONS.map(({ owned, ...tab }) => {
           const [have, total] = owned(progress);
-          return (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              id={`pal-shop-${id}`}
-              aria-selected={section === id}
-              aria-controls="pal-shop-panel"
-              className={`${styles.chip} ${section === id ? styles.chipActive : ''}`}
-              onClick={() => {
-                sfx.tab();
-                setSection(id);
-              }}
-            >
-              <Icon name={icon} size={16} />
-              <span>{label}</span>
-              <span className={styles.chipCount} aria-label={`${have} of ${total} owned`}>
-                {have}/{total}
-              </span>
-            </button>
-          );
+          return { ...tab, count: `${have}/${total}`, countLabel: `${have} of ${total} owned` };
         })}
-      </div>
+      />
       <div id="pal-shop-panel" role="tabpanel" aria-labelledby={`pal-shop-${section}`} className={styles.palShopPanel}>
         {section === 'adopt' && (
           <AdoptShelf

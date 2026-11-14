@@ -96,7 +96,7 @@ function Routes() {
     case 'top':
       return <LeaderboardScreen />;
     case 'pals':
-      return <PalsScreen />;
+      return <PalsScreen key={route.params[0] ?? 'team'} initialTab={route.params[0]} />;
     case 'grove':
       return <GroveScreen />;
     case 'settings':

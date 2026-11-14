@@ -32,8 +32,8 @@ export default function LuckyPalProgress() {
           <span className={styles.fill} style={{ width: `${(toward / LUCKY_PAL_EVERY) * 100}%` }} />
         </div>
         <p className={styles.odds}>
-          Chances: Basic {percent(LUCKY_PAL_ODDS.common)} · ★ Legendary {percent(LUCKY_PAL_ODDS.legendary)} · ✦ Mythic {percent(LUCKY_PAL_ODDS.mythic)}.
-          Always one you don’t have yet.
+          Chances: Basic {percent(LUCKY_PAL_ODDS.common)} · ★ Legendary {percent(LUCKY_PAL_ODDS.legendary)} · ✦ Mythic{' '}
+          {percent(LUCKY_PAL_ODDS.mythic)}. Always one you don’t have yet.
         </p>
       </div>
     </section>

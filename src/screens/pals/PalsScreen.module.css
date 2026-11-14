@@ -12,3 +12,8 @@
 .main > :first-child {
   margin: 0;
 }
+
+.panel {
+  display: grid;
+  gap: var(--space-4);
+}
