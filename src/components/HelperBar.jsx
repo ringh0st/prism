@@ -1,5 +1,6 @@
 import Icon from './Icon.jsx';
-import { HELPERS } from '../game/catalog.js';
+import { helperText } from '../i18n/gameText.js';
+import { useI18n } from '../i18n/I18nContext.jsx';
 import styles from './HelperBar.module.css';
 
 /**
@@ -8,12 +9,13 @@ import styles from './HelperBar.module.css';
  * @param freeIds   helpers free right now (the first Hint in each early level): shown as "Free"
  */
 export default function HelperBar({ helperIds, inventory, usedCount, allowed, disabled, onUse, nudgeId = null, freeIds = [] }) {
+  const { t, lang } = useI18n();
   const isAtLimit = usedCount >= allowed;
   return (
     <div className={styles.bar}>
-      <div className={styles.buttons} role="group" aria-label="Helpers" style={{ '--helper-count': helperIds.length }}>
+      <div className={styles.buttons} role="group" aria-label={t('helpers.label')} style={{ '--helper-count': helperIds.length }}>
         {helperIds.map((id) => {
-          const helper = HELPERS[id];
+          const helper = helperText(lang, id);
           const owned = inventory[id] ?? 0;
           const isFree = freeIds.includes(id);
           return (
@@ -23,24 +25,20 @@ export default function HelperBar({ helperIds, inventory, usedCount, allowed, di
               className={`${styles.helper} ${owned === 0 ? styles.empty : ''} ${nudgeId === id ? styles.nudge : ''}`}
               disabled={disabled || isAtLimit}
               onClick={() => onUse(id)}
-              aria-label={`${helper.name}: ${helper.description} ${isFree ? 'Free in this level.' : owned > 0 ? `${owned} left.` : 'None left, tap to get more.'}`}
+              aria-label={`${helper.name}: ${helper.description} ${isFree ? t('helpers.freeHere') : owned > 0 ? t('helpers.left', { count: owned }) : t('helpers.none')}`}
             >
               <span className={styles.icon} aria-hidden="true">
                 <Icon name={helper.icon} size={22} />
               </span>
               <span className={styles.name}>{helper.name}</span>
               <span className={`${styles.count} ${isFree ? styles.free : ''}`} aria-hidden="true">
-                {isFree ? 'Free' : owned > 0 ? owned : '+'}
+                {isFree ? t('helpers.free') : owned > 0 ? owned : '+'}
               </span>
             </button>
           );
         })}
       </div>
-      {usedCount > 0 && (
-        <p className={styles.limit}>
-          {usedCount} of {allowed} {allowed === 1 ? 'helper' : 'helpers'} used
-        </p>
-      )}
+      {usedCount > 0 && <p className={styles.limit}>{t('helpers.used', { used: usedCount, count: allowed })}</p>}
     </div>
   );
 }

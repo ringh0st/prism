@@ -1,0 +1,29 @@
+.card {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.option {
+  min-height: 52px;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-strong);
+  background: var(--surface-sunken);
+  cursor: pointer;
+}
+
+.selected {
+  color: var(--action-label);
+  background: var(--action-bottom);
+  box-shadow: var(--shadow-sm);
+}

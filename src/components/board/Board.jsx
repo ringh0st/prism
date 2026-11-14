@@ -9,10 +9,11 @@ import { isRotatable as tileIsRotatable } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
 import { gemBurst } from '../../lib/effects.js';
 import CoachHand from './CoachHand.jsx';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './Board.module.css';
 
-/** Name tags for the first levels, so new players know which piece is which. */
-const COACH_LABELS = { [TILE.EMITTER]: 'Lamp', [TILE.GEM]: 'Gem' };
+/** Name tags for the first levels, so new players know which piece is which (translation keys). */
+const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
 
 /**
  * Interactive puzzle board.
@@ -56,6 +57,7 @@ export default function Board({
   onBlocked = null,
   nudgedCell = null,
 }) {
+  const { t } = useI18n();
   const { width, height, tiles } = level;
   const [focusedCell, setFocusedCell] = useState(0);
   const cellRefs = useRef([]);
@@ -110,6 +112,7 @@ export default function Board({
 
   return (
     <div
+      dir="ltr"
       className={`${styles.board} ${styles[mood] ?? ''} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''}`}
       style={{ '--cols': width, '--rows': height }}
     >
@@ -161,7 +164,7 @@ export default function Board({
                     {coach?.tile === tileIndex && tileIndex >= 0 && <CoachHand />}
                     {coach?.labels && COACH_LABELS[tile?.type] && (
                       <span className={styles.coachLabel} aria-hidden="true">
-                        {COACH_LABELS[tile.type]}
+                        {t(COACH_LABELS[tile.type])}
                       </span>
                     )}
                     {tile && (

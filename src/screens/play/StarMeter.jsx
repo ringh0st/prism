@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import Icon from '../../components/Icon.jsx';
 import styles from './StarMeter.module.css';
 
@@ -7,6 +8,7 @@ import styles from './StarMeter.module.css';
  * (the first levels) leaves the stars out, so there's less to take in.
  */
 export default function StarMeter({ moves, par, limit, starCap, tapsLeft = 0, isSimple = false }) {
+  const { t } = useI18n();
   const twoStarLimit = par + Math.ceil((limit - par) / 2);
   const left = Math.max(0, limit - moves);
   const fill = (left / limit) * 100;
@@ -19,13 +21,13 @@ export default function StarMeter({ moves, par, limit, starCap, tapsLeft = 0, is
     <div
       className={styles.meter}
       role="group"
-      aria-label={`${left} moves left of ${limit}${isSimple ? '' : `. Best still possible: ${stars} ${stars === 1 ? 'star' : 'stars'}`}`}
+      aria-label={`${t('meter.left', { count: left, limit })}${isSimple ? '' : ` ${t('meter.best', { count: stars })}`}`}
     >
       <div className={styles.movesLeft}>
         <span className={`game-title ${styles.count}`} key={left}>
           {left}
         </span>
-        <span className={styles.caption}>moves left</span>
+        <span className={styles.caption}>{t('meter.caption')}</span>
       </div>
       <div className={styles.track}>
         <div className={`${styles.fill} ${tone}`} style={{ width: `${fill}%` }} />

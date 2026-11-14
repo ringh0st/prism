@@ -5,6 +5,7 @@ import BoardDemo from './BoardDemo.jsx';
 import StarsDemo from './StarsDemo.jsx';
 import PalGrowDemo from './PalGrowDemo.jsx';
 import { sfx } from '../../audio/sfx.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './WelcomeTour.module.css';
 
 const TAP_LEVEL = {
@@ -33,7 +34,7 @@ const GEMS_LEVEL = {
 /** The four pictures: each shows one idea, in a handful of words. Turn counts per frame drive the demos. */
 const SLIDES = [
   {
-    title: 'Tap a mirror to turn it',
+    title: 'tour.tap',
     demo: (
       <BoardDemo
         level={TAP_LEVEL}
@@ -46,7 +47,7 @@ const SLIDES = [
     ),
   },
   {
-    title: 'Light up every gem',
+    title: 'tour.gems',
     demo: (
       <BoardDemo
         level={GEMS_LEVEL}
@@ -59,8 +60,8 @@ const SLIDES = [
       />
     ),
   },
-  { title: 'Fewer taps, more stars', demo: <StarsDemo /> },
-  { title: 'Your Pal grows as you play', demo: <PalGrowDemo /> },
+  { title: 'tour.stars', demo: <StarsDemo /> },
+  { title: 'tour.pal', demo: <PalGrowDemo /> },
 ];
 
 /**
@@ -72,6 +73,7 @@ export default function WelcomeTour({ onDone }) {
   const slide = SLIDES[index];
   const isLast = index === SLIDES.length - 1;
   const tourRef = useRef(null);
+  const { t } = useI18n();
 
   // Focus the tour itself (arrow keys, Enter on the button after Tab) without a ring on the button.
   useEffect(() => {
@@ -96,22 +98,22 @@ export default function WelcomeTour({ onDone }) {
     <div className={styles.tour} role="dialog" aria-modal="true" aria-labelledby="welcome-title" tabIndex={-1} ref={tourRef}>
       <TileDefs />
       <button type="button" className={styles.skip} onClick={onDone}>
-        Close
+        {t('common.close')}
       </button>
       <div className={styles.slide} key={index}>
         <div className={styles.demo}>{slide.demo}</div>
         <h1 id="welcome-title" className={`game-title ${styles.title}`}>
-          {slide.title}
+          {t(slide.title)}
         </h1>
       </div>
       <div className={styles.footer}>
-        <span className={styles.dots} aria-label={`Step ${index + 1} of ${SLIDES.length}`}>
+        <span className={styles.dots} aria-label={t('common.stepOf', { n: index + 1, total: SLIDES.length })}>
           {SLIDES.map((other, i) => (
             <span key={other.title} className={i === index ? styles.dotOn : styles.dot} />
           ))}
         </span>
         <Button size="lg" icon="play" onClick={isLast ? onDone : () => setIndex(index + 1)}>
-          {isLast ? 'Got it!' : 'Next'}
+          {isLast ? t('common.gotIt') : t('common.next')}
         </Button>
       </div>
     </div>

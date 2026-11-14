@@ -18,27 +18,30 @@ import { withArticle } from '../../game/treats.js';
 import { cheerFor } from '../../game/palCheers.js';
 import LevelUp from './LevelUp.jsx';
 import ChallengeShare from './ChallengeShare.jsx';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './WinDialog.module.css';
 
+/** The headline's translation key. */
 function headlineFor({ stars, isSkipped, completesWorld, isFirstToday }, difficulty) {
-  if (isSkipped) return 'Skipped';
-  if (isFirstToday) return 'Daily done!';
-  if (completesWorld) return 'World complete!';
-  if (stars === 3 && difficulty === DIFFICULTY.EXTRA) return 'Legendary!';
-  if (stars === 3) return 'Brilliant!';
-  if (stars === 2) return 'Great job!';
-  return 'Solved!';
+  if (isSkipped) return 'win.skipped';
+  if (isFirstToday) return 'win.dailyDone';
+  if (completesWorld) return 'win.worldComplete';
+  if (stars === 3 && difficulty === DIFFICULTY.EXTRA) return 'win.legendary';
+  if (stars === 3) return 'win.brilliant';
+  if (stars === 2) return 'win.great';
+  return 'win.solved';
 }
 
-const SHARE_FEEDBACK = { shared: 'Shared!', copied: 'Copied! Paste it anywhere.', failed: 'Sharing isn’t available here.' };
+const SHARE_FEEDBACK = { shared: 'share.shared', copied: 'share.copied', failed: 'share.failed' };
 
 /** Share button for the daily result; says how it went. */
 function ShareResult({ text }) {
+  const { t } = useI18n();
   const [feedback, setFeedback] = useState('');
   return (
     <div className={styles.share}>
-      <Button variant="secondary" icon="share" onClick={async () => setFeedback(SHARE_FEEDBACK[await shareText(text)] ?? '')}>
-        Share result
+      <Button variant="secondary" icon="share" onClick={async () => setFeedback(t(SHARE_FEEDBACK[await shareText(text)] ?? '', {}, ''))}>
+        {t('share.result')}
       </Button>
       <p className={styles.shareFeedback} role="status">
         {feedback}
@@ -67,6 +70,7 @@ export default function WinDialog({
   onMap,
 }) {
   const { isSignedIn, progress } = usePlayer();
+  const { t, lang } = useI18n();
   const partner = palById(progress.pal.id);
   const {
     stars,
@@ -96,56 +100,46 @@ export default function WinDialog({
   }, [stars, sparksEarned, diamondsEarned, completesWorld, palGrewTo, isFirstToday]);
 
   return (
-    <Dialog title={headlineFor(result, difficulty)} tone="celebrate" onClose={onMap} closesOnBackdrop={false}>
+    <Dialog title={t(headlineFor(result, difficulty))} tone="celebrate" onClose={onMap} closesOnBackdrop={false}>
       <Stars count={stars} size={46} animate className={styles.stars} />
-      {isSkipped ? (
-        <p className={styles.summary}>Come back any time to earn all three stars.</p>
-      ) : (
-        <p className={styles.summary}>
-          Solved in <strong>{moves}</strong> {moves === 1 ? 'move' : 'moves'}
-        </p>
-      )}
-      {!isSkipped && stars < 3 && (
-        <p className={styles.tip}>
-          Get ★★★ in {par} {par === 1 ? 'move' : 'moves'}.
-        </p>
-      )}
+      {isSkipped ? <p className={styles.summary}>{t('win.comeBack')}</p> : <p className={styles.summary}>{t('win.solvedIn', { count: moves })}</p>}
+      {!isSkipped && stars < 3 && <p className={styles.tip}>{t('win.starTip', { count: par })}</p>}
 
       {isFirstToday && (
         <p className={`game-title ${styles.dailyReward}`}>
-          <Icon name="gift" size={22} /> Daily reward collected
+          <Icon name="gift" size={22} /> {t('win.dailyReward')}
         </p>
       )}
       <div className={styles.rewards}>
         {sparksEarned > 0 && (
           <span className={styles.reward}>
-            <Icon name="spark" size={18} /> +{sparksEarned} sparks
+            <Icon name="spark" size={18} /> {t('win.sparks', { count: sparksEarned })}
           </span>
         )}
         {diamondsEarned > 0 && (
           <span className={`${styles.reward} ${styles.diamond}`}>
-            <Icon name="diamond" size={18} /> +{diamondsEarned} {diamondsEarned === 1 ? 'diamond' : 'diamonds'}
+            <Icon name="diamond" size={18} /> {t('win.diamonds', { count: diamondsEarned })}
           </span>
         )}
-        {isNewBest && <span className={`${styles.reward} ${styles.best}`}>New best</span>}
+        {isNewBest && <span className={`${styles.reward} ${styles.best}`}>{t('win.newBest')}</span>}
         {hotStreak >= 2 && (
           <span className={`${styles.reward} ${styles.streak}`}>
-            <Icon name="flame" size={18} /> {hotStreak} perfect in a row!
+            <Icon name="flame" size={18} /> {t('win.perfectRow', { count: hotStreak })}
           </span>
         )}
         {streak > 0 && (
           <span className={`${styles.reward} ${styles.streak}`}>
-            <Icon name="flame" size={18} /> {streak}-day streak
+            <Icon name="flame" size={18} /> {t('win.dayStreak', { count: streak })}
           </span>
         )}
         {shieldsUsed > 0 && (
           <span className={`${styles.reward} ${styles.shield}`}>
-            <Icon name="shield" size={18} /> {shieldsUsed === 1 ? 'A shield saved your streak' : `${shieldsUsed} shields saved your streak`}
+            <Icon name="shield" size={18} /> {t('win.shieldsUsed', { count: shieldsUsed })}
           </span>
         )}
         {shieldEarned && (
           <span className={`${styles.reward} ${styles.shield}`}>
-            <Icon name="shield" size={18} /> +1 streak shield
+            <Icon name="shield" size={18} /> {t('win.shieldEarned')}
           </span>
         )}
       </div>
@@ -153,20 +147,20 @@ export default function WinDialog({
       <div className={styles.actions}>
         {hasNext ? (
           <Button size="lg" icon="play" onClick={onNext} data-autofocus>
-            Next level
+            {t('win.next')}
           </Button>
         ) : (
           <Button size="lg" onClick={onMap} data-autofocus>
-            Back to {backName}
+            {t('play.backTo', { place: backName })}
           </Button>
         )}
         <div className={styles.secondary}>
           <Button variant="secondary" icon="restart" onClick={onReplay}>
-            Play again
+            {t('win.playAgain')}
           </Button>
           {hasNext && (
             <Button variant="secondary" onClick={onMap}>
-              {backName === 'event' ? 'Event' : 'Map'}
+              {backName}
             </Button>
           )}
         </div>
@@ -180,15 +174,11 @@ export default function WinDialog({
           <div className={styles.cheerText}>
             {palGrewTo ? (
               <p role="status">
-                <strong>
-                  {partner.name} grew into a {palGrewTo.name}!
-                </strong>
+                <strong>{t('win.grew', { name: partner.name, stage: t(`stage.${palGrewTo.id}`, {}, palGrewTo.name) })}</strong>
               </p>
             ) : (
               <>
-                <p className={styles.cheerLine}>
-                  {partner.name}: “{cheer.line}”
-                </p>
+                <p className={styles.cheerLine}>{t('win.cheer', { name: partner.name, line: lang === 'en' ? cheer.line : t('win.cheerLine') })}</p>
                 <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
               </>
             )}
@@ -201,12 +191,14 @@ export default function WinDialog({
         <div className={styles.finds}>
           {result.treat && partner && (
             <span className={styles.find}>
-              <span aria-hidden="true">{result.treat.emoji}</span> {partner.name} found {withArticle(result.treat)}! Feed it in Pals.
+              <span aria-hidden="true">{result.treat.emoji}</span>{' '}
+              {t('win.treat', { name: partner.name, treat: t(`treat.${result.treat.id}`, {}, withArticle(result.treat)) })}
             </span>
           )}
           {result.newStickers?.map(({ world, sticker }) => (
             <a key={sticker.id} href="#/stickers" className={styles.find}>
-              <StickerBadge sticker={sticker} world={world} size={30} /> New sticker: <strong>{sticker.name}</strong> (World {world})
+              <StickerBadge sticker={sticker} world={world} size={30} />{' '}
+              {t('win.sticker', { name: t(`sticker.${sticker.id}`, {}, sticker.name), world })}
             </a>
           ))}
         </div>
@@ -216,7 +208,7 @@ export default function WinDialog({
       {replay && !isSkipped && <ReplayShare replay={{ ...replay, stars, moves }} />}
       {completesWorld && !isSignedIn && (
         <p className={styles.nudge}>
-          <Icon name="diamond" size={16} /> Finishing a world earns a diamond. <a href="#/settings">Sign in</a> to collect it.
+          <Icon name="diamond" size={16} /> {t('win.worldDiamond')} <a href="#/settings">{t('common.signIn')}</a>
         </p>
       )}
     </Dialog>

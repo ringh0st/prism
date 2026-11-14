@@ -8,9 +8,13 @@ import { sparkPurchasesLeft } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
 import { usePlayer } from '../state/PlayerContext.jsx';
 import styles from './QuickBuyDialog.module.css';
+import { useI18n } from '../i18n/I18nContext.jsx';
+import { helperText } from '../i18n/gameText.js';
 
 /** Shown when a player taps a helper they don't have: buy one and use it right away. */
 export default function QuickBuyDialog({ helperId, onBought, onClose }) {
+  const { t, lang } = useI18n();
+  const text = helperText(lang, helperId);
   const { progress, isSignedIn, buyItem } = usePlayer();
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState('');
@@ -31,22 +35,18 @@ export default function QuickBuyDialog({ helperId, onBought, onClose }) {
   };
 
   return (
-    <Dialog title={`Out of ${helper.name}s`} onClose={onClose}>
+    <Dialog title={t('buy.outOf', { name: text.name })} onClose={onClose}>
       <div className={styles.helper} aria-hidden="true">
         <Icon name={helper.icon} size={34} />
       </div>
-      <p className={styles.description}>{helper.description}</p>
-      <p className={styles.cap}>Using it limits this level to {helper.starCap} ★.</p>
+      <p className={styles.description}>{text.description}</p>
+      <p className={styles.cap}>{t('buy.cap', { count: helper.starCap })}</p>
 
       <div className={styles.buy}>
-        <BuyButtons item={item} itemName={helper.name} progress={progress} isSignedIn={isSignedIn} isBusy={isBusy} onBuy={buy} />
+        <BuyButtons item={item} itemName={text.name} progress={progress} isSignedIn={isSignedIn} isBusy={isBusy} onBuy={buy} />
       </div>
       {item.price.sparks && (
-        <p className={styles.note}>
-          {sparksLeftToday > 0
-            ? `${sparksLeftToday} spark purchase${sparksLeftToday === 1 ? '' : 's'} left today.`
-            : 'No spark purchases left today. Diamonds still work.'}
-        </p>
+        <p className={styles.note}>{sparksLeftToday > 0 ? t('buy.sparksLeftToday', { count: sparksLeftToday }) : t('buy.noSparksToday')}</p>
       )}
       {!isSignedIn && item.price.diamonds && <p className={styles.note}>Sign in to use diamonds.</p>}
       {error && (
@@ -56,10 +56,10 @@ export default function QuickBuyDialog({ helperId, onBought, onClose }) {
       )}
       <div className={styles.footer}>
         <Button variant="ghost" onClick={onClose} data-autofocus>
-          Keep trying
+          {t('skip.keepTrying')}
         </Button>
         <Button variant="secondary" icon="bag" as="a" href="#/store">
-          Store
+          {t('nav.shop')}
         </Button>
       </div>
     </Dialog>

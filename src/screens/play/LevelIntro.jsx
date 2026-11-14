@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import ScreenTitle from '../../components/game/ScreenTitle.jsx';
 import Button from '../../components/Button.jsx';
 import LumiSays from '../../components/game/LumiSays.jsx';
@@ -10,13 +11,13 @@ import { TILE } from '../../game/constants.js';
 import styles from './LevelIntro.module.css';
 
 const DIFFICULTY_STICKERS = {
-  hard: { text: 'HARD LEVEL', className: 'hard' },
+  hard: { key: 'intro.sticker.hard', className: 'hard' },
 };
 
 const STICKERS = {
-  boss: { text: 'BOSS LEVEL!', className: 'boss' },
-  disco: { text: 'DISCO LEVEL!', className: 'disco' },
-  night: { text: 'NIGHT LEVEL', className: 'night' },
+  boss: { key: 'intro.sticker.boss', className: 'boss' },
+  disco: { key: 'intro.sticker.disco', className: 'disco' },
+  night: { key: 'intro.sticker.night', className: 'night' },
 };
 
 /** How long the intro stays before the level starts by itself (any tap starts it sooner). */
@@ -48,6 +49,7 @@ export default function LevelIntro({
     return () => clearTimeout(timer);
   }, [onDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const { t } = useI18n();
   const gems = level.tiles.filter((tile) => tile.type === TILE.GEM);
   const limit = moveLimit ?? moveLimitFor(level.par, level.difficulty);
   // Hard and Extra Hard levels get their own stamp, so a tougher level is never a surprise.
@@ -61,40 +63,30 @@ export default function LevelIntro({
         <ScreenTitle as="h1" size="lg" tone={modifier === 'boss' ? 'boss' : 'calm'}>
           {title}
         </ScreenTitle>
-        {sticker && <p className={`game-title ${styles.sticker}`}>{sticker.text}</p>}
+        {sticker && <p className={`game-title ${styles.sticker}`}>{t(sticker.key)}</p>}
         {flavor && <p className={`game-title ${styles.flavor}`}>✨ {flavor.name}</p>}
         <p className={styles.goal}>
-          Light {gems.length === 1 ? 'the gem' : `all ${gems.length} gems`}
+          {t('intro.lightGems', { count: gems.length })}
           <span className={styles.gems}>
             {gems.map((gem, i) => (
               <GemShape key={i} color={gem.color} size={22} />
             ))}
           </span>
           <span className={styles.together}>
-            {showsStarTarget ? (
-              <>
-                ★★★ in <strong>{level.par}</strong> {level.par === 1 ? 'move' : 'moves'}
-              </>
-            ) : (
-              <>
-                in <strong>{limit}</strong> moves
-              </>
-            )}
+            {showsStarTarget ? <>{t('intro.starTarget', { count: level.par })}</> : <>{t('intro.inMoves', { count: limit })}</>}
           </span>
         </p>
         {glowbugId && (
           <p className={styles.glowbug}>
             <GlowbugArt id={glowbugId} size={40} isAwake={false} />
-            <span>
-              Get ★★★ to rescue <strong>{glowbugById(glowbugId).name}</strong>!
-            </span>
+            <span>{t('intro.rescue', { name: glowbugById(glowbugId).name })}</span>
           </p>
         )}
         <div className={styles.lumi}>
           <LumiSays mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={84} line={flavor?.goal ?? lumiLine} />
         </div>
         <Button size="lg" icon="play" onClick={onDone} data-autofocus autoFocus>
-          Let’s go!
+          {t('intro.go')}
         </Button>
       </div>
     </div>

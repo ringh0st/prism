@@ -6,16 +6,25 @@ import { sfx } from '../../audio/sfx.js';
 import styles from './Map.module.css';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import { glowbugForLevel } from '../../game/glowbugs.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
-const DIFFICULTY_LABEL = { [DIFFICULTY.HARD]: 'hard', [DIFFICULTY.EXTRA]: 'boss' };
+const DIFFICULTY_LABEL = { [DIFFICULTY.HARD]: 'map.node.hard', [DIFFICULTY.EXTRA]: 'map.node.boss' };
 
 /** One level bubble on the map. */
 export default function LevelNode({ stop, stars, isUnlocked, isCurrent, greeting = null, nodeRef }) {
+  const { t } = useI18n();
   // A Glowbug still waiting to be rescued here (three stars frees it).
   const glowbug = isUnlocked && stars < 3 ? glowbugForLevel(stop.ref.id) : null;
   const { ref, x, y } = stop;
   const kindLabel = DIFFICULTY_LABEL[ref.difficulty];
-  const label = `Level ${ref.world}-${ref.index}${kindLabel ? `, ${kindLabel}` : ''}, ${isUnlocked ? `${stars} of ${MAX_STARS} stars` : 'locked'}${glowbug ? ', a Glowbug is waiting to be rescued' : ''}`;
+  const label = [
+    t('level.title', { label: `${ref.world}-${ref.index}` }),
+    kindLabel && t(kindLabel),
+    isUnlocked ? t('map.node.stars', { count: stars, max: MAX_STARS }) : t('map.node.locked'),
+    glowbug && t('map.node.glowbug'),
+  ]
+    .filter(Boolean)
+    .join(', ');
   const className = `${styles.node} ${styles[ref.difficulty]} ${isUnlocked ? '' : styles.lockedNode} ${isCurrent ? styles.currentNode : ''} ${
     stars > 0 ? styles.doneNode : ''
   }`;
@@ -41,7 +50,7 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, greeting
           <Icon name="crown" size={22} />
         </span>
       )}
-      {ref.difficulty === DIFFICULTY.EXTRA && <span className={`game-title on-color ${styles.bossPlate}`}>BOSS</span>}
+      {ref.difficulty === DIFFICULTY.EXTRA && <span className={`game-title on-color ${styles.bossPlate}`}>{t('map.boss')}</span>}
       {glowbug && (
         <span className={styles.glowbugBadge} aria-hidden="true">
           <GlowbugArt id={glowbug.id} size={30} isAwake={false} />

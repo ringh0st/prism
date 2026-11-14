@@ -29,6 +29,9 @@ const QUIPS = {
   streak: ['You’re on fire! 🔥', 'Unstoppable!', 'Streak power!', 'Hot hot hot!'],
 };
 
+/** All of Lumi's English lines for an event (the fallback when a translation has none). */
+export const quipLines = (event) => QUIPS[event] ?? QUIPS.start;
+
 /** A random line for an event. */
 export function quipFor(event, random = Math.random) {
   const lines = QUIPS[event] ?? QUIPS.start;

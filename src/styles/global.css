@@ -11,6 +11,12 @@ body,
   margin: 0;
 }
 
+/* Scenery can reach past the screen edge; clip it so the page never scrolls (or zooms out) sideways. */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   font-family: var(--font-body);
   font-size: 16px;
@@ -91,4 +97,16 @@ a {
 svg {
   display: block;
   flex: none;
+}
+
+/* Right-to-left languages (Hebrew): arrows that mean "back" or "forward" point the other way, and body
+   text uses Fredoka, which has Hebrew letters. The puzzle board itself stays left to right. */
+:root[dir='rtl'] svg[data-icon='back'],
+:root[dir='rtl'] svg[data-icon='play'],
+:root[dir='rtl'] svg[data-icon='skip'] {
+  transform: scaleX(-1);
+}
+
+:root[lang='he'] {
+  --font-body: 'Fredoka', 'Arial Hebrew', 'Noto Sans Hebrew', system-ui, sans-serif;
 }

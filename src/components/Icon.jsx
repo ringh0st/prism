@@ -179,6 +179,7 @@ export default function Icon({ name, size = 20, label, className, strokeWidth = 
   return (
     <svg
       className={className}
+      data-icon={name}
       width={size}
       height={size}
       viewBox="0 0 24 24"

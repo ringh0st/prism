@@ -18,7 +18,8 @@ import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
 import { chestId } from '../../game/surprises.js';
 import { MAX_STARS } from '../../game/scoring.js';
-import { quipFor } from '../../game/quips.js';
+import { quipLines } from '../../game/quips.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import { buildWorldStops, pathThrough, ROW_HEIGHT } from './mapLayout.js';
 import styles from './Map.module.css';
 
@@ -79,13 +80,14 @@ function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeR
 const LOCKED_PREVIEW_STOPS = buildWorldStops(Array.from({ length: 4 }, (_, i) => ({ id: `preview-${i}` })));
 
 function LockedWorld({ world, stars }) {
+  const { t } = useI18n();
   return (
     <section className={`${styles.world} ${styles.lockedWorld} ${styles[world.theme]}`} aria-labelledby={`world-${world.id}`}>
       <div className={styles.lockedView} style={{ height: LOCKED_PREVIEW_STOPS.length * ROW_HEIGHT }}>
         <WorldScenery stops={LOCKED_PREVIEW_STOPS} worldId={world.id} theme={world.theme} />
         <div className={styles.gate}>
           <Icon name="lock" size={40} strokeWidth={2.6} />
-          <p className="game-title">{world.starsToUnlock - stars} more ★ to unlock</p>
+          <p className="game-title">{t('map.toUnlock', { count: world.starsToUnlock - stars })}</p>
         </div>
       </div>
       <WorldSign world={world} headingId={`world-${world.id}`} isLocked className={styles.worldSign} />
@@ -103,7 +105,8 @@ export default function MapScreen() {
   const currentNodeRef = useRef(null);
   const stars = totalStars(progress);
   const solvedCount = Object.values(progress.levels).filter((entry) => entry.stars > 0).length;
-  const [greeting, setGreeting] = useState(() => quipFor('start'));
+  const { t, line } = useI18n();
+  const [greeting, setGreeting] = useState(() => line('quips.start', quipLines('start')));
   const hushLumi = useCallback(() => setGreeting(null), []);
 
   const unlockedWorlds = worlds.filter((world) => stars >= world.starsToUnlock);
@@ -161,23 +164,17 @@ export default function MapScreen() {
           />
         ))}
         {nextLockedWorld && <LockedWorld world={nextLockedWorld} stars={stars} />}
-        {worldsLeft > 0 && (
-          <p className={`game-title ${styles.teaser}`}>
-            + {worldsLeft} more worlds and {worldsLeft * 20} levels waiting…
-          </p>
-        )}
+        {worldsLeft > 0 && <p className={`game-title ${styles.teaser}`}>{t('map.teaser', { count: worldsLeft, levels: worldsLeft * 20 })}</p>}
         {currentRef && (
           <a href={`#/play/${currentRef.id}`} className={styles.playButton}>
-            <span className="game-title on-color">PLAY</span>
+            <span className="game-title on-color">{t('map.play')}</span>
             {progress.hotStreak >= 2 && (
-              <span className={styles.hotStreak} role="img" aria-label={`Hot streak: ${progress.hotStreak} perfect levels in a row`}>
+              <span className={styles.hotStreak} role="img" aria-label={t('map.hotStreak', { count: progress.hotStreak })}>
                 <Icon name="flame" size={12} />
                 <span className="game-title on-color">{progress.hotStreak}</span>
               </span>
             )}
-            <span className={styles.playLevel}>
-              Level {currentRef.world}-{currentRef.index}
-            </span>
+            <span className={styles.playLevel}>{t('level.title', { label: `${currentRef.world}-${currentRef.index}` })}</span>
           </a>
         )}
       </main>

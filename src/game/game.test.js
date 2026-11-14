@@ -856,3 +856,57 @@ test('level names never repeat within a built-in world', async () => {
     assert.equal(new Set(names).size, names.length, `world ${world}: ${names.join(', ')}`);
   }
 });
+
+test('translations: every language uses the same keys and placeholders as English', async () => {
+  const { en } = await import('../i18n/strings/en.js');
+  const { es } = await import('../i18n/strings/es.js');
+  const { he } = await import('../i18n/strings/he.js');
+  // Keys for game content (pieces, flavors, helpers…) only exist in translations: English lives in the game modules.
+  const CONTENT = /^(piece|recipe|helper|stage|title|treat|sticker|quips|combo)\./;
+  const base = (key) => key.replace(/\.(zero|one|two|few|many|other)$/, '');
+  const enBases = new Set(Object.keys(en).map(base));
+  const placeholders = (text) => (typeof text === 'string' ? [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).filter((n) => n !== 'count').sort() : []);
+  for (const [name, dict] of [['es', es], ['he', he]]) {
+    for (const [key, value] of Object.entries(dict)) {
+      if (CONTENT.test(key)) continue;
+      assert.ok(enBases.has(base(key)), `${name}: "${key}" is not an English key`);
+      const enValue = en[key] ?? en[`${base(key)}.other`] ?? en[base(key)];
+      assert.deepEqual(placeholders(value), placeholders(enValue), `${name}: placeholders of "${key}"`);
+    }
+    for (const key of enBases) {
+      const has = dict[key] !== undefined || Object.keys(dict).some((k) => base(k) === key);
+      assert.ok(has, `${name} is missing "${key}"`);
+    }
+  }
+});
+
+test('translations: plurals, placeholders, English fallback and the device language', async () => {
+  const { translate, detectLanguage } = await import('../i18n/translate.js');
+  assert.equal(translate('en', 'win.solvedIn', { count: 1 }), 'Solved in 1 move');
+  assert.equal(translate('es', 'win.solvedIn', { count: 3 }), 'Resuelto en 3 movimientos');
+  assert.equal(translate('he', 'win.solvedIn', { count: 1 }), 'נפתר במהלך אחד');
+  assert.equal(translate('he', 'win.solvedIn', { count: 2 }), 'נפתר ב-2 מהלכים');
+  assert.equal(translate('he', 'no.such.key', {}, 'fallback'), 'fallback');
+  assert.equal(detectLanguage(['he-IL']), 'he');
+  assert.equal(detectLanguage(['iw']), 'he');
+  assert.equal(detectLanguage(['es-MX', 'en']), 'es');
+  assert.equal(detectLanguage(['fr-FR']), 'en');
+});
+
+test('translations: every key the screens ask for exists in English', async () => {
+  const { readdirSync, statSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const { en } = await import('../i18n/strings/en.js');
+  const root = new URL('../', import.meta.url).pathname;
+  const files = [];
+  const walk = (dir) => readdirSync(dir).forEach((name) => (statSync(join(dir, name)).isDirectory() ? walk(join(dir, name)) : /\.jsx?$/.test(name) && files.push(join(dir, name))));
+  walk(root);
+  const base = (key) => key.replace(/\.(one|other)$/, '');
+  const known = new Set(Object.keys(en).map(base));
+  for (const file of files) {
+    for (const [, key, hasFallback] of readFileSync(file, 'utf8').matchAll(/\bt\('([a-zA-Z.]+)'(?:,\s*\{[^}]*\}(,\s*[^)]))?/g)) {
+      if (hasFallback) continue;
+      assert.ok(known.has(key), `${file.replace(root, '')}: "${key}" is missing from en.js`);
+    }
+  }
+});

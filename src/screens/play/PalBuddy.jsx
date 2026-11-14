@@ -4,6 +4,7 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { palById, stageOf } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './PalBuddy.module.css';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
 /**
  * Your partner Pal, in its outfit, watching you play from the corner of the level header. It reacts to what happens:
@@ -12,6 +13,7 @@ import styles from './PalBuddy.module.css';
  * @param reaction { name: hop | spin | shake | shiver | dance | droop, key }
  */
 export default function PalBuddy({ reaction }) {
+  const { t } = useI18n();
   const { progress } = usePlayer();
   const [poke, setPoke] = useState(null);
   const pal = palById(progress.pal.id);
@@ -26,7 +28,7 @@ export default function PalBuddy({ reaction }) {
         sfx.hello();
         setPoke({ name: 'hop', key: Date.now() });
       }}
-      aria-label={`${pal.name} is cheering you on`}
+      aria-label={t('buddy.cheering', { name: pal.name })}
     >
       <span key={shown?.key ?? 'idle'} className={`${styles.body} ${shown ? styles[shown.name] : ''}`}>
         <PalArt palId={pal.id} stage={stageOf(progress.pal.owned[pal.id])} wearing={progress.pal.wearing} size="100%" alive />

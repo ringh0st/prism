@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { AuthProvider } from './state/AuthContext.jsx';
 import { PlayerProvider, usePlayer } from './state/PlayerContext.jsx';
 import { LevelsProvider, useLevels } from './state/LevelsContext.jsx';
+import { I18nProvider } from './i18n/I18nContext.jsx';
 import { useHashRoute } from './hooks/useHashRoute.js';
 import { useLevel } from './hooks/useLevel.js';
 import GameBackground from './components/game/GameBackground.jsx';
@@ -150,21 +151,23 @@ export default function App() {
     <AuthProvider>
       <PlayerProvider>
         <LevelsProvider>
-          <GameBackground />
-          <BeamThemeStyle />
-          <SplashContext.Provider value={showsSplash}>
-            <Routes />
-          </SplashContext.Provider>
-          {/* Pop-ups wait until the splash is gone */}
-          {showsSplash ? (
-            <SplashScreen onDone={hideSplash} />
-          ) : (
-            <>
-              <WeeklyRewardNotice />
-              <PalNotices />
-              {route.name === 'map' && <FirstLaunch />}
-            </>
-          )}
+          <I18nProvider>
+            <GameBackground />
+            <BeamThemeStyle />
+            <SplashContext.Provider value={showsSplash}>
+              <Routes />
+            </SplashContext.Provider>
+            {/* Pop-ups wait until the splash is gone */}
+            {showsSplash ? (
+              <SplashScreen onDone={hideSplash} />
+            ) : (
+              <>
+                <WeeklyRewardNotice />
+                <PalNotices />
+                {route.name === 'map' && <FirstLaunch />}
+              </>
+            )}
+          </I18nProvider>
         </LevelsProvider>
       </PlayerProvider>
     </AuthProvider>

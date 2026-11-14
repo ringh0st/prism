@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useState } from 'react';
 import Button from '../Button.jsx';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Spotlight.module.css';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
 const GAP = 10; // space around the highlighted element
 const BUBBLE_ROOM = 230; // height the bubble needs below the element, or it goes above
@@ -21,6 +22,7 @@ function measure(selector) {
 export default function Spotlight({ target, title, text, art = null, step = 0, total = 1, onNext }) {
   const titleId = useId();
   const [hole, setHole] = useState(null);
+  const { t } = useI18n();
 
   useLayoutEffect(() => {
     const update = () => setHole(measure(target));
@@ -56,7 +58,7 @@ export default function Spotlight({ target, title, text, art = null, step = 0, t
   return (
     <div className={styles.layer} role="dialog" aria-modal="true" aria-labelledby={titleId}>
       {hole ? (
-        <button type="button" className={styles.hole} style={hole} onClick={onNext} aria-label="Got it" tabIndex={-1} />
+        <button type="button" className={styles.hole} style={hole} onClick={onNext} aria-label={t('common.gotIt')} tabIndex={-1} />
       ) : (
         <div className={styles.dim} />
       )}
@@ -76,14 +78,14 @@ export default function Spotlight({ target, title, text, art = null, step = 0, t
         </div>
         <div className={styles.footer}>
           {total > 1 && (
-            <span className={styles.dots} aria-label={`${step + 1} of ${total}`}>
+            <span className={styles.dots} aria-label={t('common.stepOf', { n: step + 1, total })}>
               {Array.from({ length: total }, (_, i) => (
                 <span key={i} className={i === step ? styles.dotOn : styles.dot} />
               ))}
             </span>
           )}
           <Button size="lg" onClick={onNext} autoFocus data-autofocus>
-            Got it!
+            {t('common.gotIt')}
           </Button>
         </div>
       </div>

@@ -1,19 +1,21 @@
 import Icon from '../Icon.jsx';
 import { sfx } from '../../audio/sfx.js';
 import styles from './BottomNav.module.css';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
 const TABS = [
-  { route: 'map', href: '#/', icon: 'map', label: 'Map' },
-  { route: 'pals', href: '#/pals', icon: 'paw', label: 'Pals' },
-  { route: 'top', href: '#/top', icon: 'trophy', label: 'Top' },
-  { route: 'store', href: '#/store', icon: 'bag', label: 'Shop' },
-  { route: 'settings', href: '#/settings', icon: 'user', label: 'Me' },
+  { route: 'map', href: '#/', icon: 'map', label: 'nav.map' },
+  { route: 'pals', href: '#/pals', icon: 'paw', label: 'nav.pals' },
+  { route: 'top', href: '#/top', icon: 'trophy', label: 'nav.top' },
+  { route: 'store', href: '#/store', icon: 'bag', label: 'nav.shop' },
+  { route: 'settings', href: '#/settings', icon: 'user', label: 'nav.me' },
 ];
 
 /** Big chunky game tab bar along the bottom of the screen. (The daily puzzle lives on the map's top bar.) */
 export default function BottomNav({ active }) {
+  const { t } = useI18n();
   return (
-    <nav className={styles.nav} aria-label="Main">
+    <nav className={styles.nav} aria-label={t('nav.main')}>
       {TABS.map((tab) => (
         <a
           key={tab.route}
@@ -25,7 +27,7 @@ export default function BottomNav({ active }) {
           <span className={styles.icon}>
             <Icon name={tab.icon} size={24} strokeWidth={2.6} />
           </span>
-          <span className={styles.label}>{tab.label}</span>
+          <span className={styles.label}>{t(tab.label)}</span>
         </a>
       ))}
     </nav>

@@ -7,6 +7,7 @@ import { firstFriendFor } from '../../game/firstFriend.js';
 import { celebrate } from '../../lib/effects.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './FriendFoundDialog.module.css';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
 /**
  * "You found a friend!": after a few solved levels a Pal turns up as a reward and joins the player.
@@ -16,6 +17,7 @@ export default function FriendFoundDialog({ onDone }) {
   const { progress, choosePal } = usePlayer();
   const [friend] = useState(() => firstFriendFor(progress));
   const [isSaving, setIsSaving] = useState(false);
+  const { t } = useI18n();
 
   useEffect(() => {
     sfx.newPal();
@@ -33,17 +35,15 @@ export default function FriendFoundDialog({ onDone }) {
   };
 
   return (
-    <Dialog title="You found a friend!" tone="celebrate" closesOnBackdrop={false} onClose={welcome}>
+    <Dialog title={t('friend.title')} tone="celebrate" closesOnBackdrop={false} onClose={welcome}>
       <div className={styles.friend}>
-        <PalArt palId={friend.id} size={150} alive label={`${friend.name} the ${friend.species}`} />
+        <PalArt palId={friend.id} size={150} alive label={friend.name} />
       </div>
-      <p className={styles.text}>
-        <strong>{friend.name}</strong> the {friend.species} wants to join you. It cheers you on while you play!
-      </p>
+      <p className={styles.text}>{t('friend.text', { name: friend.name })}</p>
       <Button size="lg" icon="heart" onClick={welcome} disabled={isSaving} data-autofocus>
-        Welcome, {friend.name}!
+        {t('friend.welcome', { name: friend.name })}
       </Button>
-      <p className={styles.note}>You’ll meet more friends as you play. Visit them in Pals.</p>
+      <p className={styles.note}>{t('friend.note')}</p>
     </Dialog>
   );
 }

@@ -14,6 +14,8 @@ import styles from './SettingsScreen.module.css';
 import { APP_VERSION, COPYRIGHT_YEAR, STORE_NAME, STUDIO_NAME } from '../lib/appInfo.js';
 import InstallSettingsCard from '../components/install/InstallSettingsCard.jsx';
 import HowToPlayCard from './me/HowToPlayCard.jsx';
+import LanguageCard from './me/LanguageCard.jsx';
+import { useI18n } from '../i18n/I18nContext.jsx';
 
 const SYNC_LABELS = {
   local: 'Progress is saved on this device.',
@@ -160,40 +162,43 @@ function AccountCard() {
 export default function SettingsScreen() {
   const { progress, settings, updateSettings, setBeamTheme, resetLocalProgress } = usePlayer();
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
+  const { t } = useI18n();
   const stars = totalStars(progress);
 
   return (
     <div className={styles.page}>
-      <ScreenHeader title="Me" />
+      <ScreenHeader title={t('nav.me')} />
       <main className={styles.main}>
         <PlayerCard />
+
+        <LanguageCard className={styles.card} />
 
         <AccountCard />
 
         <HowToPlayCard className={styles.card} />
 
         <section className={styles.card} aria-labelledby="feel-title">
-          <h2 id="feel-title">Sound & feel</h2>
-          <Toggle id="sound" label="Sound effects" checked={settings.sound} onChange={(sound) => updateSettings({ sound })} />
+          <h2 id="feel-title">{t('settings.feel')}</h2>
+          <Toggle id="sound" label={t('settings.sound')} checked={settings.sound} onChange={(sound) => updateSettings({ sound })} />
           <Toggle
             id="music"
-            label="Music"
-            description={settings.sound ? 'Soft background music in levels' : 'Turn on sound effects to hear music'}
+            label={t('settings.music')}
+            description={t(settings.sound ? 'settings.musicHint' : 'settings.musicNeedsSound')}
             checked={settings.music && settings.sound}
             disabled={!settings.sound}
             onChange={(isOn) => updateSettings({ music: isOn })}
           />
           <Toggle
             id="haptics"
-            label="Vibration"
-            description="On supported phones"
+            label={t('settings.vibration')}
+            description={t('settings.vibrationHint')}
             checked={settings.haptics}
             onChange={(haptics) => updateSettings({ haptics })}
           />
           <Toggle
             id="calm-board"
-            label="Calm board"
-            description="Nothing moves around the board while you think"
+            label={t('settings.calm')}
+            description={t('settings.calmHint')}
             checked={settings.calmBoard}
             onChange={(calmBoard) => updateSettings({ calmBoard })}
           />

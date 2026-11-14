@@ -31,18 +31,18 @@ import { navigate } from '../../hooks/useHashRoute.js';
 import { music } from '../../audio/music.js';
 import { sfx } from '../../audio/sfx.js';
 import { moveLimitFor, starsForMoves } from '../../game/scoring.js';
-import { HELPER_IDS, HELPERS, LENS_DURATION_MS, helpersAllowedFor } from '../../game/catalog.js';
+import { HELPER_IDS, LENS_DURATION_MS, helpersAllowedFor } from '../../game/catalog.js';
 import { isWorldComplete } from '../../game/progress.js';
 import { dailyShareText } from '../../game/share.js';
 import { PUBLIC_GAME_URL } from '../../lib/config.js';
-import { levelNameFor } from '../../game/levelNames.js';
 import { levelModifierFor } from '../../game/surprises.js';
-import { quipFor } from '../../game/quips.js';
+import { quipLines } from '../../game/quips.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { flavorText, levelTitle, pieceText, worldName } from '../../i18n/gameText.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
 import { firstTileOf, newPiecesIn, piecesMetIn } from '../../game/pieces.js';
 import { findHint, tapsLeft } from '../../game/solver.js';
 import { isRotatable } from '../../game/beam.js';
-import { recipeOf } from '../../game/recipes.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import { EVENT_LEVELS, parseEventLevelId } from '../../game/events.js';
 import ComboBurst from './ComboBurst.jsx';
@@ -93,11 +93,6 @@ function piecesToIntroduce(level, mode, progress) {
   return newPiecesIn(level, seenPieces(progress)).filter((piece) => !(piece.id === 'basics' && isFirstStepsLevel(level, mode)));
 }
 
-const COACH_LINES = {
-  start: 'Tap the mirror the hand points at, and watch the light!',
-  firstMove: 'See? The mirror turned and the light bounced! Keep following the hand.',
-};
-
 /**
  * mode: 'level' (records progress) | 'daily' (streak + sparks) | 'event' (weekend event puzzle) | 'playtest' (admin preview, free helpers, records nothing)
  * | 'challenge' (a friend's "beat my score" link: no helpers, records nothing; `challenge` is { levelId, moves, name })
@@ -142,6 +137,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   // The spotlight tour shown right after the intro: new pieces on the board, then one-time tips.
   const [tour, setTour] = useState({ steps: [], index: 0 });
   const [spotlightTile, setSpotlightTile] = useState(-1);
+  const { t, line, lang } = useI18n();
   const [lumi, setLumi] = useState({ mood: 'happy', line: '' });
   const [buyingHelper, setBuyingHelper] = useState(null);
   const [isConfirmingSkip, setIsConfirmingSkip] = useState(false);
@@ -158,7 +154,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
   const modifier = useMemo(() => levelModifierFor(level), [level]);
   const isFirstSteps = isFirstStepsLevel(level, mode);
-  const flavor = recipeOf(level);
+  const flavor = flavorText(lang, level);
   const moveLimit = (mode === 'rush' ? rushMoveLimit(rush.run, level.par) : moveLimitFor(level.par, level.difficulty)) + bonusMoves;
   const starCap = bonusMoves > 0 ? Math.min(1, puzzle.starCap) : puzzle.starCap;
   const canKeepGoing = mode === 'level' && level.world <= KEEP_GOING_WORLDS;
@@ -174,35 +170,37 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         : mode === 'daily' || mode === 'event'
           ? HELPER_IDS.filter((id) => id !== 'skip')
           : HELPER_IDS;
-  const levelName = title || levelNameFor(level);
+  const levelName = mode === 'daily' ? t('play.daily') : mode === 'playtest' ? title : title || levelTitle(lang, level);
   const levelLabel = `${level.world}-${level.index}`;
   // Built-in worlds have their own look (board colors and landscape) and show their name.
   const world = ['level', 'challenge', 'rush'].includes(mode) ? WORLDS[level.world - 1] : null;
-  const backName = mode === 'event' ? 'event' : mode === 'rush' ? 'Light Rush' : 'map';
+  const backName = t(mode === 'event' ? 'place.event' : mode === 'rush' ? 'place.rush' : 'place.map');
   const eventSpot = useMemo(() => (mode === 'event' ? parseEventLevelId(level.id) : null), [mode, level.id]);
   const subtitle = level.isDaily
-    ? 'Daily puzzle'
+    ? t('play.daily')
     : eventSpot
-      ? `Weekend event · ${eventSpot.number}/${EVENT_LEVELS}`
+      ? t('play.eventSpot', { n: eventSpot.number, total: EVENT_LEVELS })
       : mode === 'playtest'
         ? 'Test play'
         : mode === 'challenge'
-          ? `Challenge from ${challenge.name ?? 'a friend'}`
+          ? challenge.name
+            ? t('play.challengeFrom', { name: challenge.name })
+            : t('play.challengeFromFriend')
           : mode === 'rush'
-            ? `Light Rush · ${rush.number}/${RUSH_LENGTH}`
-            : `${world ? `${world.name} · ` : ''}${level.world}-${level.index}`;
+            ? t('play.rushSpot', { n: rush.number, total: RUSH_LENGTH })
+            : `${world ? `${worldName(lang, world)} · ` : ''}${level.world}-${level.index}`;
   const introLine = useMemo(
     () =>
       challenge
-        ? `Beat ${challenge.moves} moves! Fewer moves wins.`
+        ? t('intro.challenge', { count: challenge.moves })
         : rush
-          ? `Puzzle ${rush.number}: ${rush.run.spare} spare moves left. Make them count!`
-          : quipFor(modifier === 'normal' ? 'start' : modifier),
+          ? t('intro.rush', { n: rush.number, count: rush.run.spare })
+          : line(`quips.${modifier === 'normal' ? 'start' : modifier}`, quipLines(modifier === 'normal' ? 'start' : modifier)),
     [modifier, challenge], // eslint-disable-line react-hooks/exhaustive-deps -- the rush line is set once per puzzle
   );
   const isOver = trace.isSolved || isOutOfMoves || Boolean(result);
 
-  const say = useCallback((mood, event) => setLumi({ mood, line: event ? quipFor(event) : '' }), []);
+  const say = useCallback((mood, event) => setLumi({ mood, line: event ? line(`quips.${event}`, quipLines(event)) : '' }), [line]);
   const playStats = usePlayStats(level.id, mode === 'level', moves);
 
   // Reset per level.
@@ -235,7 +233,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     const tileIndex = findHint(level, puzzle.orients);
     const tile = tileIndex === null ? null : level.tiles[tileIndex];
     setLookHere(tile ? lookHereCells(tile, level.width, level.height) : null);
-    setLumi({ mood: 'happy', line: tile ? 'Psst… look around the glowing spot. Still stuck? Tap Hint!' : 'Stuck? Tap Hint!' });
+    setLumi({ mood: 'happy', line: t(tile ? 'lumi.lookHere' : 'lumi.stuckHint') });
     sfx.lumiTalk();
     setIsNudgingHint(true);
   };
@@ -295,7 +293,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   // First levels: Lumi explains what just happened after the first tap.
   useEffect(() => {
     if (isFirstSteps && moves === 1 && !trace.isSolved) {
-      setLumi({ mood: 'excited', line: COACH_LINES.firstMove });
+      setLumi({ mood: 'excited', line: t('coach.firstMove') });
       sfx.lumiTalk();
     }
   }, [moves]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -395,18 +393,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     (cell, tileIndex) => {
       if (isOver) return;
       const tile = level.tiles[tileIndex];
-      const lines = {
-        mirror: 'That one’s bolted down. Turn the others!',
-        wall: 'Walls stay put. Bend the light around them!',
-        emitter: 'That’s the lamp. Turn the mirrors to steer its light!',
-        gem: 'That’s a gem. Bend the light into it!',
-      };
       sfx.locked();
       setNudgedCell(null);
       requestAnimationFrame(() => setNudgedCell(cell));
-      setLumi({ mood: 'happy', line: lines[tile.type] ?? 'That piece can’t turn. Try a mirror!' });
+      setLumi({ mood: 'happy', line: t(`lumi.blocked.${['mirror', 'wall', 'emitter', 'gem'].includes(tile.type) ? tile.type : 'other'}`) });
     },
-    [isOver, level.tiles],
+    [isOver, level.tiles, t],
   );
 
   const onActivate = useCallback(
@@ -449,12 +441,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       puzzle.applyHelper(helperId);
       sfx.helper();
       // Say plainly what a helper costs: the best result left for this try.
-      const lines = {
-        hint: 'Turn the glowing one! (Best now: ★★)',
-        lens: 'Follow the dotted path! (Best now: ★★)',
-        autoturn: 'Zap! I turned one for you. (Best now: ★)',
-      };
-      if (lines[helperId]) setLumi({ mood: 'excited', line: lines[helperId] });
+      if (helperId !== 'skip') setLumi({ mood: 'excited', line: t(`lumi.helper.${helperId}`) });
       if (helperId === 'skip') completeLevel({ isSkipped: true });
     },
     [mode, consumeHelper, puzzle, completeLevel],
@@ -464,7 +451,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     (helperId) => {
       if (isOver) return;
       if (puzzle.usedHelpers.length >= helpersAllowed) {
-        setLumi({ mood: 'worried', line: `Only ${helpersAllowed} helper${helpersAllowed === 1 ? '' : 's'} per try here!` });
+        setLumi({ mood: 'worried', line: t('lumi.helperLimit', { count: helpersAllowed }) });
         return;
       }
       if (helperId === 'autoturn' && moves >= moveLimit) return;
@@ -505,8 +492,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       return {
         id: `piece-${piece.id}`,
         target: tile ? `[data-cell="${tile.y * level.width + tile.x}"]` : '[data-tour="board"]',
-        title: piece.name,
-        text: piece.text,
+        ...pieceText(lang, piece),
         art: (
           <TileArt
             tile={piece.sample}
@@ -519,7 +505,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       };
     });
     const showsTips = ['level', 'daily', 'event'].includes(mode) && !isFirstSteps && pieceSteps.length === 0;
-    const tipSteps = showsTips ? unseenTips(readJson(SEEN_TIPS_KEY, [])) : [];
+    const tipSteps = showsTips
+      ? unseenTips(readJson(SEEN_TIPS_KEY, [])).map((tip) => ({ ...tip, title: t(`tip.${tip.id}.title`), text: t(`tip.${tip.id}.text`) }))
+      : [];
     return [...pieceSteps, ...tipSteps];
   };
 
@@ -573,7 +561,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     if (isFirstSteps) {
       // The basics are taught right here on the board, so they count as met.
       writeJson(SEEN_PIECES_KEY, [...new Set([...seenPieces(progress), 'basics'])]);
-      setLumi({ mood: 'excited', line: COACH_LINES.start });
+      setLumi({ mood: 'excited', line: t('coach.start') });
       sfx.lumiTalk();
     } else if (flavor) {
       setLumi({ mood: 'happy', line: flavor.goal });
@@ -601,7 +589,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     >
       {world && <WorldBackdrop levelId={level.id} theme={world.theme} />}
       <header className={styles.header}>
-        <Button as="a" href={backHref} variant="secondary" icon="back" label={`Back to ${backName}`} />
+        <Button as="a" href={backHref} variant="secondary" icon="back" label={t('play.backTo', { place: backName })} />
         <div className={styles.titleBlock}>
           <p className={styles.subtitle}>{subtitle}</p>
           <ScreenTitle as="h1" size="sm" tone={modifier === 'boss' ? 'boss' : 'calm'}>
@@ -655,7 +643,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           }
           isLocked={isOver}
           mood={modifier}
-          label={`${levelName} board. Use arrow keys to move, Enter to rotate.`}
+          label={t('play.boardLabel', { name: levelName })}
         />
       </div>
 
@@ -665,7 +653,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           <Lumi mood={lumi.mood} size={96} />
         </div>
         <div className={styles.controls}>
-          <Button variant="secondary" icon="restart" label="Restart level" onClick={restart} />
+          <Button variant="secondary" icon="restart" label={t('play.restart')} onClick={restart} />
           {!isFirstSteps && (
             <div data-tour="helpers">
               <HelperBar
@@ -714,11 +702,11 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         />
       )}
       {isConfirmingSkip && (
-        <Dialog title="Skip this level?" onClose={() => setIsConfirmingSkip(false)}>
-          <p className={styles.dialogText}>{HELPERS.skip.description} You can come back for more stars any time.</p>
+        <Dialog title={t('skip.title')} onClose={() => setIsConfirmingSkip(false)}>
+          <p className={styles.dialogText}>{t('skip.text')}</p>
           <div className={styles.dialogActions}>
             <Button variant="secondary" onClick={() => setIsConfirmingSkip(false)} data-autofocus>
-              Keep trying
+              {t('skip.keepTrying')}
             </Button>
             <Button
               icon="skip"
@@ -727,7 +715,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
                 spendHelper('skip');
               }}
             >
-              Skip
+              {t('helper.skip.name', {}, 'Skip')}
             </Button>
           </div>
         </Dialog>
@@ -751,7 +739,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           backName={backName}
           gemsLeft={gems.length - trace.litGems.size}
           gemsLit={trace.litGems.size}
-          lumiLine={quipFor('outOfMoves')}
+          lumiLine={line('quips.outOfMoves', quipLines('outOfMoves'))}
           hintsOwned={progress.helpers.hint ?? 0}
           onRetry={restart}
           onKeepGoing={
@@ -759,7 +747,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
               ? () => {
                   setBonusMoves((extra) => extra + KEEP_GOING_MOVES);
                   setIsOutOfMoves(false);
-                  setLumi({ mood: 'happy', line: 'Take your time. You’ve got this!' });
+                  setLumi({ mood: 'happy', line: t('lumi.keepGoing') });
                 }
               : null
           }

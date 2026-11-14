@@ -68,7 +68,8 @@ import { sfx } from '../audio/sfx.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
 const SETTINGS_KEY = 'prism.settings.v1';
-const DEFAULT_SETTINGS = { sound: true, music: true, haptics: true, calmBoard: false };
+// language: null follows the device's language (see src/i18n/translate.js).
+const DEFAULT_SETTINGS = { sound: true, music: true, haptics: true, calmBoard: false, language: null };
 
 const PlayerContext = createContext(null);
 

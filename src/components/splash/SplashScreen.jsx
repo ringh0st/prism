@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import Lumi from '../game/Lumi.jsx';
 import { APP_VERSION, COPYRIGHT_YEAR, GAME_NAME, STUDIO_NAME } from '../../lib/appInfo.js';
 import styles from './SplashScreen.module.css';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
 const SPLASH_MS = 4000;
 const FADE_MS = 450;
-const LINES = ['Waking up the gems…', 'Polishing mirrors…', 'Warming up the light…', 'Calling the Pals…'];
+const LINES = ['splash.line1', 'splash.line2', 'splash.line3', 'splash.line4'];
 const TITLE_COLORS = ['#58AC82', '#E59A62', '#D9A23A', '#4FBFAD', '#DF7458', '#58AC82', '#E59A62', '#D9A23A'];
 
 /**
@@ -14,6 +15,7 @@ const TITLE_COLORS = ['#58AC82', '#E59A62', '#D9A23A', '#4FBFAD', '#DF7458', '#5
  * Tap, Enter or Escape skips it.
  */
 export default function SplashScreen({ onDone }) {
+  const { t } = useI18n();
   const [isLeaving, setIsLeaving] = useState(false);
   const [lineIndex, setLineIndex] = useState(0);
   const splashRef = useRef(null);
@@ -46,7 +48,7 @@ export default function SplashScreen({ onDone }) {
       onKeyDown={(event) => (event.key === 'Enter' || event.key === 'Escape' || event.key === ' ') && skip()}
       role="dialog"
       aria-modal="true"
-      aria-label={`${GAME_NAME}, by ${STUDIO_NAME}. Version ${APP_VERSION}. Loading.`}
+      aria-label={t('splash.label', { game: GAME_NAME, studio: STUDIO_NAME, version: APP_VERSION })}
     >
       <div className={styles.rays} aria-hidden="true" />
 
@@ -86,21 +88,19 @@ export default function SplashScreen({ onDone }) {
           <span className={styles.fill} style={{ animationDuration: `${SPLASH_MS}ms` }} />
         </div>
         <p key={lineIndex} className={styles.line}>
-          {LINES[lineIndex]}
+          {t(LINES[lineIndex])}
         </p>
       </div>
 
       <footer className={styles.footer}>
-        <p className={styles.studio}>
-          A <strong>{STUDIO_NAME}</strong> production
-        </p>
+        <p className={styles.studio}>{t('splash.production', { studio: STUDIO_NAME })}</p>
         <p className={styles.meta}>
-          Version {APP_VERSION} · © {COPYRIGHT_YEAR} {STUDIO_NAME}
+          {t('splash.version', { version: APP_VERSION })} · © {COPYRIGHT_YEAR} {STUDIO_NAME}
         </p>
       </footer>
 
       <button type="button" className={styles.skip} onClick={skip}>
-        Tap to skip
+        {t('splash.skip')}
       </button>
     </div>
   );
