@@ -7,6 +7,7 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
 import { WEEKLY_POINTS, WEEKLY_REWARDS } from '../../game/catalog.js';
 import Podium from './Podium.jsx';
+import { stageOf } from '../../game/pals.js';
 import PartnerSwitcher from '../pals/PartnerSwitcher.jsx';
 import RankRow from './RankRow.jsx';
 import styles from './LeaderboardScreen.module.css';
@@ -53,10 +54,16 @@ export default function LeaderboardScreen() {
     return () => {
       isCurrent = false;
     };
-  }, [isSignedIn, solvedCount]);
+  }, [isSignedIn, solvedCount, progress.pal.id]);
 
-  const rest = board?.top.filter((row) => row.rank > 3) ?? [];
-  const isMeListed = board?.top.some((row) => row.isMe);
+  // Your own rows always show the Pal you're playing with right now, even before the board reloads.
+  const withMyPal = (row) =>
+    row.isMe && progress.pal.id
+      ? { ...row, pal: progress.pal.id, palStage: stageOf(progress.pal.owned[progress.pal.id]), accessory: progress.pal.accessory }
+      : row;
+  const top = board?.top.map(withMyPal) ?? [];
+  const rest = top.filter((row) => row.rank > 3);
+  const isMeListed = top.some((row) => row.isMe);
   const lumiLine = board?.me ? `You’re #${board.me.rank} this week. Keep shining!` : 'Who will shine brightest this week?';
 
   return (
@@ -71,7 +78,7 @@ export default function LeaderboardScreen() {
         <PartnerSwitcher />
         {error && <p className={styles.empty}>{error}</p>}
         {!board && !error && <p className={styles.empty}>Loading the board…</p>}
-        {board && <Podium top={board.top} />}
+        {board && <Podium top={top} />}
 
         <div className={styles.below}>
           {rest.length > 0 && (
@@ -83,7 +90,7 @@ export default function LeaderboardScreen() {
           )}
           {board?.me && !isMeListed && (
             <ol className={styles.list} aria-label="Your place">
-              <RankRow row={{ ...board.me, isMe: true }} />
+              <RankRow row={withMyPal({ ...board.me, isMe: true })} />
             </ol>
           )}
           {isSignedIn && board?.myNickname && !board.me && (
