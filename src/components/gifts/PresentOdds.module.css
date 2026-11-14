@@ -1,69 +1,99 @@
 .odds {
   display: grid;
-  gap: 6px;
+  justify-items: center;
+  gap: var(--space-2);
   margin-bottom: var(--space-4);
   padding: var(--space-3);
   border-radius: var(--radius-md);
   background: var(--surface-sunken);
 }
 
-.title {
-  margin: 0;
-  font-size: 16px;
-}
-
-.always,
-.note {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-soft);
-}
-
-.list {
-  display: grid;
-  gap: 4px;
+.rarities,
+.surprises {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-weight: 700;
+.rarity,
+.surprise {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-width: 56px;
 }
 
-.what {
-  flex: 1;
-}
-
-.chance {
-  font-size: 15px;
-  color: var(--text-strong);
+.box {
+  position: relative;
+  display: grid;
+  place-items: end center;
+  height: 60px;
 }
 
 .symbol {
+  position: absolute;
+  top: -4px;
+  inset-inline-end: -6px;
+  font-size: 16px;
+  color: var(--reward-label);
+}
+
+.chance {
+  font-size: 16px;
+  color: var(--text-strong);
+}
+
+.adds {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.add {
+  display: inline-flex;
+  align-items: center;
+}
+
+.inside {
+  display: flex;
+  margin: var(--space-1) 0 0;
+  font-weight: 700;
+}
+
+.inside > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.surpriseIcon {
+  position: relative;
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  font-size: 13px;
+  color: var(--text-strong);
   background: var(--surface-raised);
 }
 
-.rare .symbol {
-  color: var(--warm-label);
-  background: var(--warm-bottom);
+.bag {
+  position: absolute;
+  bottom: -6px;
+  font-size: 10px;
+  font-weight: 800;
 }
 
-.epic .symbol,
-.legendary .symbol {
-  color: var(--reward-label);
-  background: var(--reward-bottom);
-}
-
-.what {
-  font-weight: 400;
+.note {
+  margin: 0;
+  font-size: 13px;
+  text-align: center;
+  color: var(--text-soft);
 }

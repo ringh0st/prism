@@ -50,6 +50,7 @@ import { recordRushRunLocally, rushWeekOf } from '../game/rush.js';
 import { starsForMoves } from '../game/scoring.js';
 import { claimQuestLocally, questWeekOf, questsForWeek, recordQuestProgress } from '../game/quests.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
+import { recordPalFeats } from '../game/palRecords.js';
 import { claimCalendarGiftLocally, claimWinGiftLocally, openPresentLocally, recordDailyWin } from '../game/gifts.js';
 import { nicknameProblem } from '../game/nicknames.js';
 import {
@@ -202,6 +203,10 @@ export function PlayerProvider({ children }) {
           const grown = growPartnerLocally(local.progress);
           local.progress = grown.progress;
           local.palGrewTo = grown.grewTo;
+          // Records with the partner Pal (Hard levels, ★★★, a triple, growing up…), kept on this device.
+          const feats = recordPalFeats(local.progress, { difficulty: level.difficulty, stars: local.stars, combo: result.combo });
+          local.progress = feats.progress;
+          local.newRecords = feats.newRecords;
         }
         setProgress(local.progress);
         if (!userId) {

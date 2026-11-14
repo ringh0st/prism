@@ -1,5 +1,6 @@
 /* Texts for gifts (the gift moment, the daily gift calendar, the partner Pal's presents), in every language. */
 export const en = {
+  'present.odds.short': 'Free. Earned by playing.',
   'winGift.label.one': 'Today you won {count} level',
   'winGift.label.other': 'Today you won {count} levels',
   'winGift.title.one': 'Today’s wins: {count}',
@@ -9,7 +10,6 @@ export const en = {
   'winGift.next.other': '{count} more wins to the next gift',
   'winGift.giftTitle.one': 'Your first win today!',
   'winGift.giftTitle.other': '{count} wins today!',
-  'present.rarity.title': 'How special will it be?',
   'present.rarity.plain': 'Plain',
   'present.rarity.rare': 'Rare!',
   'present.rarity.epic': 'Epic!',
@@ -56,7 +56,6 @@ export const en = {
   'present.odds.helper': 'A helper',
   'present.odds.sparks': 'A bag of {n} more sparks',
   'present.odds.item': 'Clothes or decor you don’t have yet',
-  'present.odds.note': 'Free, earned by playing. It shows how special it is as it opens. If a surprise can’t be given, you get the bag of sparks.',
   'present.win.ready': '{name} has a present for you on the map!',
   'present.win.toGo.one': '{count} more ★ until {name}’s present',
   'present.win.toGo.other': '{count} more ★ until {name}’s present',
@@ -64,6 +63,7 @@ export const en = {
 };
 
 export const es = {
+  'present.odds.short': 'Gratis. Se gana jugando.',
   'winGift.label.one': 'Hoy ganaste {count} nivel',
   'winGift.label.other': 'Hoy ganaste {count} niveles',
   'winGift.title.one': 'Victorias de hoy: {count}',
@@ -73,7 +73,6 @@ export const es = {
   'winGift.next.other': 'Faltan {count} victorias para el próximo regalo',
   'winGift.giftTitle.one': '¡Tu primera victoria de hoy!',
   'winGift.giftTitle.other': '¡{count} victorias hoy!',
-  'present.rarity.title': '¿Qué tan especial será?',
   'present.rarity.plain': 'Normal',
   'present.rarity.rare': '¡Raro!',
   'present.rarity.epic': '¡Épico!',
@@ -120,7 +119,6 @@ export const es = {
   'present.odds.helper': 'Una ayuda',
   'present.odds.sparks': 'Una bolsa con {n} chispas más',
   'present.odds.item': 'Ropa o decoración que aún no tienes',
-  'present.odds.note': 'Gratis, ganado jugando. Al abrirlo verás lo especial que es. Si una sorpresa no se puede dar, recibes la bolsa de chispas.',
   'present.win.ready': '¡{name} tiene un regalo para ti en el mapa!',
   'present.win.toGo.one': 'Falta {count} ★ para el regalo de {name}',
   'present.win.toGo.other': 'Faltan {count} ★ para el regalo de {name}',
@@ -128,6 +126,7 @@ export const es = {
 };
 
 export const he = {
+  'present.odds.short': 'בחינם. מרוויחים במשחק.',
   'winGift.label.one': 'היום עברתם שלב אחד',
   'winGift.label.other': 'היום עברתם {count} שלבים',
   'winGift.title.one': 'ניצחונות היום: 1',
@@ -137,7 +136,6 @@ export const he = {
   'winGift.next.other': 'עוד {count} ניצחונות עד המתנה הבאה',
   'winGift.giftTitle.one': 'הניצחון הראשון שלכם היום!',
   'winGift.giftTitle.other': '{count} ניצחונות היום!',
-  'present.rarity.title': 'כמה מיוחדת היא תהיה?',
   'present.rarity.plain': 'רגילה',
   'present.rarity.rare': 'נדירה!',
   'present.rarity.epic': 'מיוחדת!',
@@ -184,7 +182,6 @@ export const he = {
   'present.odds.helper': 'עזר',
   'present.odds.sparks': 'שקית עם עוד {n} ניצוצות',
   'present.odds.item': 'בגד או קישוט שעוד אין לכם',
-  'present.odds.note': 'בחינם, מרוויחים במשחק. כשהיא נפתחת רואים כמה היא מיוחדת. אם אי אפשר לתת את ההפתעה, מקבלים את שקית הניצוצות.',
   'present.win.ready': '{name} מחכה לכם עם מתנה במפה!',
   'present.win.toGo.one': 'עוד כוכב ★ אחד עד המתנה של {name}',
   'present.win.toGo.other': 'עוד {count} ★ עד המתנה של {name}',

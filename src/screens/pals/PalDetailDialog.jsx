@@ -4,6 +4,7 @@ import Button from '../../components/Button.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import PalFormsStrip from '../../components/pals/PalFormsStrip.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
+import PalRecords from '../../components/pals/PalRecords.jsx';
 import RarityBadge from '../../components/pals/RarityBadge.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PAL_GROWTH_LEVELS, PAL_STAGES, growthOf, palStage, stageOf } from '../../game/pals.js';
@@ -84,6 +85,7 @@ export default function PalDetailDialog({ pal, onClose }) {
           </Button>
         </div>
       )}
+      {owned && <PalRecords palId={pal.id} />}
     </Dialog>
   );
 }

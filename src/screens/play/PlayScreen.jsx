@@ -242,6 +242,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   };
   // Many taps without lighting anything new also counts as stuck.
   const lastGemMove = useRef(0);
+  // The most gems lit by one tap in this try (for the partner Pal's records).
+  const bestCombo = useRef(0);
   useEffect(() => {
     if (trace.litGems.size > lastLitCount.current || moves === 0) {
       lastGemMove.current = moves;
@@ -273,6 +275,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       const combo = comboFor(litCount - lastLitCount.current);
       if (combo) {
         setCombo({ ...combo, key: Date.now() });
+        bestCombo.current = Math.max(bestCombo.current, combo.size);
         sfx.combo(combo.size);
       } else {
         sfx.gemLit(litCount);
@@ -328,7 +331,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
       let outcome;
       if (mode === 'level') {
-        outcome = finishLevel(level, isSkipped ? { moves: null, forcedStars: 1, usedHelpers: true } : { moves, starCap, usedHelpers });
+        outcome = finishLevel(
+          level,
+          isSkipped ? { moves: null, forcedStars: 1, usedHelpers: true } : { moves, starCap, usedHelpers, combo: bestCombo.current },
+        );
       } else if (mode === 'event') {
         outcome = finishEventLevel(level, { ...eventSpot, moves, starCap });
       } else if (mode === 'rush') {
@@ -432,6 +438,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     sfx.restart();
     if (mode === 'rush' && moves > 0) rush.onRestart(moves);
     puzzle.restart();
+    bestCombo.current = 0;
     playStats.start();
     setResult(null);
     setIsOutOfMoves(false);

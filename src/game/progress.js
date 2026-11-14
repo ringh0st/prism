@@ -38,6 +38,8 @@ export function createEmptyProgress() {
     // Different levels won today and today's win gifts opened (see gifts.js).
     winsToday: { date: null, levels: [] },
     winGifts: { date: null, opened: 0 },
+    // Records done with each Pal: { [palId]: { hard, perfect, triple, bossPerfect } } (see palRecords.js).
+    palRecords: {},
     pal: { id: null, owned: {}, accessories: [], wearing: [] },
     grove: { items: [], placed: [] },
     luckyPals: { claimed: 0 },

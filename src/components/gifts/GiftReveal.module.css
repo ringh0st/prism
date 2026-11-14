@@ -1,4 +1,5 @@
 .stage {
+  position: relative;
   display: grid;
   justify-items: center;
   gap: var(--space-2);
@@ -58,12 +59,42 @@
   animation: pop 500ms var(--ease-pop) both;
 }
 
-.glowBadge {
-  margin: 0;
-  padding: 4px 14px;
-  border-radius: var(--radius-pill);
-  font-size: 20px;
-  animation: pop 500ms var(--ease-pop) both;
+/* Light rays in the present's color spin behind it as it glows up */
+.rays {
+  position: absolute;
+  top: -10px;
+  /* Physical left on purpose: centered the same way in both reading directions */
+  left: calc(50% - 130px);
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--ray) 0 18%, transparent 62%), repeating-conic-gradient(var(--ray) 0 12deg, transparent 12deg 30deg);
+  opacity: 0.55;
+  mask-image: radial-gradient(circle, #000 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(circle, #000 30%, transparent 70%);
+  animation: spin 6s linear infinite;
+  pointer-events: none;
+}
+
+.wrapped {
+  position: relative;
+}
+
+/* The rarity's symbol: big, round, in its own color (never color alone) */
+.glowMark {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-top: -14px;
+  border-radius: 50%;
+  font-size: 30px;
+  line-height: 1;
+  box-shadow:
+    0 0 0 4px var(--surface-raised),
+    var(--shadow-md);
+  animation: stamp 480ms var(--ease-pop) both;
+  position: relative;
 }
 
 .glow1 {
@@ -71,15 +102,33 @@
   background: var(--warm-bottom);
 }
 
-.glow2,
-.glow3 {
+.glow2 {
   color: var(--reward-label);
   background: var(--reward-bottom);
 }
 
 .glow3 {
-  font-size: 24px;
-  box-shadow: 0 0 18px rgba(240, 193, 78, 0.8);
+  width: 66px;
+  height: 66px;
+  font-size: 38px;
+  color: var(--reward-label);
+  background: #ffd54a;
+  box-shadow:
+    0 0 0 4px var(--surface-raised),
+    0 0 26px 6px rgba(255, 213, 74, 0.9);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: scale(2.2) rotate(-20deg);
+  }
 }
 
 .items {
@@ -173,7 +222,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .prompt,
-  .glowBadge,
+  .glowMark,
+  .rays,
   .chest-wrapped,
   .chest-shaking,
   .chest-open,

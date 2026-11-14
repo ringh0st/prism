@@ -12,6 +12,7 @@ import PalArt from '../../components/pals/PalArt.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import PresentNote from '../../components/gifts/PresentNote.jsx';
 import WinGiftLadder from '../../components/gifts/WinGiftLadder.jsx';
+import PalRecordNote from '../../components/pals/PalRecordNote.jsx';
 import { palById, stageOf } from '../../game/pals.js';
 import ReplayShare from '../../components/replay/ReplayShare.jsx';
 import GlowbugRescue from './GlowbugRescue.jsx';
@@ -177,6 +178,7 @@ export default function WinDialog({
       </div>
       {/* The extras pop in one by one once the stars and sparks have landed, so the result reads first. */}
       <div className={styles.extras} style={{ '--extras-at': `${rewardsAt + 700}ms` }}>
+        {partner && result.newRecords?.length > 0 && <PalRecordNote partner={partner} records={result.newRecords} />}
         {!isSkipped && showWinGifts && <WinGiftLadder />}
         {partner && !isSkipped && (
           <div className={`${styles.evolved} ${palGrewTo ? styles.grew : ''}`}>

@@ -17,10 +17,10 @@ const SHAKE_MS = 900;
 const GLOW_STEP_MS = 750;
 /** Each step a present glows up to, plain → rare → epic → legendary: its color and a symbol (never color alone). */
 const GLOW_LOOKS = [
-  { tone: 'mint', symbol: '' },
-  { tone: 'peach', symbol: '◆' },
-  { tone: 'honey', symbol: '★' },
-  { tone: 'gold', symbol: '✦' },
+  { tone: 'mint', symbol: '', light: null },
+  { tone: 'peach', symbol: '◆', light: '#F2A67E' },
+  { tone: 'honey', symbol: '★', light: '#F0C14E' },
+  { tone: 'gold', symbol: '✦', light: '#FFD54A' },
 ];
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const ITEM_GAP_MS = 380;
@@ -67,7 +67,7 @@ export default function GiftReveal({ title, doneTitle, wrapping = { kind: 'box',
         setPhase('glowing');
         setGlow(step);
         sfx.glowUp(step);
-        gemBurst(boxRef.current, null);
+        gemBurst(boxRef.current, GLOW_LOOKS[step].light);
         await wait(calm ? 0 : GLOW_STEP_MS);
       }
       const list = giftItems(lang, gift, partner);
@@ -101,6 +101,7 @@ export default function GiftReveal({ title, doneTitle, wrapping = { kind: 'box',
   return (
     <Dialog title={heading} tone="celebrate" onClose={phase === 'shaking' ? undefined : onClose}>
       <div className={styles.stage} onClick={showAll}>
+        {glow > 0 && <span className={styles.rays} style={{ '--ray': GLOW_LOOKS[glow].light }} aria-hidden="true" />}
         <button
           type="button"
           ref={boxRef}
@@ -124,9 +125,11 @@ export default function GiftReveal({ title, doneTitle, wrapping = { kind: 'box',
           )}
         </button>
         {glow > 0 && (
-          <p key={glow} className={`game-title ${styles.glowBadge} ${styles[`glow${glow}`]}`} role="status">
-            <span aria-hidden="true">{GLOW_LOOKS[glow].symbol}</span> {t(`present.rarity.${PRESENT_RARITIES[glow].id}`)}
-          </p>
+          // Rarity reads from color, light and a big symbol; the word is only for screen readers.
+          <span key={glow} className={`${styles.glowMark} ${styles[`glow${glow}`]}`} role="status">
+            <span aria-hidden="true">{GLOW_LOOKS[glow].symbol}</span>
+            <span className="visually-hidden">{t(`present.rarity.${PRESENT_RARITIES[glow].id}`)}</span>
+          </span>
         )}
         {phase === 'wrapped' && (
           <p className={`game-title ${styles.prompt}`} aria-hidden="true">

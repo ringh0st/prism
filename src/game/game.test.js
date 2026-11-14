@@ -413,6 +413,23 @@ test('daily win gifts: 1st, 3rd and 6th different level won today, matches the d
   assert.equal(readyWinGift(progress, '2026-03-02'), WIN_GIFTS[0]);
 });
 
+test('pal records: counted per partner, done once, never bought', async () => {
+  const { PAL_RECORDS, palRecordsFor, recordPalFeats } = await import('./palRecords.js');
+  const { createEmptyProgress } = await import('./progress.js');
+  let progress = { ...createEmptyProgress(), pal: { id: 'ember', owned: { ember: { stage: 0, growth: 0 } }, accessories: [], wearing: [] } };
+  let done = [];
+  for (let i = 0; i < 5; i++) {
+    const feats = recordPalFeats(progress, { difficulty: 'hard', stars: 2, combo: i === 0 ? 3 : 0 });
+    progress = feats.progress;
+    done = done.concat(feats.newRecords);
+  }
+  assert.deepEqual(done, ['combo', 'brave'], 'each record is announced once, when it is done');
+  const boss = recordPalFeats(progress, { difficulty: 'extra', stars: 3 });
+  assert.deepEqual(boss.newRecords, ['boss']);
+  assert.equal(palRecordsFor(boss.progress, 'ember').length, PAL_RECORDS.length);
+  assert.deepEqual(recordPalFeats({ ...createEmptyProgress() }, { difficulty: 'hard', stars: 3 }).newRecords, [], 'no partner, no records');
+});
+
 test('pals: starter choice, unlocks, growth and accessories', async () => {
   const { createEmptyProgress } = await import('./progress.js');
   const pals = await import('./pals.js');
