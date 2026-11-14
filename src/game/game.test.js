@@ -670,3 +670,11 @@ test('weekly theme collections: one theme a week, prices match the server, buyin
   assert.throws(() => pals.buyAccessoryLocally(base, 'leafCrown'), /not in the shop/, 'theme items never go through the regular sparks shop');
   assert.equal(pals.accessoryById('leafCrown').slot, 'head');
 });
+
+test('combos cheer when one tap lights several gems', async () => {
+  const { comboFor } = await import('./combos.js');
+  assert.equal(comboFor(1), null);
+  assert.equal(comboFor(2).word, 'Double!');
+  assert.equal(comboFor(3).word, 'Triple!');
+  assert.equal(comboFor(5).word, 'MEGA!');
+});

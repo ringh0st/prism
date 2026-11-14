@@ -74,6 +74,7 @@
 }
 
 .boardArea {
+  position: relative;
   flex: 1;
   display: grid;
   align-items: center;

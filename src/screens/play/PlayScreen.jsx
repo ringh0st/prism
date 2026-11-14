@@ -33,6 +33,8 @@ import { DIFFICULTY, TILE } from '../../game/constants.js';
 import { firstTileOf, newPiecesIn, piecesMetIn } from '../../game/pieces.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import { EVENT_LEVELS, parseEventLevelId } from '../../game/events.js';
+import ComboBurst from './ComboBurst.jsx';
+import { comboFor } from '../../game/combos.js';
 import styles from './PlayScreen.module.css';
 
 const WIN_DIALOG_DELAY_MS = 900;
@@ -68,6 +70,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const lastShadeCount = useRef(0);
   const hasRecordedWin = useRef(false);
   const boardAreaRef = useRef(null);
+  const [combo, setCombo] = useState(null);
 
   const modifier = useMemo(() => levelModifierFor(level), [level]);
   const moveLimit = moveLimitFor(level.par, level.difficulty);
@@ -127,8 +130,15 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       return;
     }
     if (litCount > lastLitCount.current) {
-      sfx.gemLit(litCount);
-      say('excited', litCount < gems.length ? 'gem' : null);
+      // Several gems from one tap: a combo!
+      const combo = comboFor(litCount - lastLitCount.current);
+      if (combo) {
+        setCombo({ ...combo, key: Date.now() });
+        sfx.combo(combo.size);
+      } else {
+        sfx.gemLit(litCount);
+      }
+      say('excited', litCount < gems.length ? (combo ? 'combo' : 'gem') : null);
     } else if (shadeCount > lastShadeCount.current) {
       sfx.shade();
       say('worried', 'shade');
@@ -337,6 +347,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       </section>
 
       <div className={styles.boardArea} ref={boardAreaRef}>
+        {combo && <ComboBurst combo={combo} />}
         <Board
           level={level}
           orients={puzzle.orients}

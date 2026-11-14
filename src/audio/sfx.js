@@ -135,6 +135,13 @@ export const sfx = {
     play(voiceNote(count + 1), { volume: 0.11, duration: 0.5 });
     feel('light');
   },
+  /** One tap lit several gems: a rising run of chimes that grows with the combo. */
+  combo(size) {
+    const run = [3, 5, 7, 8, 10].slice(0, Math.min(5, size + 1));
+    run.forEach((step, i) => play(voiceNote(step), { delay: i * 0.06, volume: 0.1, duration: 0.45 }));
+    tone(note(8), note(10) * 1.02, 0.3, { volume: 0.04, delay: run.length * 0.06 });
+    feel(size >= 4 ? 'celebrate' : 'success');
+  },
   /** The beam hits a shadow crystal: a soft "hmm", not an error buzz. */
   shade() {
     tone(392, 330, 0.22, { volume: 0.07 });
