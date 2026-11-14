@@ -1,286 +1,66 @@
 /*
- * A collectible Pal card.
- * Age  → the card's fill (--card-fill), its ink color (--card-ink), corner decor and rays behind the Pal.
- * Rarity → the frame and the corner tab (★ Legendary, ✦ Mythic), plus twinkles on Mythic cards.
- * Colors mix with the page surface, so the same rules work in light and dark mode.
+ * A Pal card: one layout for every Pal.
+ * Rarity → the ribbon under the Pal and the frame (plain, gold or sunset).
+ * Age    → the five growth icons and the age's name under the Pal's name.
  */
 .card {
-  --card-fill: var(--surface-tonal);
-  --card-ink: var(--text-soft);
-  --card-ledge: color-mix(in srgb, var(--card-fill) 78%, var(--text-strong));
-  --frame: transparent;
+  --frame: color-mix(in srgb, var(--text-strong) 10%, var(--surface-raised));
+  --ledge: color-mix(in srgb, var(--frame) 70%, var(--text-strong));
 
   position: relative;
   display: grid;
   justify-items: center;
   align-content: start;
-  gap: 3px;
+  gap: 4px;
   padding: var(--space-3) 6px var(--space-3);
   border: 4px solid var(--frame);
   border-radius: var(--radius-lg);
   text-align: center;
-  background: var(--card-fill);
+  background: var(--surface-raised);
   box-shadow:
-    0 4px 0 var(--card-ledge),
+    0 4px 0 var(--ledge),
     var(--shadow-sm);
   isolation: isolate;
 }
 
-/* ---------- Age: the fill grows richer, Baby → Legend ---------- */
-.unowned {
-  --card-fill: var(--surface-tonal);
+.legendary {
+  --frame: #f0c14e;
+  --ledge: #c99a2e;
 }
 
-.baby {
-  --card-fill: color-mix(in srgb, var(--color-mint) 12%, var(--surface-raised));
-  --card-ink: color-mix(in srgb, var(--color-mint) 42%, var(--text-strong));
+.mythic {
+  --ledge: #b85a40;
+  border-color: transparent;
+  background:
+    linear-gradient(var(--surface-raised), var(--surface-raised)) padding-box,
+    linear-gradient(135deg, #df7458, #f0c14e 34%, #f2a67e 62%, #df7458) border-box;
 }
 
-.junior {
-  --card-fill: color-mix(in srgb, var(--color-sage) 38%, var(--surface-raised));
-  --card-ink: color-mix(in srgb, var(--color-sage) 34%, var(--text-strong));
-}
-
-.buddy {
-  --card-fill: color-mix(in srgb, var(--color-honey) 34%, var(--surface-raised));
-  --card-ink: color-mix(in srgb, #b0841c 50%, var(--text-strong));
-}
-
-.champ {
-  --card-fill: color-mix(in srgb, var(--color-peach) 40%, var(--surface-raised));
-  --card-ink: color-mix(in srgb, var(--color-terracotta) 48%, var(--text-strong));
-}
-
-/* A Legend gets a dark, golden card in both themes */
-.legend {
-  --card-fill: #33291e;
-  --card-ink: #f0c14e;
-  --card-ledge: #1c1610;
-}
-
-.legend .name {
-  color: #fff1c2;
-}
-
-/* Little dots from Buddy up */
-.buddy::before,
-.champ::before {
-  content: '';
+/* Mythic cards twinkle softly */
+.sparkles {
   position: absolute;
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background-image: radial-gradient(circle, var(--card-ink) 1.1px, transparent 1.5px);
-  background-size: 13px 13px;
-  opacity: 0.13;
-}
-
-/* ---------- Rarity: frame and corner tab ---------- */
-.legendary {
-  --frame: #f0c14e;
-  --card-ledge: #c99a2e;
-}
-
-.mythic {
-  --card-ledge: #b85a40;
-  border-color: transparent;
   background:
-    linear-gradient(var(--card-fill), var(--card-fill)) padding-box,
-    linear-gradient(135deg, #df7458, #f0c14e 34%, #f2a67e 62%, #df7458) border-box;
-}
-
-.tab {
-  position: absolute;
-  top: -4px;
-  left: -4px;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-lg) 0 14px 0;
-  font-size: 17px;
-  line-height: 1;
-  z-index: 2;
-}
-
-.legendary .tab {
-  color: #4a3510;
-  background: #f0c14e;
-}
-
-.mythic .tab {
-  color: #2b1a12;
-  background: #df7458;
-}
-
-/* The rarity ribbon across the card, like a trading card's banner */
-.ribbon {
-  position: relative;
-  justify-self: stretch;
-  text-align: center;
-  z-index: 1;
-  margin: -6px -10px 2px;
-  padding: 3px 14px 4px;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 50%, 100% 100%, 0 100%, 7px 50%);
-}
-
-.legendary .ribbon {
-  color: #4a3510;
-  background: linear-gradient(#f6d375, #f0c14e 60%, #e0ac36);
-}
-
-.mythic .ribbon {
-  color: #2b1a12;
-  background: linear-gradient(90deg, #e98a68, #f0b15a 50%, #e98a68);
-}
-
-/* Special cards catch the light: a soft shine sweeps across now and then */
-.shine {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  overflow: hidden;
-  border-radius: calc(var(--radius-lg) - 4px);
-  pointer-events: none;
-}
-
-.shine::after {
-  content: '';
-  position: absolute;
-  top: -20%;
-  bottom: -20%;
-  left: 0;
-  width: 20%;
-  background: linear-gradient(100deg, transparent, rgb(255 250 235 / 0.28) 40%, rgb(255 250 235 / 0.4) 50%, rgb(255 250 235 / 0.28) 60%, transparent);
-  transform: translateX(-140%) skewX(-12deg);
-  animation: shine 5.5s ease-in-out infinite;
-}
-
-.mythic .shine::after {
-  animation-delay: -2.4s;
-}
-
-@keyframes shine {
-  0%,
-  62% {
-    transform: translateX(-140%) skewX(-12deg);
-  }
-  90%,
-  100% {
-    transform: translateX(600%) skewX(-12deg);
-  }
-}
-
-/* Mythic cards twinkle */
-.sparkle {
-  position: absolute;
-  z-index: -1;
-  font-size: 11px;
-  color: #e8955f;
-  animation: twinkle 2.6s ease-in-out infinite;
-}
-
-.legend .sparkle {
-  color: #f0c14e;
-}
-
-.sparkle:nth-of-type(1) {
-  top: 14%;
-  right: 12%;
-}
-
-.sparkle:nth-of-type(2) {
-  top: 44%;
-  left: 8%;
-  font-size: 9px;
-  animation-delay: -0.8s;
-}
-
-.sparkle:nth-of-type(3) {
-  top: 38%;
-  right: 9%;
-  font-size: 13px;
-  animation-delay: -1.6s;
-}
-
-.sparkle:nth-of-type(4) {
-  top: 8%;
-  left: 36%;
-  font-size: 8px;
-  animation-delay: -2.1s;
-}
-
-.sparkle:nth-of-type(5) {
-  top: 60%;
-  right: 22%;
-  font-size: 8px;
-  animation-delay: -1.2s;
+    radial-gradient(circle, #e8955f 1.4px, transparent 2px) 18% 14% / 100% 100% no-repeat,
+    radial-gradient(circle, #f0c14e 1.6px, transparent 2.2px) 84% 22% / 100% 100% no-repeat,
+    radial-gradient(circle, #e8955f 1.2px, transparent 1.8px) 12% 52% / 100% 100% no-repeat,
+    radial-gradient(circle, #f0c14e 1.4px, transparent 2px) 88% 48% / 100% 100% no-repeat;
+  animation: twinkle 2.8s ease-in-out infinite;
 }
 
 @keyframes twinkle {
-  0%,
-  100% {
-    opacity: 0.25;
-    transform: scale(0.7) rotate(0);
-  }
   50% {
-    opacity: 1;
-    transform: scale(1.15) rotate(45deg);
+    opacity: 0.3;
   }
 }
 
-/* ---------- Partner ribbon ---------- */
-.partner {
-  position: absolute;
-  top: -11px;
-  left: 50%;
-  z-index: 2;
-  padding: 2px 9px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 11.5px;
-  white-space: nowrap;
-  color: var(--action-label);
-  background: var(--action-bottom);
-  box-shadow: 0 2px 0 color-mix(in srgb, var(--action-bottom) 70%, #000);
-  transform: translateX(-50%);
-}
-
-/* ---------- The Pal, on a little stage of light rays (Champ and Legend) ---------- */
+/* ---------- The Pal ---------- */
 .stageArt {
-  position: relative;
   display: grid;
   place-items: center;
-}
-
-.champ .stageArt::before,
-.legend .stageArt::before {
-  content: '';
-  position: absolute;
-  inset: -10px;
-  z-index: -1;
-  border-radius: 50%;
-  background: repeating-conic-gradient(var(--card-ink) 0 7deg, transparent 7deg 30deg);
-  mask: radial-gradient(circle, #000 20%, transparent 70%);
-  opacity: 0.2;
-  animation: rays 40s linear infinite;
-}
-
-.legend .stageArt::before {
-  opacity: 0.35;
-}
-
-@keyframes rays {
-  to {
-    transform: rotate(1turn);
-  }
+  width: min(100%, 124px);
 }
 
 .look {
@@ -301,10 +81,6 @@
   transform: scale(0.92);
 }
 
-.stageArt {
-  width: min(100%, 128px);
-}
-
 .art {
   display: block;
   width: 100%;
@@ -315,8 +91,31 @@
   filter: brightness(0) opacity(0.18);
 }
 
-.legend.locked .art {
-  filter: brightness(0) invert(1) opacity(0.2);
+/* ---------- Rarity ribbon: always in the same place ---------- */
+.ribbon {
+  justify-self: stretch;
+  margin: -6px -10px 2px;
+  padding: 3px 12px 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-align: center;
+  color: var(--text-soft);
+  background: var(--surface-sunken);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 50%, 100% 100%, 0 100%, 7px 50%);
+}
+
+.legendary .ribbon {
+  color: #4a3510;
+  background: #f0c14e;
+}
+
+.mythic .ribbon {
+  color: #2b1a12;
+  background: linear-gradient(90deg, #e98a68, #f0b15a 50%, #e98a68);
 }
 
 .name {
@@ -324,12 +123,11 @@
   line-height: 1.15;
 }
 
-/* ---------- Form: five icons and the form's name ---------- */
+/* ---------- Age: five growth icons and the age's name ---------- */
 .form {
   display: grid;
   justify-items: center;
   gap: 1px;
-  margin-bottom: 2px;
 }
 
 .pips {
@@ -339,13 +137,14 @@
 
 .pip,
 .pipOn {
-  width: 13px;
-  height: 13px;
-  fill: var(--card-ink);
+  width: 14px;
+  height: 14px;
+  fill: var(--color-sage);
 }
 
 .pip {
-  opacity: 0.22;
+  fill: var(--text-soft);
+  opacity: 0.25;
 }
 
 .formName {
@@ -353,60 +152,33 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--card-ink);
+  color: var(--text-soft);
 }
 
-/* ---------- Corner decor ---------- */
-.ornament {
+/* ---------- Partner ribbon ---------- */
+.partner {
   position: absolute;
-  z-index: -1;
-  width: 24px;
-  height: 24px;
-  fill: var(--card-ink);
-  opacity: 0.35;
-}
-
-.legend .ornament {
-  opacity: 0.9;
-}
-
-.topRight {
-  top: 5px;
-  right: 5px;
-}
-
-.topLeft {
-  top: 5px;
-  left: 5px;
-  transform: rotate(-90deg);
-}
-
-.junior .topRight,
-.buddy .topRight,
-.champ .topRight {
-  transform: scaleX(-1);
-}
-
-.junior .topLeft,
-.buddy .topLeft,
-.champ .topLeft {
-  transform: none;
+  top: -12px;
+  left: 50%;
+  z-index: 2;
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11.5px;
+  white-space: nowrap;
+  color: var(--action-label);
+  background: var(--action-bottom);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--action-bottom) 70%, #000);
+  transform: translateX(-50%);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sparkle,
-  .shine::after,
-  .stageArt::before {
-    animation: none !important;
+  .sparkles {
+    animation: none;
   }
 
   .look {
     transition: none;
   }
-}
-
-/* A Legend card's button is golden, so it stands out on the dark card in both themes */
-.legend > button {
-  color: #2b2118;
-  background: #f0c14e;
 }
