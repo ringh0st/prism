@@ -76,25 +76,26 @@
   gap: 2px;
   width: 100%;
   margin-top: 4px;
-  padding-top: var(--space-2);
+  padding-block: var(--space-2);
   border-radius: var(--radius-md) var(--radius-md) 0 0;
   box-shadow: var(--shadow-md);
 }
 
 .first .step {
-  height: 132px;
+  min-height: 140px;
   color: var(--reward-label);
   background: var(--reward-bottom);
 }
 
 .second .step {
-  height: 100px;
+  min-height: 116px;
   color: #2f2a22;
   background: #d6cfc2;
 }
 
 .third .step {
-  height: 78px;
+  min-height: 100px;
+  padding-bottom: var(--space-2);
   color: var(--warm-label);
   background: var(--warm-bottom);
 }

@@ -490,7 +490,7 @@ export const he = {
   'ui.error.noHelper': 'אין לכם את כלי העזר הזה.',
   'ui.error.palLocked': 'החבר הזה עוד לא נפתח.',
   'ui.error.palNotToday': 'החבר הזה לא בחנות שלכם היום. מחר יש בחירה חדשה!',
-  'ui.error.palOnTeam': 'החבר הזה כבר בצוות שלכם.',
+  'ui.error.palOnTeam': 'החבר הזה כבר בחבורה שלכם.',
   'ui.error.noLuckyPal': 'מתנת חבר המזל עוד לא מוכנה.',
   'ui.error.giftUnavailable': 'המתנה הזאת לא זמינה.',
   'ui.error.checkout': 'התשלום לא זמין כרגע. נסו שוב מאוחר יותר.',

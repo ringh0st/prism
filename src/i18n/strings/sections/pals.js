@@ -377,7 +377,7 @@ export const he = {
   'records.grown.how.one': 'לגדול עד מאסטר',
   'records.grown.how.other': 'לגדול עד מאסטר',
   'pals.title': 'החברים שלי',
-  'pals.tab.team': 'צוות',
+  'pals.tab.team': 'החבורה',
   'pals.tab.wardrobe': 'ארון',
   'pals.tab.grove': 'החורשה',
   'pals.tab.quests': 'משימות',
@@ -394,9 +394,9 @@ export const he = {
   'pals.unlock.worlds.other': 'סיימו {count} עולמות',
   'pals.unlock.streak': 'הגיעו לרצף של {streak} ימים',
 
-  'pals.team.label': 'הצוות שלכם',
+  'pals.team.label': 'החבורה שלכם',
   'pals.team.partnerUp': 'בחרו כשותף',
-  'pals.team.add': 'הוסיפו לצוות',
+  'pals.team.add': 'הוסיפו לחבורה',
   'pals.team.choose': 'בחירה',
   'pals.switch.title': 'לשחק עם',
 
@@ -427,7 +427,7 @@ export const he = {
 
   'pals.detail.isNow': '{name} הוא עכשיו {stage}.',
   'pals.detail.was': '{name} היה {stage}.',
-  'pals.detail.addToWatch': 'הוסיפו את {name} לצוות כדי לראות אותו גדל.',
+  'pals.detail.addToWatch': 'הוסיפו את {name} לחבורה כדי לראות אותו גדל.',
   'pals.detail.growInto.one': 'עוד שלב אחד כשותף שלכם כדי להפוך ל{stage}.',
   'pals.detail.growInto.other': 'עוד {count} שלבים כשותף שלכם כדי להפוך ל{stage}.',
   'pals.detail.growIntoMystery.one': 'עוד שלב אחד כשותף שלכם כדי להפוך לצורה המסתורית הזאת.',
@@ -469,7 +469,7 @@ export const he = {
   'pals.lucky.yay': 'יש!',
 
   'pals.unlocked.title': 'חבר חדש נפתח!',
-  'pals.unlocked.wants': 'רוצה להצטרף לצוות שלכם.',
+  'pals.unlocked.wants': 'רוצה להצטרף לחבורה שלכם!',
   'pals.unlocked.meet': 'הכירו את {name}',
 
   'pals.garden.title': 'גינת חרקיקי האור',

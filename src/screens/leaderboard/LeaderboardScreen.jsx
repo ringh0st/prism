@@ -97,12 +97,15 @@ export default function LeaderboardScreen() {
                 palId={partner.id}
                 stage={stageOf(progress.pal.owned[partner.id])}
                 wearing={progress.pal.wearing}
-                size={48}
+                size={40}
                 portrait
                 className={styles.playingArt}
               />
+              <span className={`game-title ${styles.playingName}`} aria-hidden="true">
+                {t(`palName.${partner.id}`, {}, partner.name)}
+              </span>
               <span className={styles.swap} aria-hidden="true">
-                <Icon name="restart" size={16} strokeWidth={2.6} />
+                <Icon name="restart" size={14} strokeWidth={2.6} />
               </span>
             </a>
           )}

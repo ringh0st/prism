@@ -101,7 +101,7 @@ export default function PlayerCard() {
           >
             <span className={styles.fill} style={{ width: `${Math.round(playerLevel.progress * 100)}%` }} />
             <span className={styles.trackText} aria-hidden="true">
-              {stars}/{playerLevel.to}
+              {stars - playerLevel.from}/{playerLevel.to - playerLevel.from}
             </span>
           </div>
           <span className={`game-title ${styles.nextGlow}`} aria-hidden="true">

@@ -140,13 +140,22 @@
 }
 
 .playingWith {
-  position: relative;
-  display: grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin-bottom: var(--space-2);
-  border-radius: 50%;
+  padding: 3px;
+  padding-inline-end: 6px;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  color: var(--text-strong);
+  background: var(--surface-raised);
   box-shadow: var(--shadow-md);
   transition: transform 160ms var(--ease-out);
+}
+
+.playingName {
+  font-size: 16px;
 }
 
 .playingWith:active {
@@ -159,9 +168,6 @@
 }
 
 .swap {
-  position: absolute;
-  inset-block-end: -4px;
-  inset-inline-end: -6px;
   display: grid;
   place-items: center;
   width: 26px;
@@ -169,7 +175,6 @@
   border-radius: 50%;
   color: var(--action-label);
   background: var(--action-bottom);
-  box-shadow: 0 0 0 2px var(--surface-raised);
 }
 
 .join {
