@@ -16,7 +16,8 @@ export const RECIPES = {
 };
 
 // Index 1–20 in each world; null keeps the world's usual level (tutorials, piece introductions, bosses).
-// One tap wonders never land on Hard levels (5, 10, 15).
+// Each world runs in 5-level arcs: build up to a Hard level (5, 10, 15), then a breather (6, 11, 16:
+// a quick one tap wonder or tiny board) before the next arc. One tap wonders never land on Hard levels.
 const SEQUENCES = {
   1: [
     null,
@@ -32,9 +33,9 @@ const SEQUENCES = {
     'oneTap',
     'lightShow',
     'longRoad',
-    'tiny',
-    'wallMaze',
     'twoLamps',
+    'wallMaze',
+    'tiny',
     'oneTap',
     'longRoad',
     'lightShow',
@@ -51,12 +52,12 @@ const SEQUENCES = {
     'gemShower',
     'wallMaze',
     'lightShow',
-    'twoLamps',
+    'oneTap',
     'longRoad',
-    'tiny',
+    'twoLamps',
     'gemShower',
     'wallMaze',
-    'oneTap',
+    'tiny',
     'lightShow',
     'gemShower',
     'longRoad',
@@ -73,18 +74,21 @@ const SEQUENCES = {
     'oneTap',
     'wallMaze',
     'gemShower',
-    'rainbow',
+    'oneTap',
     'longRoad',
-    'tiny',
+    'rainbow',
     'twoLamps',
     'wallMaze',
-    'oneTap',
+    'tiny',
     'rainbow',
     'lightShow',
     'longRoad',
     null,
   ],
 };
+
+/** Quick, easy flavors: the breather right after each Hard level (6, 11 and 16). */
+export const REST_RECIPES = ['oneTap', 'tiny'];
 
 /** The flavor of a built-in level (an id from RECIPES), or null for a plain one. */
 export const recipeFor = (world, index) => SEQUENCES[world]?.[index - 1] ?? null;

@@ -30,6 +30,7 @@ const COACH_LABELS = { [TILE.EMITTER]: 'Lamp', [TILE.GEM]: 'Gem' };
  * @param turnsLeft    turns each cracking mirror has left (a cracked one can't turn)
  * @param revealedCells cells the light has reached (fog lifts there); null shows everything (editor)
  * @param glowbug      { id, cell, isAwake, isFreed }: a Glowbug sleeping on a cell (it wakes in the light)
+ * @param lookHere     Set of cells to softly glow: the free "look around here" step of the hint ladder
  * @param coach        first-levels coaching: { tile: tile index the hand points at, or null; labels: show Lamp/Gem tags }
  */
 export default function Board({
@@ -49,6 +50,7 @@ export default function Board({
   revealedCells = null,
   glowbug = null,
   coach = null,
+  lookHere = null,
 }) {
   const { width, height, tiles } = level;
   const [focusedCell, setFocusedCell] = useState(0);
@@ -139,7 +141,7 @@ export default function Board({
                       highlightTile === tileIndex && tileIndex >= 0 ? styles.hint : ''
                     } ${
                       spotlightTile === tileIndex && tileIndex >= 0 ? styles.spotlight : ''
-                    } ${coach?.tile === tileIndex && tileIndex >= 0 ? styles.coached : ''} ${tile?.type === TILE.SHADE && isLit ? styles.shake : ''}`}
+                    } ${coach?.tile === tileIndex && tileIndex >= 0 ? styles.coached : ''} ${lookHere?.has(cell) ? styles.lookHere : ''} ${tile?.type === TILE.SHADE && isLit ? styles.shake : ''}`}
                     tabIndex={cell === focusedCell ? 0 : -1}
                     aria-label={`${description}${glowbug?.cell === cell ? `. ${glowbugById(glowbug.id).name} the Glowbug is ${glowbug.isAwake ? 'awake' : 'asleep'} here` : ''}. Row ${row + 1}, column ${col + 1}`}
                     aria-disabled={!isActionable || undefined}

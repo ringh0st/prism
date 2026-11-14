@@ -64,8 +64,8 @@ const SLIDES = [
 ];
 
 /**
- * First launch: what the game is, in four picture slides (Next, Next, Let's play!). No reading needed:
- * each slide is a tiny demo that plays itself. Skippable; shown once.
+ * How to play, in four picture slides (Next, Next, Let's play!), opened from the Me screen. No reading
+ * needed: each slide is a tiny demo that plays itself.
  */
 export default function WelcomeTour({ onDone }) {
   const [index, setIndex] = useState(0);
@@ -96,7 +96,7 @@ export default function WelcomeTour({ onDone }) {
     <div className={styles.tour} role="dialog" aria-modal="true" aria-labelledby="welcome-title" tabIndex={-1} ref={tourRef}>
       <TileDefs />
       <button type="button" className={styles.skip} onClick={onDone}>
-        Skip
+        Close
       </button>
       <div className={styles.slide} key={index}>
         <div className={styles.demo}>{slide.demo}</div>
@@ -111,7 +111,7 @@ export default function WelcomeTour({ onDone }) {
           ))}
         </span>
         <Button size="lg" icon="play" onClick={isLast ? onDone : () => setIndex(index + 1)}>
-          {isLast ? 'Let’s play!' : 'Next'}
+          {isLast ? 'Got it!' : 'Next'}
         </Button>
       </div>
     </div>

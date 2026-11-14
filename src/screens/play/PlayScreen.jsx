@@ -12,6 +12,8 @@ import QuickBuyDialog from '../../components/QuickBuyDialog.jsx';
 import StarMeter from './StarMeter.jsx';
 import LevelIntro from './LevelIntro.jsx';
 import ChallengeResultDialog from './ChallengeResultDialog.jsx';
+import FriendFoundDialog from '../pals/FriendFoundDialog.jsx';
+import { isFriendDue } from '../../game/firstFriend.js';
 import RushClearedDialog from '../rush/RushClearedDialog.jsx';
 import RushOverDialog from '../rush/RushOverDialog.jsx';
 import { RUSH_LENGTH, rushMoveLimit } from '../../game/rush.js';
@@ -71,6 +73,14 @@ function seenPieces(progress) {
 }
 
 /** The first three levels teach on the board itself (a pointing hand, Lamp/Gem tags) and hide the extras. */
+/** The 3×3 area around a tile (clipped to the board), as cell indexes: where to look, not which piece. */
+function lookHereCells(tile, width, height) {
+  const cells = new Set();
+  for (let y = Math.max(0, tile.y - 1); y <= Math.min(height - 1, tile.y + 1); y++)
+    for (let x = Math.max(0, tile.x - 1); x <= Math.min(width - 1, tile.x + 1); x++) cells.add(y * width + x);
+  return cells;
+}
+
 const isFirstStepsLevel = (level, mode) => mode === 'level' && level.world === 1 && level.index <= 3;
 
 /** New-piece cards to show; the basics are taught on the board in the first levels instead. */
@@ -90,7 +100,7 @@ const COACH_LINES = {
  * | 'rush' (Light Rush: no helpers, the run's spare moves set the limit; `rush` is from RushRoute)
  */
 export default function PlayScreen({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey, challenge = null, rush = null }) {
-  const { progress, finishLevel, finishDaily, finishEventLevel, consumeHelper } = usePlayer();
+  const { progress, settings, finishLevel, finishDaily, finishEventLevel, consumeHelper } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
   const { trace, moves } = puzzle;
@@ -118,6 +128,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const [isOutOfMoves, setIsOutOfMoves] = useState(false);
   // Early worlds forgive running out: "Keep going" adds moves, for 1 star at most.
   const [bonusMoves, setBonusMoves] = useState(0);
+  const [isMeetingFriend, setIsMeetingFriend] = useState(false);
   const [rushOver, setRushOver] = useState(null);
   const [showIntro, setShowIntro] = useState(true);
   // Pieces this player meets for the first time get a "New piece!" card before the level starts.
@@ -202,8 +213,15 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const [isNudgingHint, setIsNudgingHint] = useState(false);
   const isTouring = tour.steps.length > 0;
   const canSuggestHint = !isFirstSteps && offeredHelpers.includes('hint') && puzzle.usedHelpers.length < helpersAllowed;
+  // The hint ladder's free first step: a soft glow on the area to look at (Hint then marks the mirror,
+  // Auto-turn turns it), so the "aha" is still the player's.
+  const [lookHere, setLookHere] = useState(null);
   const suggestHint = () => {
-    setLumi({ mood: 'happy', line: 'Stuck? Tap Hint and I’ll show you a mirror!' });
+    const tileIndex = findHint(level, puzzle.orients);
+    const tile = tileIndex === null ? null : level.tiles[tileIndex];
+    setLookHere(tile ? lookHereCells(tile, level.width, level.height) : null);
+    setLumi({ mood: 'happy', line: tile ? 'Psst… look around the glowing spot. Still stuck? Tap Hint!' : 'Stuck? Tap Hint!' });
+    sfx.lumiTalk();
     setIsNudgingHint(true);
   };
   // Many taps without lighting anything new also counts as stuck.
@@ -212,6 +230,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     if (trace.litGems.size > lastLitCount.current || moves === 0) {
       lastGemMove.current = moves;
       setIsNudgingHint(false);
+      setLookHere(null);
     }
     if (!isOver && canSuggestHint && moves - lastGemMove.current >= STUCK_AFTER_MOVES && !isNudgingHint) suggestHint();
   }, [moves]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -260,7 +279,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
   // First levels: Lumi explains what just happened after the first tap.
   useEffect(() => {
-    if (isFirstSteps && moves === 1 && !trace.isSolved) setLumi({ mood: 'excited', line: COACH_LINES.firstMove });
+    if (isFirstSteps && moves === 1 && !trace.isSolved) {
+      setLumi({ mood: 'excited', line: COACH_LINES.firstMove });
+      sfx.lumiTalk();
+    }
   }, [moves]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /** Record the result (server-checked when signed in) and celebrate. */
@@ -515,8 +537,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       // The basics are taught right here on the board, so they count as met.
       writeJson(SEEN_PIECES_KEY, [...new Set([...seenPieces(progress), 'basics'])]);
       setLumi({ mood: 'excited', line: COACH_LINES.start });
+      sfx.lumiTalk();
     } else if (flavor) {
       setLumi({ mood: 'happy', line: flavor.goal });
+      sfx.lumiTalk();
     }
   }, [playStats, isFirstSteps, flavor, progress, newPieces, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -527,7 +551,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   );
 
   return (
-    <main className={`${styles.screen} ${styles[modifier] ?? ''} ${world ? `${styles.themed} ${styles[world.theme]}` : ''}`}>
+    <main
+      className={`${styles.screen} ${settings.calmBoard ? styles.calm : ''} ${styles[modifier] ?? ''} ${world ? `${styles.themed} ${styles[world.theme]}` : ''}`}
+    >
       {world && <WorldBackdrop levelId={level.id} theme={world.theme} />}
       <header className={styles.header}>
         <Button as="a" href={backHref} variant="secondary" icon="back" label={`Back to ${backName}`} />
@@ -569,6 +595,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           spotlightTile={moves === 0 && spotlightTile >= 0 ? spotlightTile : null}
           ghostSegments={puzzle.ghostSegments}
           coach={isFirstSteps ? { tile: coachTile, labels: true } : null}
+          lookHere={isOver || puzzle.hintTile !== null ? null : lookHere}
           turnsLeft={puzzle.turnsLeft}
           revealedCells={puzzle.revealedCells}
           glowbug={
@@ -702,7 +729,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           onHome={() => navigate('#/')}
         />
       )}
-      {result && mode !== 'challenge' && mode !== 'rush' && (
+      {isMeetingFriend && <FriendFoundDialog onDone={() => (nextLevel ? navigate(nextLevel) : navigate(backHref))} />}
+      {result && mode !== 'challenge' && mode !== 'rush' && !isMeetingFriend && (
         <WinDialog
           challenge={mode === 'level' && !result.isSkipped && !isFirstSteps ? { levelId: level.id, levelLabel, moves: result.moves } : null}
           backName={backName}
@@ -724,9 +752,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
                 })
               : null
           }
-          // No partner yet (a new player's first win): meet the Pals on the map before going on.
-          nextLabel={mode === 'level' && !progress.pal.id ? 'Meet your Pal friend' : 'Next level'}
-          onNext={() => (mode === 'level' && !progress.pal.id ? navigate('#/') : nextLevel && navigate(nextLevel))}
+          // A few wins in, a first Pal turns up as a surprise before the next level.
+          onNext={() => (mode === 'level' && isFriendDue(progress) ? setIsMeetingFriend(true) : nextLevel && navigate(nextLevel))}
           onReplay={restart}
           onMap={() => navigate(backHref)}
         />

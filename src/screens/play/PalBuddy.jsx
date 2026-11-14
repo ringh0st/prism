@@ -19,6 +19,7 @@ export default function PalBuddy({ reaction }) {
   const shown = poke && (!reaction || poke.key > reaction.key) ? poke : reaction;
   return (
     <button
+      data-scenery
       type="button"
       className={styles.buddy}
       onClick={() => {

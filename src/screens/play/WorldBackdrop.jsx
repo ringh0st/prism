@@ -32,7 +32,7 @@ function WorldBackdrop({ levelId, theme }) {
   }, [levelId, theme]);
 
   return (
-    <div className={styles.backdrop} aria-hidden="true">
+    <div className={styles.backdrop} aria-hidden="true" data-scenery>
       <svg className={styles.hills} viewBox="0 0 400 120" preserveAspectRatio="none">
         <path className={styles.far} d="M0 60C60 30 130 40 200 55S330 30 400 45V120H0z" />
         <path className={styles.near} d="M0 90C80 70 160 80 240 92S350 75 400 85V120H0z" />

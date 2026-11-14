@@ -3,7 +3,7 @@ import { finishedWorldCount } from './titles.js';
 import { THEME_OUTFITS } from './themes.js';
 
 /**
- * Pals: profile characters. You pick one starter on your first game, then unlock the rest by playing.
+ * Pals: profile characters. A first one (a starter) turns up after a few solved levels, then you unlock the rest by playing.
  * Only the partner Pal grows: 20 solved levels per form. Must match supabase/pals.sql.
  *
  * unlock: what makes a Pal available (starters can also be picked as your very first Pal).

@@ -307,6 +307,23 @@
   pointer-events: none;
 }
 
+/* Hint ladder, step one: a soft honey wash over the area worth a look (no single piece is marked). */
+.lookHere::before {
+  content: '';
+  position: absolute;
+  inset: -2%;
+  border-radius: 22%;
+  background: rgb(240 193 78 / 0.32);
+  animation: lookHere 1.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes lookHere {
+  50% {
+    background: rgb(240 193 78 / 0.5);
+  }
+}
+
 /* First-levels coach: a honey ring, a hand pointing up at the tile to tap, and Lamp/Gem name tags. */
 .coached {
   z-index: 2;

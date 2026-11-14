@@ -185,6 +185,10 @@ export const sfx = {
     [5, 7, 9, 10].forEach((step) => bell(note(step), { delay: 0.55, volume: 0.07, duration: 1.4 }));
     feel('celebrate');
   },
+  /** Lumi says something that matters (an instruction or a nudge): a short, sing-song "voice". */
+  lumiTalk() {
+    [4, 6, 5, 7].forEach((step, i) => tone(note(step) * 0.98, note(step), 0.07, { type: 'triangle', volume: 0.035, delay: i * 0.075 }));
+  },
   /** The player reaches a new level: a quick climbing sparkle that lands on a bright chord. */
   levelUp() {
     [0, 2, 4, 5, 7].forEach((step, i) => bell(note(step), { delay: i * 0.05, volume: 0.06, duration: 0.35 }));

@@ -171,3 +171,10 @@
 .gold {
   --world-tint: #d9bb63;
 }
+
+/* Calm board (Settings): the scenery and the Pal stay still while the player thinks. */
+.calm [data-scenery],
+.calm [data-scenery] * {
+  animation: none !important;
+  transition: none !important;
+}

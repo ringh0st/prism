@@ -815,7 +815,7 @@ test('Light Rush milestones match the database', async () => {
 });
 
 test('worlds 1–3: every flavored level is built as its flavor, and no two in a row share one', async () => {
-  const { recipeFor } = await import('./recipes.js');
+  const { recipeFor, REST_RECIPES } = await import('./recipes.js');
   for (const world of [1, 2, 3]) {
     const levels = JSON.parse(readFileSync(new URL(`../data/worlds/world-00${world}.json`, import.meta.url), 'utf8'));
     levels.forEach((level, i) => {
@@ -825,8 +825,13 @@ test('worlds 1–3: every flavored level is built as its flavor, and no two in a
       if (level.recipe === 'oneTap') assert.equal(level.par, 1, level.id);
       if (level.recipe === 'twoLamps') assert.equal(lamps, 2, level.id);
       if (level.recipe === 'lightShow') assert.equal(lamps, 3, level.id);
-      if (level.recipe === 'rainbow') assert.ok(level.tiles.some((t) => t.type === 'filter'), level.id);
+      if (level.recipe === 'rainbow')
+        assert.ok(
+          level.tiles.some((t) => t.type === 'filter'),
+          level.id,
+        );
       if (level.recipe === 'oneTap') assert.notEqual(level.difficulty, 'hard', level.id);
+      if ([6, 11, 16].includes(level.index) && level.recipe) assert.ok(REST_RECIPES.includes(level.recipe), `${level.id} should be a breather`);
     });
   }
 });

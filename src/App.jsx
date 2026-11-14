@@ -20,8 +20,9 @@ import GlowbugGarden from './screens/glowbugs/GlowbugGarden.jsx';
 import StickerAlbum from './screens/stickers/StickerAlbum.jsx';
 import EventLevelRoute from './screens/event/EventLevelRoute.jsx';
 import WeeklyRewardDialog from './screens/leaderboard/WeeklyRewardDialog.jsx';
-import StarterPicker from './screens/pals/StarterPicker.jsx';
-import WelcomeNotice from './screens/welcome/WelcomeNotice.jsx';
+import FriendFoundDialog from './screens/pals/FriendFoundDialog.jsx';
+import { isFriendDue } from './game/firstFriend.js';
+import FirstLaunch from './screens/welcome/FirstLaunch.jsx';
 import PalUnlockNotice from './screens/pals/PalUnlockNotice.jsx';
 import LuckyPalDialog from './screens/pals/LuckyPalDialog.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
@@ -51,7 +52,7 @@ function WeeklyRewardNotice() {
   return weeklyReward ? <WeeklyRewardDialog reward={weeklyReward} onClose={dismissWeeklyReward} /> : null;
 }
 
-/** After the first win: pick a starter Pal. Later: celebrate newly unlocked Pals. Only on menu screens, never mid-level. */
+/** A first Pal turns up after a few wins; later, newly unlocked Pals are celebrated. Only on menu screens, never mid-level. */
 const PAL_NOTICE_ROUTES = ['map', 'pals', 'settings', 'store', 'top'];
 
 function PalNotices() {
@@ -59,11 +60,9 @@ function PalNotices() {
   const route = useHashRoute();
   const [isSkipped, setIsSkipped] = useState(false);
   if (!PAL_NOTICE_ROUTES.includes(route.name)) return null;
-  // The partner is picked after the first solved level, once new players know what the game is.
-  if (!progress.pal.id) {
-    const hasSolvedOne = Object.values(progress.levels).some((entry) => entry.stars > 0);
-    return isSkipped || !hasSolvedOne ? null : <StarterPicker onSkip={() => setIsSkipped(true)} />;
-  }
+  // The first Pal turns up as a reward after a few solved levels (usually on the win screen; this
+  // catches players who went back to the map instead).
+  if (!progress.pal.id) return isFriendDue(progress) && !isSkipped ? <FriendFoundDialog onDone={() => setIsSkipped(true)} /> : null;
   return (
     <>
       <PalUnlockNotice />
@@ -163,7 +162,7 @@ export default function App() {
             <>
               <WeeklyRewardNotice />
               <PalNotices />
-              {route.name === 'map' && <WelcomeNotice />}
+              {route.name === 'map' && <FirstLaunch />}
             </>
           )}
         </LevelsProvider>

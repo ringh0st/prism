@@ -11,7 +11,9 @@ import { fileURLToPath } from 'node:url';
 import { generateLevel } from '../src/game/generator.js';
 import { analyzeLevel } from '../src/game/solver.js';
 import { validateLevel } from '../src/game/levelSchema.js';
-import { piecesIn } from '../src/game/pieces.js';
+import { PIECE_FIRST_LEVEL, piecesIn } from '../src/game/pieces.js';
+import { MAX_RANDOM_SOLVE_RATE, randomSolveRate } from '../src/game/levelQuality.js';
+import { REST_RECIPES } from '../src/game/recipes.js';
 import { difficultyFor, generatorPresetFor, levelId, LEVELS_PER_WORLD, WORLD_COUNT } from '../src/game/worlds.js';
 import { createRandom } from '../src/lib/random.js';
 import { LEVEL_SCHEMA_VERSION } from '../src/game/constants.js';
@@ -31,9 +33,22 @@ function simplifications(preset) {
   ];
 }
 
+/** Tutorials, piece introductions and quick "rest" flavors may be easy; everything else needs a catch. */
+const needsCatchFor = (world, index, preset) =>
+  world <= CATCH_WORLDS &&
+  !(world === 1 && index <= 3) &&
+  !INTRO_LEVELS.has(levelId(world, index)) &&
+  !REST_RECIPES.includes(preset.recipe);
+/** Levels that teach a new piece stay gentle. */
+const INTRO_LEVELS = new Set(Object.values(PIECE_FIRST_LEVEL));
+/** Worlds built with the catch check so far (later worlds keep their earlier boards until regenerated). */
+const CATCH_WORLDS = 3;
+
 function bestLevelFor(world, index) {
   const preset = generatorPresetFor(world, index);
+  const needsCatch = needsCatchFor(world, index, preset);
   let best = null;
+  let fallback = null; // the least random-solvable board, if none passes the catch check
   for (const [attempt, variant] of simplifications(preset).entries()) {
     const deadline = Date.now() + TIME_BUDGET_MS;
     for (let seed = 0; seed < 400 && Date.now() < deadline; seed++) {
@@ -41,10 +56,17 @@ function bestLevelFor(world, index) {
       const level = generateLevel({ ...variant, minPar: Math.min(variant.minPar, 2) }, random, 25);
       // A level that introduces a piece must actually contain it.
       const hasRequired = !preset.mustHave || (level && piecesIn(level).includes(preset.mustHave));
-      if (level && hasRequired && level.par <= preset.maxPar && (!best || level.par > best.par)) best = level;
+      // Every regular level needs a real "catch": random tapping mustn't solve it (levelQuality.js).
+      const rate = level && hasRequired && needsCatch ? randomSolveRate({ ...level, difficulty: difficultyFor(index) }) : 0;
+      if (level && hasRequired && level.par <= preset.maxPar && (!fallback || rate < fallback.rate)) fallback = { level, rate };
+      if (level && hasRequired && level.par <= preset.maxPar && (!best || level.par > best.par) && rate <= MAX_RANDOM_SOLVE_RATE) best = level;
       if (best && best.par >= preset.minPar) return best;
     }
     if (best && best.par >= preset.minPar - 2) return best;
+  }
+  if (!best && fallback) {
+    console.warn(`${levelId(world, index)}: no board with a clear catch; using the hardest to guess (${Math.round(fallback.rate * 100)}%)`);
+    best = fallback.level;
   }
   if (!best) throw new Error(`Could not generate ${levelId(world, index)}`);
   return best;

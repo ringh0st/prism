@@ -13,6 +13,7 @@ import PlayerCard from './me/PlayerCard.jsx';
 import styles from './SettingsScreen.module.css';
 import { APP_VERSION, COPYRIGHT_YEAR, STORE_NAME, STUDIO_NAME } from '../lib/appInfo.js';
 import InstallSettingsCard from '../components/install/InstallSettingsCard.jsx';
+import HowToPlayCard from './me/HowToPlayCard.jsx';
 
 const SYNC_LABELS = {
   local: 'Progress is saved on this device.',
@@ -169,6 +170,8 @@ export default function SettingsScreen() {
 
         <AccountCard />
 
+        <HowToPlayCard className={styles.card} />
+
         <section className={styles.card} aria-labelledby="feel-title">
           <h2 id="feel-title">Sound & feel</h2>
           <Toggle id="sound" label="Sound effects" checked={settings.sound} onChange={(sound) => updateSettings({ sound })} />
@@ -186,6 +189,13 @@ export default function SettingsScreen() {
             description="On supported phones"
             checked={settings.haptics}
             onChange={(haptics) => updateSettings({ haptics })}
+          />
+          <Toggle
+            id="calm-board"
+            label="Calm board"
+            description="Nothing moves around the board while you think"
+            checked={settings.calmBoard}
+            onChange={(calmBoard) => updateSettings({ calmBoard })}
           />
         </section>
 

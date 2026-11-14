@@ -29,7 +29,7 @@ Most fetches of full papers failed, so this is based on search summaries. The st
 ## Done so far
 
 - 1-1 to 1-3: coached on the board (pointing hand, Lamp/Gem tags), no move counter, no helpers.
-- Short skippable picture tour (kept because the owner asked for one; the research says it matters less than on-board teaching).
+- No tour before playing: new players go straight into the coached level 1-1; the picture tour is under Me → How to play.
 - New pieces and first-time controls introduced by spotlighting the real thing, in a few words.
 - Level flavors in Worlds 1–3 so no two levels in a row feel the same.
 - Worlds 1–2: "Keep going" instead of failing when moves run out.
@@ -37,12 +37,13 @@ Most fetches of full papers failed, so this is based on search summaries. The st
 
 ## Still to consider
 
-1. A hint ladder: first highlight a region, then a mirror, then its right position.
-2. A filter in the level generator that rejects boards a random tapper solves, so every level has a catch.
-3. Build each world as four 5-level arcs (introduce, develop, twist, rest), with a hand-picked signature level in each.
-4. Calm board mode: still the backdrop animals and the Pal while a level is being played.
-5. Lumi's lines with a voice or a melodic "speech" sound, so non-readers can follow.
-6. Track the first-session funnel (open, first tap, 1-1, 1-3, 1-5, 1-10, second session) and time to first tap.
+Done in the second round: a hint ladder (free glow on the area → Hint marks the mirror → Auto-turn turns it),
+a catch filter in the level builder (Worlds 1–3), 5-level arcs with a breather after each Hard level, a Calm board
+setting, Lumi's sing-song voice on instructions, and the first Pal as a surprise after level 5 instead of a choice up front.
+
+1. Bring the catch filter and arcs to Worlds 4–50 (regenerates their boards).
+2. A hand-picked signature level in each arc.
+3. Track the first-session funnel (open, first tap, 1-1, 1-3, 1-5, 1-10, second session) and time to first tap.
 7. Test in rounds of ~5 people (a child, an older adult, someone with ADHD), asking after 10 s on a board:
    "What do you think you need to do?"
 
