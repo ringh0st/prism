@@ -34,6 +34,8 @@ import { firstTileOf, newPiecesIn, piecesMetIn } from '../../game/pieces.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import { EVENT_LEVELS, parseEventLevelId } from '../../game/events.js';
 import ComboBurst from './ComboBurst.jsx';
+import { glowbugCellOf, glowbugForLevel, rescuedGlowbugs } from '../../game/glowbugs.js';
+import { cellsOnBeams } from '../../game/beam.js';
 import PalBuddy from './PalBuddy.jsx';
 import { comboFor } from '../../game/combos.js';
 import styles from './PlayScreen.module.css';
@@ -58,6 +60,26 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const puzzle = usePuzzle(level);
   const { trace, moves } = puzzle;
   const [result, setResult] = useState(null);
+  const [solvedStars, setSolvedStars] = useState(0);
+
+  // A Glowbug naps on some levels until you rescue it with three stars (glowbugs.js).
+  const glowbug = useMemo(
+    () => (mode === 'level' && (progress.levels[level.id]?.stars ?? 0) < 3 ? glowbugForLevel(level.id) : null),
+    [mode, level.id],
+  ); // eslint-disable-line react-hooks/exhaustive-deps
+  const [glowbugCell, setGlowbugCell] = useState(null);
+  useEffect(() => {
+    setGlowbugCell(null);
+    if (!glowbug) return undefined;
+    // Finding its cell runs the solver, so it happens just after the level appears.
+    const timer = setTimeout(() => setGlowbugCell(glowbugCellOf(level)), 60);
+    return () => clearTimeout(timer);
+  }, [glowbug, level]);
+  const litCells = useMemo(() => cellsOnBeams(trace.segments, level.width, level.height), [trace, level]);
+  const isGlowbugAwake = glowbugCell !== null && litCells.has(glowbugCell);
+  useEffect(() => {
+    if (isGlowbugAwake) sfx.sparkle();
+  }, [isGlowbugAwake]);
   const [isOutOfMoves, setIsOutOfMoves] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
   // Pieces this player meets for the first time get a "New piece!" card before the level starts.
@@ -164,6 +186,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       hasRecordedWin.current = true;
 
       const stars = isSkipped ? 1 : Math.min(starsForMoves(moves, level.par, level.difficulty), puzzle.starCap);
+      setSolvedStars(stars);
       const isBig = modifier === 'boss' || level.difficulty === DIFFICULTY.EXTRA;
       sfx.win({ stars, isBig });
       if (!isSkipped) celebrate({ stars, isBig, from: boardAreaRef.current });
@@ -189,7 +212,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       const [finished] = await Promise.all([outcome, wait(WIN_DIALOG_DELAY_MS)]);
       const solvedLevels = { ...progress.levels, [level.id]: { stars } };
       const completesWorld = mode === 'level' && !wasWorldComplete && isWorldComplete({ levels: solvedLevels }, worldRefs);
-      setResult({ ...finished, moves: isSkipped ? null : moves, isSkipped, completesWorld });
+      const glowbugResult = glowbug && {
+        id: glowbug.id,
+        isRescued: stars === 3 && !isSkipped,
+        isNew: !rescuedGlowbugs(progress.levels).has(glowbug.id),
+      };
+      setResult({ ...finished, moves: isSkipped ? null : moves, isSkipped, completesWorld, glowbug: glowbugResult });
     },
     [
       moves,
@@ -207,6 +235,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       dateKey,
       say,
       react,
+      glowbug,
     ],
   );
 
@@ -247,6 +276,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     puzzle.restart();
     setResult(null);
     setIsOutOfMoves(false);
+    setSolvedStars(0);
     hasRecordedWin.current = false;
     say('happy', 'start');
     setPalReaction(null);
@@ -369,6 +399,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           ghostSegments={puzzle.ghostSegments}
           turnsLeft={puzzle.turnsLeft}
           revealedCells={puzzle.revealedCells}
+          glowbug={
+            glowbug && glowbugCell !== null ? { id: glowbug.id, cell: glowbugCell, isAwake: isGlowbugAwake, isFreed: solvedStars === 3 } : null
+          }
           isLocked={isOver}
           mood={modifier}
           label={`${levelName} board. Use arrow keys to move, Enter to rotate.`}
@@ -395,7 +428,15 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
       {newPieces.length > 0 && <NewPieceDialog pieces={newPieces} onDone={finishPieceIntro} />}
       {showIntro && newPieces.length === 0 && (
-        <LevelIntro level={level} title={levelName} subtitle={subtitle} modifier={modifier} lumiLine={introLine} onDone={dismissIntro} />
+        <LevelIntro
+          level={level}
+          title={levelName}
+          subtitle={subtitle}
+          modifier={modifier}
+          lumiLine={introLine}
+          glowbugId={glowbug?.id}
+          onDone={dismissIntro}
+        />
       )}
       {buyingHelper && (
         <QuickBuyDialog

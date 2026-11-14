@@ -3,6 +3,8 @@ import ScreenTitle from '../../components/game/ScreenTitle.jsx';
 import Button from '../../components/Button.jsx';
 import LumiSays from '../../components/game/LumiSays.jsx';
 import GemShape from '../../components/GemShape.jsx';
+import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
+import { glowbugById } from '../../game/glowbugs.js';
 import { moveLimitFor } from '../../game/scoring.js';
 import { TILE } from '../../game/constants.js';
 import styles from './LevelIntro.module.css';
@@ -17,7 +19,7 @@ const STICKERS = {
 const INTRO_MS = 1600;
 
 /** "Level 7 · The Sneaky Pickle · Light 2 gems in 6 moves". Tap anywhere or wait to start. */
-export default function LevelIntro({ level, title, subtitle, modifier, lumiLine, onDone }) {
+export default function LevelIntro({ level, title, subtitle, modifier, lumiLine, glowbugId = null, onDone }) {
   useEffect(() => {
     const timer = setTimeout(onDone, modifier === 'normal' ? INTRO_MS : INTRO_MS * 1.6);
     return () => clearTimeout(timer);
@@ -47,6 +49,14 @@ export default function LevelIntro({ level, title, subtitle, modifier, lumiLine,
             in <strong>{limit}</strong> moves
           </span>
         </p>
+        {glowbugId && (
+          <p className={styles.glowbug}>
+            <GlowbugArt id={glowbugId} size={40} isAwake={false} />
+            <span>
+              Shh… <strong>{glowbugById(glowbugId).name}</strong> the Glowbug is napping here. Get ★★★ to rescue it!
+            </span>
+          </p>
+        )}
         <div className={styles.lumi}>
           <LumiSays mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={84} line={lumiLine} />
         </div>

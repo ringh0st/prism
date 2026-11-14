@@ -678,3 +678,18 @@ test('combos cheer when one tap lights several gems', async () => {
   assert.equal(comboFor(3).word, 'Triple!');
   assert.equal(comboFor(5).word, 'MEGA!');
 });
+
+test('Glowbugs: 60 species, on about a quarter of levels and every boss, rescued with three stars', async () => {
+  const bugs = await import('./glowbugs.js');
+  assert.equal(bugs.GLOWBUGS.length, 60);
+  assert.equal(new Set(bugs.GLOWBUGS.map((bug) => bug.name)).size, 60, 'every Glowbug has its own name');
+  assert.ok(bugs.GLOWBUGS.every((bug) => /[.!?]$/.test(bug.bio) && !/[.!?]\.$/.test(bug.bio)));
+  assert.equal(bugs.glowbugForLevel('w1-02'), null, 'not in the tutorial');
+  assert.equal(bugs.glowbugForLevel('daily-2026-11-14'), null);
+  for (let w = 1; w <= 50; w++) assert.ok(bugs.glowbugForLevel(`w${w}-20`)?.rare, `boss of world ${w} has a rare Glowbug`);
+  const level = JSON.parse(readFileSync(new URL('../data/worlds/world-001.json', import.meta.url), 'utf8'))[6];
+  const cell = bugs.glowbugCellOf(level);
+  assert.ok(cell !== null && !level.tiles.some((t) => t.y * level.width + t.x === cell), 'sleeps on an empty cell');
+  const rescued = bugs.rescuedGlowbugs({ 'w1-07': { stars: 3 }, 'w1-10': { stars: 2 }, 'w1-08': { stars: 3 } });
+  assert.deepEqual([...rescued.keys()], [bugs.glowbugForLevel('w1-07').id]);
+});

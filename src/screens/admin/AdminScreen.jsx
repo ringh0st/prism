@@ -37,7 +37,9 @@ export default function AdminScreen() {
   if (!isAdmin) {
     return (
       <Gate title="Admins only">
-        <p>Your account isn’t an admin yet. Run <code>supabase/make-admin.sql</code> in the Supabase SQL Editor, then:</p>
+        <p>
+          Your account isn’t an admin yet. Run <code>supabase/make-admin.sql</code> in the Supabase SQL Editor, then:
+        </p>
         <Button onClick={refreshProfile}>Check again</Button>
       </Gate>
     );

@@ -74,7 +74,9 @@
   padding: var(--space-4);
   border-radius: var(--radius-lg);
   background: var(--surface-card);
-  box-shadow: var(--shadow-md), inset 0 0 0 1.5px var(--line);
+  box-shadow:
+    var(--shadow-md),
+    inset 0 0 0 1.5px var(--line);
 }
 
 .workspace {
@@ -317,7 +319,9 @@
   overflow-x: auto;
   border-radius: var(--radius-lg);
   background: var(--surface-card);
-  box-shadow: var(--shadow-md), inset 0 0 0 1.5px var(--line);
+  box-shadow:
+    var(--shadow-md),
+    inset 0 0 0 1.5px var(--line);
 }
 
 .table {

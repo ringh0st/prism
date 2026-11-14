@@ -240,11 +240,23 @@ export default function LevelEditor() {
           </label>
           <label>
             Width
-            <input type="number" min="3" max="10" value={draft.width} onChange={(e) => setDraft((d) => resizeLevel(d, clampSize(e.target.value), d.height))} />
+            <input
+              type="number"
+              min="3"
+              max="10"
+              value={draft.width}
+              onChange={(e) => setDraft((d) => resizeLevel(d, clampSize(e.target.value), d.height))}
+            />
           </label>
           <label>
             Height
-            <input type="number" min="3" max="10" value={draft.height} onChange={(e) => setDraft((d) => resizeLevel(d, d.width, clampSize(e.target.value)))} />
+            <input
+              type="number"
+              min="3"
+              max="10"
+              value={draft.height}
+              onChange={(e) => setDraft((d) => resizeLevel(d, d.width, clampSize(e.target.value)))}
+            />
           </label>
         </div>
 
@@ -320,8 +332,8 @@ export default function LevelEditor() {
       <aside className={styles.toolsPanel}>
         <ToolPalette tool={tool} onToolChange={setTool} color={color} onColorChange={setColor} dir={dir} onDirChange={setDir} />
         <p className={styles.hint}>
-          Tip: build the solved puzzle first, then press <strong>Scramble</strong>. The solver sets par automatically. Shadow
-          crystals ({TILE.SHADE}) make great traps next to mirrors.
+          Tip: build the solved puzzle first, then press <strong>Scramble</strong>. The solver sets par automatically. Shadow crystals ({TILE.SHADE})
+          make great traps next to mirrors.
         </p>
       </aside>
 

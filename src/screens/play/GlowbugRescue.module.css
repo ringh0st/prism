@@ -1,0 +1,73 @@
+.rescue {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  text-align: left;
+  background: color-mix(in srgb, var(--color-honey) 26%, var(--surface-raised));
+  animation: pop 500ms var(--ease-pop) 1.4s both;
+}
+
+.shy {
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--surface-sunken);
+}
+
+.art {
+  flex: none;
+  animation: wiggle 1.4s ease-in-out 1.9s 2;
+}
+
+@keyframes wiggle {
+  25% {
+    transform: translateY(-14%) rotate(-10deg);
+  }
+  75% {
+    transform: translateY(-14%) rotate(10deg);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.new {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--action-label);
+  background: var(--action-bottom);
+}
+
+.kind {
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.bio {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.link {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rescue,
+  .art {
+    animation: none;
+  }
+}

@@ -148,3 +148,17 @@ export function traceBeams(level, orients = null, cells = buildCellIndex(level))
     isSolved: gemCount > 0 && litGems.size === gemCount && litShades.size === 0,
   };
 }
+
+/** Every board cell the light passes through or ends in (from traceBeams' segments). */
+export function cellsOnBeams(segments, width, height) {
+  const cells = new Set();
+  for (const { x1, y1, x2, y2 } of segments) {
+    const steps = Math.ceil(Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)) * 2);
+    for (let i = 0; i <= steps; i++) {
+      const x = Math.round(x1 + ((x2 - x1) * i) / Math.max(1, steps));
+      const y = Math.round(y1 + ((y2 - y1) * i) / Math.max(1, steps));
+      if (x >= 0 && y >= 0 && x < width && y < height) cells.add(y * width + x);
+    }
+  }
+  return cells;
+}

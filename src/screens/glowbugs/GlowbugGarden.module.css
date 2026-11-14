@@ -1,0 +1,132 @@
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 var(--space-3) 130px;
+}
+
+.main {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.intro {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(color-mix(in srgb, var(--color-honey) 22%, var(--surface-raised)), var(--surface-raised));
+  box-shadow: var(--shadow-md);
+}
+
+.count {
+  margin: 0;
+  font-weight: 700;
+}
+
+.count strong {
+  font-size: 28px;
+}
+
+.meter {
+  height: 12px;
+  padding: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  min-width: 8px;
+  border-radius: inherit;
+  background: var(--color-honey);
+}
+
+.how {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+/* The garden: soft grass, every Glowbug in its own little spot */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3);
+  list-style: none;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    color-mix(in srgb, var(--color-sage) 14%, var(--surface-raised)),
+    color-mix(in srgb, var(--color-sage) 26%, var(--surface-raised))
+  );
+}
+
+.bug {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: 6px 2px;
+  border: 0;
+  border-radius: var(--radius-md);
+  font: inherit;
+  color: inherit;
+  background: none;
+  cursor: pointer;
+  transition: transform 200ms var(--ease-spring);
+}
+
+button.bug:active {
+  transform: scale(0.93);
+}
+
+.missing {
+  cursor: default;
+}
+
+.name {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.missing .name {
+  color: var(--text-soft);
+}
+
+.times {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.meet {
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.title {
+  margin: 0 0 4px;
+  font-weight: 800;
+  color: var(--text-soft);
+}
+
+.rare {
+  color: var(--reward-label);
+}
+
+.bio {
+  margin: 0 0 var(--space-4);
+  font-size: 17px;
+  font-weight: 700;
+}

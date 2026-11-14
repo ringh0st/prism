@@ -399,3 +399,52 @@
     animation: none;
   }
 }
+
+/* A Glowbug sleeping on a cell (in a soft bubble); it flies off when rescued */
+.glowbug {
+  position: absolute;
+  inset: 12%;
+  z-index: 3;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 250 240 / 0.7), rgb(255 250 240 / 0.15) 70%, transparent 72%);
+  pointer-events: none;
+}
+
+.glowbug svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Snuggled on the lamp: small, in the corner */
+.glowbugOnTile {
+  inset: auto -6% -6% auto;
+  width: 52%;
+  height: 52%;
+}
+
+.glowbugFreed {
+  animation: flyAway 1.6s ease-in 0.4s forwards;
+}
+
+@keyframes flyAway {
+  30% {
+    transform: translateY(-20%) scale(1.25) rotate(-8deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(40%, -260%) scale(0.6) rotate(20deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glowbugFreed {
+    animation: fadeOut 0.6s ease 0.4s forwards;
+  }
+
+  @keyframes fadeOut {
+    to {
+      opacity: 0;
+    }
+  }
+}

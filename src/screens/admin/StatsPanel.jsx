@@ -44,8 +44,7 @@ export default function StatsPanel() {
             {levels.map((level) => {
               const entry = stats.byLevel.get(level.id);
               const completions = entry?.completions ?? 0;
-              const dropOff =
-                previousCompletions && previousCompletions > 0 ? Math.round((1 - completions / previousCompletions) * 100) : null;
+              const dropOff = previousCompletions && previousCompletions > 0 ? Math.round((1 - completions / previousCompletions) * 100) : null;
               previousCompletions = completions;
               return (
                 <tr key={level.id} className={dropOff !== null && dropOff >= 40 ? styles.warnRow : ''}>

@@ -12,6 +12,7 @@ import PalArt from '../../components/pals/PalArt.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import { palById, stageOf } from '../../game/pals.js';
 import ReplayShare from '../../components/replay/ReplayShare.jsx';
+import GlowbugRescue from './GlowbugRescue.jsx';
 import { cheerFor } from '../../game/palCheers.js';
 import styles from './WinDialog.module.css';
 
@@ -162,6 +163,7 @@ export default function WinDialog({
           </div>
         </div>
       )}
+      {result.glowbug && !isSkipped && <GlowbugRescue glowbug={result.glowbug} />}
       {shareMessage && <ShareResult text={shareMessage} />}
       {replay && !isSkipped && <ReplayShare replay={{ ...replay, stars, moves }} />}
       {completesWorld && !isSignedIn && (

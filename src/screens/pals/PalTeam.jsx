@@ -4,6 +4,7 @@ import PalCard from '../../components/pals/PalCard.jsx';
 import PalDetailDialog from './PalDetailDialog.jsx';
 import LuckyPalProgress from './LuckyPalProgress.jsx';
 import TeamSwitcher from './TeamSwitcher.jsx';
+import GlowbugGardenLink from './GlowbugGardenLink.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, isPalUnlocked, palStage, stageOf, unlockText } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
@@ -68,6 +69,7 @@ export default function PalTeam() {
   return (
     <>
       <TeamSwitcher />
+      <GlowbugGardenLink />
       <LuckyPalProgress />
       <section className={styles.section} aria-label="Your team">
         <Collection onError={setMessage} />

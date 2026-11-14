@@ -432,7 +432,11 @@ a.node:active {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--surface-page) 92%, transparent), color-mix(in srgb, var(--surface-page) 55%, transparent));
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--surface-page) 92%, transparent),
+    color-mix(in srgb, var(--surface-page) 55%, transparent)
+  );
   pointer-events: none;
 }
 
@@ -498,4 +502,13 @@ a.node:active {
   transform: translateX(-50%) scale(0.96);
   box-shadow: var(--shadow-sm);
   transition-duration: 90ms;
+}
+
+/* A Glowbug waiting on this level (rescue it with three stars) */
+.glowbugBadge {
+  position: absolute;
+  top: -10px;
+  left: -14px;
+  z-index: 2;
+  pointer-events: none;
 }

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import TileArt, { TileDefs } from './TileArt.jsx';
 import BeamLayer from './BeamLayer.jsx';
+import GlowbugArt from '../glowbugs/GlowbugArt.jsx';
+import { glowbugById } from '../../game/glowbugs.js';
 import { describeTile } from '../../game/describe.js';
 import { isRotatable as tileIsRotatable } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
@@ -21,6 +23,7 @@ import styles from './Board.module.css';
  * @param mood         surprise look: normal | disco | night | boss
  * @param turnsLeft    turns each cracking mirror has left (a cracked one can't turn)
  * @param revealedCells cells the light has reached (fog lifts there); null shows everything (editor)
+ * @param glowbug      { id, cell, isAwake, isFreed }: a Glowbug sleeping on a cell (it wakes in the light)
  */
 export default function Board({
   level,
@@ -36,6 +39,7 @@ export default function Board({
   label = 'Puzzle board',
   turnsLeft = null,
   revealedCells = null,
+  glowbug = null,
 }) {
   const { width, height, tiles } = level;
   const [focusedCell, setFocusedCell] = useState(0);
@@ -125,12 +129,17 @@ export default function Board({
                       highlightTile === tileIndex && tileIndex >= 0 ? styles.hint : ''
                     } ${tile?.type === TILE.SHADE && isLit ? styles.shake : ''}`}
                     tabIndex={cell === focusedCell ? 0 : -1}
-                    aria-label={`${description}. Row ${row + 1}, column ${col + 1}`}
+                    aria-label={`${description}${glowbug?.cell === cell ? `. ${glowbugById(glowbug.id).name} the Glowbug is ${glowbug.isAwake ? 'awake' : 'asleep'} here` : ''}. Row ${row + 1}, column ${col + 1}`}
                     aria-disabled={!isActionable || undefined}
                     onFocus={() => setFocusedCell(cell)}
                     onKeyDown={(event) => onKeyDown(event, cell)}
                     onClick={() => isActionable && onActivate(cell, tileIndex)}
                   >
+                    {glowbug?.cell === cell && (
+                      <span className={`${styles.glowbug} ${tile ? styles.glowbugOnTile : ''} ${glowbug.isFreed ? styles.glowbugFreed : ''}`}>
+                        <GlowbugArt id={glowbug.id} size="100%" isAwake={glowbug.isAwake} />
+                      </span>
+                    )}
                     {tile && (
                       <TileArt
                         tile={tile}

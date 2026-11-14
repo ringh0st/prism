@@ -1,0 +1,44 @@
+.bug {
+  overflow: visible;
+}
+
+.glow {
+  opacity: 0.35;
+}
+
+.awake .glow {
+  animation: glow 2.2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.sleepy {
+  animation: breathe 3s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(1.04, 0.97);
+  }
+}
+
+/* Not found yet: a gentle shadow of what's waiting */
+.silhouette {
+  filter: brightness(0) opacity(0.16);
+}
+
+.silhouette .glow {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .awake .glow,
+  .sleepy {
+    animation: none;
+  }
+}

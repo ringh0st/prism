@@ -109,7 +109,16 @@ export const SCENERY = {
   },
   tuft: {
     size: 22,
-    art: <path d="M30 98c0-20 4-30 10-36M50 98c0-24 0-36 0-44M70 98c0-20-4-30-10-36" stroke={LEAF_DARK} strokeWidth="7" strokeLinecap="round" fill="none" opacity="0.6" />,
+    art: (
+      <path
+        d="M30 98c0-20 4-30 10-36M50 98c0-24 0-36 0-44M70 98c0-20-4-30-10-36"
+        stroke={LEAF_DARK}
+        strokeWidth="7"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.6"
+      />
+    ),
   },
   mushroom: {
     size: 34,

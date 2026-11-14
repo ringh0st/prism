@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { rotationGroup, traceBeams } from '../game/beam.js';
+import { cellsOnBeams, rotationGroup, traceBeams } from '../game/beam.js';
 import { findHint, nearestSolution } from '../game/solver.js';
 import { starCapForHelpers } from '../game/catalog.js';
 import { FRAGILE_TURNS } from '../game/constants.js';
@@ -22,20 +22,6 @@ const rotated = (s, tiles, tileIndex) => {
 
 /** Turns a cracking mirror has left (Infinity for every other tile). */
 const turnsLeftOf = (tile, turns) => (tile.fragile ? Math.max(0, FRAGILE_TURNS - (turns - (tile.orient ?? 0))) : Infinity);
-
-/** The board cells a beam passes through or ends in (for lifting fog). */
-function cellsTouched(trace, width) {
-  const cells = new Set();
-  for (const { x1, y1, x2, y2 } of trace.segments) {
-    const steps = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)) * 2;
-    for (let i = 0; i <= steps; i++) {
-      const x = Math.round(x1 + ((x2 - x1) * i) / Math.max(1, steps));
-      const y = Math.round(y1 + ((y2 - y1) * i) / Math.max(1, steps));
-      cells.add(y * width + x);
-    }
-  }
-  return cells;
-}
 
 /**
  * Play state for one level: orientations, moves, helpers, and the live beam trace.
@@ -62,13 +48,13 @@ export function usePuzzle(level) {
   // Fog lifts for good once light touches a cell.
   const [revealed, setRevealed] = useState(() => ({ levelId: level.id, cells: new Set() }));
   useEffect(() => {
-    const touched = cellsTouched(trace, level.width);
+    const touched = cellsOnBeams(trace.segments, level.width, level.height);
     setRevealed((r) => {
       const base = r.levelId === level.id ? r.cells : new Set();
       if ([...touched].every((cell) => base.has(cell))) return r.levelId === level.id ? r : { levelId: level.id, cells: base };
       return { levelId: level.id, cells: new Set([...base, ...touched]) };
     });
-  }, [trace, level.id, level.width]);
+  }, [trace, level.id, level.width, level.height]);
   const revealedCells = revealed.levelId === level.id ? revealed.cells : new Set();
 
   const rotate = useCallback(
