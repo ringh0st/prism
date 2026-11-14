@@ -19,7 +19,8 @@
   align-items: center;
   gap: 5px;
   height: 32px;
-  padding: 0 10px 0 4px;
+  padding-block: 0;
+  padding-inline: 4px 10px;
   border-radius: var(--radius-pill);
 }
 
@@ -73,7 +74,7 @@
 
 @media (max-width: 380px) {
   .counter {
-    padding-right: 7px;
+    padding-inline-end: 7px;
   }
   .value {
     font-size: 14px;

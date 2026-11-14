@@ -112,7 +112,7 @@
   align-items: center;
   padding: var(--space-3);
   border-radius: var(--radius-md);
-  text-align: left;
+  text-align: start;
   background: var(--surface-tonal);
 }
 

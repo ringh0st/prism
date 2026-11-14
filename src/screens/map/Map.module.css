@@ -30,13 +30,14 @@
 /* The hot streak sits on the PLAY button's corner as a small flame badge */
 .hotStreak {
   position: absolute;
-  right: -4px;
+  inset-inline-end: -4px;
   top: -8px;
   display: inline-flex;
   align-items: center;
   gap: 1px;
   height: 22px;
-  padding: 0 7px 0 5px;
+  padding-block: 0;
+  padding-inline: 5px 7px;
   border-radius: var(--radius-pill);
   --label: var(--warm-label);
   color: var(--warm-label);
@@ -288,7 +289,7 @@ a.node:active {
 }
 
 .flame {
-  right: -6px;
+  inset-inline-end: -6px;
   bottom: -2px;
   width: 26px;
   height: 26px;

@@ -4,7 +4,8 @@
   grid-template-columns: minmax(0, 46%) minmax(0, 1fr);
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+  padding-block: var(--space-2);
+  padding-inline: var(--space-2) var(--space-3);
   border-radius: var(--radius-lg);
   background:
     radial-gradient(ellipse 45% 75% at 24% 50%, color-mix(in srgb, var(--color-honey) 24%, transparent), transparent 70%), var(--surface-raised);

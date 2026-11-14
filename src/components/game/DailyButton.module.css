@@ -19,7 +19,7 @@
 .dot {
   position: absolute;
   top: -3px;
-  right: -3px;
+  inset-inline-end: -3px;
   width: 12px;
   height: 12px;
   border-radius: 50%;
@@ -30,12 +30,13 @@
 .streak {
   position: absolute;
   bottom: -7px;
-  right: -8px;
+  inset-inline-end: -8px;
   display: inline-flex;
   align-items: center;
   gap: 1px;
   height: 20px;
-  padding: 0 6px 0 4px;
+  padding-block: 0;
+  padding-inline: 4px 6px;
   border-radius: var(--radius-pill);
   font-size: 12px;
   color: var(--warm-label);

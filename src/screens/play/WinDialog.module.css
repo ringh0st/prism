@@ -130,7 +130,7 @@
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   font-weight: 700;
-  text-align: left;
+  text-align: start;
   background: var(--surface-sunken);
   animation: pop 500ms var(--ease-pop) 1.2s both;
 }

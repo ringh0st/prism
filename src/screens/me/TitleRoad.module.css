@@ -41,7 +41,7 @@
   content: '';
   position: absolute;
   top: 26px;
-  right: calc(-1 * var(--space-2));
+  inset-inline-end: calc(-1 * var(--space-2));
   width: var(--space-2);
   height: 4px;
   background: var(--surface-cell-edge);

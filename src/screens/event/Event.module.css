@@ -231,7 +231,7 @@ a.puzzle:active {
   place-items: center;
   min-width: 26px;
   height: 26px;
-  margin-left: 4px;
+  margin-inline-start: 4px;
   padding: 0 6px;
   border-radius: var(--radius-pill);
   font-size: 14px;

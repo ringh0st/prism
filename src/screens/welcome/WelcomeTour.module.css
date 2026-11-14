@@ -16,7 +16,7 @@
 .skip {
   position: absolute;
   top: calc(env(safe-area-inset-top) + 12px);
-  right: 16px;
+  inset-inline-end: 16px;
   min-height: 44px;
   padding: 0 16px;
   border: 0;

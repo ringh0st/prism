@@ -42,7 +42,8 @@
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: var(--space-3);
-  padding: 10px 16px 12px 10px;
+  padding-block: 10px 12px;
+  padding-inline: 10px 16px;
   border-radius: var(--radius-lg);
   background: var(--surface-raised);
   box-shadow: var(--highlight), var(--shadow-md);
@@ -67,7 +68,7 @@
 
 .gemCount {
   align-self: center;
-  margin-left: 4px;
+  margin-inline-start: 4px;
   font-size: 18px;
 }
 

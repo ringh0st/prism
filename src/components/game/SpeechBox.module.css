@@ -22,12 +22,12 @@
 }
 
 .left::before {
-  left: -6px;
+  inset-inline-start: -6px;
   top: calc(50% - 7px);
 }
 
 .down::before {
-  left: 34px;
+  inset-inline-start: 34px;
   bottom: -6px;
 }
 
@@ -46,7 +46,7 @@
 
 .speaker {
   display: inline-block;
-  margin-right: 6px;
+  margin-inline-end: 6px;
   padding: 0 7px;
   border-radius: var(--radius-pill);
   font-size: 12px;

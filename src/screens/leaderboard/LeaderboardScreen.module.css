@@ -54,12 +54,13 @@
   gap: var(--space-2);
   width: 100%;
   min-height: 52px;
-  padding: 6px var(--space-4) 6px var(--space-3);
+  padding-block: 6px;
+  padding-inline: var(--space-3) var(--space-4);
   border: 0;
   border-radius: var(--radius-md);
   font: inherit;
   color: inherit;
-  text-align: left;
+  text-align: start;
   background: var(--surface-raised);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
@@ -131,7 +132,7 @@
   left: 50%;
   width: 14px;
   height: 14px;
-  margin-left: -7px;
+  margin-inline-start: -7px;
   border-radius: 50%;
   background: var(--color-terracotta);
   box-shadow: 0 2px 3px rgba(60, 40, 20, 0.35);
@@ -187,7 +188,8 @@
   align-items: center;
   gap: var(--space-2);
   margin: 0 var(--space-3) var(--space-2);
-  padding: 4px var(--space-3) 4px 4px;
+  padding-block: 4px;
+  padding-inline: 4px var(--space-3);
   border-radius: var(--radius-pill);
   font-weight: 700;
   text-decoration: none;
@@ -197,7 +199,7 @@
 }
 
 .change {
-  margin-left: auto;
+  margin-inline-start: auto;
   font-family: var(--font-display);
   font-weight: 600;
   color: var(--text-accent);

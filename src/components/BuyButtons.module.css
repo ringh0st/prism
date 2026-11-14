@@ -15,8 +15,11 @@
 .tags .price {
   min-width: 64px;
   min-height: 38px;
-  padding: 0 12px 0 20px;
-  border-radius: 8px 16px 16px 8px;
+  padding-block: 0;
+  padding-inline: 20px 12px;
+  border-radius: 16px;
+  border-start-start-radius: 8px;
+  border-end-start-radius: 8px;
   transform: rotate(-2deg);
 }
 
@@ -27,7 +30,7 @@
 .tags .price::before {
   content: '';
   position: absolute;
-  left: 7px;
+  inset-inline-start: 7px;
   top: 50%;
   width: 6px;
   height: 6px;

@@ -100,7 +100,7 @@ button.bug:active {
 .times {
   position: absolute;
   top: 2px;
-  right: 6px;
+  inset-inline-end: 6px;
   padding: 0 6px;
   border-radius: var(--radius-pill);
   font-size: 11px;

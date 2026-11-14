@@ -104,7 +104,7 @@
 .dots {
   display: flex;
   gap: 6px;
-  margin-right: auto;
+  margin-inline-end: auto;
 }
 
 .dot,
