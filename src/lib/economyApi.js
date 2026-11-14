@@ -43,11 +43,13 @@ export const setNicknameOnServer = (nickname) => rpc('set_nickname', { p_nicknam
 
 export const choosePalOnServer = (palId) => rpc('choose_pal', { p_pal: palId });
 
-export const glowUpPalOnServer = (palId) => rpc('glow_up_pal', { p_pal: palId });
-
 export const buyAccessoryOnServer = (itemId) => rpc('buy_accessory', { p_item: itemId });
 
 export const wearAccessoryOnServer = (itemId, isWearing) => rpc('wear_accessory', { p_item: itemId, p_wear: isWearing });
+
+export const buyGroveItemOnServer = (itemId) => rpc('buy_grove_item', { p_item: itemId });
+
+export const placeGroveItemOnServer = (itemId, isPlacing) => rpc('place_grove_item', { p_item: itemId, p_place: isPlacing });
 
 /** Adopt a Pal you choose for diamonds. */
 export const adoptPalOnServer = (palId) => rpc('adopt_pal', { p_pal: palId });

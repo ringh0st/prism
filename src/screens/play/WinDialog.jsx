@@ -8,6 +8,7 @@ import { sfx } from '../../audio/sfx.js';
 import { DIFFICULTY } from '../../game/constants.js';
 import { shareText } from '../../lib/shareText.js';
 import PalArt from '../../components/pals/PalArt.jsx';
+import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import { palById, stageOf } from '../../game/pals.js';
 import styles from './WinDialog.module.css';
 
@@ -94,12 +95,18 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
           </span>
         )}
       </div>
-      {result.glowUpEarned && partner && (
-        <div className={styles.evolved}>
-          <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={72} />
-          <p>
-            <strong>World finished: you earned a Glow-up!</strong> Choose which Pal grows in Pals.
-          </p>
+      {partner && !isSkipped && (
+        <div className={`${styles.evolved} ${result.palGrewTo ? styles.grew : ''}`}>
+          <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={64} portrait />
+          {result.palGrewTo ? (
+            <p role="status">
+              <strong>
+                {partner.name} grew into a {result.palGrewTo.name}!
+              </strong>
+            </p>
+          ) : (
+            <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
+          )}
         </div>
       )}
       {shareMessage && <ShareResult text={shareMessage} />}

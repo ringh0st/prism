@@ -7,10 +7,11 @@ import {
   claimDailyGiftOnServer,
   choosePalOnServer,
   setNicknameOnServer,
-  glowUpPalOnServer,
   buyAccessoryOnServer,
   wearAccessoryOnServer,
   adoptPalOnServer,
+  buyGroveItemOnServer,
+  placeGroveItemOnServer,
   claimWeeklyRewardOnServer,
   consumeHelperOnServer,
   fetchEconomyState,
@@ -37,7 +38,8 @@ import { todayKey } from '../game/daily.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
 import { DAILY_GIFT_SPARKS } from '../game/catalog.js';
 import { nicknameProblem } from '../game/nicknames.js';
-import { buyAccessoryLocally, choosePalLocally, glowUpPalLocally, glowUpsEarned, wearAccessoryLocally } from '../game/pals.js';
+import { buyAccessoryLocally, choosePalLocally, growPartnerLocally, wearAccessoryLocally } from '../game/pals.js';
+import { buyGroveItemLocally, placeGroveItemLocally } from '../game/grove.js';
 import { sfx } from '../audio/sfx.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
@@ -126,8 +128,12 @@ export function PlayerProvider({ children }) {
         const hotStreak = nextHotStreak(progressRef.current, { stars: local.stars, usedHelpers: result.usedHelpers });
         local.progress = { ...local.progress, hotStreak };
         local.hotStreak = hotStreak;
-        // Finishing a world earns a Glow-up to spend on any Pal.
-        local.glowUpEarned = glowUpsEarned(local.progress) > glowUpsEarned(progressRef.current);
+        // The partner Pal grows with every solved level (a Skip doesn't count). The server does the same.
+        if (Number.isFinite(result.moves)) {
+          const grown = growPartnerLocally(local.progress);
+          local.progress = grown.progress;
+          local.palGrewTo = grown.grewTo;
+        }
         setProgress(local.progress);
         if (!userId) return { ...local, diamondsEarned: 0 };
         try {
@@ -212,17 +218,6 @@ export function PlayerProvider({ children }) {
         }
       },
 
-      /** Spend a Glow-up so a Pal grows into its next form. @throws EconomyError */
-      async glowUpPal(palId) {
-        setProgress(glowUpPalLocally(progressRef.current, palId));
-        if (!userId) return;
-        try {
-          applyServerState(await glowUpPalOnServer(palId));
-        } catch {
-          setSyncStatus('error');
-        }
-      },
-
       /** Buy a Pal accessory with sparks. @throws EconomyError */
       async buyAccessory(itemId) {
         if (!userId) {
@@ -238,6 +233,26 @@ export function PlayerProvider({ children }) {
         if (!userId) return;
         try {
           applyServerState(await wearAccessoryOnServer(itemId, isWearing));
+        } catch {
+          setSyncStatus('error');
+        }
+      },
+
+      /** Buy Grove decor with sparks. @throws EconomyError */
+      async buyGroveItem(itemId) {
+        if (!userId) {
+          setProgress(buyGroveItemLocally(progressRef.current, itemId));
+          return;
+        }
+        applyServerState(await buyGroveItemOnServer(itemId));
+      },
+
+      /** Place owned decor in its Grove spot (replacing what was there) or put it away. @throws EconomyError */
+      async placeGroveItem(itemId, isPlacing) {
+        setProgress(placeGroveItemLocally(progressRef.current, itemId, isPlacing));
+        if (!userId) return;
+        try {
+          applyServerState(await placeGroveItemOnServer(itemId, isPlacing));
         } catch {
           setSyncStatus('error');
         }

@@ -32,6 +32,7 @@ export function createEmptyProgress() {
     hotStreak: 0,
     giftDate: null,
     pal: { id: null, owned: {}, accessories: [], wearing: [] },
+    grove: { items: [], placed: [] },
     nickname: null,
   };
 }
@@ -50,6 +51,7 @@ export function upgradeProgress(saved) {
     helpers: { ...empty.helpers, ...saved?.helpers },
     daily: { ...empty.daily, ...saved?.daily },
     pal: upgradePal({ ...empty.pal, ...saved?.pal }),
+    grove: { ...empty.grove, ...saved?.grove },
   };
 }
 
@@ -211,5 +213,6 @@ export function withServerState(progress, state, today) {
     giftDate: state.lastGiftDate ?? progress.giftDate,
     // The account's Pals win, unless the account has none yet (then keep this device's choice).
     pal: state.pal?.id ? state.pal : progress.pal,
+    grove: state.grove ?? progress.grove,
   };
 }

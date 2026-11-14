@@ -267,15 +267,18 @@ test('pals: starter choice, unlocks, growth and accessories', async () => {
   progress = pals.choosePalLocally(progress, 'mossy');
   // After the first pick, the other starters need their own milestone.
   assert.equal(pals.isPalUnlocked(progress, pals.palById('ember')), false);
-  // Glow-ups: one per finished world, spent on any owned Pal; five forms in all.
-  assert.equal(pals.glowUpsAvailable(progress), 0);
-  assert.throws(() => pals.glowUpPalLocally(progress, 'mossy'));
-  const world1 = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`w1-${String(i + 1).padStart(2, '0')}`, { stars: 1 }]));
-  progress = { ...progress, levels: world1 };
-  assert.equal(pals.glowUpsAvailable(progress), 1);
-  progress = pals.glowUpPalLocally(progress, 'mossy');
+  // Only the partner grows: one step per solved level, 20 steps per form; other Pals keep their own count.
+  progress = { ...progress, pal: { ...progress.pal, owned: { ...progress.pal.owned, ember: { stage: 0, growth: 5 } } } };
+  for (let i = 0; i < 19; i++) progress = pals.growPartnerLocally(progress).progress;
+  assert.deepEqual(progress.pal.owned.mossy, { stage: 0, growth: 19 });
+  const grown = pals.growPartnerLocally(progress);
+  assert.equal(grown.grewTo.name, 'Junior');
+  progress = grown.progress;
+  assert.deepEqual(progress.pal.owned.mossy, { stage: 1, growth: 0 });
+  assert.deepEqual(progress.pal.owned.ember, { stage: 0, growth: 5 });
+  const legend = { ...progress, pal: { ...progress.pal, owned: { ...progress.pal.owned, mossy: { stage: 4, growth: 0 } } } };
+  assert.equal(pals.growPartnerLocally(legend).progress, legend);
   assert.equal(pals.palStage(pals.stageOf(progress.pal.owned.mossy)).name, 'Junior');
-  assert.equal(pals.glowUpsAvailable(progress), 0);
   assert.equal(pals.palStage(4).name, 'Legend');
   assert.equal(pals.PALS.length, 30);
   // Accessories cost sparks and must be owned to wear.
@@ -306,6 +309,8 @@ test('pal unlocks and accessory prices match the database', async () => {
   }
   const { ADOPT_PAL_DIAMONDS } = await import('./pals.js');
   assert.ok(sql.includes(`v_price constant integer := ${ADOPT_PAL_DIAMONDS};`), 'adopt price');
+  const { PAL_GROWTH_LEVELS } = await import('./pals.js');
+  assert.ok(sql.includes(`if v_growth >= ${PAL_GROWTH_LEVELS} then`), 'levels per form');
 });
 
 test('nicknames: friendly rules, random names and the same blocked list as the database', async () => {
@@ -321,11 +326,26 @@ test('nicknames: friendly rules, random names and the same blocked list as the d
   assert.ok(sql.includes(`array[${BLOCKED_NICKNAME_PARTS.map((part) => `'${part}'`).join(', ')}]`), 'blocked list');
 });
 
-test('pals: the growth bar tracks the unfinished world nearest to done', async () => {
-  const { nextGlowUpProgress } = await import('./pals.js');
-  const solved = (world, count) => Object.fromEntries(Array.from({ length: count }, (_, i) => [`w${world}-${String(i + 1).padStart(2, '0')}`, { stars: 1 }]));
-  assert.deepEqual(nextGlowUpProgress({}), { world: 1, solved: 0, needed: 20 });
-  assert.deepEqual(nextGlowUpProgress({ ...solved(1, 20), ...solved(2, 7) }), { world: 2, solved: 7, needed: 20 });
-  assert.deepEqual(nextGlowUpProgress(solved(1, 20)), { world: 2, solved: 0, needed: 20 });
-  assert.deepEqual(nextGlowUpProgress({ ...solved(2, 3), ...solved(3, 9) }), { world: 3, solved: 9, needed: 20 });
+test('grove: decor is bought with sparks and placed one per spot, with the same prices as the database', async () => {
+  const { createEmptyProgress } = await import('./progress.js');
+  const { GROVE_ITEMS, GROVE_SPOTS, buyGroveItemLocally, placeGroveItemLocally } = await import('./grove.js');
+  const start = { ...createEmptyProgress(), sparks: 300 };
+  assert.throws(() => placeGroveItemLocally(start, 'mushroomHouse', true));
+  assert.throws(() => buyGroveItemLocally({ ...start, sparks: 10 }, 'mushroomHouse'));
+  const one = buyGroveItemLocally(start, 'mushroomHouse');
+  assert.equal(one.sparks, 180);
+  assert.throws(() => buyGroveItemLocally(one, 'mushroomHouse'));
+  const placed = placeGroveItemLocally(one, 'mushroomHouse', true);
+  assert.deepEqual(placed.grove.placed, ['mushroomHouse']);
+  // A second home replaces the first; a bench sits alongside it.
+  const two = buyGroveItemLocally(buyGroveItemLocally({ ...placed, sparks: 300 }, 'acornCottage'), 'logBench');
+  assert.deepEqual(placeGroveItemLocally(two, 'acornCottage', true).grove.placed, ['acornCottage']);
+  assert.deepEqual(placeGroveItemLocally(two, 'logBench', true).grove.placed, ['mushroomHouse', 'logBench']);
+  assert.deepEqual(placeGroveItemLocally(two, 'mushroomHouse', false).grove.placed, []);
+  // Every spot has decor, and the server charges the same.
+  for (const spot of GROVE_SPOTS) assert.ok(GROVE_ITEMS.some((item) => item.spot === spot.id), spot.id);
+  const sql = readFileSync(new URL('../../supabase/grove.sql', import.meta.url), 'utf8');
+  for (const item of GROVE_ITEMS) {
+    assert.ok(sql.includes(`when '${item.id}' then '{"price": ${item.price}, "spot": "${item.spot}"}'::jsonb`), `${item.id} price and spot`);
+  }
 });

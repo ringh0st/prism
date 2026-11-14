@@ -1,7 +1,7 @@
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, palById, palStage, stageOf } from '../../game/pals.js';
-import GlowUpStatus from './GlowUpStatus.jsx';
+import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Pals.module.css';
 
@@ -31,7 +31,7 @@ export default function PartnerSwitcher() {
             <span key={i} className={i <= stage.index ? styles.stageDotOn : styles.stageDot} />
           ))}
         </div>
-        <GlowUpStatus partner={partner} stage={stage} />
+        <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} />
       </div>
       {team.length > 1 && (
         <div className={styles.team} role="radiogroup" aria-label="Play with">

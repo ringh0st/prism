@@ -11,6 +11,7 @@ import DailyGift from '../components/game/DailyGift.jsx';
 import PalArt from '../components/pals/PalArt.jsx';
 import { PAL_ACCESSORIES, PAL_SLOTS, stageOf } from '../game/pals.js';
 import AdoptShelf from './store/AdoptShelf.jsx';
+import GroveShelf from './store/GroveShelf.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
 import { DIAMOND_PACKS, DIAMOND_REWARDS, HELPERS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS } from '../game/catalog.js';
 import { sparkPurchasesLeft } from '../game/progress.js';
@@ -344,6 +345,14 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
                     mood: 'dance',
                     line: `Ooh, the ${item.name.toLowerCase()}! Try it on in Pals.`,
                   });
+                }}
+                onError={(message) => setLumi({ mood: 'worried', line: message })}
+              />
+              <h2 className={`game-title ${styles.sectionTitle}`}>Grove decor</h2>
+              <GroveShelf
+                onBought={(item) => {
+                  sfx.sparkle();
+                  setLumi({ mood: 'dance', line: `The ${item.name.toLowerCase()} will look lovely in the Grove!` });
                 }}
                 onError={(message) => setLumi({ mood: 'worried', line: message })}
               />

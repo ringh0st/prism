@@ -1,0 +1,96 @@
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 var(--space-3) 130px;
+}
+
+.main {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* The Grove card on the Pals screen */
+.home {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-md);
+}
+
+.homeHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.homeHead h2 {
+  font-size: 22px;
+}
+
+.lead {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+/* The live preview stays in view while you scroll the decor */
+.preview {
+  position: sticky;
+  top: var(--space-2);
+  z-index: 2;
+}
+
+.status,
+.error {
+  min-height: 1.5em;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-soft);
+}
+
+.error {
+  color: var(--text-accent);
+}
+
+.spot {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.spotTitle {
+  font-size: 18px;
+}
+
+.items {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 6px;
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.placed {
+  background: color-mix(in srgb, var(--color-sage) 24%, var(--surface-raised));
+}
+
+.itemName {
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.2;
+}

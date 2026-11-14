@@ -447,5 +447,5 @@ button.goods:active .goodsArt {
   font-weight: 800;
   font-size: 13px;
   color: var(--action-label);
-  background: color-mix(in srgb, var(--color-sage) 40%, var(--surface-raised));
+  background: var(--action-bottom);
 }

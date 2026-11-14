@@ -1,4 +1,4 @@
--- Lumipals: Pals, profile characters you pick, collect, grow (one Glow-up per finished world) and dress up.
+-- Lumipals: Pals, profile characters you pick, collect, grow by playing (20 solved levels per form) and dress up.
 -- Run in Supabase → SQL Editor AFTER social.sql. Safe to run more than once.
 -- Rules must match src/game/pals.js (a test checks the unlocks and prices).
 
@@ -238,35 +238,8 @@ begin
 end;
 $$;
 
--- Glow-ups: one per finished world. Spending one grows a Pal into its next form (5 forms: 0-4).
-create or replace function public.glow_up_pal(p_pal text)
-returns jsonb
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_user uuid := public._require_user();
-  v_profile public.profiles;
-  v_stage integer;
-  v_spent integer;
-begin
-  select * into v_profile from public.profiles where id = v_user for update;
-  if not (v_profile.pals ? p_pal) then
-    raise exception using message = 'That Pal isn’t on your team yet.';
-  end if;
-  v_stage := coalesce((v_profile.pals -> p_pal ->> 'stage')::integer, 0);
-  if v_stage >= 4 then
-    raise exception using message = 'This Pal is already a Legend!';
-  end if;
-  select coalesce(sum(coalesce((value ->> 'stage')::integer, 0)), 0) into v_spent from jsonb_each(v_profile.pals);
-  if public._finished_world_count(v_user) - v_spent < 1 then
-    raise exception using message = 'Finish a world to earn a Glow-up.';
-  end if;
-  update public.profiles set pals = jsonb_set(pals, array[p_pal], jsonb_build_object('stage', v_stage + 1)) where id = v_user;
-  return public._economy_state(v_user);
-end;
-$$;
+-- Pals now grow by playing (see record_level_result), so Glow-ups are gone.
+drop function if exists public.glow_up_pal(text);
 
 create or replace function public.buy_accessory(p_item text)
 returns jsonb
@@ -351,7 +324,8 @@ begin
 end;
 $$;
 
--- Level results: as in social.sql (kept here so all of Lumipals' level rules stay in one place).
+-- Level results: as in social.sql, plus Pal growth: each solved level (not a Skip, which sends no moves) grows
+-- the partner Pal by one; 20 grow it into its next form (5 forms: 0-4). Must match growPartnerLocally in pals.js.
 create or replace function public.record_level_result(p_level_id text, p_stars integer, p_moves integer)
 returns jsonb
 language plpgsql
@@ -365,6 +339,9 @@ declare
   v_world integer;
   v_diamonds integer := 0;
   v_is_real_level boolean;
+  v_pal text;
+  v_stage integer;
+  v_growth integer;
 begin
   if p_stars < 1 or p_stars > 3 then
     raise exception using message = 'Invalid result.';
@@ -386,6 +363,19 @@ begin
     completed_at = now();
 
   update public.profiles set sparks = sparks + v_sparks where id = v_user;
+
+  if p_moves is not null then
+    select pal_id, coalesce((pals -> pal_id ->> 'stage')::integer, 0), coalesce((pals -> pal_id ->> 'growth')::integer, 0) + 1
+      into v_pal, v_stage, v_growth
+      from public.profiles where id = v_user and pals ? pal_id for update;
+    if v_pal is not null and v_stage < 4 then
+      if v_growth >= 20 then
+        v_stage := v_stage + 1;
+        v_growth := 0;
+      end if;
+      update public.profiles set pals = jsonb_set(pals, array[v_pal], jsonb_build_object('stage', v_stage, 'growth', v_growth)) where id = v_user;
+    end if;
+  end if;
 
   select world into v_world from public.levels where id = p_level_id;
   v_world := coalesce(v_world, (regexp_match(p_level_id, '^w([0-9]+)-'))[1]::integer);
@@ -434,8 +424,6 @@ revoke all on function public.buy_accessory(text) from public, anon;
 revoke all on function public.wear_accessory(text, boolean) from public, anon;
 revoke all on function public.adopt_pal(text) from public, anon;
 grant execute on function public.choose_pal(text) to authenticated;
-revoke all on function public.glow_up_pal(text) from public, anon;
-grant execute on function public.glow_up_pal(text) to authenticated;
 revoke all on function public._finished_world_count(uuid) from public, anon, authenticated;
 grant execute on function public.buy_accessory(text) to authenticated;
 grant execute on function public.wear_accessory(text, boolean) to authenticated;

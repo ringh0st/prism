@@ -1,0 +1,96 @@
+.scene {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  aspect-ratio: 400 / 280;
+  box-shadow: var(--shadow-md);
+  container-type: inline-size;
+}
+
+.art {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fireflies g {
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  50% {
+    opacity: 0.35;
+    transform: translateY(-4px);
+  }
+}
+
+/* A Pal standing in the Grove (positioned by its feet) */
+.pal {
+  position: absolute;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform: translate(-50%, -78%);
+  animation: idle 3.4s ease-in-out infinite;
+}
+
+.pal svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pal:focus-visible {
+  border-radius: 50%;
+}
+
+@keyframes idle {
+  50% {
+    transform: translate(-50%, -80%);
+  }
+}
+
+.hop {
+  animation: hop 600ms var(--ease-pop);
+}
+
+@keyframes hop {
+  40% {
+    transform: translate(-50%, -100%) scale(1.06, 0.96);
+  }
+}
+
+.bubble {
+  position: absolute;
+  bottom: 96%;
+  left: 50%;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(11px, 3.4cqi, 15px);
+  white-space: nowrap;
+  color: var(--text-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  transform: translateX(-50%);
+  animation: pop 300ms var(--ease-pop) both;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fireflies g,
+  .pal,
+  .hop,
+  .bubble {
+    animation: none;
+  }
+}

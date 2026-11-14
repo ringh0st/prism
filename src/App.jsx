@@ -11,10 +11,10 @@ import SettingsScreen from './screens/SettingsScreen.jsx';
 import StoreScreen from './screens/StoreScreen.jsx';
 import LeaderboardScreen from './screens/leaderboard/LeaderboardScreen.jsx';
 import PalsScreen from './screens/pals/PalsScreen.jsx';
+import GroveScreen from './screens/grove/GroveScreen.jsx';
 import WeeklyRewardDialog from './screens/leaderboard/WeeklyRewardDialog.jsx';
 import StarterPicker from './screens/pals/StarterPicker.jsx';
 import PalUnlockNotice from './screens/pals/PalUnlockNotice.jsx';
-import GlowUpNotice from './screens/pals/GlowUpNotice.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
 import LoadingScreen from './screens/LoadingScreen.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
@@ -52,7 +52,6 @@ function PalNotices() {
   return (
     <>
       <PalUnlockNotice />
-      <GlowUpNotice />
     </>
   );
 }
@@ -90,6 +89,8 @@ function Routes() {
       return <LeaderboardScreen />;
     case 'pals':
       return <PalsScreen />;
+    case 'grove':
+      return <GroveScreen />;
     case 'settings':
       return <SettingsScreen />;
     case 'store':

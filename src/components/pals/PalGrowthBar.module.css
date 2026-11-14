@@ -1,0 +1,46 @@
+.box {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-strong);
+}
+
+.track {
+  height: 14px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  min-width: 14px;
+  border-radius: inherit;
+  background: var(--color-sage);
+  transition: width 600ms var(--ease-out);
+}
+
+.full .fill {
+  background: var(--color-honey);
+}
+
+.line {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-soft);
+}

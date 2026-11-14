@@ -19,7 +19,7 @@ export function titleFor(stars) {
 }
 
 /** Solved built-in levels ("w3-01" … "w3-20", at least one star) per world number. */
-export function solvedCountByWorld(levels) {
+function solvedCountByWorld(levels) {
   const solvedPerWorld = new Map();
   for (const [id, entry] of Object.entries(levels)) {
     const world = /^w(\d+)-\d{2}$/.exec(id)?.[1];
