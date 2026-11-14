@@ -178,13 +178,6 @@
   flex: 1;
 }
 
-.cheerLine {
-  margin: 0 0 4px;
-  font-family: var(--font-display);
-  font-weight: 600;
-  color: var(--text-strong);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .cheerPal {
     animation: none;

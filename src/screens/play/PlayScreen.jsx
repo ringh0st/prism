@@ -47,6 +47,7 @@ import { isRotatable } from '../../game/beam.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import { EVENT_LEVELS, parseEventLevelId } from '../../game/events.js';
 import ComboBurst from './ComboBurst.jsx';
+import Callout from './Callout.jsx';
 import { treatFoundBy } from '../../game/treats.js';
 import { newStickersFor } from '../../game/stickers.js';
 import { climbFor } from '../../game/titles.js';
@@ -59,6 +60,8 @@ import { comboFor } from '../../game/combos.js';
 import styles from './PlayScreen.module.css';
 
 const WIN_DIALOG_DELAY_MS = 1300;
+/** Lumi's quips that are just cheers: shown as a pop-up word over the board, not in her speech box. */
+const CALLOUT_EVENTS = new Set(['start', 'gem', 'combo', 'lastMove', 'win1', 'win2', 'win3', 'streak']);
 const IDLE_AFTER_MS = 30000;
 /** Taps in a row that light no new gem before Lumi suggests a Hint. */
 const STUCK_AFTER_MOVES = 6;
@@ -203,7 +206,18 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   );
   const isOver = trace.isSolved || isOutOfMoves || Boolean(result);
 
-  const say = useCallback((mood, event) => setLumi({ mood, line: event ? line(`quips.${event}`, quipLines(event)) : '' }), [line]);
+  // Cheers pop over the board and fade (a game shout, nothing to read); Lumi's box keeps the useful lines.
+  const [callout, setCallout] = useState(null);
+  const say = useCallback(
+    (mood, event) => {
+      const text = event ? line(`quips.${event}`, quipLines(event)) : '';
+      if (!CALLOUT_EVENTS.has(event)) return setLumi({ mood, line: text });
+      setLumi({ mood, line: '' });
+      // A combo already shows its own burst.
+      if (event !== 'combo') setCallout({ text, key: Date.now(), isBig: event.startsWith('win') });
+    },
+    [line],
+  );
   const playStats = usePlayStats(level.id, mode === 'level', moves);
 
   // Reset per level.
@@ -322,8 +336,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       // The light finale: each move left over bursts along the winning light path before the result shows.
       const movesLeft = isSkipped ? 0 : moveLimit - moves;
       const finaleMs = playLightFinale({ segments: trace.segments, width: level.width, movesLeft, onBurst: sfx.finaleBurst });
-      if (finaleMs > 0) setLumi({ mood: 'dance', line: t('play.spare', { count: movesLeft }) });
-      else say(stars === 3 ? 'dance' : 'excited', isSkipped ? null : `win${stars}`);
+      if (finaleMs > 0) {
+        setLumi({ mood: 'dance', line: '' });
+        setCallout({ text: t('play.spare', { count: movesLeft }), key: Date.now(), isBig: true });
+      } else say(stars === 3 ? 'dance' : 'excited', isSkipped ? null : `win${stars}`);
       react('dance');
       const worldRefs = mode === 'level' ? levelRefsInWorld(level.world) : [];
       const wasWorldComplete = isWorldComplete(progress, worldRefs);
@@ -646,6 +662,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         style={boardRoom ? { '--board-max-height': `${boardRoom}px` } : undefined}
       >
         {combo && <ComboBurst combo={combo} />}
+        {callout && <Callout callout={callout} />}
         <Board
           level={level}
           orients={puzzle.orients}

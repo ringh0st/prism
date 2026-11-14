@@ -188,8 +188,6 @@ export const en = {
   'win.next': 'Next level',
   'win.playAgain': 'Play again',
   'win.grew': '{name} grew into a {stage}!',
-  'win.cheer': '{name}: “{line}”',
-  'win.cheerLine': 'Yay, you did it!',
   'win.treat': '{name} found {treat}! Feed it in Pals.',
   'win.sticker': 'New sticker: {name} (World {world})',
   'win.worldDiamond': 'Finishing a world earns a diamond.',

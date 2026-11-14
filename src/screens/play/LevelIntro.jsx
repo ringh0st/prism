@@ -66,25 +66,30 @@ export default function LevelIntro({
         </ScreenTitle>
         {sticker && <p className={`game-title ${styles.sticker}`}>{t(sticker.key)}</p>}
         {flavor && <p className={`game-title ${styles.flavor}`}>✨ {flavor.name}</p>}
-        <p className={styles.goal}>
-          {t('intro.lightGems', { count: gems.length })}
-          <span className={styles.gems}>
+        {/* The goal at a glance: the gems to light, then the stars (words only for screen readers). */}
+        <p
+          className={styles.goal}
+          aria-label={`${t('intro.lightGems', { count: gems.length })}. ${showsStarTarget ? t('intro.starTarget', { count: level.par }) : t('intro.inMoves', { count: limit })}`}
+        >
+          <span className={styles.gems} aria-hidden="true">
             {gems.map((gem, i) => (
-              <GemShape key={i} color={gem.color} size={22} />
+              <GemShape key={i} color={gem.color} size={34} />
             ))}
           </span>
-          <span className={styles.together}>
-            {showsStarTarget ? <>{t('intro.starTarget', { count: level.par })}</> : <>{t('intro.inMoves', { count: limit })}</>}
+          <span className={`game-title ${styles.together}`} aria-hidden="true">
+            {showsStarTarget ? t('intro.starTarget', { count: level.par }) : t('intro.inMoves', { count: limit })}
           </span>
         </p>
         {glowbugId && (
-          <p className={styles.glowbug}>
-            <GlowbugArt id={glowbugId} size={40} isAwake={false} />
-            <span>{t('intro.rescue', { name: glowbugName(lang, glowbugById(glowbugId)) })}</span>
+          <p className={styles.glowbug} aria-label={t('intro.rescue', { name: glowbugName(lang, glowbugById(glowbugId)) })}>
+            <GlowbugArt id={glowbugId} size={44} isAwake={false} />
+            <span className="game-title" aria-hidden="true">
+              ★★★
+            </span>
           </p>
         )}
         <div className={styles.lumi}>
-          <LumiSays mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={84} line={flavor?.goal ?? lumiLine} />
+          <LumiSays mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={84} line={lumiLine} />
         </div>
         <Button size="lg" icon="play" onClick={onDone} data-autofocus autoFocus>
           {t('intro.go')}

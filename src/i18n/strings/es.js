@@ -184,8 +184,6 @@ export const es = {
   'win.next': 'Siguiente nivel',
   'win.playAgain': 'Jugar otra vez',
   'win.grew': '¡{name} creció: ahora es {stage}!',
-  'win.cheer': '{name}: «{line}»',
-  'win.cheerLine': '¡Bien hecho!',
   'win.treat': '¡{name} encontró {treat}! Dáselo en Amigos.',
   'win.sticker': 'Nueva pegatina: {name} (Mundo {world})',
   'win.worldDiamond': 'Terminar un mundo da un diamante.',

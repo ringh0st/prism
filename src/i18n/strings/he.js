@@ -186,8 +186,6 @@ export const he = {
   'win.next': 'לשלב הבא',
   'win.playAgain': 'לשחק שוב',
   'win.grew': '{name} גדל ועכשיו הוא {stage}!',
-  'win.cheer': '{name}: "{line}"',
-  'win.cheerLine': 'יש! הצלחתם!',
   'win.treat': '{name} מצא {treat}! האכילו אותו במסך החברים.',
   'win.sticker': 'מדבקה חדשה: {name} (עולם {world})',
   'win.worldDiamond': 'סיום עולם מזכה ביהלום.',

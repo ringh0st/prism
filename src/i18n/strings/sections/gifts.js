@@ -56,9 +56,9 @@ export const en = {
   'present.odds.helper': 'A helper',
   'present.odds.sparks': 'A bag of {n} more sparks',
   'present.odds.item': 'Clothes or decor you don’t have yet',
-  'present.win.ready': '{name} has a present for you on the map!',
-  'present.win.toGo.one': '{count} more ★ until {name}’s present',
-  'present.win.toGo.other': '{count} more ★ until {name}’s present',
+  'present.win.ready': 'A present is waiting!',
+  'present.win.toGo.one': '{count} more ★',
+  'present.win.toGo.other': '{count} more ★',
   'ui.error.noPresent': 'No present yet.',
 };
 
@@ -119,9 +119,9 @@ export const es = {
   'present.odds.helper': 'Una ayuda',
   'present.odds.sparks': 'Una bolsa con {n} chispas más',
   'present.odds.item': 'Ropa o decoración que aún no tienes',
-  'present.win.ready': '¡{name} tiene un regalo para ti en el mapa!',
-  'present.win.toGo.one': 'Falta {count} ★ para el regalo de {name}',
-  'present.win.toGo.other': 'Faltan {count} ★ para el regalo de {name}',
+  'present.win.ready': '¡Te espera un regalo!',
+  'present.win.toGo.one': 'Falta {count} ★',
+  'present.win.toGo.other': 'Faltan {count} ★',
   'ui.error.noPresent': 'Todavía no hay regalo.',
 };
 
@@ -182,8 +182,8 @@ export const he = {
   'present.odds.helper': 'עזר',
   'present.odds.sparks': 'שקית עם עוד {n} ניצוצות',
   'present.odds.item': 'בגד או קישוט שעוד אין לכם',
-  'present.win.ready': '{name} מחכה לכם עם מתנה במפה!',
-  'present.win.toGo.one': 'עוד כוכב ★ אחד עד המתנה של {name}',
-  'present.win.toGo.other': 'עוד {count} ★ עד המתנה של {name}',
+  'present.win.ready': 'מתנה מחכה לכם!',
+  'present.win.toGo.one': 'עוד ★ אחד',
+  'present.win.toGo.other': 'עוד {count} ★',
   'ui.error.noPresent': 'עוד אין מתנה.',
 };

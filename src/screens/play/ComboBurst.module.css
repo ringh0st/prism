@@ -28,16 +28,6 @@
   background: linear-gradient(90deg, #df7458, #f0c14e, #58ac82);
 }
 
-.detail {
-  padding: 2px 10px;
-  border-radius: var(--radius-pill);
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--text-strong);
-  background: var(--surface-raised);
-  box-shadow: var(--shadow-sm);
-}
-
 @keyframes burst {
   0% {
     opacity: 0;

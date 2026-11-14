@@ -193,11 +193,8 @@ export default function WinDialog({
                 </p>
               ) : (
                 <>
-                  <p className={styles.cheerLine}>
-                    {t('win.cheer', { name: palName(lang, partner), line: lang === 'en' ? cheer.line : t('win.cheerLine') })}
-                  </p>
                   <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
-                  <PresentNote partner={partner} />
+                  <PresentNote />
                 </>
               )}
             </div>
