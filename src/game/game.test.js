@@ -280,7 +280,7 @@ test('pals: starter choice, unlocks, growth and accessories', async () => {
   assert.equal(pals.growPartnerLocally(legend).progress, legend);
   assert.equal(pals.palStage(pals.stageOf(progress.pal.owned.mossy)).name, 'Junior');
   assert.equal(pals.palStage(4).name, 'Legend');
-  assert.equal(pals.PALS.length, 40);
+  assert.equal(pals.PALS.length, 48);
   // Accessories cost sparks and must be owned to wear.
   assert.throws(() => pals.wearAccessoryLocally(progress, 'scarf', true));
   const rich = { ...progress, sparks: 100 };
@@ -307,8 +307,17 @@ test('pal unlocks and accessory prices match the database', async () => {
   for (const item of PAL_ACCESSORIES) {
     assert.ok(sql.includes(`when '${item.id}' then '{"price": ${item.price}, "slot": "${item.slot}"}'::jsonb`), `${item.id} price and slot`);
   }
-  const { ADOPT_PAL_DIAMONDS } = await import('./pals.js');
-  assert.ok(sql.includes(`v_price constant integer := ${ADOPT_PAL_DIAMONDS};`), 'adopt price');
+  const { ADOPT_PRICES, rarityOf, LUCKY_PAL_EVERY, LUCKY_PAL_FALLBACK_SPARKS } = await import('./pals.js');
+  assert.ok(sql.includes(`when 'mythic' then ${ADOPT_PRICES.mythic} when 'legendary' then ${ADOPT_PRICES.legendary} else ${ADOPT_PRICES.common} end`), 'adopt prices');
+  // Same Pal order (daily picks depend on it) and the same rarities on both sides.
+  const allPals = sql.slice(sql.indexOf('_all_pals()'), sql.indexOf('_pal_rarity(p_pal text)'));
+  assert.deepEqual([...allPals.matchAll(/'(\w+)'/g)].map((m) => m[1]), PALS.map((pal) => pal.id), 'pal order');
+  for (const rarity of ['legendary', 'mythic']) {
+    const ids = PALS.filter((pal) => rarityOf(pal) === rarity).map((pal) => `'${pal.id}'`).join(', ');
+    assert.ok(sql.includes(`when p_pal in (${ids}) then '${rarity}'`), `${rarity} list`);
+  }
+  assert.ok(sql.includes(`v_solved / ${LUCKY_PAL_EVERY} <=`) && sql.includes(`sparks = sparks + ${LUCKY_PAL_FALLBACK_SPARKS}`), 'lucky gift rules');
+  assert.ok(sql.includes('when v_roll < 0.1 then') && sql.includes('when v_roll < 0.3 then'), 'lucky odds');
   const { PAL_GROWTH_LEVELS } = await import('./pals.js');
   assert.ok(sql.includes(`if v_growth >= ${PAL_GROWTH_LEVELS} then`), 'levels per form');
 });
@@ -348,4 +357,32 @@ test('grove: decor is bought with sparks and placed one per spot, with the same 
   for (const item of GROVE_ITEMS) {
     assert.ok(sql.includes(`when '${item.id}' then '{"price": ${item.price}, "spot": "${item.spot}"}'::jsonb`), `${item.id} price and spot`);
   }
+});
+
+test('pals: daily Shop picks and Lucky Pal gifts', async () => {
+  const { createEmptyProgress } = await import('./progress.js');
+  const pals = await import('./pals.js');
+  const base = { ...createEmptyProgress(), pal: { id: 'ember', owned: { ember: { stage: 0 } }, accessories: [], wearing: [] } };
+  // A daily pick is a Pal you don't have, the same all day, and usually different tomorrow.
+  const day = new Date('2026-06-01T08:00:00Z');
+  const pick = pals.dailyPalPick(base, 'mythic', 42, day);
+  assert.equal(pals.rarityOf(pick), 'mythic');
+  assert.equal(pals.dailyPalPick(base, 'mythic', 42, new Date('2026-06-01T23:00:00Z')).id, pick.id);
+  assert.notEqual(pals.dailyPalPick(base, 'mythic', 42, new Date('2026-06-02T08:00:00Z')).id, pick.id);
+  assert.equal(pals.canAdopt(base, pick, 42, day), true);
+  const other = pals.PALS.find((pal) => pals.rarityOf(pal) === 'mythic' && pal.id !== pick.id);
+  assert.equal(pals.canAdopt(base, other, 42, day), false);
+  assert.equal(pals.canAdopt(base, pals.palById('mossy'), 42, day), true);
+  // Lucky gifts: one per 200 solved levels, odds 10/20/70, always a Pal you don't have.
+  assert.equal(pals.luckyRarityFor(0.05), 'mythic');
+  assert.equal(pals.luckyRarityFor(0.2), 'legendary');
+  assert.equal(pals.luckyRarityFor(0.5), 'common');
+  assert.throws(() => pals.claimLuckyPalLocally(base));
+  const levels = Object.fromEntries(Array.from({ length: 200 }, (_, i) => [`w${Math.floor(i / 20) + 1}-${String((i % 20) + 1).padStart(2, '0')}`, { stars: 1 }]));
+  const gift = pals.claimLuckyPalLocally({ ...base, levels }, 0.05, 0);
+  assert.equal(pals.rarityOf(pals.palById(gift.palId)), 'mythic');
+  assert.ok(gift.progress.pal.owned[gift.palId]);
+  assert.equal(pals.luckyPalsWaiting(gift.progress), 0);
+  // Legendary Pals can't be unlocked by stars; only gifts or the Shop.
+  assert.equal(pals.isPalUnlocked({ ...base, levels }, pals.palById('leo')), false);
 });

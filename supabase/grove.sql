@@ -54,7 +54,8 @@ as $$
     'sparkPurchasesToday', case when p.spark_purchase_date = current_date then p.spark_purchases_today else 0 end,
     'claimedChests', to_jsonb(p.claimed_chests),
     'pal', jsonb_build_object('id', p.pal_id, 'owned', p.pals, 'accessories', to_jsonb(p.pal_accessories), 'wearing', to_jsonb(p.pal_wearing)),
-    'grove', jsonb_build_object('items', to_jsonb(p.grove_items), 'placed', to_jsonb(p.grove_placed))
+    'grove', jsonb_build_object('items', to_jsonb(p.grove_items), 'placed', to_jsonb(p.grove_placed)),
+    'luckyPalsClaimed', p.lucky_pals_claimed
   )
   from public.profiles p
   where p.id = p_user;

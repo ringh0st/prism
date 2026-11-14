@@ -10,6 +10,7 @@ import {
   buyAccessoryOnServer,
   wearAccessoryOnServer,
   adoptPalOnServer,
+  claimLuckyPalOnServer,
   buyGroveItemOnServer,
   placeGroveItemOnServer,
   claimWeeklyRewardOnServer,
@@ -38,7 +39,15 @@ import { todayKey } from '../game/daily.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
 import { DAILY_GIFT_SPARKS } from '../game/catalog.js';
 import { nicknameProblem } from '../game/nicknames.js';
-import { buyAccessoryLocally, choosePalLocally, growPartnerLocally, wearAccessoryLocally } from '../game/pals.js';
+import {
+  buyAccessoryLocally,
+  choosePalLocally,
+  claimLuckyPalLocally,
+  growPartnerLocally,
+  luckyPalsWaiting,
+  seedFor,
+  wearAccessoryLocally,
+} from '../game/pals.js';
 import { buyGroveItemLocally, placeGroveItemLocally } from '../game/grove.js';
 import { sfx } from '../audio/sfx.js';
 
@@ -60,6 +69,8 @@ export function PlayerProvider({ children }) {
   const [settings, setSettings] = useState(() => ({ ...DEFAULT_SETTINGS, ...readJson(SETTINGS_KEY, {}) }));
   const [syncStatus, setSyncStatus] = useState('local'); // local | syncing | synced | error
   const [weeklyReward, setWeeklyReward] = useState(null);
+  /** Lucky Pal gifts opened and not shown yet: { palId, sparks }[] */
+  const [luckyGifts, setLuckyGifts] = useState([]);
   const progressRef = useRef(progress);
 
   const setProgress = useCallback((next) => {
@@ -72,6 +83,27 @@ export function PlayerProvider({ children }) {
     (state) => setProgress(withServerState(progressRef.current, state, todayKey())),
     [setProgress],
   );
+
+  /** Open every Lucky Pal gift that's waiting (the server draws them for accounts) and queue the reveals. */
+  const openLuckyPals = useCallback(async () => {
+    const opened = [];
+    if (!userId) {
+      while (luckyPalsWaiting(progressRef.current) > 0) {
+        const gift = claimLuckyPalLocally(progressRef.current);
+        setProgress(gift.progress);
+        opened.push({ palId: gift.palId, sparks: gift.sparks });
+      }
+    } else {
+      for (let i = 0; i < 10 && luckyPalsWaiting(progressRef.current) > 0; i++) {
+        const state = await claimLuckyPalOnServer().catch(() => null);
+        if (!state) break;
+        applyServerState(state);
+        if (!state.luckyPal && !state.sparksEarned) break;
+        opened.push({ palId: state.luckyPal, sparks: state.sparksEarned });
+      }
+    }
+    if (opened.length) setLuckyGifts((queue) => [...queue, ...opened]);
+  }, [userId, setProgress, applyServerState]);
 
   useEffect(() => {
     writeJson(SETTINGS_KEY, settings);
@@ -101,10 +133,11 @@ export function PlayerProvider({ children }) {
         applyServerState(claimed);
         setWeeklyReward(claimed.reward);
       }
+      await openLuckyPals();
     } catch {
       setSyncStatus('error');
     }
-  }, [userId, setProgress, applyServerState]);
+  }, [userId, setProgress, applyServerState, openLuckyPals]);
 
   useEffect(() => {
     if (userId) syncWithServer();
@@ -121,6 +154,11 @@ export function PlayerProvider({ children }) {
       /** Last week's top-10 reward that was just collected, shown once. */
       weeklyReward,
       dismissWeeklyReward: () => setWeeklyReward(null),
+      /** The next Lucky Pal gift to reveal, if any. */
+      luckyGift: luckyGifts[0] ?? null,
+      dismissLuckyGift: () => setLuckyGifts((queue) => queue.slice(1)),
+      /** This player's number for their daily Shop picks. */
+      shopSeed: userId ? seedFor(userId) : progress.shopSeed,
 
       /** @returns Promise<{ stars, previousStars, sparksEarned, diamondsEarned, isNewBest }> */
       async finishLevel(level, result) {
@@ -135,11 +173,15 @@ export function PlayerProvider({ children }) {
           local.palGrewTo = grown.grewTo;
         }
         setProgress(local.progress);
-        if (!userId) return { ...local, diamondsEarned: 0 };
+        if (!userId) {
+          openLuckyPals();
+          return { ...local, diamondsEarned: 0 };
+        }
         try {
           const state = await recordLevelResultOnServer(level.id, local.stars, result.moves);
           applyServerState(state);
           setSyncStatus('synced');
+          openLuckyPals();
           return { ...local, sparksEarned: state.sparksEarned, diamondsEarned: state.diamondsEarned };
         } catch {
           // Stars are kept on the device and sent again on the next sync.
@@ -299,7 +341,7 @@ export function PlayerProvider({ children }) {
         setProgress(createEmptyProgress());
       },
     }),
-    [progress, settings, syncStatus, userId, weeklyReward, setProgress, applyServerState, syncWithServer],
+    [progress, settings, syncStatus, userId, weeklyReward, luckyGifts, setProgress, applyServerState, syncWithServer, openLuckyPals],
   );
 
   return <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>;

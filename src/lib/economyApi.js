@@ -51,6 +51,9 @@ export const buyGroveItemOnServer = (itemId) => rpc('buy_grove_item', { p_item: 
 
 export const placeGroveItemOnServer = (itemId, isPlacing) => rpc('place_grove_item', { p_item: itemId, p_place: isPlacing });
 
+/** Opens one waiting Lucky Pal gift (every 200 solved levels). The result's `luckyPal` is the new Pal or null. */
+export const claimLuckyPalOnServer = () => rpc('claim_lucky_pal');
+
 /** Adopt a Pal you choose for diamonds. */
 export const adoptPalOnServer = (palId) => rpc('adopt_pal', { p_pal: palId });
 

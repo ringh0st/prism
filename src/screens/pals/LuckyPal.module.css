@@ -1,0 +1,133 @@
+/* The progress card on the Pals screen */
+.card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-md);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.body {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.body h2 {
+  font-size: 20px;
+}
+
+.line {
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.track {
+  height: 12px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  min-width: 12px;
+  border-radius: inherit;
+  background: var(--color-honey);
+  transition: width 600ms var(--ease-out);
+}
+
+.odds {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+/* The gift dialog */
+.box {
+  display: grid;
+  place-items: center;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto var(--space-3);
+  border: 0;
+  border-radius: 36px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: var(--shadow-button);
+  cursor: pointer;
+  animation: wiggle 1.4s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  70% {
+    transform: rotate(-7deg) scale(1.04);
+  }
+  80% {
+    transform: rotate(6deg) scale(1.04);
+  }
+  90% {
+    transform: rotate(-3deg);
+  }
+}
+
+.reveal {
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--space-2);
+  animation: reveal 650ms var(--ease-pop) both;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-12deg);
+  }
+}
+
+.text {
+  margin-bottom: var(--space-4);
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.sparks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: var(--space-2);
+  font-size: 28px;
+}
+
+.actions {
+  display: grid;
+  gap: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .box,
+  .reveal {
+    animation: none;
+  }
+}

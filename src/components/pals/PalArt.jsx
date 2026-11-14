@@ -281,6 +281,13 @@ function Ears({ type, color, inner }) {
           <path d="M46 32 50 14l4 18z" fill={inner} />
         </>
       );
+    case 'tusk':
+      return (
+        <g>
+          <path d="M47 32 52 2l3 30z" fill="#f4ead8" />
+          <path d="M48 26l6-3M49 18l5-3M50 10l4-2" stroke="#d9c4a6" strokeWidth="1.6" />
+        </g>
+      );
     case 'tufts':
       return <path d="M30 42l-8-22 16 12zM70 42l8-22-16 12z" fill={inner} />;
     case 'nubs':
@@ -357,6 +364,8 @@ function Tail({ type, color, inner }) {
           <circle cx="84" cy="68" r="5" />
         </g>
       );
+    case 'fin':
+      return <path d="M66 84c8-4 16-14 26-12-4 6-4 12 0 18-10 2-18-2-26-6z" fill={inner} />;
     case 'humps':
       return (
         <g fill={color}>
@@ -410,6 +419,33 @@ function Marking({ type, color }) {
       );
     case 'belly':
       return <ellipse cx="50" cy="66" rx="14" ry="10" fill={color} />;
+    case 'eyePatches':
+      return (
+        <g fill="#3b3330">
+          <ellipse cx="39" cy="52" rx="9" ry="11" transform="rotate(20 39 52)" />
+          <ellipse cx="61" cy="52" rx="9" ry="11" transform="rotate(-20 61 52)" />
+        </g>
+      );
+    case 'tigerStripes':
+      return <path d="M44 32l2 7M50 30v8M56 32l-2 7M27 52l7 2M27 60l7 0M73 52l-7 2M73 60l-7 0" stroke="#3b3330" strokeWidth="3" strokeLinecap="round" />;
+    case 'leopardSpots':
+      return (
+        <g fill="none" stroke="#8d8278" strokeWidth="2">
+          <circle cx="36" cy="38" r="3" />
+          <circle cx="64" cy="37" r="3" />
+          <circle cx="50" cy="34" r="2.5" />
+          <circle cx="30" cy="62" r="2.5" />
+          <circle cx="70" cy="62" r="2.5" />
+        </g>
+      );
+    case 'koiSpots':
+      return (
+        <g fill="#f2a67e">
+          <path d="M34 34c8-6 18-4 20 4-6 4-16 4-20-4z" />
+          <circle cx="66" cy="66" r="5" />
+          <circle cx="36" cy="70" r="3.5" />
+        </g>
+      );
     case 'trunk':
       return <path d="M45 59h10v11a5 5 0 0 1-10 0z" fill="#857a6e" />;
     case 'muzzle':
@@ -422,7 +458,7 @@ function Marking({ type, color }) {
 }
 
 /** Builds a Pal from parts: head and body colors, ears, a signature tail/feature and face markings. */
-function partsPal({ color, headColor = color, inner, belly = null, ears, tail, marks = [], shape = 'chibi', faceY = 54, gap = 10, behind = null }) {
+function partsPal({ color, headColor = color, earColor = headColor, inner, belly = null, ears, tail, marks = [], shape = 'chibi', faceY = 54, gap = 10, behind = null }) {
   const head =
     shape === 'cloud' ? (
       <g fill={color}>
@@ -455,7 +491,7 @@ function partsPal({ color, headColor = color, inner, belly = null, ears, tail, m
       <>
         {behind}
         {body}
-        <Ears type={ears} color={headColor} inner={inner} />
+        <Ears type={ears} color={earColor} inner={inner} />
         {head}
         {belly && <Marking type="belly" color={belly} />}
         {marks.map((mark) => (
@@ -495,6 +531,15 @@ const PARTS_PALS = {
   twinkle: { color: '#ffd45e', inner: '#f2a67e', ears: 'none', tail: 'twinkles', shape: 'star', faceY: 50, gap: 8 },
   starla: { color: '#fffaf2', inner: '#f6c3b2', ears: 'unicorn', tail: 'mane' },
   ziggy: { color: '#7cc8b5', inner: '#3f8a64', ears: 'dragon', tail: 'batWings', belly: '#dcefe9' },
+  // Legendary Pals
+  leo: { color: '#e9b86a', inner: '#c98a3e', ears: 'bear', tail: 'tuftTail', belly: '#fff1d6', marks: ['nose'] },
+  koi: { color: '#fbf5ec', inner: '#f2a67e', ears: 'none', tail: 'fin', marks: ['koiSpots'], faceY: 56 },
+  bamboo: { color: '#f7f3ec', earColor: '#3b3330', inner: '#3b3330', ears: 'bear', tail: 'none', marks: ['eyePatches', 'nose'] },
+  aurora: { color: '#f1ece3', inner: '#cfe9e2', ears: 'cat', tail: 'fluffy', marks: ['nose'] },
+  storm: { color: '#f2a67e', inner: '#fff6ea', ears: 'bear', tail: 'striped', belly: '#fff6ea', marks: ['tigerStripes', 'nose'] },
+  plume: { color: '#4fbfad', inner: '#f0c14e', ears: 'crest', tail: 'wings', belly: '#cfe9e2', marks: ['beak'] },
+  nova: { color: '#bcd6cf', inner: '#9fc4bb', ears: 'tusk', tail: 'flippers', belly: '#e9f3ef', marks: ['spots'] },
+  luna: { color: '#e9e4dc', inner: '#8d8278', ears: 'cat', tail: 'long', marks: ['leopardSpots', 'nose'] },
   // Mythic Pals
   sol: { color: '#f2a67e', inner: '#f0c14e', ears: 'crest', tail: 'wings', belly: '#fbe3a6', marks: ['beak'] },
   kiri: { color: '#9fd8cf', inner: '#f0c14e', ears: 'kirin', tail: 'tuftTail', belly: '#fff6ea', marks: ['nose'] },

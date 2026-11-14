@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import Button from '../../components/Button.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
+import RarityBadge from '../../components/pals/RarityBadge.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, PAL_ACCESSORIES, PAL_SLOTS, isPalUnlocked, palStage, stageOf, unlockText } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
@@ -30,6 +31,7 @@ function Collection({ onError }) {
           <li key={pal.id} className={`${styles.palCard} ${isPartner ? styles.partner : ''} ${isUnlocked ? '' : styles.locked}`}>
             <PalArt palId={pal.id} stage={stage.index} wearing={isPartner ? progress.pal.wearing : []} size={76} className={styles.palArt} />
             <span className={`game-title ${styles.palName}`}>{isUnlocked ? pal.name : '???'}</span>
+            <RarityBadge pal={pal} className={styles.rarity} />
             {isPartner && <span className={styles.badge}>Partner</span>}
             {owned && !isPartner && (
               <button type="button" className={styles.pickButton} onClick={() => pick(pal.id)}>
@@ -47,7 +49,6 @@ function Collection({ onError }) {
               </span>
             )}
             {owned && <span className={styles.stage}>{stage.name}</span>}
-            {pal.isMythic && <span className={styles.mythic}>✦ Mythic</span>}
           </li>
         );
       })}

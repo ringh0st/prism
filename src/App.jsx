@@ -15,6 +15,7 @@ import GroveScreen from './screens/grove/GroveScreen.jsx';
 import WeeklyRewardDialog from './screens/leaderboard/WeeklyRewardDialog.jsx';
 import StarterPicker from './screens/pals/StarterPicker.jsx';
 import PalUnlockNotice from './screens/pals/PalUnlockNotice.jsx';
+import LuckyPalDialog from './screens/pals/LuckyPalDialog.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
 import LoadingScreen from './screens/LoadingScreen.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
@@ -52,6 +53,7 @@ function PalNotices() {
   return (
     <>
       <PalUnlockNotice />
+      <LuckyPalDialog />
     </>
   );
 }

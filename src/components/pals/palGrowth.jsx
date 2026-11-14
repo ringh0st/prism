@@ -218,6 +218,55 @@ export const PAL_GROWTH = {
     form([<Wings key="w" kind="bat" color="#3f8a64" accent="#7cc8b5" y={58} />], [<Horns key="h" kind="nubs" color={HONEY} y={28} />]),
     form([<Tails key="t" angles={[60]} base={[60, 88]} color="#7cc8b5" tip={TERRACOTTA} />], [<Mark key="m" kind="flame" color={TERRACOTTA} y={40} />]),
   ],
+  // Legendary Pals
+  leo: [
+    null,
+    form([<Mane key="m" color="#c98a3e" cy={56} r={24} puff={6} count={12} />]),
+    form([<Mane key="m" color="#b57a32" edge="#8a5a36" cy={56} r={28} puff={8} />], [<Tuft key="t" color="#c98a3e" y={26} big />]),
+    form([<Rays key="r" color={HONEY} cy={56} />], [<Mark key="m" kind="star" color={HONEY} y={76} size={1.2} />]),
+  ],
+  koi: [
+    null,
+    form([], [<Spots key="p" color={HONEY} points={[[60, 40, 2.5], [44, 78, 2.5], [56, 82, 2]]} />]),
+    form([<Spikes key="s" color={PEACH} cy={56} r={26} round count={5} height={10} />]),
+    form([<Rays key="r" color={HONEY} cy={56} />, <Floaters key="f" kind="bubble" color={MINT} />]),
+  ],
+  bamboo: [
+    form([], [<Sprout key="s" kind="sprout" x={50} y={30} color={LEAF} />]),
+    form([], [<Fluff key="f" color={CREAM} y={84} />]),
+    form([], [<Sprout key="l" kind="leafy" x={50} y={30} color={LEAF_DARK} />, <Mark key="m" kind="heart" color={TERRACOTTA} y={76} />]),
+    form([<Wings key="w" kind="leaf" color={LEAF} accent={LEAF_DARK} y={64} />], [<Floaters key="f" kind="leaf" color={LEAF} />]),
+  ],
+  aurora: [
+    null,
+    form([], [<Mark key="m" kind="snow" color={MINT} y={40} />]),
+    form([<Tails key="t" angles={[-62]} base={[40, 88]} color="#f1ece3" tip={MINT} />]),
+    form([<RainbowArc key="r" cy={58} />, <Floaters key="f" kind="snow" color="#bfe6dc" />]),
+  ],
+  storm: [
+    null,
+    form([], [<CheekMarks key="c" color="#3b3330" y={62} gap={22} />]),
+    form([], [<Mark key="m" kind="bolt" color={HONEY} y={76} size={1.3} />, <Tuft key="t" color="#e08b5c" y={28} />]),
+    form([<Rays key="r" color={HONEY} cy={56} />], [<Floaters key="f" kind="star" color={HONEY} />]),
+  ],
+  plume: [
+    null,
+    form([<Tails key="t" angles={[-30, 0, 30]} base={[50, 70]} color="#3f9e8f" tip={HONEY} length={20} />]),
+    form([<Tails key="t" angles={[-75, -50, 50, 75]} base={[50, 70]} color="#4fbfad" tip={HONEY} length={24} />]),
+    form([<Rays key="r" color="#fbe3a6" cy={52} />], [<Mark key="m" kind="star" color={HONEY} y={40} />]),
+  ],
+  nova: [
+    null,
+    form([<Floaters key="f" kind="bubble" color={MINT} />]),
+    form([], [<Mark key="m" kind="drop" color={MINT} y={76} />, <CheekMarks key="c" color={CREAM} y={64} gap={20} />]),
+    form([<Rays key="r" color="#bff0e6" cy={56} />], [<Floaters key="f" kind="star" color={HONEY} />]),
+  ],
+  luna: [
+    null,
+    form([], [<Mark key="m" kind="moon" color={HONEY} y={44} />]),
+    form([<Mane key="m" color="#f4f0e8" edge="#c9c2b8" cy={58} r={26} puff={7} />]),
+    form([<Floaters key="f" kind="snow" color="#cfe9e2" />], [<Mark key="s" kind="star" color={HONEY} y={78} size={1.1} />]),
+  ],
   // Mythic Pals
   sol: [
     null,

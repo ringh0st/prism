@@ -33,6 +33,9 @@ export function createEmptyProgress() {
     giftDate: null,
     pal: { id: null, owned: {}, accessories: [], wearing: [] },
     grove: { items: [], placed: [] },
+    luckyPals: { claimed: 0 },
+    // A guest's number for their daily Shop picks (accounts use their id instead).
+    shopSeed: Math.floor(Math.random() * 1000),
     nickname: null,
   };
 }
@@ -52,6 +55,7 @@ export function upgradeProgress(saved) {
     daily: { ...empty.daily, ...saved?.daily },
     pal: upgradePal({ ...empty.pal, ...saved?.pal }),
     grove: { ...empty.grove, ...saved?.grove },
+    luckyPals: { ...empty.luckyPals, ...saved?.luckyPals },
   };
 }
 
@@ -214,5 +218,6 @@ export function withServerState(progress, state, today) {
     // The account's Pals win, unless the account has none yet (then keep this device's choice).
     pal: state.pal?.id ? state.pal : progress.pal,
     grove: state.grove ?? progress.grove,
+    luckyPals: { claimed: state.luckyPalsClaimed ?? progress.luckyPals.claimed },
   };
 }

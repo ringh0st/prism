@@ -326,7 +326,6 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
           {tab === 'sparks' && <SparksShelf buyProps={buyProps} onInfo={setInfo} />}
           {tab === 'pals' && (
             <>
-              <h2 className={`game-title ${styles.sectionTitle}`}>Adopt a Pal</h2>
               <AdoptShelf
                 onAdopted={(pal) => {
                   sfx.newPal();

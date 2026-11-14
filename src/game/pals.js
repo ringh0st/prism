@@ -39,21 +39,34 @@ export const PALS = [
   { id: 'twinkle', name: 'Twinkle', species: 'Star', animal: 'Star', unlock: { stars: 1800 } },
   { id: 'starla', name: 'Starla', species: 'Unicorn', animal: 'Unicorn', unlock: { stars: 2400 } },
   { id: 'ziggy', name: 'Ziggy', species: 'Dragon', animal: 'Dragon', unlock: { stars: 3000 } },
+  // Legendary Pals: rare and regal. They only arrive as Lucky Pal gifts (or by adoption).
+  { id: 'leo', name: 'Leo', species: 'Lion cub', animal: 'Lion', rarity: 'legendary', unlock: { lucky: true } },
+  { id: 'koi', name: 'Koi', species: 'Lucky koi', animal: 'Koi', rarity: 'legendary', unlock: { lucky: true } },
+  { id: 'bamboo', name: 'Bamboo', species: 'Giant panda', animal: 'Panda', rarity: 'legendary', unlock: { lucky: true } },
+  { id: 'aurora', name: 'Aurora', species: 'Arctic fox', animal: 'Snowfox', rarity: 'legendary', unlock: { lucky: true } },
+  { id: 'storm', name: 'Storm', species: 'Tiger cub', animal: 'Tiger', rarity: 'legendary', unlock: { lucky: true } },
+  { id: 'plume', name: 'Plume', species: 'Peacock', animal: 'Peacock', rarity: 'legendary', unlock: { lucky: true } },
+  { id: 'nova', name: 'Nova', species: 'Narwhal', animal: 'Narwhal', rarity: 'legendary', unlock: { lucky: true } },
+  { id: 'luna', name: 'Luna', species: 'Snow leopard', animal: 'Leopard', rarity: 'legendary', unlock: { lucky: true } },
   // Mythic Pals, from myths and legends around the world. They join late in the adventure.
-  { id: 'sol', name: 'Sol', species: 'Phoenix', animal: 'Phoenix', isMythic: true, unlock: { worlds: 15 } },
-  { id: 'kiri', name: 'Kiri', species: 'Qilin', animal: 'Qilin', isMythic: true, unlock: { worlds: 18 } },
-  { id: 'gryff', name: 'Gryff', species: 'Griffin', animal: 'Griffin', isMythic: true, unlock: { worlds: 20 } },
-  { id: 'nessa', name: 'Nessa', species: 'Loch Ness monster', animal: 'Nessie', isMythic: true, unlock: { streak: 21 } },
-  { id: 'dozy', name: 'Dozy', species: 'Baku dream-eater', animal: 'Baku', isMythic: true, unlock: { worlds: 22 } },
-  { id: 'nimbus', name: 'Nimbus', species: 'Pegasus', animal: 'Pegasus', isMythic: true, unlock: { worlds: 25 } },
-  { id: 'hopscotch', name: 'Hopscotch', species: 'Jackalope', animal: 'Jackalope', isMythic: true, unlock: { streak: 45 } },
-  { id: 'frosty', name: 'Frosty', species: 'Yeti', animal: 'Yeti', isMythic: true, unlock: { worlds: 30 } },
-  { id: 'fen', name: 'Fen', species: 'Fenrir wolf pup', animal: 'Wolf', isMythic: true, unlock: { worlds: 35 } },
-  { id: 'riddle', name: 'Riddle', species: 'Sphinx kitten', animal: 'Sphinx', isMythic: true, unlock: { worlds: 40 } },
+  { id: 'sol', name: 'Sol', species: 'Phoenix', animal: 'Phoenix', rarity: 'mythic', unlock: { worlds: 15 } },
+  { id: 'kiri', name: 'Kiri', species: 'Qilin', animal: 'Qilin', rarity: 'mythic', unlock: { worlds: 18 } },
+  { id: 'gryff', name: 'Gryff', species: 'Griffin', animal: 'Griffin', rarity: 'mythic', unlock: { worlds: 20 } },
+  { id: 'nessa', name: 'Nessa', species: 'Loch Ness monster', animal: 'Nessie', rarity: 'mythic', unlock: { streak: 21 } },
+  { id: 'dozy', name: 'Dozy', species: 'Baku dream-eater', animal: 'Baku', rarity: 'mythic', unlock: { worlds: 22 } },
+  { id: 'nimbus', name: 'Nimbus', species: 'Pegasus', animal: 'Pegasus', rarity: 'mythic', unlock: { worlds: 25 } },
+  { id: 'hopscotch', name: 'Hopscotch', species: 'Jackalope', animal: 'Jackalope', rarity: 'mythic', unlock: { streak: 45 } },
+  { id: 'frosty', name: 'Frosty', species: 'Yeti', animal: 'Yeti', rarity: 'mythic', unlock: { worlds: 30 } },
+  { id: 'fen', name: 'Fen', species: 'Fenrir wolf pup', animal: 'Wolf', rarity: 'mythic', unlock: { worlds: 35 } },
+  { id: 'riddle', name: 'Riddle', species: 'Sphinx kitten', animal: 'Sphinx', rarity: 'mythic', unlock: { worlds: 40 } },
 ];
 
 export const STARTER_PALS = PALS.filter((pal) => pal.isStarter);
 export const palById = (id) => PALS.find((pal) => pal.id === id) ?? null;
+
+/** How rare a Pal is: common (most), legendary or mythic. */
+export const rarityOf = (pal) => pal?.rarity ?? 'common';
+export const RARITY_NAMES = { common: 'Pal', legendary: 'Legendary', mythic: 'Mythic' };
 
 /** Each Pal has five forms, Baby to Legend. */
 export const PAL_STAGES = [
@@ -126,11 +139,71 @@ export const PAL_SLOTS = [
 ];
 
 /** Adopting a Pal you choose (one you don't have yet) costs diamonds. Must match public.adopt_pal(). */
-export const ADOPT_PAL_DIAMONDS = 20;
+/** Diamonds to adopt a Pal, by rarity. Legendary and Mythic Pals are sold as each player's daily pick. */
+export const ADOPT_PRICES = { common: 20, legendary: 40, mythic: 60 };
+export const adoptPriceOf = (pal) => ADOPT_PRICES[rarityOf(pal)];
+
+const DAY_ZERO = Date.UTC(2026, 0, 1);
+
+/** Days since 1 Jan 2026 by the UTC calendar, so the game and the server agree on "today". */
+export const utcDayNumber = (now = new Date()) =>
+  Math.floor((Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) - DAY_ZERO) / 86_400_000);
+
+/** A player's number for their daily Shop picks: the sum of the character codes of their account id. */
+export const seedFor = (text) => [...text].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+
+/**
+ * Today's Shop pick of one rarity, chosen at random for this player and shown before buying (so it's
+ * never a surprise purchase). It changes every day. Must match _daily_pick in supabase/pals.sql.
+ */
+export function dailyPalPick(progress, rarity, seed, now = new Date()) {
+  const pool = PALS.filter((pal) => rarityOf(pal) === rarity && !progress.pal.owned[pal.id]);
+  return pool.length ? pool[(utcDayNumber(now) + seed) % pool.length] : null;
+}
+
+/**
+ * Lucky Pal gifts: every 200 solved levels, a free Pal you don't have yet, picked at random with these
+ * odds (shown in the game). Free and earned, never bought. Must match claim_lucky_pal in supabase/pals.sql.
+ */
+export const LUCKY_PAL_EVERY = 200;
+export const LUCKY_PAL_ODDS = { mythic: 0.1, legendary: 0.2, common: 0.7 };
+export const LUCKY_PAL_FALLBACK_SPARKS = 300;
+
+export const solvedLevelCount = (levels) => Object.entries(levels).filter(([id, entry]) => /^w\d+-\d{2}$/.test(id) && entry.stars > 0).length;
+
+/** Lucky Pal gifts earned by solving levels and not opened yet. */
+export const luckyPalsWaiting = (progress) => Math.floor(solvedLevelCount(progress.levels) / LUCKY_PAL_EVERY) - progress.luckyPals.claimed;
+
+/** Which rarity a roll (0–1) lands on: 10% mythic, then 20% legendary, else common. */
+export function luckyRarityFor(roll) {
+  if (roll < LUCKY_PAL_ODDS.mythic) return 'mythic';
+  if (roll < LUCKY_PAL_ODDS.mythic + LUCKY_PAL_ODDS.legendary) return 'legendary';
+  return 'common';
+}
+
+/**
+ * Open one Lucky Pal gift. The rolled rarity is tried first; if you own all of those, the next rarer
+ * pool, then any Pal you don't have; if you have every Pal, sparks instead.
+ * @returns {{ progress, palId: string|null, sparks: number }}
+ */
+export function claimLuckyPalLocally(progress, roll = Math.random(), pick = Math.random()) {
+  if (luckyPalsWaiting(progress) < 1) throw new EconomyError('No Lucky Pal gift yet.');
+  const missing = (rarity) => PALS.filter((pal) => rarityOf(pal) === rarity && !progress.pal.owned[pal.id]);
+  const order = { mythic: ['mythic', 'legendary', 'common'], legendary: ['legendary', 'mythic', 'common'], common: ['common', 'legendary', 'mythic'] };
+  const pool = order[luckyRarityFor(roll)].map(missing).find((pals) => pals.length > 0);
+  const luckyPals = { claimed: progress.luckyPals.claimed + 1 };
+  if (!pool) {
+    return { progress: { ...progress, luckyPals, sparks: progress.sparks + LUCKY_PAL_FALLBACK_SPARKS }, palId: null, sparks: LUCKY_PAL_FALLBACK_SPARKS };
+  }
+  const pal = pool[Math.min(pool.length - 1, Math.floor(pick * pool.length))];
+  const owned = { ...progress.pal.owned, [pal.id]: { stage: 0 } };
+  return { progress: { ...progress, luckyPals, pal: { ...progress.pal, id: progress.pal.id ?? pal.id, owned } }, palId: pal.id, sparks: 0 };
+}
 
 export const accessoryById = (id) => PAL_ACCESSORIES.find((item) => item.id === id) ?? null;
 
-export function unlockText({ stars, worlds, streak }) {
+export function unlockText({ stars, worlds, streak, lucky }) {
+  if (lucky) return 'Lucky Pal gift';
   if (stars) return `Collect ${stars} ★`;
   if (worlds) return `Finish ${worlds} ${worlds === 1 ? 'world' : 'worlds'}`;
   return `Reach a ${streak}-day streak`;
@@ -140,7 +213,8 @@ export function unlockText({ stars, worlds, streak }) {
 export function isPalUnlocked(progress, pal) {
   if (progress.pal.owned[pal.id]) return true;
   if (!progress.pal.id && pal.isStarter) return true;
-  const { stars, worlds, streak } = pal.unlock;
+  const { stars, worlds, streak, lucky } = pal.unlock;
+  if (lucky) return false;
   if (stars) return totalStars(progress) >= stars;
   if (worlds) return finishedWorldCount(progress.levels) >= worlds;
   return progress.daily.streak >= streak;
@@ -176,7 +250,9 @@ export function wearAccessoryLocally(progress, accessoryId, isWearing) {
   return { ...progress, pal: { ...progress.pal, wearing: isWearing ? [...others, accessoryId] : others } };
 }
 
-/** Adopt a Pal of your choice (signed-in players pay with diamonds on the server). */
-export function canAdopt(progress, palId) {
-  return Boolean(palById(palId)) && !progress.pal.owned[palId];
+/** Can this Pal be adopted now? Any regular Pal you don't have; Legendary and Mythic ones only as today's pick. */
+export function canAdopt(progress, pal, seed, now = new Date()) {
+  if (!pal || progress.pal.owned[pal.id]) return false;
+  const rarity = rarityOf(pal);
+  return rarity === 'common' || dailyPalPick(progress, rarity, seed, now)?.id === pal.id;
 }

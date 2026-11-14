@@ -7,7 +7,8 @@ alter table public.profiles
   add column if not exists pals jsonb not null default '{}',
   add column if not exists pal_accessories text[] not null default '{}',
   add column if not exists pal_accessory text,
-  add column if not exists pal_wearing text[] not null default '{}';
+  add column if not exists pal_wearing text[] not null default '{}',
+  add column if not exists lucky_pals_claimed integer not null default 0;
 
 -- Saves from before slots wore one item in pal_accessory.
 update public.profiles set pal_wearing = array[pal_accessory] where pal_accessory is not null and pal_wearing = '{}';
@@ -51,6 +52,14 @@ as $$
     when 'twinkle' then '{"stars": 1800}'::jsonb
     when 'starla' then '{"stars": 2400}'::jsonb
     when 'ziggy' then '{"stars": 3000}'::jsonb
+    when 'leo' then '{"lucky": true}'::jsonb
+    when 'koi' then '{"lucky": true}'::jsonb
+    when 'bamboo' then '{"lucky": true}'::jsonb
+    when 'aurora' then '{"lucky": true}'::jsonb
+    when 'storm' then '{"lucky": true}'::jsonb
+    when 'plume' then '{"lucky": true}'::jsonb
+    when 'nova' then '{"lucky": true}'::jsonb
+    when 'luna' then '{"lucky": true}'::jsonb
     when 'sol' then '{"worlds": 15}'::jsonb
     when 'kiri' then '{"worlds": 18}'::jsonb
     when 'gryff' then '{"worlds": 20}'::jsonb
@@ -101,6 +110,14 @@ as $$
     when 'twinkle' then 'Star'
     when 'starla' then 'Unicorn'
     when 'ziggy' then 'Dragon'
+    when 'leo' then 'Lion'
+    when 'koi' then 'Koi'
+    when 'bamboo' then 'Panda'
+    when 'aurora' then 'Snowfox'
+    when 'storm' then 'Tiger'
+    when 'plume' then 'Peacock'
+    when 'nova' then 'Narwhal'
+    when 'luna' then 'Leopard'
     when 'sol' then 'Phoenix'
     when 'kiri' then 'Qilin'
     when 'gryff' then 'Griffin'
@@ -145,6 +162,56 @@ drop function if exists public._accessory_price(text);
 -- ---------------------------------------------------------------------------
 -- Rules
 -- ---------------------------------------------------------------------------
+-- Every Pal, in the game's order (src/game/pals.js PALS).
+create or replace function public._all_pals()
+returns text[]
+language sql
+immutable
+as $$
+  select array[
+    'ember', 'mossy', 'coral', 'mochi', 'hoot', 'waffles', 'peep', 'bruno', 'biscuit', 'truffle',
+    'pebble', 'quartz', 'ribbit', 'cotton', 'squeak', 'maple', 'otto', 'buzz', 'kiko', 'splash',
+    'shroomy', 'bandit', 'waddles', 'fawn', 'shelly', 'inky', 'puff', 'twinkle', 'starla', 'ziggy',
+    'leo', 'koi', 'bamboo', 'aurora', 'storm', 'plume', 'nova', 'luna', 'sol', 'kiri',
+    'gryff', 'nessa', 'dozy', 'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle'
+  ];
+$$;
+
+-- How rare a Pal is. Must match `rarity` in src/game/pals.js.
+create or replace function public._pal_rarity(p_pal text)
+returns text
+language sql
+immutable
+as $$
+  select case
+    when p_pal in ('leo', 'koi', 'bamboo', 'aurora', 'storm', 'plume', 'nova', 'luna') then 'legendary'
+    when p_pal in ('sol', 'kiri', 'gryff', 'nessa', 'dozy', 'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle') then 'mythic'
+    else 'common'
+  end;
+$$;
+
+-- Today's Shop pick of one rarity for a player, shown before buying (never a surprise purchase):
+-- among the Pals of that rarity they don't have, number (days since 2026-01-01 + their seed) mod how
+-- many there are. The seed is the sum of the character codes of their id. Must match dailyPalPick in pals.js.
+create or replace function public._daily_pick(p_user uuid, p_rarity text, p_day date)
+returns text
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with pool as (
+    select pal, row_number() over (order by ord) - 1 as position, count(*) over () as size
+    from unnest(public._all_pals()) with ordinality as t(pal, ord)
+    where public._pal_rarity(pal) = p_rarity
+      and not coalesce((select pals ? t.pal from public.profiles where id = p_user), false)
+  ), seed as (
+    select coalesce(sum(ascii(c)), 0) as value from regexp_split_to_table(p_user::text, '') as c
+  )
+  select pal from pool, seed
+  where position = ((p_day - date '2026-01-01') + seed.value) % size;
+$$;
+
 -- Built-in worlds where all 20 levels have at least one star.
 create or replace function public._finished_world_count(p_user uuid)
 returns integer
@@ -183,6 +250,9 @@ begin
   end if;
   if v_profile.pal_id is null and coalesce((v_rule ->> 'starter')::boolean, false) then
     return true;
+  end if;
+  if v_rule ? 'lucky' then
+    return false; -- Legendary Pals arrive as Lucky Pal gifts or from the Shop
   end if;
   if v_rule ? 'stars' then
     select coalesce(sum(stars), 0) into v_stars from public.progress where user_id = p_user;
@@ -232,7 +302,8 @@ as $$
     'lastGiftDate', p.last_gift_date,
     'sparkPurchasesToday', case when p.spark_purchase_date = current_date then p.spark_purchases_today else 0 end,
     'claimedChests', to_jsonb(p.claimed_chests),
-    'pal', jsonb_build_object('id', p.pal_id, 'owned', p.pals, 'accessories', to_jsonb(p.pal_accessories), 'wearing', to_jsonb(p.pal_wearing))
+    'pal', jsonb_build_object('id', p.pal_id, 'owned', p.pals, 'accessories', to_jsonb(p.pal_accessories), 'wearing', to_jsonb(p.pal_wearing)),
+    'luckyPalsClaimed', p.lucky_pals_claimed
   )
   from public.profiles p
   where p.id = p_user;
@@ -313,7 +384,9 @@ end;
 $$;
 drop function if exists public.equip_accessory(text);
 
--- Adopt a Pal you choose (one you don't have yet) for diamonds. Must match ADOPT_PAL_DIAMONDS.
+-- Adopt a Pal for diamonds, priced by rarity (regular 20, Legendary 40, Mythic 60). Regular Pals can be
+-- any you don't have; Legendary and Mythic ones only as today's pick for this player.
+-- Must match ADOPT_PRICES and canAdopt in src/game/pals.js.
 create or replace function public.adopt_pal(p_pal text)
 returns jsonb
 language plpgsql
@@ -322,11 +395,15 @@ set search_path = public
 as $$
 declare
   v_user uuid := public._require_user();
-  v_price constant integer := 20;
+  v_rarity text := public._pal_rarity(p_pal);
+  v_price integer := case public._pal_rarity(p_pal) when 'mythic' then 60 when 'legendary' then 40 else 20 end;
   v_profile public.profiles;
 begin
   if public._pal_unlock(p_pal) is null then
     raise exception using message = 'That Pal doesn’t exist.';
+  end if;
+  if v_rarity <> 'common' and p_pal is distinct from public._daily_pick(v_user, v_rarity, (now() at time zone 'utc')::date) then
+    raise exception using message = 'That Pal isn’t in your Shop today. There’s a new pick tomorrow!';
   end if;
   select * into v_profile from public.profiles where id = v_user for update;
   if v_profile.pals ? p_pal then
@@ -341,6 +418,58 @@ begin
     pal_id = coalesce(pal_id, p_pal)
   where id = v_user;
   return public._economy_state(v_user);
+end;
+$$;
+
+-- Lucky Pal gifts: every 200 solved built-in levels, one free Pal you don't have yet, at random:
+-- 10% Mythic, 20% Legendary, 70% any other Pal (falling back to another pool when one is complete,
+-- and to 300 sparks when you have every Pal). Free and earned, never sold. Opens one gift per call;
+-- `luckyPal` in the result is the new Pal's id (null when it paid sparks or none was waiting).
+-- Must match claimLuckyPalLocally in src/game/pals.js.
+create or replace function public.claim_lucky_pal()
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user uuid := public._require_user();
+  v_profile public.profiles;
+  v_solved integer;
+  v_roll double precision := random();
+  v_order text[];
+  v_rarity text;
+  v_pal text;
+begin
+  select * into v_profile from public.profiles where id = v_user for update;
+  select count(*)::integer into v_solved from public.progress
+    where user_id = v_user and stars > 0 and level_id ~ '^w[0-9]+-[0-9]{2}$';
+  if v_solved / 200 <= v_profile.lucky_pals_claimed then
+    return public._economy_state(v_user) || jsonb_build_object('luckyPal', null, 'sparksEarned', 0);
+  end if;
+
+  v_order := case
+    when v_roll < 0.1 then array['mythic', 'legendary', 'common']
+    when v_roll < 0.3 then array['legendary', 'mythic', 'common']
+    else array['common', 'legendary', 'mythic']
+  end;
+  foreach v_rarity in array v_order loop
+    select pal into v_pal from unnest(public._all_pals()) as pal
+      where public._pal_rarity(pal) = v_rarity and not (v_profile.pals ? pal)
+      order by random() limit 1;
+    exit when v_pal is not null;
+  end loop;
+
+  if v_pal is null then
+    update public.profiles set lucky_pals_claimed = lucky_pals_claimed + 1, sparks = sparks + 300 where id = v_user;
+    return public._economy_state(v_user) || jsonb_build_object('luckyPal', null, 'sparksEarned', 300);
+  end if;
+  update public.profiles set
+    lucky_pals_claimed = lucky_pals_claimed + 1,
+    pals = pals || jsonb_build_object(v_pal, jsonb_build_object('stage', 0)),
+    pal_id = coalesce(pal_id, v_pal)
+  where id = v_user;
+  return public._economy_state(v_user) || jsonb_build_object('luckyPal', v_pal, 'sparksEarned', 0);
 end;
 $$;
 
@@ -448,4 +577,7 @@ revoke all on function public._finished_world_count(uuid) from public, anon, aut
 grant execute on function public.buy_accessory(text) to authenticated;
 grant execute on function public.wear_accessory(text, boolean) to authenticated;
 grant execute on function public.adopt_pal(text) to authenticated;
+revoke all on function public._daily_pick(uuid, text, date) from public, anon, authenticated;
+revoke all on function public.claim_lucky_pal() from public, anon;
+grant execute on function public.claim_lucky_pal() to authenticated;
 grant execute on function public.weekly_leaderboard() to anon, authenticated;

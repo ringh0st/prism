@@ -449,3 +449,49 @@ button.goods:active .goodsArt {
   color: var(--action-label);
   background: var(--action-bottom);
 }
+
+/* Today's Legendary and Mythic picks */
+.dailyPicks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dailyPick {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: var(--space-3) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-lg);
+  font: inherit;
+  text-align: center;
+  color: var(--text-strong);
+  background: var(--paper);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out);
+}
+
+.dailyPick:active {
+  transform: scale(0.96);
+}
+
+.dailyPick.legendary {
+  background: color-mix(in srgb, var(--color-honey) 22%, var(--paper));
+}
+
+.dailyPick.mythic {
+  background: color-mix(in srgb, var(--color-peach) 24%, var(--paper));
+}
+
+.pickSpecies {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
