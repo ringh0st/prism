@@ -15,7 +15,6 @@ const QUIPS = {
   combo: ['WOW, two at once!', 'Combo! You’re a genius!', 'Look at them all light up!', 'Big brain move!'],
   crack: ['Crrrack! That mirror is stuck now.', 'Oops, it cracked! Plan around it… or restart.', 'Crack! It won’t turn anymore.'],
   shade: ['Eek! Keep that one dark!', 'Too spooky, turn it back!', 'The shadow crystal hates light. Rude, but true.'],
-  lastMove: ['Last move! No pressure. (A little pressure.)', 'Final move… choose wisely!', 'One left. I’m holding my breath. I don’t breathe.'],
   win3: ['PERFECT! Three stars!', 'Flawless! The gems are applauding.', 'You’re basically a laser wizard.', 'Brilliant! I’m glowing with pride.'],
   win2: ['Great job! Try for three?', 'So close to perfect!', 'Nice! Two shiny stars.'],
   win1: ['Solved! Every star counts.', 'Done! Now, can you do it in fewer moves?', 'Phew! We made it.'],

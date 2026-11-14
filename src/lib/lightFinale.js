@@ -1,7 +1,8 @@
-import { gemBurst } from './effects.js';
+import { flyToCounter, gemBurst } from './effects.js';
 
 const MAX_BURSTS = 8;
-const GAP_MS = 160;
+const GAP_MS = 220;
+const FLIGHT_MS = 620;
 
 /** Every board cell the light passes through, in order along the beams (segments go cell to cell in a straight line). */
 export function cellsAlongBeams(segments) {
@@ -23,24 +24,28 @@ export function cellsAlongBeams(segments) {
 }
 
 /**
- * The light finale after a win: every move left over bursts somewhere along the winning light path,
- * one after another, each with a higher chime (`onBurst(i)`). Returns how long it takes (ms), so the
- * result can wait for it. Nothing is paid for it: it celebrates the moves the player didn't need.
+ * The light finale after a win: each move left over flies out of the moves counter as a spark and bursts
+ * somewhere along the winning light path, one after another, each with a higher chime (`onBurst(i)`, also used
+ * to count the counter down). Returns how long it takes (ms), so the result can wait for it. Nothing is paid for
+ * it: it celebrates the moves the player didn't need, without a word.
  */
 export function playLightFinale({ segments, width, movesLeft, onBurst }) {
   const cells = cellsAlongBeams(segments).filter(({ x, y }) => x >= 0 && y >= 0 && x < width);
   const count = Math.min(MAX_BURSTS, movesLeft);
   if (!cells.length || count < 1) return 0;
   const colors = ['#F0C14E', '#F2A67E', '#4FBFAD', '#58AC82'];
+  const counter = document.querySelector('[data-moves-left]');
   for (let i = 0; i < count; i++) {
     setTimeout(
       () => {
         const { x, y } = cells[Math.floor(((i + 1) * cells.length) / (count + 1))];
-        gemBurst(document.querySelector(`[data-cell="${y * width + x}"]`), colors[i % colors.length]);
+        const cell = document.querySelector(`[data-cell="${y * width + x}"]`);
+        const color = colors[i % colors.length];
         onBurst?.(i);
+        flyToCounter(counter, cell, color, () => gemBurst(cell, color));
       },
       350 + i * GAP_MS,
     );
   }
-  return 350 + count * GAP_MS;
+  return 350 + count * GAP_MS + FLIGHT_MS;
 }

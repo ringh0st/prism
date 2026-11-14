@@ -61,7 +61,7 @@ import styles from './PlayScreen.module.css';
 
 const WIN_DIALOG_DELAY_MS = 1300;
 /** Lumi's quips that are just cheers: shown as a pop-up word over the board, not in her speech box. */
-const CALLOUT_EVENTS = new Set(['start', 'gem', 'combo', 'lastMove', 'win1', 'win2', 'win3', 'streak']);
+const CALLOUT_EVENTS = new Set(['start', 'gem', 'combo', 'win1', 'win2', 'win3', 'streak']);
 const IDLE_AFTER_MS = 30000;
 /** Taps in a row that light no new gem before Lumi suggests a Hint. */
 const STUCK_AFTER_MOVES = 6;
@@ -208,6 +208,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
   // Cheers pop over the board and fade (a game shout, nothing to read); Lumi's box keeps the useful lines.
   const [callout, setCallout] = useState(null);
+  // Spare moves flying off in the win's light finale (the moves counter counts down with them).
+  const [finaleSpent, setFinaleSpent] = useState(0);
   const say = useCallback(
     (mood, event) => {
       const text = event ? line(`quips.${event}`, quipLines(event)) : '';
@@ -303,7 +305,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       say('worried', 'shade');
       react('shake');
     } else if (!trace.isSolved && moves === moveLimit - 1) {
-      say('worried', 'lastMove');
+      // The last move shows on the moves counter itself (it beats like a heart); Lumi just looks worried.
+      setLumi({ mood: 'worried', line: '' });
       react('shiver');
     } else {
       setLumi((current) => (current.mood === 'sleepy' ? { mood: 'happy', line: '' } : current));
@@ -335,11 +338,17 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       if (!isSkipped) celebrate({ stars, isBig: isBig || level.difficulty === DIFFICULTY.HARD, from: boardAreaRef.current });
       // The light finale: each move left over bursts along the winning light path before the result shows.
       const movesLeft = isSkipped ? 0 : moveLimit - moves;
-      const finaleMs = playLightFinale({ segments: trace.segments, width: level.width, movesLeft, onBurst: sfx.finaleBurst });
-      if (finaleMs > 0) {
-        setLumi({ mood: 'dance', line: '' });
-        setCallout({ text: t('play.spare', { count: movesLeft }), key: Date.now(), isBig: true });
-      } else say(stars === 3 ? 'dance' : 'excited', isSkipped ? null : `win${stars}`);
+      const finaleMs = playLightFinale({
+        segments: trace.segments,
+        width: level.width,
+        movesLeft,
+        onBurst: (i) => {
+          sfx.finaleBurst(i);
+          setFinaleSpent(i + 1);
+        },
+      });
+      if (finaleMs > 0) setLumi({ mood: 'dance', line: '' });
+      else say(stars === 3 ? 'dance' : 'excited', isSkipped ? null : `win${stars}`);
       react('dance');
       const worldRefs = mode === 'level' ? levelRefsInWorld(level.world) : [];
       const wasWorldComplete = isWorldComplete(progress, worldRefs);
@@ -454,6 +463,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     sfx.restart();
     if (mode === 'rush' && moves > 0) rush.onRestart(moves);
     puzzle.restart();
+    setFinaleSpent(0);
     bestCombo.current = 0;
     playStats.start();
     setResult(null);
@@ -640,7 +650,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       </header>
 
       <section className={styles.status} aria-label={t('play.status')} data-tour="meter">
-        {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} />}
+        {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} spent={finaleSpent} />}
         <ul className={styles.gems} aria-label={t('play.gemsLit', { n: trace.litGems.size, total: gems.length })}>
           {gems.map(({ tile, i }) => (
             <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff} data-gem-slot={i}>

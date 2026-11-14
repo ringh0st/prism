@@ -65,8 +65,6 @@ export const es = {
   'play.backTo': 'Volver: {place}',
   'play.boardLabel': 'Tablero de {name}. Usa las flechas para moverte y Enter para girar.',
   'play.restart': 'Empezar de nuevo',
-  'play.spare.one': '¡Guau, te sobró {count} movimiento!',
-  'play.spare.other': '¡Guau, te sobraron {count} movimientos!',
   'play.status': 'Estado del nivel',
   'play.gemsLit': '{n} de {total} gemas encendidas',
 
@@ -346,7 +344,6 @@ export const es = {
   'quips.combo': ['¡GUAU, dos a la vez!', '¡Combo! ¡Eres un genio!', '¡Mira cómo se encienden!'],
   'quips.crack': ['¡Crac! Ese espejo ya no gira.', '¡Se rompió! Ya no gira más.'],
   'quips.shade': ['¡Ay! ¡Ese tiene que quedar oscuro!', '¡Gíralo de vuelta!'],
-  'quips.lastMove': ['¡Último movimiento!', 'Último movimiento… ¡piénsalo bien!'],
   'quips.win3': ['¡PERFECTO! ¡Tres estrellas!', '¡Impecable!', '¡Brillante! Estoy orgulloso.'],
   'quips.win2': ['¡Muy bien! ¿Vamos por tres?', '¡Casi perfecto!'],
   'quips.win1': ['¡Resuelto! Cada estrella cuenta.', '¡Lo logramos!'],

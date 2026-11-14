@@ -9,10 +9,11 @@ import styles from './StarMeter.module.css';
  * the moment it can't be reached any more (moves so far plus the fewest taps left), never later. `isSimple`
  * (the first levels) leaves the stars out, so there's less to take in.
  */
-export default function StarMeter({ moves, par, limit, starCap, tapsLeft = 0, isSimple = false }) {
+export default function StarMeter({ moves, par, limit, starCap, tapsLeft = 0, isSimple = false, spent = 0 }) {
   const { t } = useI18n();
   const twoStarLimit = par + Math.ceil((limit - par) / 2);
-  const left = Math.max(0, limit - moves);
+  // `spent`: moves flying off as sparks in the win's light finale (the counter counts down with them).
+  const left = Math.max(0, limit - moves - spent);
   const fill = (left / limit) * 100;
   const tone = left <= 1 ? styles.danger : left <= Math.ceil(limit * 0.34) ? styles.warn : styles.good;
   // The best you can still get: your moves so far plus the fewest taps that can finish it.
@@ -31,7 +32,7 @@ export default function StarMeter({ moves, par, limit, starCap, tapsLeft = 0, is
       role="group"
       aria-label={`${t('meter.left', { count: left, limit })}${isSimple ? '' : ` ${t('meter.best', { count: stars })}`}`}
     >
-      <div className={styles.movesLeft}>
+      <div className={`${styles.movesLeft} ${left === 1 && !spent ? styles.last : ''}`} data-moves-left>
         <span className={`game-title ${styles.count}`} key={left}>
           {left}
         </span>

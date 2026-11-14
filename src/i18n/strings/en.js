@@ -69,8 +69,6 @@ export const en = {
   'play.backTo': 'Back to {place}',
   'play.boardLabel': '{name} board. Use arrow keys to move, Enter to rotate.',
   'play.restart': 'Restart level',
-  'play.spare.one': 'Wow, {count} move to spare!',
-  'play.spare.other': 'Wow, {count} moves to spare!',
   'play.status': 'Level status',
   'play.gemsLit': '{n} of {total} gems lit',
 

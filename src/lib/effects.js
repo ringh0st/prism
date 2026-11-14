@@ -72,9 +72,10 @@ function lightRing(element, color = '#F0C14E') {
 
 /**
  * A spark flies in an arc from a lit gem to its spot in the gem counter, which bounces when it lands,
- * so every gem visibly "counts". Without motion, the counter just bounces.
+ * so every gem visibly "counts" (also used the other way: a spare move flying out onto the board).
+ * `onLand` runs when it arrives. Without motion, the target just bounces.
  */
-export function flyToCounter(fromElement, toElement, color = '#F0C14E') {
+export function flyToCounter(fromElement, toElement, color = '#F0C14E', onLand = null) {
   if (!fromElement || !toElement) return;
   const bump = () =>
     toElement.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.45)' }, { transform: 'scale(1)' }], {
@@ -83,6 +84,7 @@ export function flyToCounter(fromElement, toElement, color = '#F0C14E') {
     });
   if (prefersReducedMotion()) {
     bump();
+    onLand?.();
     return;
   }
   const from = centerOf(fromElement);
@@ -113,6 +115,7 @@ export function flyToCounter(fromElement, toElement, color = '#F0C14E') {
   ).onfinish = () => {
     spark.remove();
     bump();
+    onLand?.();
   };
 }
 
