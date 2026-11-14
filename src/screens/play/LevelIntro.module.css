@@ -10,11 +10,18 @@
   animation: fade 250ms ease;
 }
 
+/* Everything about the level on one paper card */
 .card {
   display: grid;
   justify-items: center;
   gap: var(--space-3);
   width: min(400px, 100%);
+  padding: var(--space-5) var(--space-4) var(--space-4);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-lg);
+  cursor: default;
   animation: slam 600ms var(--ease-pop);
 }
 
@@ -24,7 +31,7 @@
   font-size: 15px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--text-soft);
 }
 
 .sticker {
@@ -65,10 +72,13 @@
   border-radius: var(--radius-lg);
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 19px;
+  font-size: 18px;
   color: var(--text-strong);
-  background: var(--surface-raised);
-  box-shadow: var(--highlight), var(--shadow-md);
+  background: var(--surface-sunken);
+}
+
+.together {
+  white-space: nowrap;
 }
 
 .gems {
@@ -77,12 +87,7 @@
 }
 
 .lumi {
-  display: flex;
-  justify-content: flex-start;
   width: 100%;
-  min-height: 110px;
-  padding-left: 16px;
-  align-items: flex-end;
 }
 
 @keyframes fade {
@@ -94,7 +99,7 @@
 @keyframes slam {
   from {
     opacity: 0;
-    transform: scale(1.6);
+    transform: scale(0.85) translateY(20px);
   }
 }
 

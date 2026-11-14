@@ -30,7 +30,7 @@ export default function LevelIntro({ level, title, subtitle, modifier, lumiLine,
   return (
     // Clicking anywhere also starts; the button is the keyboard and screen-reader path.
     <div className={`${styles.overlay} ${sticker ? styles[sticker.className] : ''}`} onClick={onDone} role="presentation">
-      <div className={styles.card}>
+      <div className={styles.card} onClick={(event) => event.stopPropagation()} role="presentation">
         <p className={styles.subtitle}>{subtitle}</p>
         <ScreenTitle as="h1" size="lg" tone={modifier === 'boss' ? 'boss' : 'calm'}>
           {title}
@@ -43,10 +43,12 @@ export default function LevelIntro({ level, title, subtitle, modifier, lumiLine,
               <GemShape key={i} color={gem.color} size={22} />
             ))}
           </span>
-          in <strong>{limit}</strong> moves
+          <span className={styles.together}>
+            in <strong>{limit}</strong> moves
+          </span>
         </p>
         <div className={styles.lumi}>
-          <LumiSays mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={110} line={lumiLine} />
+          <LumiSays mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={84} line={lumiLine} />
         </div>
         <Button size="lg" icon="play" onClick={onDone} data-autofocus autoFocus>
           Let’s go!
