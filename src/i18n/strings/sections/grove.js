@@ -189,13 +189,13 @@ export const es = {
 
 export const he = {
   'grove.title': 'החורשה',
-  'grove.leadBare': 'הבית של החבר שלכם ביער הקסום. עשו אותו נעים!',
+  'grove.leadBare': 'הבית של החבר שלכם ביער הקסום. בואו נעשה אותו נעים!',
   'grove.lead': 'הבית של החבר שלכם ביער הקסום. הקישו כדי להגיד שלום.',
   'grove.decorate': 'לקשט',
   'grove.decorateHelp': 'קישוט אחד בכל מקום. הקישוטים שלכם לתמיד, ואפשר להחליף מתי שרוצים.',
-  'grove.bought': '{name}: שלכם! עכשיו מקמו אותו.',
+  'grove.bought': '{name}: שלכם! עכשיו אפשר למקם.',
   'grove.placed': '{name} במקום!',
-  'grove.putAwayDone': '{name} הוחזר לארגז.',
+  'grove.putAwayDone': 'החזרנו לארגז: {name}.',
   'grove.buy': 'לקנות {name} ב-{price} ניצוצות',
   'grove.place': 'למקם',
   'grove.putAway': 'להחזיר',
@@ -214,11 +214,11 @@ export const he = {
   'grove.season.summer': 'קיץ',
   'grove.season.autumn': 'סתיו',
   'grove.season.winter': 'חורף',
-  'grove.scene.intro': 'החורשה שלכם ביער הקסום, עונה: {season}.',
+  'grove.scene.intro': 'החורשה שלכם ביער הקסום, ב{season}.',
   'grove.scene.lives': '{name} גר כאן',
   'grove.scene.livesNapping': '{name} גר כאן ועכשיו ישן',
   'grove.scene.choose': 'בחרו חבר שיגור כאן',
-  'grove.scene.with': ', עם: {list}',
+  'grove.scene.with': ', עם {list}',
   'grove.scene.joiner': ', ',
   'grove.scene.visiting': '{name} בא לבקר.',
   'grove.scene.party': 'יש מסיבה לכבוד סיום עולם {world}!',
@@ -228,13 +228,13 @@ export const he = {
   'garden.meter': 'חרקיקי אור שנמצאו',
   'garden.how': 'חרקיקי אור מנמנמים בחלק מהשלבים (חפשו אותם במפה). השיגו שם ★★★ כדי להציל אותם. הנדירים מתחבאים בשלבים קשים ובשלבי בוס.',
   'garden.bugLabel': '{name}, {title}',
-  'garden.bugLabelTimes': '{name}, {title}, ניצל {times} פעמים',
+  'garden.bugLabelTimes': '{name}, {title}, הצלתם אותו {times} פעמים',
   'garden.missing': 'עוד לא נמצא',
   'garden.missingRare': 'עוד לא נמצא, חרקיק נדיר',
   'garden.rare': '★ נדיר',
   'garden.hi': 'היי, {name}!',
 
-  'stickers.title': 'אלבום מדבקות',
+  'stickers.title': 'אלבום המדבקות',
   'stickers.count': '{earned} מתוך {total} מדבקות',
   'stickers.world': 'עולם {n}: {name}',
   'stickers.earned': 'הושגה!',
@@ -306,7 +306,7 @@ export const he = {
   'bug.color.mint': 'מנטה',
   'bug.color.sage': 'מרווה',
   'bug.color.blossom': 'פריחה',
-  'bug.bio.firefly': 'מהבהב שלום בקוד מורס (הוא יודע רק ”היי“).',
+  'bug.bio.firefly': 'מהבהב שלום בקוד מורס (הוא יודע רק "היי").',
   'bug.bio.beetle': 'מצחצח את השריון שלו כל בוקר. מבריק מאוד. גאה מאוד.',
   'bug.bio.snail': 'לא ממהר בכלל, וזה בסדר גמור.',
   'bug.bio.sprout': 'גדל עוד קצת בכל פעם שאתם מחייכים.',
@@ -318,64 +318,64 @@ export const he = {
   'bug.bio.puff': 'עשוי 90% פלומה ו-10% צחקוקים.',
   'bug.bio.dragonling': 'נושף ניצוצות קטנים וחמימים במקום אש.',
   'bug.bio.comet': 'עף מסביב ומשאיר שובל של משאלות.',
-  'bug.name.firefly-peach': 'פיפ', // Pip
-  'bug.name.firefly-honey': 'דוט', // Dot
-  'bug.name.firefly-mint': 'בין', // Bean
+  'bug.name.firefly-peach': 'פיצי', // Pip
+  'bug.name.firefly-honey': 'נקודי', // Dot
+  'bug.name.firefly-mint': 'שעועי', // Bean
   'bug.name.firefly-sage': 'זוזו', // Zuzu
-  'bug.name.firefly-blossom': 'מו', // Mo
+  'bug.name.firefly-blossom': 'מוקי', // Mo
   'bug.name.beetle-peach': 'טילי', // Tilly
-  'bug.name.beetle-honey': 'ניב', // Nib
+  'bug.name.beetle-honey': 'ניבי', // Nib
   'bug.name.beetle-mint': 'לולו', // Lulu
-  'bug.name.beetle-sage': 'בו', // Bo
-  'bug.name.beetle-blossom': 'פיז', // Fizz
-  'bug.name.snail-peach': 'ורן', // Wren
+  'bug.name.beetle-sage': 'בובו', // Bo
+  'bug.name.beetle-blossom': 'תוססי', // Fizz
+  'bug.name.snail-peach': 'דרורי', // Wren
   'bug.name.snail-honey': 'מימי', // Mimi
-  'bug.name.snail-mint': 'קיפ', // Kip
-  'bug.name.snail-sage': 'ג׳ונו', // Juno
-  'bug.name.snail-blossom': 'פבל', // Pebble
-  'bug.name.sprout-peach': 'טוויג', // Twig
-  'bug.name.sprout-honey': 'נובה', // Nova
+  'bug.name.snail-mint': 'קיפי', // Kip
+  'bug.name.snail-sage': 'נוני', // Juno
+  'bug.name.snail-blossom': 'אבנון', // Pebble
+  'bug.name.sprout-peach': 'זרדי', // Twig
+  'bug.name.sprout-honey': 'נוגה', // Nova
   'bug.name.sprout-mint': 'ביבי', // Bibi
   'bug.name.sprout-sage': 'טופי', // Toffee
-  'bug.name.sprout-blossom': 'פום', // Pom
-  'bug.name.bunny-peach': 'סאני', // Sunny
-  'bug.name.bunny-honey': 'לארק', // Lark
+  'bug.name.sprout-blossom': 'רימוני', // Pom
+  'bug.name.bunny-peach': 'שמשי', // Sunny
+  'bug.name.bunny-honey': 'עפרוני', // Lark
   'bug.name.bunny-mint': 'מומו', // Momo
-  'bug.name.bunny-sage': 'טינק', // Tink
-  'bug.name.bunny-blossom': 'אולי', // Ollie
-  'bug.name.shroom-peach': 'ברי', // Bree
+  'bug.name.bunny-sage': 'דינגי', // Tink
+  'bug.name.bunny-blossom': 'זיתי', // Ollie
+  'bug.name.shroom-peach': 'צופי', // Bree
   'bug.name.shroom-honey': 'ג׳וג׳ו', // Jojo
-  'bug.name.shroom-mint': 'פרן', // Fern
-  'bug.name.shroom-sage': 'הייזל', // Hazel
-  'bug.name.shroom-blossom': 'פאדל', // Puddle
-  'bug.name.moth-peach': 'ספרינקל', // Sprinkle
-  'bug.name.moth-honey': 'נודל', // Noodle
-  'bug.name.moth-mint': 'ביסקוויט', // Biscuit
-  'bug.name.moth-sage': 'וויגלס', // Wiggles
-  'bug.name.moth-blossom': 'פינאט', // Peanut
-  'bug.name.jelly-peach': 'קלובר', // Clover
-  'bug.name.jelly-honey': 'דייזי', // Daisy
-  'bug.name.jelly-mint': 'גאמדרופ', // Gumdrop
-  'bug.name.jelly-sage': 'באטן', // Button
-  'bug.name.jelly-blossom': 'מרבל', // Marble
+  'bug.name.shroom-mint': 'שרכי', // Fern
+  'bug.name.shroom-sage': 'לוזי', // Hazel
+  'bug.name.shroom-blossom': 'שלולי', // Puddle
+  'bug.name.moth-peach': 'סוכרי', // Sprinkle
+  'bug.name.moth-honey': 'ספגטי', // Noodle
+  'bug.name.moth-mint': 'עוגי', // Biscuit
+  'bug.name.moth-sage': 'פרפורי', // Wiggles
+  'bug.name.moth-blossom': 'בוטני', // Peanut
+  'bug.name.jelly-peach': 'תלתני', // Clover
+  'bug.name.jelly-honey': 'חינני', // Daisy
+  'bug.name.jelly-mint': 'גומי', // Gumdrop
+  'bug.name.jelly-sage': 'כפתורי', // Button
+  'bug.name.jelly-blossom': 'גולי', // Marble
   'bug.name.starling-peach': 'פודינג', // Pudding
-  'bug.name.starling-honey': 'טאפי', // Taffy
-  'bug.name.starling-mint': 'באבלס', // Bubbles
-  'bug.name.starling-sage': 'קקאו', // Cocoa
-  'bug.name.starling-blossom': 'פיקל', // Pickle
-  'bug.name.puff-peach': 'סזמי', // Sesame
-  'bug.name.puff-honey': 'נאגט', // Nugget
-  'bug.name.puff-mint': 'וופל', // Waffle
-  'bug.name.puff-sage': 'ספראוט', // Sprout
-  'bug.name.puff-blossom': 'קריקט', // Cricket
-  'bug.name.dragonling-peach': 'פיקסי', // Pixie
-  'bug.name.dragonling-honey': 'ג׳ליבין', // Jellybean
+  'bug.name.starling-honey': 'קרמלי', // Taffy
+  'bug.name.starling-mint': 'בועי', // Bubbles
+  'bug.name.starling-sage': 'שוקו', // Cocoa
+  'bug.name.starling-blossom': 'חמוצי', // Pickle
+  'bug.name.puff-peach': 'שומשום', // Sesame
+  'bug.name.puff-honey': 'פתיתי', // Nugget
+  'bug.name.puff-mint': 'פופקורן', // Waffle
+  'bug.name.puff-sage': 'שתילי', // Sprout
+  'bug.name.puff-blossom': 'צרצרי', // Cricket
+  'bug.name.dragonling-peach': 'שדוני', // Pixie
+  'bug.name.dragonling-honey': 'סוכריון', // Jellybean
   'bug.name.dragonling-mint': 'מאפין', // Muffin
-  'bug.name.dragonling-sage': 'טריקסי', // Trixie
-  'bug.name.dragonling-blossom': 'ברמבל', // Bramble
-  'bug.name.comet-peach': 'זפיר', // Zephyr
-  'bug.name.comet-honey': 'סאפרון', // Saffron
-  'bug.name.comet-mint': 'קומט', // Comet
-  'bug.name.comet-sage': 'אורורה', // Aurora
-  'bug.name.comet-blossom': 'סטארלה', // Starla
+  'bug.name.dragonling-sage': 'תעלולי', // Trixie
+  'bug.name.dragonling-blossom': 'פטלי', // Bramble
+  'bug.name.comet-peach': 'משבי', // Zephyr
+  'bug.name.comet-honey': 'כרכומי', // Saffron
+  'bug.name.comet-mint': 'שביטי', // Comet
+  'bug.name.comet-sage': 'שחרי', // Aurora
+  'bug.name.comet-blossom': 'כוכבי', // Starla
 };
