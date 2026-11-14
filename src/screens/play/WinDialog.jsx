@@ -8,7 +8,7 @@ import { sfx } from '../../audio/sfx.js';
 import { DIFFICULTY } from '../../game/constants.js';
 import { shareText } from '../../lib/shareText.js';
 import PalArt from '../../components/pals/PalArt.jsx';
-import { palById } from '../../game/pals.js';
+import { palById, stageOf } from '../../game/pals.js';
 import styles from './WinDialog.module.css';
 
 function headlineFor({ stars, isSkipped, completesWorld }, difficulty) {
@@ -94,11 +94,11 @@ export default function WinDialog({ result, par, difficulty, hotStreak = 0, hasN
           </span>
         )}
       </div>
-      {result.palEvolvedTo && partner && (
+      {result.glowUpEarned && partner && (
         <div className={styles.evolved}>
-          <PalArt palId={partner.id} xp={progress.pal.owned[partner.id]?.xp ?? 0} accessory={progress.pal.accessory} size={72} />
+          <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} accessory={progress.pal.accessory} size={72} />
           <p>
-            <strong>{partner.name} evolved!</strong> Now {result.palEvolvedTo.name}.
+            <strong>World finished: you earned a Glow-up!</strong> Choose which Pal grows on the map.
           </p>
         </div>
       )}

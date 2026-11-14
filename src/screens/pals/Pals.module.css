@@ -2,7 +2,7 @@
 .pickerLumi {
   display: flex;
   align-items: flex-end;
-  min-height: 112px;
+  min-height: 128px;
   margin: 0 0 var(--space-3) var(--space-2);
 }
 
@@ -246,21 +246,6 @@
   background: var(--reward-bottom);
 }
 
-.growthTrack {
-  height: 10px;
-  overflow: hidden;
-  border-radius: var(--radius-pill);
-  background: var(--surface-sunken);
-  box-shadow: var(--shadow-inset);
-}
-
-.growthFill {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--color-sage);
-}
-
 .team {
   grid-column: 1 / -1;
   display: flex;
@@ -289,4 +274,94 @@
 
 .teamPalActive {
   background: color-mix(in srgb, var(--color-sage) 35%, var(--surface-raised));
+}
+
+/* ---------- Glow-ups ---------- */
+.glowGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--space-2);
+  max-height: 46vh;
+  overflow-y: auto;
+  margin: 0 0 var(--space-3);
+  padding: 2px;
+  list-style: none;
+}
+
+.glowPal {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: var(--space-2) 4px;
+  border: 0;
+  border-radius: var(--radius-md);
+  font: inherit;
+  color: var(--text-strong);
+  background: var(--surface-tonal);
+  cursor: pointer;
+  transition: transform 220ms var(--ease-spring);
+}
+
+.glowPal:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.glowPal:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.glowStep {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-soft);
+}
+
+.glowReady {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: var(--shadow-button);
+  cursor: pointer;
+  animation: glowNudge 2.4s ease-in-out infinite;
+}
+
+@keyframes glowNudge {
+  0%,
+  70%,
+  100% {
+    transform: scale(1);
+  }
+  85% {
+    transform: scale(1.05);
+  }
+}
+
+.stageDots {
+  display: flex;
+  gap: 5px;
+}
+
+.stageDot,
+.stageDotOn {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
+}
+
+.stageDotOn {
+  background: var(--color-honey);
+  box-shadow: none;
 }

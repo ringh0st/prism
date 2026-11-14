@@ -6,6 +6,7 @@ import {
   claimChestOnServer,
   claimDailyGiftOnServer,
   choosePalOnServer,
+  glowUpPalOnServer,
   buyAccessoryOnServer,
   equipAccessoryOnServer,
   claimWeeklyRewardOnServer,
@@ -32,7 +33,7 @@ import {
 import { todayKey } from '../game/daily.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
 import { DAILY_GIFT_SPARKS } from '../game/catalog.js';
-import { buyAccessoryLocally, choosePalLocally, equipAccessoryLocally, growPartnerPal } from '../game/pals.js';
+import { buyAccessoryLocally, choosePalLocally, equipAccessoryLocally, glowUpPalLocally, glowUpsEarned } from '../game/pals.js';
 import { sfx } from '../audio/sfx.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
@@ -119,13 +120,8 @@ export function PlayerProvider({ children }) {
         const hotStreak = nextHotStreak(progressRef.current, { stars: local.stars, usedHelpers: result.usedHelpers });
         local.progress = { ...local.progress, hotStreak };
         local.hotStreak = hotStreak;
-        // A newly solved level helps the partner Pal grow (the server does the same for accounts).
-        local.palEvolvedTo = null;
-        if (local.previousStars === 0 && local.stars > 0) {
-          const grown = growPartnerPal(local.progress);
-          local.progress = grown.progress;
-          local.palEvolvedTo = grown.evolvedTo;
-        }
+        // Finishing a world earns a Glow-up to spend on any Pal.
+        local.glowUpEarned = glowUpsEarned(local.progress) > glowUpsEarned(progressRef.current);
         setProgress(local.progress);
         if (!userId) return { ...local, diamondsEarned: 0 };
         try {
@@ -187,6 +183,17 @@ export function PlayerProvider({ children }) {
           applyServerState(await choosePalOnServer(palId));
         } catch {
           // Kept on this device and sent again on the next sync.
+          setSyncStatus('error');
+        }
+      },
+
+      /** Spend a Glow-up so a Pal grows into its next form. @throws EconomyError */
+      async glowUpPal(palId) {
+        setProgress(glowUpPalLocally(progressRef.current, palId));
+        if (!userId) return;
+        try {
+          applyServerState(await glowUpPalOnServer(palId));
+        } catch {
           setSyncStatus('error');
         }
       },

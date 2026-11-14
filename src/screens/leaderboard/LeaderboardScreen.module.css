@@ -27,7 +27,7 @@
 .host {
   display: flex;
   align-items: flex-end;
-  min-height: 120px;
+  min-height: 138px;
   padding: 0 var(--space-4);
 }
 
@@ -166,15 +166,4 @@
 .who {
   display: grid;
   min-width: 0;
-}
-
-.title {
-  justify-self: start;
-  margin-top: 2px;
-  padding: 0 8px;
-  border-radius: var(--radius-pill);
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--reward-label);
-  background: color-mix(in srgb, var(--color-honey) 45%, var(--surface-raised));
 }

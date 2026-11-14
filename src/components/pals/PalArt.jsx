@@ -2,8 +2,8 @@ import { palStage } from '../../game/pals.js';
 
 /*
  * Pals (inline SVG, 100×100, standing on y≈94). Eight are hand-drawn; the other 22 are built from a
- * kit of parts below. Every Pal has five forms that add to its look: Baby, Kid (signature feature),
- * Teen (forehead gem), Hero (warm aura) and Legend (light wings, halo and sparkles).
+ * kit of parts below. Every Pal has five forms that add to its look: Baby, Junior (signature feature),
+ * Buddy (forehead gem), Champ (warm aura) and Legend (light wings, halo and sparkles).
  * `hat` and `neck` say where accessories sit on that Pal.
  */
 
@@ -500,10 +500,10 @@ const STAGE_LOOKS = [
 ];
 
 /** A Pal in one of its five forms, optionally wearing an accessory. Decorative unless `label` is given. */
-export default function PalArt({ palId, xp = 0, accessory = null, size = 64, label, className }) {
+export default function PalArt({ palId, stage = 0, accessory = null, size = 64, label, className }) {
   const art = ART[palId];
   if (!art) return null;
-  const look = STAGE_LOOKS[palStage(xp).index];
+  const look = STAGE_LOOKS[palStage(stage).index];
   const [hx, hy] = art.hat;
   return (
     <svg

@@ -35,7 +35,7 @@
 .counter {
   display: flex;
   align-items: flex-end;
-  min-height: 136px;
+  min-height: 156px;
   padding: var(--space-2) var(--space-4) 0;
   /* the counter top Lumi stands on */
   background: linear-gradient(to top, var(--wood) 0 10px, transparent 10px);

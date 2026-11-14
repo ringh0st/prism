@@ -13,6 +13,7 @@ import LeaderboardScreen from './screens/leaderboard/LeaderboardScreen.jsx';
 import WeeklyRewardDialog from './screens/leaderboard/WeeklyRewardDialog.jsx';
 import StarterPicker from './screens/pals/StarterPicker.jsx';
 import PalUnlockNotice from './screens/pals/PalUnlockNotice.jsx';
+import GlowUpNotice from './screens/pals/GlowUpNotice.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
 import LoadingScreen from './screens/LoadingScreen.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
@@ -47,7 +48,12 @@ function PalNotices() {
   const [isSkipped, setIsSkipped] = useState(false);
   if (!PAL_NOTICE_ROUTES.includes(route.name)) return null;
   if (!progress.pal.id) return isSkipped ? null : <StarterPicker onSkip={() => setIsSkipped(true)} />;
-  return <PalUnlockNotice />;
+  return (
+    <>
+      <PalUnlockNotice />
+      <GlowUpNotice />
+    </>
+  );
 }
 
 function LevelRoute({ levelId }) {

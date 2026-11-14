@@ -267,12 +267,16 @@ test('pals: starter choice, unlocks, growth and accessories', async () => {
   progress = pals.choosePalLocally(progress, 'mossy');
   // After the first pick, the other starters need their own milestone.
   assert.equal(pals.isPalUnlocked(progress, pals.palById('ember')), false);
-  // Evolving: a new form every 100 new levels, five forms in all.
-  progress.pal.owned.mossy.xp = 99;
-  const grown = pals.growPartnerPal(progress);
-  assert.equal(grown.evolvedTo.id, 'kid');
-  assert.equal(pals.palStage(250).id, 'teen');
-  assert.equal(pals.palStage(999).id, 'legend');
+  // Glow-ups: one per finished world, spent on any owned Pal; five forms in all.
+  assert.equal(pals.glowUpsAvailable(progress), 0);
+  assert.throws(() => pals.glowUpPalLocally(progress, 'mossy'));
+  const world1 = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`w1-${String(i + 1).padStart(2, '0')}`, { stars: 1 }]));
+  progress = { ...progress, levels: world1 };
+  assert.equal(pals.glowUpsAvailable(progress), 1);
+  progress = pals.glowUpPalLocally(progress, 'mossy');
+  assert.equal(pals.palStage(pals.stageOf(progress.pal.owned.mossy)).name, 'Junior');
+  assert.equal(pals.glowUpsAvailable(progress), 0);
+  assert.equal(pals.palStage(4).name, 'Legend');
   assert.equal(pals.PALS.length, 30);
   // Accessories cost sparks and must be owned to wear.
   assert.throws(() => pals.equipAccessoryLocally(progress, 'scarf'));
@@ -296,10 +300,15 @@ test('pal unlocks and accessory prices match the database', async () => {
   }
 });
 
-test('nickname word lists match the database', async () => {
-  const { NICKNAME_WORDS, NICKNAME_NAMES } = await import('./nicknames.js');
+test('nicknames: friendly rules, random names and the same blocked list as the database', async () => {
+  const { BLOCKED_NICKNAME_PARTS, nicknameProblem, randomNickname } = await import('./nicknames.js');
+  assert.equal(nicknameProblem('Rin the Great'), null);
+  assert.equal(nicknameProblem('רינה'), null);
+  assert.ok(nicknameProblem('ab'));
+  assert.ok(nicknameProblem('call 0541234567'));
+  assert.ok(nicknameProblem('www.site.com'));
+  assert.ok(nicknameProblem('Sh1t Head'));
+  assert.equal(nicknameProblem(randomNickname()), null);
   const sql = readFileSync(new URL('../../supabase/nicknames.sql', import.meta.url), 'utf8');
-  const list = (items) => `array[${items.map((item) => `'${item}'`).join(', ')}]`;
-  assert.ok(sql.includes(list(NICKNAME_WORDS)), 'words');
-  assert.ok(sql.includes(list(NICKNAME_NAMES)), 'names');
+  assert.ok(sql.includes(`array[${BLOCKED_NICKNAME_PARTS.map((part) => `'${part}'`).join(', ')}]`), 'blocked list');
 });

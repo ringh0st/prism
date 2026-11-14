@@ -63,12 +63,7 @@
 }
 
 .titleChip {
-  padding: 4px 16px;
-  border-radius: var(--radius-pill);
-  font-size: 18px;
-  color: var(--reward-label);
-  background: var(--reward-bottom);
-  box-shadow: var(--shadow-sm);
+  justify-self: center;
 }
 
 .track {

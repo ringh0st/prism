@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Lumi from '../../components/game/Lumi.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
-import { palById, palStage } from '../../game/pals.js';
+import { palById, palStage, stageOf } from '../../game/pals.js';
 import Icon from '../../components/Icon.jsx';
 import { useAuth } from '../../state/AuthContext.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
@@ -10,6 +10,7 @@ import { finishedWorldCount, titleFor } from '../../game/titles.js';
 import { todayKey } from '../../game/daily.js';
 import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
 import NicknameDialog from './NicknameDialog.jsx';
+import TitleBadge from '../../components/game/TitleBadge.jsx';
 import styles from './PlayerCard.module.css';
 
 function Stat({ icon, tone, value, label, note = null }) {
@@ -43,7 +44,7 @@ export default function PlayerCard() {
   const streak = currentStreak(progress, todayKey());
   const shields = progress.daily.shields ?? 0;
   const partner = palById(progress.pal.id);
-  const partnerXp = partner ? progress.pal.owned[partner.id]?.xp ?? 0 : 0;
+  const partnerStage = partner ? stageOf(progress.pal.owned[partner.id]) : 0;
 
   // The public nickname shown on the Top board (signed-in players only).
   useEffect(() => {
@@ -62,11 +63,11 @@ export default function PlayerCard() {
       <div className={styles.banner} aria-hidden="true" />
       <div className={styles.avatar}>
         {partner ? (
-          <PalArt palId={partner.id} xp={partnerXp} accessory={progress.pal.accessory} size={84} />
+          <PalArt palId={partner.id} stage={partnerStage} accessory={progress.pal.accessory} size={84} />
         ) : avatarUrl ? (
           <img src={avatarUrl} alt="" width="84" height="84" referrerPolicy="no-referrer" />
         ) : (
-          <Lumi mood="happy" size={80} />
+          <Lumi mood="happy" size={96} />
         )}
       </div>
       <h2 id="player-name" className={`game-title ${styles.name}`}>
@@ -74,7 +75,7 @@ export default function PlayerCard() {
       </h2>
       {partner && (
         <p className={styles.nickname}>
-          Partner: {partner.name} the {partner.species} · {palStage(partnerXp).name}
+          Partner: {partner.name} the {partner.species} · {palStage(partnerStage).name}
         </p>
       )}
       {user && (
@@ -101,7 +102,7 @@ export default function PlayerCard() {
       )}
 
       <div className={styles.title}>
-        <span className={`game-title ${styles.titleChip}`}>{current.name}</span>
+        <TitleBadge stars={stars} size="lg" className={styles.titleChip} />
         {next ? (
           <>
             <div

@@ -1,42 +1,37 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { NICKNAME_NAMES, NICKNAME_WORDS } from '../../game/nicknames.js';
+import { stageOf } from '../../game/pals.js';
+import { NICKNAME_MAX, nicknameProblem, randomNickname } from '../../game/nicknames.js';
 import { setNicknameOnServer } from '../../lib/economyApi.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './NicknameDialog.module.css';
 
-function WordPicker({ label, words, value, onChange }) {
-  return (
-    <fieldset className={styles.picker}>
-      <legend className={styles.legend}>{label}</legend>
-      <div className={styles.chips}>
-        {words.map((word) => (
-          <button key={word} type="button" aria-pressed={value === word} className={`${styles.chip} ${value === word ? styles.chipOn : ''}`} onClick={() => onChange(word)}>
-            {word}
-          </button>
-        ))}
-      </div>
-    </fieldset>
-  );
-}
-
-/** Build a nickname from two safe word lists; the server adds the number. */
+/** Type your Top-board nickname, or roll a random one. Checked here and again on the server. */
 export default function NicknameDialog({ current, onSaved, onClose }) {
   const { progress, refresh } = usePlayer();
-  const [first, second] = current?.split(' ') ?? [];
-  const [word, setWord] = useState(NICKNAME_WORDS.includes(first) ? first : null);
-  const [name, setName] = useState(NICKNAME_NAMES.includes(second) ? second : null);
+  const inputId = useId();
+  const hintId = useId();
+  const [nickname, setNickname] = useState(current ?? randomNickname());
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
+  const problem = nicknameProblem(nickname);
 
-  const save = async () => {
+  const roll = () => {
+    sfx.tap();
+    setError('');
+    setNickname(randomNickname());
+  };
+
+  const save = async (event) => {
+    event.preventDefault();
+    if (problem) return;
     setIsSaving(true);
     setError('');
     try {
-      const state = await setNicknameOnServer(word, name);
+      const state = await setNicknameOnServer(nickname);
       sfx.sparkle();
       refresh();
       onSaved(state.nickname);
@@ -48,23 +43,41 @@ export default function NicknameDialog({ current, onSaved, onClose }) {
 
   return (
     <Dialog title="Your nickname" onClose={onClose}>
-      <div className={styles.preview}>
-        {progress.pal.id && <PalArt palId={progress.pal.id} xp={progress.pal.owned[progress.pal.id]?.xp ?? 0} accessory={progress.pal.accessory} size={56} />}
-        <span className="game-title">
-          {word ?? '…'} {name ?? '…'} <span className={styles.number}>##</span>
-        </span>
-      </div>
-      <p className={styles.note}>This is how everyone sees you on the Top board. Your real name stays private.</p>
-      <WordPicker label="1. Pick a word" words={NICKNAME_WORDS} value={word} onChange={setWord} />
-      <WordPicker label="2. Pick a name" words={NICKNAME_NAMES} value={name} onChange={setName} />
-      {error && (
-        <p className={styles.error} role="alert">
-          {error}
+      <form onSubmit={save}>
+        <div className={styles.preview}>
+          {progress.pal.id && <PalArt palId={progress.pal.id} stage={stageOf(progress.pal.owned[progress.pal.id])} accessory={progress.pal.accessory} size={56} />}
+          <span className="game-title">{nickname.trim() || '…'}</span>
+        </div>
+        <label htmlFor={inputId} className={styles.label}>
+          Type a nickname
+        </label>
+        <div className={styles.field}>
+          <input
+            id={inputId}
+            className={styles.input}
+            value={nickname}
+            maxLength={NICKNAME_MAX + 4}
+            autoComplete="off"
+            spellCheck="false"
+            aria-describedby={hintId}
+            aria-invalid={Boolean(problem)}
+            onChange={(event) => {
+              setError('');
+              setNickname(event.target.value);
+            }}
+            data-autofocus
+          />
+          <button type="button" className={styles.dice} onClick={roll} aria-label="Random nickname">
+            🎲
+          </button>
+        </div>
+        <p id={hintId} className={problem || error ? styles.problem : styles.note} role="status">
+          {error || problem || 'Everyone sees this on the Top board, so keep it friendly and never use your real name.'}
         </p>
-      )}
-      <Button size="lg" disabled={!word || !name || isSaving} onClick={save} data-autofocus>
-        {isSaving ? 'Saving…' : 'Save nickname'}
-      </Button>
+        <Button size="lg" type="submit" disabled={Boolean(problem) || isSaving}>
+          {isSaving ? 'Saving…' : 'Save nickname'}
+        </Button>
+      </form>
     </Dialog>
   );
 }

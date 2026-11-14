@@ -40,7 +40,7 @@ export default function StarterPicker({ onSkip }) {
   return (
     <Dialog title="Pick your partner!">
       <div className={styles.pickerLumi}>
-        <Lumi mood="excited" size={72} line="Your Pal grows as you solve levels. Choose wisely… or cutely!" bubbleSide="right" />
+        <Lumi mood="excited" size={86} line="Your Pal grows as you solve levels. Choose wisely… or cutely!" bubbleSide="right" />
       </div>
       <div className={styles.starters} role="radiogroup" aria-label="Starter Pals">
         {STARTER_PALS.map((starter) => (

@@ -3,7 +3,8 @@ import Icon from '../../components/Icon.jsx';
 import Button from '../../components/Button.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { PALS, PAL_ACCESSORIES, isPalUnlocked, palStage, unlockText } from '../../game/pals.js';
+import { PALS, PAL_ACCESSORIES, isPalUnlocked, palStage, stageOf, unlockText } from '../../game/pals.js';
+import GlowUpStatus from './GlowUpStatus.jsx';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Pals.module.css';
 
@@ -25,10 +26,10 @@ function Collection({ onError }) {
         const owned = progress.pal.owned[pal.id];
         const isPartner = progress.pal.id === pal.id;
         const isUnlocked = isPalUnlocked(progress, pal);
-        const stage = palStage(owned?.xp ?? 0);
+        const stage = palStage(stageOf(owned));
         return (
           <li key={pal.id} className={`${styles.palCard} ${isPartner ? styles.partner : ''} ${isUnlocked ? '' : styles.locked}`}>
-            <PalArt palId={pal.id} xp={owned?.xp ?? 0} accessory={isPartner ? progress.pal.accessory : null} size={76} className={styles.palArt} />
+            <PalArt palId={pal.id} stage={stage.index} accessory={isPartner ? progress.pal.accessory : null} size={76} className={styles.palArt} />
             <span className={`game-title ${styles.palName}`}>{isUnlocked ? pal.name : '???'}</span>
             {isPartner && <span className={styles.badge}>Partner</span>}
             {owned && !isPartner && (
@@ -73,7 +74,7 @@ function Wardrobe({ onError }) {
         const isWorn = progress.pal.accessory === item.id;
         return (
           <li key={item.id} className={styles.accessory}>
-            <PalArt palId={progress.pal.id} xp={100} accessory={item.id} size={58} />
+            <PalArt palId={progress.pal.id} stage={1} accessory={item.id} size={58} />
             <span className={styles.accessoryName}>{item.name}</span>
             {isWorn ? (
               <Button size="sm" variant="secondary" onClick={() => act(() => equipAccessory(null))}>
@@ -107,21 +108,12 @@ export default function PalCollection() {
   const { progress } = usePlayer();
   const [message, setMessage] = useState('');
   const partner = progress.pal.id;
-  const xp = partner ? progress.pal.owned[partner]?.xp ?? 0 : 0;
-  const stage = palStage(xp);
-
   return (
     <section className={styles.section} aria-labelledby="pals-title">
       <h2 id="pals-title" className="game-title">
         My Pals
       </h2>
-      {partner && (
-        <p className={styles.growth}>
-          {stage.next
-            ? `${stage.next.xp - xp} more new levels until your partner becomes ${stage.next.name}.`
-            : 'Your partner is fully Radiant. Amazing!'}
-        </p>
-      )}
+      {partner && <GlowUpStatus />}
       <Collection onError={setMessage} />
       {partner && (
         <>

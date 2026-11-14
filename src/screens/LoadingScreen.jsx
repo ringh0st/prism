@@ -7,7 +7,7 @@ export default function LoadingScreen() {
   const [line] = useState(() => LINES[Math.floor(Math.random() * LINES.length)]);
   return (
     <main style={{ display: 'grid', placeItems: 'center', minHeight: '100dvh' }} aria-busy="true">
-      <Lumi mood="excited" size={110} line={line} bubbleSide="top" />
+      <Lumi mood="excited" size={130} line={line} bubbleSide="top" />
     </main>
   );
 }

@@ -1,4 +1,4 @@
--- Prism Pals: profile characters you pick, collect, grow and dress up.
+-- Prism Pals: profile characters you pick, collect, grow (one Glow-up per finished world) and dress up.
 -- Run in Supabase → SQL Editor AFTER social.sql. Safe to run more than once.
 -- Rules must match src/game/pals.js (a test checks the unlocks and prices).
 
@@ -108,6 +108,23 @@ $$;
 -- ---------------------------------------------------------------------------
 -- Rules
 -- ---------------------------------------------------------------------------
+-- Built-in worlds where all 20 levels have at least one star.
+create or replace function public._finished_world_count(p_user uuid)
+returns integer
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select count(*)::integer from (
+    select (regexp_match(level_id, '^w([0-9]+)-[0-9]{2}$'))[1] as world
+    from public.progress
+    where user_id = p_user and stars > 0 and level_id ~ '^w[0-9]+-[0-9]{2}$'
+    group by 1
+    having count(*) >= 20
+  ) finished;
+$$;
+
 create or replace function public._is_pal_unlocked(p_user uuid, p_pal text)
 returns boolean
 language plpgsql
@@ -119,7 +136,6 @@ declare
   v_rule jsonb := public._pal_unlock(p_pal);
   v_profile public.profiles;
   v_stars integer;
-  v_worlds integer;
 begin
   if v_rule is null then
     return false;
@@ -136,14 +152,7 @@ begin
     return v_stars >= (v_rule ->> 'stars')::integer;
   end if;
   if v_rule ? 'worlds' then
-    select count(*) into v_worlds from (
-      select (regexp_match(level_id, '^w([0-9]+)-[0-9]{2}$'))[1] as world
-      from public.progress
-      where user_id = p_user and stars > 0 and level_id ~ '^w[0-9]+-[0-9]{2}$'
-      group by 1
-      having count(*) >= 20
-    ) finished;
-    return v_worlds >= (v_rule ->> 'worlds')::integer;
+    return public._finished_world_count(p_user) >= (v_rule ->> 'worlds')::integer;
   end if;
   return v_profile.daily_streak >= (v_rule ->> 'streak')::integer;
 end;
@@ -206,8 +215,38 @@ begin
   end if;
   update public.profiles set
     pal_id = p_pal,
-    pals = case when pals ? p_pal then pals else pals || jsonb_build_object(p_pal, jsonb_build_object('xp', 0)) end
+    pals = case when pals ? p_pal then pals else pals || jsonb_build_object(p_pal, jsonb_build_object('stage', 0)) end
   where id = v_user;
+  return public._economy_state(v_user);
+end;
+$$;
+
+-- Glow-ups: one per finished world. Spending one grows a Pal into its next form (5 forms: 0-4).
+create or replace function public.glow_up_pal(p_pal text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user uuid := public._require_user();
+  v_profile public.profiles;
+  v_stage integer;
+  v_spent integer;
+begin
+  select * into v_profile from public.profiles where id = v_user for update;
+  if not (v_profile.pals ? p_pal) then
+    raise exception using message = 'That Pal isn’t on your team yet.';
+  end if;
+  v_stage := coalesce((v_profile.pals -> p_pal ->> 'stage')::integer, 0);
+  if v_stage >= 4 then
+    raise exception using message = 'This Pal is already a Legend!';
+  end if;
+  select coalesce(sum(coalesce((value ->> 'stage')::integer, 0)), 0) into v_spent from jsonb_each(v_profile.pals);
+  if public._finished_world_count(v_user) - v_spent < 1 then
+    raise exception using message = 'Finish a world to earn a Glow-up.';
+  end if;
+  update public.profiles set pals = jsonb_set(pals, array[p_pal], jsonb_build_object('stage', v_stage + 1)) where id = v_user;
   return public._economy_state(v_user);
 end;
 $$;
@@ -255,7 +294,7 @@ begin
 end;
 $$;
 
--- Level results: as in social.sql, plus the partner Pal grows by one for each newly solved level.
+-- Level results: as in social.sql (kept here so all of Prism's level rules stay in one place).
 create or replace function public.record_level_result(p_level_id text, p_stars integer, p_moves integer)
 returns jsonb
 language plpgsql
@@ -280,10 +319,6 @@ begin
 
   if p_stars > v_previous and v_is_real_level and public._is_level_reachable(v_user, p_level_id) then
     perform public._add_weekly_points(v_user, p_stars - v_previous);
-    if v_previous = 0 then
-      update public.profiles set pals = jsonb_set(pals, array[pal_id, 'xp'], to_jsonb(coalesce((pals -> pal_id ->> 'xp')::integer, 0) + 1))
-      where id = v_user and pal_id is not null and pals ? pal_id;
-    end if;
   end if;
 
   insert into public.progress (user_id, level_id, stars, best_moves)
@@ -305,7 +340,7 @@ begin
 end;
 $$;
 
--- The weekly board also shows each player's Pal (id, growth and accessory).
+-- The weekly board also shows each player's Pal (id, form and accessory).
 create or replace function public.weekly_leaderboard()
 returns jsonb
 language sql
@@ -314,7 +349,7 @@ security definer
 set search_path = public
 as $$
   with ranking as (
-    select r.*, p.pal_id, coalesce((p.pals -> p.pal_id ->> 'xp')::integer, 0) as pal_xp, p.pal_accessory
+    select r.*, p.pal_id, coalesce((p.pals -> p.pal_id ->> 'stage')::integer, 0) as pal_stage, p.pal_accessory
     from public._weekly_ranking(public._week_start()) r
     join public.profiles p on p.id = r.user_id
   )
@@ -324,12 +359,12 @@ as $$
     'top', coalesce((
       select jsonb_agg(jsonb_build_object(
         'rank', r.rank, 'nickname', public._nickname_for(r.user_id), 'score', r.score, 'isMe', r.user_id = auth.uid(),
-        'pal', r.pal_id, 'palXp', r.pal_xp, 'accessory', r.pal_accessory)
+        'pal', r.pal_id, 'palStage', r.pal_stage, 'accessory', r.pal_accessory)
         order by r.rank)
       from ranking r where r.rank <= 50), '[]'::jsonb),
     'me', (
       select jsonb_build_object('rank', r.rank, 'score', r.score, 'nickname', public._nickname_for(r.user_id),
-        'pal', r.pal_id, 'palXp', r.pal_xp, 'accessory', r.pal_accessory)
+        'pal', r.pal_id, 'palStage', r.pal_stage, 'accessory', r.pal_accessory)
       from ranking r where r.user_id = auth.uid()),
     'myNickname', case when auth.uid() is null then null else public._nickname_for(auth.uid()) end
   );
@@ -341,6 +376,9 @@ revoke all on function public.choose_pal(text) from public, anon;
 revoke all on function public.buy_accessory(text) from public, anon;
 revoke all on function public.equip_accessory(text) from public, anon;
 grant execute on function public.choose_pal(text) to authenticated;
+revoke all on function public.glow_up_pal(text) from public, anon;
+grant execute on function public.glow_up_pal(text) to authenticated;
+revoke all on function public._finished_world_count(uuid) from public, anon, authenticated;
 grant execute on function public.buy_accessory(text) to authenticated;
 grant execute on function public.equip_accessory(text) to authenticated;
 grant execute on function public.weekly_leaderboard() to anon, authenticated;

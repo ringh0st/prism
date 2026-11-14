@@ -38,10 +38,12 @@ export const consumeHelperOnServer = (helperId) => rpc('use_helper', { p_helper:
 
 export const claimChestOnServer = (world, chestNumber) => rpc('claim_chest', { p_world: world, p_chest: chestNumber });
 
-/** Sets the public nickname from the two word lists. @returns state with `nickname` */
-export const setNicknameOnServer = (word, name) => rpc('set_nickname', { p_word: word, p_name: name });
+/** Sets the public nickname (checked on the server too). @returns state with `nickname` */
+export const setNicknameOnServer = (nickname) => rpc('set_nickname', { p_nickname: nickname.trim() });
 
 export const choosePalOnServer = (palId) => rpc('choose_pal', { p_pal: palId });
+
+export const glowUpPalOnServer = (palId) => rpc('glow_up_pal', { p_pal: palId });
 
 export const buyAccessoryOnServer = (itemId) => rpc('buy_accessory', { p_item: itemId });
 

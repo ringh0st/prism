@@ -284,7 +284,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
       <div className={styles.bottom}>
         <div className={styles.lumi}>
-          <Lumi mood={lumi.mood} size={80} line={lumi.line} bubbleSide="right" />
+          <Lumi mood={lumi.mood} size={96} line={lumi.line} bubbleSide="right" />
         </div>
         <div className={styles.controls}>
           <Button variant="secondary" icon="restart" label="Restart level" onClick={restart} />

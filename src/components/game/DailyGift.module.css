@@ -124,7 +124,7 @@
 .lumi {
   display: flex;
   align-items: flex-end;
-  min-height: 110px;
+  min-height: 126px;
   margin: 0 0 var(--space-3) var(--space-2);
 }
 

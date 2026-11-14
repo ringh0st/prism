@@ -3,7 +3,7 @@ import { finishedWorldCount } from './titles.js';
 
 /**
  * Pals: profile characters. You pick one starter on your first game, then unlock the rest by playing.
- * Each Pal evolves through five forms as you solve new levels with it as your partner. Must match supabase/pals.sql.
+ * Every finished world earns a Glow-up, and you choose which Pal grows into its next form. Must match supabase/pals.sql.
  *
  * unlock: what makes a Pal available (starters can also be picked as your very first Pal).
  * animal: the word used in your public nickname ("Sunny Fox 42").
@@ -44,21 +44,37 @@ export const PALS = [
 export const STARTER_PALS = PALS.filter((pal) => pal.isStarter);
 export const palById = (id) => PALS.find((pal) => pal.id === id) ?? null;
 
-/** Evolution: every 100 new levels solved while the Pal is your partner, it grows into its next form. */
+/** Each Pal has five forms. It grows one form each time you spend a Glow-up (earned per finished world) on it. */
 export const PAL_STAGES = [
-  { id: 'baby', name: 'Baby', xp: 0 },
-  { id: 'kid', name: 'Kid', xp: 100 },
-  { id: 'teen', name: 'Teen', xp: 200 },
-  { id: 'hero', name: 'Hero', xp: 300 },
-  { id: 'legend', name: 'Legend', xp: 400 },
+  { id: 'baby', name: 'Baby' },
+  { id: 'junior', name: 'Junior' },
+  { id: 'buddy', name: 'Buddy' },
+  { id: 'champ', name: 'Champ' },
+  { id: 'legend', name: 'Legend' },
 ];
 
-export function palStage(xp = 0) {
-  const index = PAL_STAGES.findLastIndex((stage) => xp >= stage.xp);
-  const next = PAL_STAGES[index + 1] ?? null;
-  const current = PAL_STAGES[index];
-  return { ...current, index, next, progress: next ? (xp - current.xp) / (next.xp - current.xp) : 1 };
+export const MAX_PAL_STAGE = PAL_STAGES.length - 1;
+
+
+/** A Pal's form (0 = Baby … 4 = Legend), with the next form or null. */
+export function palStage(index = 0) {
+  const safe = Math.max(0, Math.min(MAX_PAL_STAGE, index));
+  return { ...PAL_STAGES[safe], index: safe, next: PAL_STAGES[safe + 1] ?? null };
 }
+
+/** The form index of an owned Pal entry ({ stage }). */
+export const stageOf = (owned) => owned?.stage ?? 0;
+
+/** One Glow-up for every finished world. */
+export const glowUpsEarned = (progress) => finishedWorldCount(progress.levels);
+
+/** Glow-ups earned by finishing worlds, minus those already spent growing Pals. */
+export function glowUpsAvailable(progress) {
+  const earned = glowUpsEarned(progress);
+  const spent = Object.values(progress.pal.owned).reduce((sum, owned) => sum + stageOf(owned), 0);
+  return Math.max(0, earned - spent);
+}
+
 
 /** Cosmetic accessories, bought with sparks (evolution itself can't be bought). */
 export const PAL_ACCESSORIES = [
@@ -94,22 +110,17 @@ export function isPalUnlocked(progress, pal) {
 export function choosePalLocally(progress, palId) {
   const pal = palById(palId);
   if (!pal || !isPalUnlocked(progress, pal)) throw new EconomyError('That Pal isn’t unlocked yet.');
-  const owned = { ...progress.pal.owned, [palId]: progress.pal.owned[palId] ?? { xp: 0 } };
+  const owned = { ...progress.pal.owned, [palId]: progress.pal.owned[palId] ?? { stage: 0 } };
   return { ...progress, pal: { ...progress.pal, id: palId, owned } };
 }
 
-/**
- * A new level was solved: the partner Pal grows.
- * @returns {{ progress, evolvedTo }} evolvedTo is the new stage when it just evolved, else null
- */
-export function growPartnerPal(progress) {
-  const { id, owned } = progress.pal;
-  if (!id) return { progress, evolvedTo: null };
-  const before = owned[id]?.xp ?? 0;
-  const after = before + 1;
-  const next = { ...progress, pal: { ...progress.pal, owned: { ...owned, [id]: { xp: after } } } };
-  const evolved = palStage(after).index > palStage(before).index;
-  return { progress: next, evolvedTo: evolved ? palStage(after) : null };
+/** Spend a Glow-up: the chosen Pal grows into its next form. @throws EconomyError */
+export function glowUpPalLocally(progress, palId) {
+  const owned = progress.pal.owned[palId];
+  if (!owned) throw new EconomyError('That Pal isn’t on your team yet.');
+  if (stageOf(owned) >= MAX_PAL_STAGE) throw new EconomyError('This Pal is already a Legend!');
+  if (glowUpsAvailable(progress) < 1) throw new EconomyError('Finish a world to earn a Glow-up.');
+  return { ...progress, pal: { ...progress.pal, owned: { ...progress.pal.owned, [palId]: { stage: stageOf(owned) + 1 } } } };
 }
 
 /** @throws EconomyError */

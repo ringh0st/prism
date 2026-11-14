@@ -18,7 +18,7 @@ export default function StallFront({ lumiMood, lumiLine }) {
         ))}
       </svg>
       <div className={styles.counter}>
-        <Lumi mood={lumiMood} size={84} line={lumiLine} />
+        <Lumi mood={lumiMood} size={100} line={lumiLine} />
       </div>
     </div>
   );

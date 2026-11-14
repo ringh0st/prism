@@ -65,7 +65,7 @@ export default function LeaderboardScreen() {
       <main className={styles.arena}>
         <Bunting />
         <div className={styles.host}>
-          <Lumi mood="excited" size={72} line={lumiLine} />
+          <Lumi mood="excited" size={86} line={lumiLine} />
         </div>
 
         <PartnerSwitcher />
