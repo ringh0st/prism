@@ -22,7 +22,7 @@
   display: grid;
   flex: 1;
   font-weight: 700;
-  color: var(--text-soft);
+  color: var(--text-strong);
 }
 
 .text strong {

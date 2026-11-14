@@ -14,6 +14,7 @@ import PalsScreen from './screens/pals/PalsScreen.jsx';
 import GroveScreen from './screens/grove/GroveScreen.jsx';
 import EventScreen from './screens/event/EventScreen.jsx';
 import GlowbugGarden from './screens/glowbugs/GlowbugGarden.jsx';
+import StickerAlbum from './screens/stickers/StickerAlbum.jsx';
 import EventLevelRoute from './screens/event/EventLevelRoute.jsx';
 import WeeklyRewardDialog from './screens/leaderboard/WeeklyRewardDialog.jsx';
 import StarterPicker from './screens/pals/StarterPicker.jsx';
@@ -92,6 +93,8 @@ function Routes() {
       ) : (
         <NotFoundScreen />
       );
+    case 'stickers':
+      return <StickerAlbum />;
     case 'glowbugs':
       return <GlowbugGarden />;
     case 'event':

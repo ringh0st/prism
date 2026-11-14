@@ -12,6 +12,8 @@ import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
 import NicknameDialog from './NicknameDialog.jsx';
 import TitleBadge from '../../components/game/TitleBadge.jsx';
 import styles from './PlayerCard.module.css';
+import { earnedStickers } from '../../game/stickers.js';
+import { rescuedGlowbugs } from '../../game/glowbugs.js';
 
 function Stat({ icon, tone, value, label, note = null }) {
   return (
@@ -129,6 +131,14 @@ export default function PlayerCard() {
           note={shields > 0 ? `${shields} ${shields === 1 ? 'shield' : 'shields'}` : null}
         />
       </ul>
+      <div className={styles.collections}>
+        <a href="#/stickers" className={styles.collection}>
+          <Icon name="star" size={18} /> Sticker album <strong>{earnedStickers(progress.levels).size}</strong>
+        </a>
+        <a href="#/glowbugs" className={styles.collection}>
+          <Icon name="heart" size={18} /> Glowbugs <strong>{rescuedGlowbugs(progress.levels).size}</strong>
+        </a>
+      </div>
     </section>
   );
 }

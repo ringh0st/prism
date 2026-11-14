@@ -36,6 +36,8 @@ export function createEmptyProgress() {
     luckyPals: { claimed: 0 },
     // Weekend events: { [saturday]: { stars: { [number]: stars }, claimed } } (see events.js).
     events: {},
+    // Treats eaten (how many were found comes from the solved levels; see treats.js).
+    treatsFed: 0,
     // This week's Pal quests: { week, solved, perfect, hard, claimed } (see quests.js).
     quests: null,
     // A guest's number for their daily Shop picks (accounts use their id instead).

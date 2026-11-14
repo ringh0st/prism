@@ -194,3 +194,27 @@
 .stats > li:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
+
+/* Ways into the sticker album and the Glowbug Garden */
+.collections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+.collection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}

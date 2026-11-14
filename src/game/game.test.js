@@ -693,3 +693,28 @@ test('Glowbugs: 60 species, on about a quarter of levels and every boss, rescued
   const rescued = bugs.rescuedGlowbugs({ 'w1-07': { stars: 3 }, 'w1-10': { stars: 2 }, 'w1-08': { stars: 3 } });
   assert.deepEqual([...rescued.keys()], [bugs.glowbugForLevel('w1-07').id]);
 });
+
+test('treats: one every three solved levels, fed one at a time', async () => {
+  const treats = await import('./treats.js');
+  const levels = Object.fromEntries(Array.from({ length: 7 }, (_, i) => [`w1-0${i + 1}`, { stars: 1 }]));
+  assert.equal(treats.treatsFound(levels), 2);
+  const fed = treats.feedTreat({ levels, treatsFed: 1 }, 0);
+  assert.deepEqual([fed.treat.id, fed.progress.treatsFed, fed.trick], ['berry', 2, 'backflip']);
+  assert.equal(treats.feedTreat({ levels, treatsFed: 2 }), null);
+  const eight = { ...levels, 'w1-08': { stars: 2 } };
+  const nine = { ...eight, 'w1-09': { stars: 2 } };
+  assert.equal(treats.treatFoundBy(levels, eight), null);
+  assert.equal(treats.treatFoundBy(eight, nine).id, 'starCandy');
+});
+
+test('stickers: six per world, earned from stars', async () => {
+  const { stickersForWorld, newStickersFor, earnedStickers } = await import('./stickers.js');
+  const allThree = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`w2-${String(i + 1).padStart(2, '0')}`, { stars: 3 }]));
+  assert.ok(stickersForWorld(2, allThree).every((sticker) => sticker.isEarned));
+  assert.equal(earnedStickers(allThree).size, 6);
+  const almost = { ...allThree, 'w2-20': { stars: 2 } };
+  assert.deepEqual(
+    newStickersFor(2, almost, allThree).map(({ sticker }) => sticker.id),
+    ['bossBeater', 'perfect'].concat(stickersForWorld(2, almost).find((s) => s.id === 'bugBuddy').isEarned ? [] : ['bugBuddy']).sort((a, b) => ['bossBeater', 'bugBuddy', 'perfect'].indexOf(a) - ['bossBeater', 'bugBuddy', 'perfect'].indexOf(b)),
+  );
+});

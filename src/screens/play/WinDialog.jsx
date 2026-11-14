@@ -13,6 +13,8 @@ import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import { palById, stageOf } from '../../game/pals.js';
 import ReplayShare from '../../components/replay/ReplayShare.jsx';
 import GlowbugRescue from './GlowbugRescue.jsx';
+import StickerBadge from '../../components/stickers/StickerBadge.jsx';
+import { withArticle } from '../../game/treats.js';
 import { cheerFor } from '../../game/palCheers.js';
 import styles from './WinDialog.module.css';
 
@@ -164,6 +166,20 @@ export default function WinDialog({
         </div>
       )}
       {result.glowbug && !isSkipped && <GlowbugRescue glowbug={result.glowbug} />}
+      {(result.treat || result.newStickers?.length > 0) && (
+        <div className={styles.finds}>
+          {result.treat && partner && (
+            <span className={styles.find}>
+              <span aria-hidden="true">{result.treat.emoji}</span> {partner.name} found {withArticle(result.treat)}! Feed it in Pals.
+            </span>
+          )}
+          {result.newStickers?.map(({ world, sticker }) => (
+            <a key={sticker.id} href="#/stickers" className={styles.find}>
+              <StickerBadge sticker={sticker} world={world} size={30} /> New sticker: <strong>{sticker.name}</strong> (World {world})
+            </a>
+          ))}
+        </div>
+      )}
       {shareMessage && <ShareResult text={shareMessage} />}
       {replay && !isSkipped && <ReplayShare replay={{ ...replay, stars, moves }} />}
       {completesWorld && !isSignedIn && (

@@ -59,6 +59,7 @@ import {
 } from '../game/pals.js';
 import { buyGroveItemLocally, placeGroveItemLocally } from '../game/grove.js';
 import { buyThemeItemLocally } from '../game/themes.js';
+import { feedTreat } from '../game/treats.js';
 import { sfx } from '../audio/sfx.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
@@ -352,6 +353,14 @@ export function PlayerProvider({ children }) {
           return;
         }
         applyServerState(await buyGroveItemOnServer(itemId));
+      },
+
+      /** Feed your Pal the next treat. @returns { treat, trick } or null when the bag is empty (kept on this device). */
+      feedTreat() {
+        const fed = feedTreat(progressRef.current);
+        if (!fed) return null;
+        setProgress(fed.progress);
+        return { treat: fed.treat, trick: fed.trick };
       },
 
       /** Buy a piece of this week's theme collection (sparks, or diamonds with an account). @throws EconomyError */

@@ -204,3 +204,25 @@
   font-size: 17px;
   color: var(--text-strong);
 }
+
+/* Treats found and new stickers */
+.finds {
+  display: grid;
+  gap: 6px;
+  margin-bottom: var(--space-3);
+  animation: pop 500ms var(--ease-pop) 1.6s both;
+}
+
+.find {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--text-strong);
+  background: var(--surface-sunken);
+}

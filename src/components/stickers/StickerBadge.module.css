@@ -1,0 +1,65 @@
+/* A round sticker with a white die-cut edge */
+.sticker {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  height: var(--size);
+  border: max(2px, calc(var(--size) / 18)) solid #fffaf2;
+  border-radius: 50%;
+  color: #2b2118;
+  box-shadow: var(--shadow-md);
+  rotate: var(--tilt);
+}
+
+.world {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--text-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.explorer {
+  background: #9fd6c0;
+}
+
+.starry {
+  background: #f6d375;
+}
+
+.hardHero {
+  background: #f2b08c;
+}
+
+.bossBeater {
+  background: #e99a7f;
+}
+
+.bugBuddy {
+  background: #f6c3c6;
+}
+
+.perfect {
+  background: linear-gradient(135deg, #f0c14e, #f2a67e 50%, #7cc8b5);
+}
+
+/* Not earned yet: a soft outline of what's waiting */
+.faded {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--text-strong) 20%, transparent);
+  color: color-mix(in srgb, var(--text-strong) 30%, transparent);
+  background: var(--surface-sunken);
+  box-shadow: none;
+  rotate: 0deg;
+}

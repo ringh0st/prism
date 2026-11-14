@@ -131,7 +131,149 @@
   cursor: pointer;
 }
 
+/* ---------- Treats and tricks ---------- */
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.feed {
+  padding: 4px 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  cursor: pointer;
+}
+
+/* The treat pops into the Pal's mouth */
+.treat {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  z-index: 3;
+  font-size: 30px;
+  pointer-events: none;
+  animation: munch 700ms ease-in both;
+}
+
+@keyframes munch {
+  0% {
+    opacity: 0;
+    transform: translate(60%, -40%) scale(0.6);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -10%) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 70%) scale(0.3);
+  }
+}
+
+.backflip {
+  animation: backflip 1s var(--ease-pop) 0.6s;
+}
+
+@keyframes backflip {
+  30% {
+    transform: translateY(-30%) rotate(-180deg);
+  }
+  60% {
+    transform: translateY(-30%) rotate(-360deg);
+  }
+  85% {
+    transform: scale(1.08, 0.92) rotate(-360deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+.juggle {
+  animation: juggle 360ms ease-in-out 0.6s 4 alternate;
+}
+
+@keyframes juggle {
+  to {
+    transform: translateY(-8%) rotate(4deg);
+  }
+}
+
+.bounce {
+  animation: bounce 500ms var(--ease-pop) 0.6s 3;
+}
+
+@keyframes bounce {
+  50% {
+    transform: translateY(-18%) scale(0.96, 1.05);
+  }
+}
+
+.wave {
+  animation: wave 1.4s ease-in-out 0.6s;
+}
+
+@keyframes wave {
+  25%,
+  75% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+.hearts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hearts span {
+  position: absolute;
+  bottom: 60%;
+  left: 45%;
+  font-size: 22px;
+  color: var(--color-terracotta);
+  animation: heartUp 1.2s ease-out 0.6s both;
+}
+
+.hearts span:nth-child(2) {
+  left: 25%;
+  animation-delay: 0.75s;
+}
+
+.hearts span:nth-child(3) {
+  left: 65%;
+  animation-delay: 0.9s;
+}
+
+@keyframes heartUp {
+  from {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-120%) scale(1.2);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .treat,
+  .backflip,
+  .juggle,
+  .bounce,
+  .wave,
+  .hearts span,
   .hop,
   .twirl,
   .bubble {
