@@ -26,7 +26,7 @@ function GiftDialog({ outcome, onClose }) {
             <Icon name="spark" size={24} /> +{outcome.sparks} sparks
           </p>
           <div className={styles.lumi}>
-            <Lumi mood="dance" size={52} line="See you tomorrow for another one!" bubbleSide="right" />
+            <Lumi mood="dance" size={72} line="See you tomorrow for another one!" bubbleSide="right" />
           </div>
         </>
       )}

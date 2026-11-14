@@ -55,7 +55,7 @@ export default function ChestDialog({ opening, onClose }) {
             </li>
           </ul>
           <div className={styles.lumi}>
-            <Lumi mood="dance" size={56} line="Shiny loot! Spend it wisely… or don’t!" bubbleSide="right" />
+            <Lumi mood="dance" size={76} line="Shiny loot! Spend it wisely… or don’t!" bubbleSide="right" />
           </div>
           <Button size="lg" variant="go" onClick={onClose} data-autofocus>
             Awesome!

@@ -2,7 +2,7 @@
 .pickerLumi {
   display: flex;
   align-items: flex-end;
-  min-height: 92px;
+  min-height: 112px;
   margin: 0 0 var(--space-3) var(--space-2);
 }
 
@@ -204,4 +204,89 @@
 .accessoryName {
   font-weight: 800;
   font-size: 14px;
+}
+
+/* ---------- Partner card (Top tab) ---------- */
+.partnerCard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin: 0 var(--space-3) var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-md);
+}
+
+.partnerArt {
+  border-radius: 50%;
+  background: var(--surface-tonal);
+}
+
+.partnerInfo {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.partnerName {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 22px;
+}
+
+.stageChip {
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.growthTrack {
+  height: 10px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
+}
+
+.growthFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-sage);
+}
+
+.team {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding: 4px 2px 6px;
+}
+
+.teamPal {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-tonal);
+  cursor: pointer;
+  transition: transform 220ms var(--ease-spring);
+}
+
+.teamPal:active {
+  transform: scale(0.92);
+}
+
+.teamPalActive {
+  background: color-mix(in srgb, var(--color-sage) 35%, var(--surface-raised));
 }

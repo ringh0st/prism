@@ -20,7 +20,7 @@ Prism is a light-bending puzzle game: rotate mirrors and crystals to steer beams
 - **Sparks** are earned by playing. **Diamonds** are premium: earned by finishing a world, 3-starring a world or every 7-day streak, or bought with real money (Lemon Squeezy, see PAYMENTS.md). Diamonds always require an account.
 - **Helpers:** Hint, Lens, Auto-turn and Skip. They are capped so buying isn't a shortcut through the game: max 5 held per helper, 3 helpers bought with sparks per day, a per-attempt limit by difficulty (3/2/1), and star caps (Hint/Lens → 2★, Auto-turn/Skip → 1★). Sparks can never become diamonds.
 - For signed-in players the **server is the source of truth**: every currency change goes through a `security definer` function in `supabase/economy.sql`, never a direct table write. Prices exist in both `catalog.js` and `economy.sql`; a test keeps them in sync.
-- **Pals** (profile characters, src/game/pals.js and supabase/pals.sql): pick a starter on the first game, unlock more by playing, and each Pal evolves (Baby → Grown at 100 → Radiant at 300 new levels solved as partner). Evolution can never be bought; sparks only buy cosmetic accessories.
+- **Pals** (profile characters, src/game/pals.js and supabase/pals.sql): 30 Pals. Pick one starter on the first game, unlock the rest by playing, and each Pal evolves through five forms, one every 100 new levels solved as partner (Baby, Kid, Teen, Hero, Legend). Evolution can never be bought; sparks only buy cosmetic accessories.
 - All-ages fairness: no loot boxes or random rewards, no fake timers or pressure tactics, clear prices, and an "ask a parent" note wherever money is involved.
 
 ## Brand palette ("Calm Meadow", relaxing and warm)

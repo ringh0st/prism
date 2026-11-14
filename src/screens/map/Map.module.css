@@ -331,7 +331,7 @@ a.node:active {
 
 .lumiOnNode {
   position: absolute;
-  top: -18px;
+  top: -36px;
   pointer-events: none;
 }
 

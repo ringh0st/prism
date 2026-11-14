@@ -7,6 +7,7 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
 import { WEEKLY_POINTS, WEEKLY_REWARDS } from '../../game/catalog.js';
 import Podium from './Podium.jsx';
+import PartnerSwitcher from '../pals/PartnerSwitcher.jsx';
 import RankRow from './RankRow.jsx';
 import styles from './LeaderboardScreen.module.css';
 
@@ -64,9 +65,10 @@ export default function LeaderboardScreen() {
       <main className={styles.arena}>
         <Bunting />
         <div className={styles.host}>
-          <Lumi mood="excited" size={52} line={lumiLine} />
+          <Lumi mood="excited" size={72} line={lumiLine} />
         </div>
 
+        <PartnerSwitcher />
         {error && <p className={styles.empty}>{error}</p>}
         {!board && !error && <p className={styles.empty}>Loading the board…</p>}
         {board && <Podium top={board.top} />}

@@ -81,6 +81,11 @@ export function PlayerProvider({ children }) {
       const levels = await fetchRemoteLevels(userId);
       setProgress({ ...withServerState(progressRef.current, state, todayKey()), levels });
       setSyncStatus('synced');
+      // A Pal picked while offline (or before the account knew about Pals) is saved now.
+      const localPal = progressRef.current.pal.id;
+      if (localPal && !state.pal?.id) {
+        await choosePalOnServer(localPal).then(applyServerState).catch(() => {});
+      }
       // Finished last week in the top 10? Collect the reward (the server pays it only once).
       const claimed = await claimWeeklyRewardOnServer().catch(() => null);
       if (claimed?.reward) {
@@ -175,11 +180,15 @@ export function PlayerProvider({ children }) {
 
       /** Pick your partner Pal. @throws EconomyError */
       async choosePal(palId) {
-        if (!userId) {
-          setProgress(choosePalLocally(progressRef.current, palId));
-          return;
+        // Applied on the device right away, so the choice never waits on the network.
+        setProgress(choosePalLocally(progressRef.current, palId));
+        if (!userId) return;
+        try {
+          applyServerState(await choosePalOnServer(palId));
+        } catch {
+          // Kept on this device and sent again on the next sync.
+          setSyncStatus('error');
         }
-        applyServerState(await choosePalOnServer(palId));
       },
 
       /** Buy a Pal accessory with sparks. @throws EconomyError */

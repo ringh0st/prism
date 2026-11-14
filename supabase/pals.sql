@@ -18,13 +18,35 @@ immutable
 as $$
   select case p_pal
     when 'ember' then '{"starter": true, "stars": 30}'::jsonb
-    when 'mossy' then '{"starter": true, "worlds": 1}'::jsonb
+    when 'mossy' then '{"starter": true, "stars": 60}'::jsonb
     when 'coral' then '{"starter": true, "streak": 3}'::jsonb
+    when 'mochi' then '{"stars": 90}'::jsonb
     when 'hoot' then '{"stars": 120}'::jsonb
+    when 'waffles' then '{"stars": 150}'::jsonb
+    when 'peep' then '{"worlds": 1}'::jsonb
+    when 'bruno' then '{"stars": 200}'::jsonb
     when 'biscuit' then '{"worlds": 2}'::jsonb
+    when 'truffle' then '{"stars": 250}'::jsonb
     when 'pebble' then '{"streak": 7}'::jsonb
     when 'quartz' then '{"stars": 300}'::jsonb
+    when 'ribbit' then '{"worlds": 3}'::jsonb
+    when 'cotton' then '{"stars": 350}'::jsonb
+    when 'squeak' then '{"stars": 400}'::jsonb
     when 'maple' then '{"worlds": 5}'::jsonb
+    when 'otto' then '{"stars": 500}'::jsonb
+    when 'buzz' then '{"streak": 14}'::jsonb
+    when 'kiko' then '{"stars": 600}'::jsonb
+    when 'splash' then '{"stars": 700}'::jsonb
+    when 'shroomy' then '{"worlds": 8}'::jsonb
+    when 'bandit' then '{"stars": 800}'::jsonb
+    when 'waddles' then '{"stars": 1000}'::jsonb
+    when 'fawn' then '{"stars": 1200}'::jsonb
+    when 'shelly' then '{"streak": 30}'::jsonb
+    when 'inky' then '{"stars": 1500}'::jsonb
+    when 'puff' then '{"worlds": 12}'::jsonb
+    when 'twinkle' then '{"stars": 1800}'::jsonb
+    when 'starla' then '{"stars": 2400}'::jsonb
+    when 'ziggy' then '{"stars": 3000}'::jsonb
     else null
   end;
 $$;
@@ -35,8 +57,36 @@ language sql
 immutable
 as $$
   select case p_pal
-    when 'ember' then 'Fox' when 'mossy' then 'Turtle' when 'coral' then 'Axolotl' when 'hoot' then 'Owl'
-    when 'biscuit' then 'Bunny' when 'pebble' then 'Hedgehog' when 'quartz' then 'Gem' when 'maple' then 'Panda'
+    when 'ember' then 'Fox'
+    when 'mossy' then 'Turtle'
+    when 'coral' then 'Axolotl'
+    when 'mochi' then 'Kitten'
+    when 'hoot' then 'Owl'
+    when 'waffles' then 'Puppy'
+    when 'peep' then 'Chick'
+    when 'bruno' then 'Bear'
+    when 'biscuit' then 'Bunny'
+    when 'truffle' then 'Piglet'
+    when 'pebble' then 'Hedgehog'
+    when 'quartz' then 'Gem'
+    when 'ribbit' then 'Frog'
+    when 'cotton' then 'Lamb'
+    when 'squeak' then 'Mouse'
+    when 'maple' then 'Panda'
+    when 'otto' then 'Otter'
+    when 'buzz' then 'Bee'
+    when 'kiko' then 'Koala'
+    when 'splash' then 'Seal'
+    when 'shroomy' then 'Sprite'
+    when 'bandit' then 'Raccoon'
+    when 'waddles' then 'Penguin'
+    when 'fawn' then 'Deer'
+    when 'shelly' then 'Snail'
+    when 'inky' then 'Octopus'
+    when 'puff' then 'Cloud'
+    when 'twinkle' then 'Star'
+    when 'starla' then 'Unicorn'
+    when 'ziggy' then 'Dragon'
     else null
   end;
 $$;

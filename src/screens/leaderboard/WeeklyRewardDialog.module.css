@@ -34,7 +34,7 @@
 .lumi {
   display: flex;
   justify-content: flex-start;
-  min-height: 92px;
+  min-height: 112px;
   margin: 0 0 var(--space-3) var(--space-2);
   align-items: flex-end;
 }

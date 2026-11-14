@@ -203,6 +203,7 @@ export function withServerState(progress, state, today) {
     sparkPurchases: { date: today, count: state.sparkPurchasesToday },
     claimedChests: state.claimedChests ?? progress.claimedChests,
     giftDate: state.lastGiftDate ?? progress.giftDate,
-    pal: state.pal ?? progress.pal,
+    // The account's Pals win, unless the account has none yet (then keep this device's choice).
+    pal: state.pal?.id ? state.pal : progress.pal,
   };
 }

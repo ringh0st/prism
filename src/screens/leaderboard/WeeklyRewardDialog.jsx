@@ -27,7 +27,7 @@ export default function WeeklyRewardDialog({ reward, onClose }) {
         </li>
       </ul>
       <div className={styles.lumi}>
-        <Lumi mood="dance" size={56} line="Champion vibes! Let’s do it again." bubbleSide="right" />
+        <Lumi mood="dance" size={76} line="Champion vibes! Let’s do it again." bubbleSide="right" />
       </div>
       <Button size="lg" onClick={onClose} data-autofocus>
         Yay!

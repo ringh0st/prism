@@ -27,7 +27,7 @@
 .host {
   display: flex;
   align-items: flex-end;
-  min-height: 96px;
+  min-height: 120px;
   padding: 0 var(--space-4);
 }
 

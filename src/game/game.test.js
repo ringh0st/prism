@@ -267,11 +267,13 @@ test('pals: starter choice, unlocks, growth and accessories', async () => {
   progress = pals.choosePalLocally(progress, 'mossy');
   // After the first pick, the other starters need their own milestone.
   assert.equal(pals.isPalUnlocked(progress, pals.palById('ember')), false);
-  // Growing: Baby → Grown at 100 new levels.
+  // Evolving: a new form every 100 new levels, five forms in all.
   progress.pal.owned.mossy.xp = 99;
   const grown = pals.growPartnerPal(progress);
-  assert.equal(grown.evolvedTo.id, 'grown');
-  assert.equal(pals.palStage(300).id, 'radiant');
+  assert.equal(grown.evolvedTo.id, 'kid');
+  assert.equal(pals.palStage(250).id, 'teen');
+  assert.equal(pals.palStage(999).id, 'legend');
+  assert.equal(pals.PALS.length, 30);
   // Accessories cost sparks and must be owned to wear.
   assert.throws(() => pals.equipAccessoryLocally(progress, 'scarf'));
   const rich = { ...progress, sparks: 100 };

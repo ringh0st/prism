@@ -64,7 +64,7 @@ export default function PlayerCard() {
         ) : avatarUrl ? (
           <img src={avatarUrl} alt="" width="84" height="84" referrerPolicy="no-referrer" />
         ) : (
-          <Lumi mood="happy" size={58} />
+          <Lumi mood="happy" size={80} />
         )}
       </div>
       <h2 id="player-name" className={`game-title ${styles.name}`}>
