@@ -2,84 +2,73 @@ import { TILE } from './constants.js';
 
 /*
  * The pieces a player meets along the way. The first level that has a piece they've never seen
- * introduces it ("New piece!"), Candy Crush style. Order = the order they're shown in.
+ * introduces it with a spotlight on the board: its name and a few words. Order = the order they're shown in.
  */
 export const PIECES = [
   {
     id: 'basics',
     name: 'Mirrors and gems',
-    text: 'Tap a mirror to turn it. Bend the light from the lamp into every gem to light it up!',
-    lumi: 'This is where the magic starts!',
+    text: 'Tap a mirror to turn it. Light every gem!',
     sample: { type: TILE.MIRROR, orient: 0 },
   },
   {
     id: 'wall',
     name: 'Walls',
-    text: 'Walls block the light. Find a way around them.',
-    lumi: 'Bonk! Light can’t go through.',
+    text: 'Walls stop the light.',
     sample: { type: TILE.WALL },
   },
   {
     id: 'locked',
     name: 'Fixed mirrors',
-    text: 'These mirrors are stuck in place. You can’t turn them, so plan around them.',
-    lumi: 'This one won’t budge. I tried!',
+    text: 'Bolted mirrors can’t turn.',
     sample: { type: TILE.MIRROR, orient: 1, locked: true },
   },
   {
     id: 'splitter',
     name: 'Splitters',
-    text: 'A splitter lets light go straight through and bounces a copy sideways. One beam becomes two!',
-    lumi: 'Twice the light, twice the fun!',
+    text: 'One beam in, two beams out.',
     sample: { type: TILE.SPLITTER, orient: 0 },
   },
   {
     id: 'color',
     name: 'Color glass',
-    text: 'Light that passes through colored glass takes on its color. Colored gems only light up with their own color (match the shapes too).',
-    lumi: 'Instant makeover for your light!',
+    text: 'Glass paints the light. Match each gem’s color.',
     sample: { type: TILE.FILTER, color: 'lime' },
   },
   {
     id: 'shade',
     name: 'Shadow crystals',
-    text: 'Never let the light touch a shadow crystal! Keep your beams away from it.',
-    lumi: 'Eek! Don’t wake the shadow crystal!',
+    text: 'Keep the light off this one!',
     sample: { type: TILE.SHADE },
   },
   {
     id: 'twins',
     name: 'Twin mirrors',
-    text: 'Mirrors with the same little mark are twins: turn one and its twin turns too!',
-    lumi: 'They do everything together. Cute!',
+    text: 'Same mark? They turn together.',
     sample: { type: TILE.MIRROR, orient: 0, link: 'a' },
   },
   {
     id: 'portal',
     name: 'Portals',
-    text: 'Light that goes into a portal comes out of its partner (the one with the same pattern), still going the same way.',
-    lumi: 'Whoosh! Light can teleport now?!',
+    text: 'Light jumps to the matching portal.',
     sample: { type: TILE.PORTAL, pair: 'a' },
   },
   {
     id: 'fragile',
     name: 'Cracking mirrors',
-    text: 'Mirrors with little dots can only turn 3 times. Then they crack and stay put, so think before you tap!',
-    lumi: 'Careful… crrrack!',
+    text: 'Only 3 turns, then it’s stuck.',
     sample: { type: TILE.MIRROR, orient: 0, fragile: true },
   },
   {
     id: 'fog',
     name: 'Fog',
-    text: 'Fog hides what’s underneath (a gem? a wall?) until your light touches it. Explore with your beam!',
-    lumi: 'Spooky! What’s in there?',
+    text: 'Something hides here. Shine light on it!',
     sample: { type: TILE.GEM, color: 'sun', fog: true },
   },
   {
     id: 'prism',
     name: 'Prism crystals',
-    text: 'A prism crystal splits the light in two: one beam goes out each side. It can’t be turned.',
-    lumi: 'One beam in, two beams out!',
+    text: 'Splits the light both ways. Can’t turn.',
     sample: { type: TILE.PRISM },
   },
 ];

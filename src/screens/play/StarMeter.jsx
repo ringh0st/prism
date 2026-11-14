@@ -2,22 +2,23 @@ import Icon from '../../components/Icon.jsx';
 import styles from './StarMeter.module.css';
 
 /**
- * Moves-left meter. The bar drains with every move; star markers show where the 3★ and 2★
- * thresholds are, and each star pops off when you pass it. `isSimple` (the first levels) leaves
- * the star markers out, so there's less to take in.
+ * Moves left, a bar that drains with every move, and the stars you'd get if you solved it now:
+ * ★★★ while you're within par, then a star drops off each time you pass a threshold. `isSimple`
+ * (the first levels) leaves the stars out, so there's less to take in.
  */
 export default function StarMeter({ moves, par, limit, starCap, isSimple = false }) {
   const twoStarLimit = par + Math.ceil((limit - par) / 2);
   const left = Math.max(0, limit - moves);
   const fill = (left / limit) * 100;
   const tone = left <= 1 ? styles.danger : left <= Math.ceil(limit * 0.34) ? styles.warn : styles.good;
-  const markers = [
-    { stars: 3, at: par, isKept: moves <= par && starCap >= 3 },
-    { stars: 2, at: twoStarLimit, isKept: moves <= twoStarLimit && starCap >= 2 },
-  ];
+  const stars = Math.min(starCap, moves <= par ? 3 : moves <= twoStarLimit ? 2 : 1);
 
   return (
-    <div className={styles.meter} role="group" aria-label={`${left} moves left of ${limit}`}>
+    <div
+      className={styles.meter}
+      role="group"
+      aria-label={`${left} moves left of ${limit}${isSimple ? '' : `. Solve it now for ${stars} ${stars === 1 ? 'star' : 'stars'}`}`}
+    >
       <div className={styles.movesLeft}>
         <span className={`game-title ${styles.count}`} key={left}>
           {left}
@@ -26,20 +27,16 @@ export default function StarMeter({ moves, par, limit, starCap, isSimple = false
       </div>
       <div className={styles.track}>
         <div className={`${styles.fill} ${tone}`} style={{ width: `${fill}%` }} />
-        {!isSimple &&
-          markers.map((marker) => (
-            <span
-              key={marker.stars}
-              className={`${styles.marker} ${marker.isKept ? '' : styles.lost}`}
-              style={{ left: `${((limit - marker.at) / limit) * 100}%` }}
-              aria-hidden="true"
-            >
-              {Array.from({ length: marker.stars }, (_, i) => (
-                <Icon key={i} name="star" size={14} />
-              ))}
+      </div>
+      {!isSimple && (
+        <span className={styles.stars} aria-hidden="true">
+          {[1, 2, 3].map((n) => (
+            <span key={n} className={`${styles.star} ${n > stars ? styles.lost : ''}`}>
+              <Icon name="star" size={26} />
             </span>
           ))}
-      </div>
+        </span>
+      )}
     </div>
   );
 }

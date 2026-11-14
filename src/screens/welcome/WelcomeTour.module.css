@@ -1,0 +1,157 @@
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  padding: calc(env(safe-area-inset-top) + 56px) 16px calc(env(safe-area-inset-bottom) + 28px);
+  background: radial-gradient(80% 50% at 50% 35%, rgb(240 193 78 / 0.22), transparent 70%), var(--surface-page);
+}
+
+.tour:focus {
+  outline: none;
+}
+
+.skip {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 12px);
+  right: 16px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-weight: 800;
+  color: var(--text-soft);
+  background: transparent;
+  cursor: pointer;
+}
+
+.slide {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 420px;
+  animation: slideIn 380ms var(--ease-out) both;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+
+.demo {
+  display: grid;
+  place-items: center;
+  width: min(300px, 78vw);
+  aspect-ratio: 1;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(28px, 8vw, 38px);
+  line-height: 1.1;
+  text-align: center;
+}
+
+.footer {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 420px;
+}
+
+.footer > button {
+  width: 100%;
+}
+
+.dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot,
+.dotOn {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface-cell-edge);
+  transition: width 200ms var(--ease-out);
+}
+
+.dotOn {
+  width: 26px;
+  border-radius: var(--radius-pill);
+  background: var(--color-sage);
+}
+
+/* ---------- Demos ---------- */
+.demoBoard {
+  width: 100%;
+  pointer-events: none;
+}
+
+.starsDemo {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+}
+
+.taps {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.tap {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  font-family: var(--font-display, inherit);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-soft);
+  background: var(--surface-sunken);
+  transition: transform 200ms var(--ease-pop);
+}
+
+.tapOn {
+  color: var(--action-label);
+  background: var(--action-bottom);
+  transform: scale(1.08);
+}
+
+.starsRow {
+  min-height: 64px;
+}
+
+.palDemo {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+}
+
+.palPop {
+  animation: grow 500ms var(--ease-pop);
+}
+
+@keyframes grow {
+  from {
+    transform: scale(0.85);
+  }
+}
+
+.stageName {
+  padding: 4px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 20px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}

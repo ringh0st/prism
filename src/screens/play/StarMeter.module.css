@@ -1,6 +1,6 @@
 .meter {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: var(--space-3);
 }
@@ -30,7 +30,6 @@
 .track {
   position: relative;
   height: 18px;
-  margin-top: 16px;
   border-radius: var(--radius-pill);
   background: var(--surface-sunken);
   box-shadow: var(--shadow-inset);
@@ -58,33 +57,25 @@
   animation: breathe 1.6s ease-in-out infinite alternate;
 }
 
-.marker {
-  position: absolute;
-  top: -22px;
+.stars {
   display: flex;
-  transform: translateX(-50%);
+  gap: 2px;
+}
+
+.star {
+  display: grid;
   color: var(--color-sunshine);
   filter: drop-shadow(0 1px 0 var(--reward-ledge));
   transition:
     transform 500ms var(--ease-pop),
-    opacity 400ms ease;
+    opacity 400ms ease,
+    filter 400ms ease;
 }
 
-.marker::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 19px;
-  width: 3px;
-  height: 22px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: var(--surface-raised);
-}
-
+/* A star you'd no longer get: it tips over and fades, so losing it is easy to see. */
 .lost {
   opacity: 0.25;
-  transform: translateX(-50%) translateY(10px) rotate(25deg) scale(0.8);
+  transform: translateY(6px) rotate(25deg) scale(0.8);
   filter: grayscale(1);
 }
 

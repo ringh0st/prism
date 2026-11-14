@@ -15,7 +15,9 @@ import ChallengeResultDialog from './ChallengeResultDialog.jsx';
 import RushClearedDialog from '../rush/RushClearedDialog.jsx';
 import RushOverDialog from '../rush/RushOverDialog.jsx';
 import { RUSH_LENGTH, rushMoveLimit } from '../../game/rush.js';
-import NewPieceDialog from './NewPieceDialog.jsx';
+import Spotlight from '../../components/tour/Spotlight.jsx';
+import TileArt from '../../components/board/TileArt.jsx';
+import { unseenTips } from '../../game/levelTips.js';
 import WorldBackdrop from './WorldBackdrop.jsx';
 import { WORLDS } from '../../game/worlds.js';
 import OutOfMovesDialog from './OutOfMovesDialog.jsx';
@@ -56,6 +58,7 @@ const IDLE_AFTER_MS = 15000;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const SEEN_PIECES_KEY = 'prism.seenPieces.v1';
+const SEEN_TIPS_KEY = 'prism.seenTips.v1';
 
 /** Pieces already introduced on this device, or (first time) the ones met in levels already solved. */
 function seenPieces(progress) {
@@ -112,6 +115,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const [showIntro, setShowIntro] = useState(true);
   // Pieces this player meets for the first time get a "New piece!" card before the level starts.
   const [newPieces, setNewPieces] = useState(() => piecesToIntroduce(level, mode, progress));
+  // The spotlight tour shown right after the intro: new pieces on the board, then one-time tips.
+  const [tour, setTour] = useState({ steps: [], index: 0 });
   const [spotlightTile, setSpotlightTile] = useState(-1);
   const [lumi, setLumi] = useState({ mood: 'happy', line: '' });
   const [buyingHelper, setBuyingHelper] = useState(null);
@@ -183,12 +188,23 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     return () => clearTimeout(timer);
   }, [puzzle.ghostSegments, puzzle.clearGhost]);
 
-  // Lumi dozes off if nothing happens for a while.
+  // Nothing happening for a while: Lumi suggests a Hint and the Hint button wiggles (where helpers are on).
+  const [isNudgingHint, setIsNudgingHint] = useState(false);
+  const isTouring = tour.steps.length > 0;
   useEffect(() => {
-    if (isOver || showIntro) return undefined;
-    const timer = setTimeout(() => say('sleepy', 'idle'), IDLE_AFTER_MS);
+    setIsNudgingHint(false);
+    if (isOver || showIntro || isTouring) return undefined;
+    const timer = setTimeout(() => {
+      const canHint = !isFirstSteps && offeredHelpers.includes('hint') && puzzle.usedHelpers.length < helpersAllowed;
+      if (canHint) {
+        setLumi({ mood: 'happy', line: 'Stuck? Tap Hint and I’ll show you a mirror!' });
+        setIsNudgingHint(true);
+      } else {
+        say('sleepy', 'idle');
+      }
+    }, IDLE_AFTER_MS);
     return () => clearTimeout(timer);
-  }, [moves, isOver, showIntro, say]);
+  }, [moves, isOver, showIntro, isTouring, say]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Feedback as gems light up, shadow crystals are hit, or moves run low.
   useEffect(() => {
@@ -408,11 +424,46 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [restart, requestHelper, showIntro]);
 
-  const finishPieceIntro = () => {
-    writeJson(SEEN_PIECES_KEY, [...seenPieces(progress), ...newPieces.map((piece) => piece.id)]);
-    // Point at the newest piece on the board until the first move.
-    setSpotlightTile(firstTileOf(level, newPieces[newPieces.length - 1].id));
-    setNewPieces([]);
+  /** Spotlights for this level: each new piece where it sits on the board, then any first-time tips. */
+  const buildTour = () => {
+    const pieceSteps = newPieces.map((piece) => {
+      const tile = level.tiles[firstTileOf(level, piece.id)];
+      return {
+        id: `piece-${piece.id}`,
+        target: tile ? `[data-cell="${tile.y * level.width + tile.x}"]` : '[data-tour="board"]',
+        title: piece.name,
+        text: piece.text,
+        art: (
+          <TileArt
+            tile={piece.sample}
+            turns={piece.sample.orient ?? 0}
+            isLit={piece.sample.type === 'gem'}
+            isRotatable={false}
+            isFogged={Boolean(piece.sample.fog)}
+          />
+        ),
+      };
+    });
+    const showsTips = ['level', 'daily', 'event'].includes(mode) && !isFirstSteps && pieceSteps.length === 0;
+    const tipSteps = showsTips ? unseenTips(readJson(SEEN_TIPS_KEY, []), { hasHelpers: offeredHelpers.length > 0 }) : [];
+    return [...pieceSteps, ...tipSteps];
+  };
+
+  const finishTour = () => {
+    if (newPieces.length) {
+      writeJson(SEEN_PIECES_KEY, [...seenPieces(progress), ...newPieces.map((piece) => piece.id)]);
+      // Keep a soft glow on the newest piece until the first move.
+      setSpotlightTile(firstTileOf(level, newPieces[newPieces.length - 1].id));
+      setNewPieces([]);
+    }
+    const tipIds = tour.steps.filter((step) => !step.id.startsWith('piece-')).map((step) => step.id);
+    if (tipIds.length) writeJson(SEEN_TIPS_KEY, [...new Set([...readJson(SEEN_TIPS_KEY, []), ...tipIds])]);
+    setTour({ steps: [], index: 0 });
+  };
+
+  const nextTourStep = () => {
+    if (tour.index < tour.steps.length - 1) setTour({ ...tour, index: tour.index + 1 });
+    else finishTour();
   };
 
   // In-level sounds speak in this world's voice (a desert pluck, lagoon drops…); back to normal after.
@@ -443,6 +494,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     sfx.levelStart();
     playStats.start();
     setShowIntro(false);
+    setTour({ steps: buildTour(), index: 0 });
     if (isFirstSteps) {
       // The basics are taught right here on the board, so they count as met.
       writeJson(SEEN_PIECES_KEY, [...new Set([...seenPieces(progress), 'basics'])]);
@@ -450,7 +502,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     } else if (flavor) {
       setLumi({ mood: 'happy', line: flavor.goal });
     }
-  }, [playStats, isFirstSteps, flavor, progress]);
+  }, [playStats, isFirstSteps, flavor, progress, newPieces, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // First levels: a hand points at the next mirror to turn.
   const coachTile = useMemo(
@@ -472,7 +524,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         <span className={styles.headerSpacer} aria-hidden="true" />
       </header>
 
-      <section className={styles.status} aria-label="Level status">
+      <section className={styles.status} aria-label="Level status" data-tour="meter">
         <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={puzzle.starCap} isSimple={isFirstSteps} />
         <ul className={styles.gems} aria-label={`${trace.litGems.size} of ${gems.length} gems lit`}>
           {gems.map(({ tile, i }) => (
@@ -483,7 +535,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         </ul>
       </section>
 
-      <div className={styles.boardArea} ref={boardAreaRef}>
+      <div className={styles.boardArea} ref={boardAreaRef} data-tour="board">
         {combo && <ComboBurst combo={combo} />}
         {mode !== 'playtest' && <PalBuddy reaction={palReaction} />}
         <Board
@@ -515,20 +567,25 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         <div className={styles.controls}>
           <Button variant="secondary" icon="restart" label="Restart level" onClick={restart} />
           {!isFirstSteps && (
-            <HelperBar
-              helperIds={offeredHelpers}
-              inventory={progress.helpers}
-              usedCount={puzzle.usedHelpers.length}
-              allowed={helpersAllowed}
-              disabled={isOver}
-              onUse={requestHelper}
-            />
+            <div data-tour="helpers">
+              <HelperBar
+                helperIds={offeredHelpers}
+                inventory={progress.helpers}
+                usedCount={puzzle.usedHelpers.length}
+                allowed={helpersAllowed}
+                disabled={isOver}
+                onUse={requestHelper}
+                nudgeId={isNudgingHint ? 'hint' : null}
+              />
+            </div>
           )}
         </div>
       </div>
 
-      {newPieces.length > 0 && <NewPieceDialog pieces={newPieces} onDone={finishPieceIntro} />}
-      {showIntro && newPieces.length === 0 && (
+      {tour.steps.length > 0 && (
+        <Spotlight key={tour.steps[tour.index].id} {...tour.steps[tour.index]} step={tour.index} total={tour.steps.length} onNext={nextTourStep} />
+      )}
+      {showIntro && (
         <LevelIntro
           level={level}
           title={levelName}

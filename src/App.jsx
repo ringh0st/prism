@@ -21,6 +21,7 @@ import StickerAlbum from './screens/stickers/StickerAlbum.jsx';
 import EventLevelRoute from './screens/event/EventLevelRoute.jsx';
 import WeeklyRewardDialog from './screens/leaderboard/WeeklyRewardDialog.jsx';
 import StarterPicker from './screens/pals/StarterPicker.jsx';
+import WelcomeNotice from './screens/welcome/WelcomeNotice.jsx';
 import PalUnlockNotice from './screens/pals/PalUnlockNotice.jsx';
 import LuckyPalDialog from './screens/pals/LuckyPalDialog.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
@@ -162,6 +163,7 @@ export default function App() {
             <>
               <WeeklyRewardNotice />
               <PalNotices />
+              {route.name === 'map' && <WelcomeNotice />}
             </>
           )}
         </LevelsProvider>

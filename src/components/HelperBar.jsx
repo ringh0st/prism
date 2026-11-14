@@ -6,7 +6,7 @@ import styles from './HelperBar.module.css';
  * In-level helper buttons with how many the player owns.
  * @param helperIds which helpers to offer (Skip is hidden on daily puzzles)
  */
-export default function HelperBar({ helperIds, inventory, usedCount, allowed, disabled, onUse }) {
+export default function HelperBar({ helperIds, inventory, usedCount, allowed, disabled, onUse, nudgeId = null }) {
   const isAtLimit = usedCount >= allowed;
   return (
     <div className={styles.bar}>
@@ -18,7 +18,7 @@ export default function HelperBar({ helperIds, inventory, usedCount, allowed, di
             <button
               key={id}
               type="button"
-              className={`${styles.helper} ${owned === 0 ? styles.empty : ''}`}
+              className={`${styles.helper} ${owned === 0 ? styles.empty : ''} ${nudgeId === id ? styles.nudge : ''}`}
               disabled={disabled || isAtLimit}
               onClick={() => onUse(id)}
               aria-label={`${helper.name}: ${helper.description} ${owned > 0 ? `${owned} left.` : 'None left, tap to get more.'}`}

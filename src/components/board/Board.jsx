@@ -134,6 +134,7 @@ export default function Board({
                       cellRefs.current[cell] = element;
                     }}
                     type="button"
+                    data-cell={cell}
                     className={`${styles.cell} ${isActionable ? styles.actionable : ''} ${
                       highlightTile === tileIndex && tileIndex >= 0 ? styles.hint : ''
                     } ${
