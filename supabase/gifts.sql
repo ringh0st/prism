@@ -5,9 +5,11 @@
 
 alter table public.profiles
   add column if not exists gift_days integer not null default 0,
-  add column if not exists presents_opened integer not null default 0;
+  add column if not exists presents_opened integer not null default 0,
+  add column if not exists win_gift_date date,
+  add column if not exists win_gifts_opened integer not null default 0;
 
--- Balances also report the gift calendar and presents (same as grove.sql, plus 'giftDays' and 'presentsOpened').
+-- Balances also report the gift calendar, presents and win gifts (same as grove.sql, plus the gift fields).
 create or replace function public._economy_state(p_user uuid)
 returns jsonb
 language sql
@@ -25,6 +27,8 @@ as $$
     'lastGiftDate', p.last_gift_date,
     'giftDays', p.gift_days,
     'presentsOpened', p.presents_opened,
+    'winGiftDate', p.win_gift_date,
+    'winGiftsOpened', p.win_gifts_opened,
     'sparkPurchasesToday', case when p.spark_purchase_date = current_date then p.spark_purchases_today else 0 end,
     'claimedChests', to_jsonb(p.claimed_chests),
     'pal', jsonb_build_object('id', p.pal_id, 'owned', p.pals, 'accessories', to_jsonb(p.pal_accessories), 'wearing', to_jsonb(p.pal_wearing)),
@@ -212,8 +216,71 @@ begin
 end;
 $$;
 
+-- ---------------------------------------------------------------------------
+-- Daily win gifts: the 1st, 3rd and 6th different level won each day (by the player's clock).
+-- Must match WIN_GIFTS in src/game/gifts.js.
+-- ---------------------------------------------------------------------------
+create or replace function public._win_gift(p_index integer)
+returns jsonb
+language sql
+immutable
+as $$
+  select case p_index
+    when 0 then '{"wins": 1, "sparks": 10}'::jsonb
+    when 1 then '{"wins": 3, "sparks": 15, "helper": "hint"}'::jsonb
+    when 2 then '{"wins": 6, "sparks": 25, "helper": "lens"}'::jsonb
+  end;
+$$;
+
+-- p_date: the player's today; p_since: when the player's today began (their local midnight).
+create or replace function public.claim_win_gift(p_date date, p_since timestamptz)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user uuid := public._require_user();
+  v_profile public.profiles;
+  v_opened integer;
+  v_tier jsonb;
+  v_wins integer;
+  v_helper text;
+  v_extra integer := 0;
+begin
+  if p_date < current_date - 1 or p_date > current_date + 1 or p_since < now() - interval '50 hours' or p_since > now() then
+    raise exception using message = 'That gift is not available.';
+  end if;
+  select * into v_profile from public.profiles where id = v_user for update;
+  v_opened := case when v_profile.win_gift_date = p_date then v_profile.win_gifts_opened else 0 end;
+  v_tier := public._win_gift(v_opened);
+  -- Different built-in levels solved (not skipped) since the player's day began.
+  select count(*)::integer into v_wins from public.progress
+    where user_id = v_user and level_id ~ '^w[0-9]+-[0-9]{2}$' and stars > 0 and best_moves is not null and completed_at >= p_since;
+  if v_tier is null or v_wins < (v_tier ->> 'wins')::integer then
+    raise exception using message = 'No gift yet.';
+  end if;
+
+  v_helper := v_tier ->> 'helper';
+  update public.profiles set
+    sparks = sparks + (v_tier ->> 'sparks')::integer,
+    win_gift_date = p_date,
+    win_gifts_opened = v_opened + 1
+  where id = v_user;
+  if v_helper is not null then
+    v_extra := public._give_helper(v_user, v_helper);
+  end if;
+  return public._economy_state(v_user) || jsonb_build_object('gift', jsonb_build_object(
+    'sparks', (v_tier ->> 'sparks')::integer + v_extra,
+    'helper', case when v_extra > 0 then null else v_helper end
+  ));
+end;
+$$;
+
 revoke all on function public._give_helper(uuid, text) from public, anon, authenticated;
 revoke all on function public.claim_daily_gift(date) from public, anon;
 grant execute on function public.claim_daily_gift(date) to authenticated;
 revoke all on function public.claim_present() from public, anon;
 grant execute on function public.claim_present() to authenticated;
+revoke all on function public.claim_win_gift(date, timestamptz) from public, anon;
+grant execute on function public.claim_win_gift(date, timestamptz) to authenticated;

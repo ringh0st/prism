@@ -1,0 +1,70 @@
+.ladder {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.title,
+.next {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.next {
+  color: var(--text-soft);
+}
+
+.steps {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  color: var(--text-soft);
+  background: var(--surface-raised);
+}
+
+.done {
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+}
+
+.ready {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  animation: wiggle 1.6s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%,
+  70%,
+  100% {
+    transform: none;
+  }
+  80% {
+    transform: rotate(-8deg) scale(1.1);
+  }
+  90% {
+    transform: rotate(6deg) scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ready {
+    animation: none;
+  }
+}

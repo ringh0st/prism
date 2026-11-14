@@ -158,3 +158,51 @@ export function openPresentLocally(progress, rolls) {
   if (gift.item?.type === 'decor') next.grove = { ...progress.grove, items: [...progress.grove.items, gift.item.id] };
   return { progress: next, gift };
 }
+
+// ---------------------------------------------------------------------------
+// Daily win gifts
+// ---------------------------------------------------------------------------
+
+/**
+ * Small gifts for the 1st, 3rd and 6th different level won each day (a Skip doesn't count). Nothing is lost
+ * on a day without playing. Must match public._win_gift() in supabase/gifts.sql.
+ */
+export const WIN_GIFTS = [
+  { wins: 1, sparks: 10 },
+  { wins: 3, sparks: 15, helper: 'hint' },
+  { wins: 6, sparks: 25, helper: 'lens' },
+];
+
+/** Notes a won level for today's count (each level counts once a day). */
+export function recordDailyWin(progress, levelId, today) {
+  const levels = progress.winsToday.date === today ? progress.winsToday.levels : [];
+  if (levels.includes(levelId)) return progress;
+  return { ...progress, winsToday: { date: today, levels: [...levels, levelId] } };
+}
+
+/** Different levels won today. */
+export const winsToday = (progress, today) => (progress.winsToday.date === today ? progress.winsToday.levels.length : 0);
+
+/** Win gifts already opened today. */
+export const winGiftsOpened = (progress, today) => (progress.winGifts.date === today ? progress.winGifts.opened : 0);
+
+/** The win gift ready to open now ({ wins, sparks, helper? }), or null. */
+export function readyWinGift(progress, today) {
+  const next = WIN_GIFTS[winGiftsOpened(progress, today)];
+  return next && winsToday(progress, today) >= next.wins ? next : null;
+}
+
+/** Opens today's next win gift on this device (guests). @returns { progress, gift } @throws EconomyError */
+export function claimWinGiftLocally(progress, today) {
+  const tier = readyWinGift(progress, today);
+  if (!tier) throw new EconomyError('No gift yet.');
+  let next = { ...progress, sparks: progress.sparks + tier.sparks, winGifts: { date: today, opened: winGiftsOpened(progress, today) + 1 } };
+  let { sparks } = tier;
+  let helper = tier.helper ?? null;
+  if (helper) {
+    const added = addHelper(next, helper);
+    next = added.progress;
+    if (added.extraSparks) [sparks, helper] = [sparks + added.extraSparks, null];
+  }
+  return { progress: next, gift: { sparks, helper } };
+}

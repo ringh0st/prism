@@ -791,6 +791,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       {isMeetingFriend && <FriendFoundDialog onDone={() => (nextLevel ? navigate(nextLevel) : navigate(backHref))} />}
       {result && mode !== 'challenge' && mode !== 'rush' && !isMeetingFriend && (
         <WinDialog
+          showWinGifts={mode === 'level' && !isFirstSteps}
           challenge={mode === 'level' && !result.isSkipped && !isFirstSteps ? { levelId: level.id, levelLabel, moves: result.moves } : null}
           backName={backName}
           replay={mode === 'playtest' || isFirstSteps ? null : { level, history: puzzle.history, title: levelName, subtitle }}

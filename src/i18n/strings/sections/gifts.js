@@ -1,5 +1,14 @@
 /* Texts for gifts (the gift moment, the daily gift calendar, the partner Pal's presents), in every language. */
 export const en = {
+  'winGift.label.one': 'Today you won {count} level',
+  'winGift.label.other': 'Today you won {count} levels',
+  'winGift.title.one': 'Today’s wins: {count}',
+  'winGift.title.other': 'Today’s wins: {count}',
+  'winGift.open': 'Open your gift!',
+  'winGift.next.one': '{count} more win to the next gift',
+  'winGift.next.other': '{count} more wins to the next gift',
+  'winGift.giftTitle.one': 'Your first win today!',
+  'winGift.giftTitle.other': '{count} wins today!',
   'present.rarity.title': 'How special will it be?',
   'present.rarity.plain': 'Plain',
   'present.rarity.rare': 'Rare!',
@@ -55,6 +64,15 @@ export const en = {
 };
 
 export const es = {
+  'winGift.label.one': 'Hoy ganaste {count} nivel',
+  'winGift.label.other': 'Hoy ganaste {count} niveles',
+  'winGift.title.one': 'Victorias de hoy: {count}',
+  'winGift.title.other': 'Victorias de hoy: {count}',
+  'winGift.open': '¡Abre tu regalo!',
+  'winGift.next.one': 'Falta {count} victoria para el próximo regalo',
+  'winGift.next.other': 'Faltan {count} victorias para el próximo regalo',
+  'winGift.giftTitle.one': '¡Tu primera victoria de hoy!',
+  'winGift.giftTitle.other': '¡{count} victorias hoy!',
   'present.rarity.title': '¿Qué tan especial será?',
   'present.rarity.plain': 'Normal',
   'present.rarity.rare': '¡Raro!',
@@ -110,6 +128,15 @@ export const es = {
 };
 
 export const he = {
+  'winGift.label.one': 'היום עברתם שלב אחד',
+  'winGift.label.other': 'היום עברתם {count} שלבים',
+  'winGift.title.one': 'ניצחונות היום: 1',
+  'winGift.title.other': 'ניצחונות היום: {count}',
+  'winGift.open': 'פתחו את המתנה!',
+  'winGift.next.one': 'עוד ניצחון אחד עד המתנה הבאה',
+  'winGift.next.other': 'עוד {count} ניצחונות עד המתנה הבאה',
+  'winGift.giftTitle.one': 'הניצחון הראשון שלכם היום!',
+  'winGift.giftTitle.other': '{count} ניצחונות היום!',
   'present.rarity.title': 'כמה מיוחדת היא תהיה?',
   'present.rarity.plain': 'רגילה',
   'present.rarity.rare': 'נדירה!',

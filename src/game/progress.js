@@ -35,6 +35,9 @@ export function createEmptyProgress() {
     giftDays: 0,
     // The partner Pal's presents opened (one per 10 stars; see gifts.js).
     presents: { opened: 0 },
+    // Different levels won today and today's win gifts opened (see gifts.js).
+    winsToday: { date: null, levels: [] },
+    winGifts: { date: null, opened: 0 },
     pal: { id: null, owned: {}, accessories: [], wearing: [] },
     grove: { items: [], placed: [] },
     luckyPals: { claimed: 0 },
@@ -69,6 +72,8 @@ export function upgradeProgress(saved) {
     grove: { ...empty.grove, ...saved?.grove },
     luckyPals: { ...empty.luckyPals, ...saved?.luckyPals },
     presents: { ...empty.presents, ...saved?.presents },
+    winsToday: { ...empty.winsToday, ...saved?.winsToday },
+    winGifts: { ...empty.winGifts, ...saved?.winGifts },
   };
 }
 
@@ -223,6 +228,7 @@ export function withServerState(progress, state, today) {
     giftDate: state.lastGiftDate ?? progress.giftDate,
     giftDays: state.giftDays ?? progress.giftDays,
     presents: { opened: state.presentsOpened ?? progress.presents.opened },
+    winGifts: state.winGiftDate !== undefined ? { date: state.winGiftDate, opened: state.winGiftsOpened ?? 0 } : progress.winGifts,
     // The account's Pals win, unless the account has none yet (then keep this device's choice).
     pal: state.pal?.id ? state.pal : progress.pal,
     grove: state.grove ?? progress.grove,

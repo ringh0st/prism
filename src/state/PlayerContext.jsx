@@ -13,6 +13,7 @@ import {
   recordEventLevelOnServer,
   claimDailyGiftOnServer,
   claimPresentOnServer,
+  claimWinGiftOnServer,
   choosePalOnServer,
   setNicknameOnServer,
   buyAccessoryOnServer,
@@ -49,7 +50,7 @@ import { recordRushRunLocally, rushWeekOf } from '../game/rush.js';
 import { starsForMoves } from '../game/scoring.js';
 import { claimQuestLocally, questWeekOf, questsForWeek, recordQuestProgress } from '../game/quests.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
-import { claimCalendarGiftLocally, openPresentLocally } from '../game/gifts.js';
+import { claimCalendarGiftLocally, claimWinGiftLocally, openPresentLocally, recordDailyWin } from '../game/gifts.js';
 import { nicknameProblem } from '../game/nicknames.js';
 import {
   buyAccessoryLocally,
@@ -197,6 +198,7 @@ export function PlayerProvider({ children }) {
         local.hotStreak = hotStreak;
         // The partner Pal grows with every solved level (a Skip doesn't count). The server does the same.
         if (Number.isFinite(result.moves)) {
+          local.progress = recordDailyWin(local.progress, level.id, todayKey());
           const grown = growPartnerLocally(local.progress);
           local.progress = grown.progress;
           local.palGrewTo = grown.grewTo;
@@ -431,6 +433,21 @@ export function PlayerProvider({ children }) {
         applyServerState(state);
         // Before supabase/gifts.sql is run, the server gives the old flat gift (no calendar).
         return state.gift ?? { sparks: state.sparksEarned ?? 0, helper: null, isBig: false };
+      },
+
+      /** Open today's next win gift (1st, 3rd, 6th level won today). @returns { sparks, helper } @throws EconomyError */
+      async claimWinGift() {
+        const today = todayKey();
+        if (!userId) {
+          const { progress: next, gift } = claimWinGiftLocally(progressRef.current, today);
+          setProgress(next);
+          return gift;
+        }
+        const midnight = new Date();
+        midnight.setHours(0, 0, 0, 0);
+        const state = await claimWinGiftOnServer(today, midnight.toISOString());
+        applyServerState(state);
+        return state.gift;
       },
 
       /** Open the partner Pal's present (one per 10 stars). @returns { sparks, helper?, item? } @throws EconomyError */

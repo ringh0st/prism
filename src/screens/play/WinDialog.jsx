@@ -11,6 +11,7 @@ import { shareText } from '../../lib/shareText.js';
 import PalArt from '../../components/pals/PalArt.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import PresentNote from '../../components/gifts/PresentNote.jsx';
+import WinGiftLadder from '../../components/gifts/WinGiftLadder.jsx';
 import { palById, stageOf } from '../../game/pals.js';
 import ReplayShare from '../../components/replay/ReplayShare.jsx';
 import GlowbugRescue from './GlowbugRescue.jsx';
@@ -64,6 +65,7 @@ export default function WinDialog({
   result,
   par,
   difficulty,
+  showWinGifts = false,
   hotStreak = 0,
   hasNext,
   shareMessage = null,
@@ -175,6 +177,7 @@ export default function WinDialog({
       </div>
       {/* The extras pop in one by one once the stars and sparks have landed, so the result reads first. */}
       <div className={styles.extras} style={{ '--extras-at': `${rewardsAt + 700}ms` }}>
+        {!isSkipped && showWinGifts && <WinGiftLadder />}
         {partner && !isSkipped && (
           <div className={`${styles.evolved} ${palGrewTo ? styles.grew : ''}`}>
             {/* Your partner cheers along: a happy bounce, and a big jump for the big moments. */}

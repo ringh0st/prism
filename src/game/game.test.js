@@ -386,6 +386,33 @@ test('pal presents: one per 10 stars, odds shown, glow up by rarity, never somet
   assert.equal(drawPresent(full, { rarityRoll: 0, roll: 0.1 }).sparks, PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks);
 });
 
+test('daily win gifts: 1st, 3rd and 6th different level won today, matches the database', async () => {
+  const { WIN_GIFTS, claimWinGiftLocally, readyWinGift, recordDailyWin, winsToday } = await import('./gifts.js');
+  const { createEmptyProgress } = await import('./progress.js');
+  const sql = readFileSync(new URL('../../supabase/gifts.sql', import.meta.url), 'utf8');
+  WIN_GIFTS.forEach((tier, i) => {
+    const row = new RegExp(`when ${i} then '(\\{"wins"[^']*\\})'::jsonb`).exec(sql);
+    assert.ok(row, `win gift ${i} is in gifts.sql`);
+    assert.deepEqual(JSON.parse(row[1]), tier);
+  });
+  const day = '2026-03-01';
+  let progress = createEmptyProgress();
+  assert.equal(readyWinGift(progress, day), null);
+  progress = recordDailyWin(recordDailyWin(progress, 'w1-01', day), 'w1-01', day);
+  assert.equal(winsToday(progress, day), 1, 'the same level counts once a day');
+  let gift;
+  ({ progress, gift } = claimWinGiftLocally(progress, day));
+  assert.deepEqual(gift, { sparks: WIN_GIFTS[0].sparks, helper: null });
+  assert.throws(() => claimWinGiftLocally(progress, day), 'the next one needs 3 wins');
+  progress = recordDailyWin(recordDailyWin(progress, 'w1-02', day), 'w1-03', day);
+  ({ progress, gift } = claimWinGiftLocally(progress, day));
+  assert.deepEqual(gift, { sparks: WIN_GIFTS[1].sparks, helper: 'hint' });
+  // A new day starts over.
+  assert.equal(winsToday(progress, '2026-03-02'), 0);
+  progress = recordDailyWin(progress, 'w1-04', '2026-03-02');
+  assert.equal(readyWinGift(progress, '2026-03-02'), WIN_GIFTS[0]);
+});
+
 test('pals: starter choice, unlocks, growth and accessories', async () => {
   const { createEmptyProgress } = await import('./progress.js');
   const pals = await import('./pals.js');
