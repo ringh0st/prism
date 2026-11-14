@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import ScreenHeader from '../../components/game/ScreenHeader.jsx';
 import BottomNav from '../../components/game/BottomNav.jsx';
-import Lumi from '../../components/game/Lumi.jsx';
+import LumiSays from '../../components/game/LumiSays.jsx';
 import Icon from '../../components/Icon.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
@@ -60,7 +60,13 @@ export default function LeaderboardScreen() {
   // Your own rows always show the Pal you're playing with right now, even before the board reloads.
   const withMyPal = (row) =>
     row.isMe && progress.pal.id
-      ? { ...row, pal: progress.pal.id, palStage: stageOf(progress.pal.owned[progress.pal.id]), wearing: progress.pal.wearing, nickname: progress.nickname ?? row.nickname }
+      ? {
+          ...row,
+          pal: progress.pal.id,
+          palStage: stageOf(progress.pal.owned[progress.pal.id]),
+          wearing: progress.pal.wearing,
+          nickname: progress.nickname ?? row.nickname,
+        }
       : row.isMe && progress.nickname
         ? { ...row, nickname: progress.nickname }
         : row;
@@ -76,12 +82,19 @@ export default function LeaderboardScreen() {
       <main className={styles.arena}>
         <Bunting />
         <div className={styles.host}>
-          <Lumi mood="excited" size={86} line={lumiLine} />
+          <LumiSays mood="excited" size={86} line={lumiLine} />
         </div>
 
         {partner && (
           <a href="#/pals" className={styles.playingWith}>
-            <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={42} portrait className={styles.playingArt} />
+            <PalArt
+              palId={partner.id}
+              stage={stageOf(progress.pal.owned[partner.id])}
+              wearing={progress.pal.wearing}
+              size={42}
+              portrait
+              className={styles.playingArt}
+            />
             <span>
               Playing with <strong>{partner.name}</strong>
             </span>

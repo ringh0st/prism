@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
-import Lumi from '../../components/game/Lumi.jsx';
+import LumiSays from '../../components/game/LumiSays.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { STARTER_PALS } from '../../game/pals.js';
@@ -40,7 +40,7 @@ export default function StarterPicker({ onSkip }) {
   return (
     <Dialog title="Pick your partner!">
       <div className={styles.pickerLumi}>
-        <Lumi mood="excited" size={86} line="Your Pal grows as you solve levels. Choose wisely… or cutely!" bubbleSide="right" />
+        <LumiSays mood="excited" size={86} line="Your Pal grows as you solve levels. Choose wisely… or cutely!" />
       </div>
       <div className={styles.starters} role="radiogroup" aria-label="Starter Pals">
         {STARTER_PALS.map((starter) => (

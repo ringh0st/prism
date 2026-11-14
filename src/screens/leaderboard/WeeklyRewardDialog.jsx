@@ -3,7 +3,7 @@ import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import RewardShower from '../../components/RewardShower.jsx';
-import Lumi from '../../components/game/Lumi.jsx';
+import LumiSays from '../../components/game/LumiSays.jsx';
 import { sfx } from '../../audio/sfx.js';
 import styles from './WeeklyRewardDialog.module.css';
 
@@ -27,7 +27,7 @@ export default function WeeklyRewardDialog({ reward, onClose }) {
         </li>
       </ul>
       <div className={styles.lumi}>
-        <Lumi mood="dance" size={92} line="Champion vibes! Let’s do it again." bubbleSide="right" />
+        <LumiSays mood="dance" size={92} line="Champion vibes! Let’s do it again." />
       </div>
       <Button size="lg" onClick={onClose} data-autofocus>
         Yay!

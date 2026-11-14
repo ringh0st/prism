@@ -3,7 +3,7 @@ import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import RewardShower from '../../components/RewardShower.jsx';
-import Lumi from '../../components/game/Lumi.jsx';
+import LumiSays from '../../components/game/LumiSays.jsx';
 import { HELPERS } from '../../game/catalog.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './ChestDialog.module.css';
@@ -39,7 +39,11 @@ export default function ChestDialog({ opening, onClose }) {
   }, [opening]);
 
   return (
-    <Dialog title={phase === 'open' ? 'Treasure!' : phase === 'error' ? 'Hmm…' : 'Opening…'} tone="celebrate" onClose={phase === 'shaking' ? undefined : onClose}>
+    <Dialog
+      title={phase === 'open' ? 'Treasure!' : phase === 'error' ? 'Hmm…' : 'Opening…'}
+      tone="celebrate"
+      onClose={phase === 'shaking' ? undefined : onClose}
+    >
       <div className={`${styles.chest} ${styles[phase]}`} aria-hidden="true">
         <Icon name="chest" size={96} />
         <span className={styles.burst} />
@@ -55,7 +59,7 @@ export default function ChestDialog({ opening, onClose }) {
             </li>
           </ul>
           <div className={styles.lumi}>
-            <Lumi mood="dance" size={92} line="Shiny loot! Spend it wisely… or don’t!" bubbleSide="right" />
+            <LumiSays mood="dance" size={92} line="Shiny loot! Spend it wisely… or don’t!" />
           </div>
           <Button size="lg" variant="go" onClick={onClose} data-autofocus>
             Awesome!

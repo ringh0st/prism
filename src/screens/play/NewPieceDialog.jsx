@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
-import Lumi from '../../components/game/Lumi.jsx';
+import LumiSays from '../../components/game/LumiSays.jsx';
 import TileArt from '../../components/board/TileArt.jsx';
 import { isRotatable } from '../../game/beam.js';
 import { sfx } from '../../audio/sfx.js';
@@ -37,7 +37,7 @@ export default function NewPieceDialog({ pieces, onDone }) {
       <h3 className={`game-title ${styles.name}`}>{piece.name}</h3>
       <p className={styles.text}>{piece.text}</p>
       <div className={styles.lumi}>
-        <Lumi mood="excited" size={72} line={piece.lumi} bubbleSide="right" />
+        <LumiSays mood="excited" size={72} line={piece.lumi} />
       </div>
       {pieces.length > 1 && (
         <p className={styles.dots} aria-label={`${step + 1} of ${pieces.length}`}>

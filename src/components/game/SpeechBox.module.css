@@ -1,0 +1,68 @@
+.box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  color: var(--text-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+/* A small notch pointing at Lumi */
+.box::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+
+.left::before {
+  left: -6px;
+  top: calc(50% - 7px);
+}
+
+.down::before {
+  left: 34px;
+  bottom: -6px;
+}
+
+/* Nothing to say right now: the space stays, so nothing jumps around */
+.quiet {
+  visibility: hidden;
+}
+
+.text {
+  margin: 0;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.35;
+  animation: say 320ms var(--ease-out);
+}
+
+.speaker {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+}
+
+@keyframes say {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text {
+    animation: none;
+  }
+}

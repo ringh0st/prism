@@ -4,6 +4,7 @@ import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
 import ScreenTitle from '../../components/game/ScreenTitle.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
+import SpeechBox from '../../components/game/SpeechBox.jsx';
 import { celebrate } from '../../lib/effects.js';
 import GemShape from '../../components/GemShape.jsx';
 import HelperBar from '../../components/HelperBar.jsx';
@@ -316,9 +317,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         />
       </div>
 
+      <SpeechBox line={lumi.line} tail="down" className={styles.speech} />
       <div className={styles.bottom}>
         <div className={styles.lumi}>
-          <Lumi mood={lumi.mood} size={96} line={lumi.line} bubbleSide="above" />
+          <Lumi mood={lumi.mood} size={96} />
         </div>
         <div className={styles.controls}>
           <Button variant="secondary" icon="restart" label="Restart level" onClick={restart} />

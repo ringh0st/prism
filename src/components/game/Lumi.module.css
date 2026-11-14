@@ -120,31 +120,6 @@
   transform: rotate(45deg);
 }
 
-.right {
-  left: calc(var(--size) * 0.75);
-}
-
-.right::after {
-  left: 14px;
-}
-
-.left {
-  right: calc(var(--size) * 0.75);
-}
-
-.left::after {
-  right: 14px;
-}
-
-/* Above Lumi, lined up with its left edge (for tight corners, like next to the level's helper buttons) */
-.above {
-  left: 0;
-  bottom: calc(var(--size) * 1.25);
-}
-
-.above::after {
-  left: 24px;
-}
 
 .top {
   left: 50%;

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Dialog from '../Dialog.jsx';
 import Button from '../Button.jsx';
 import Icon from '../Icon.jsx';
-import Lumi from './Lumi.jsx';
+import LumiSays from './LumiSays.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { isDailyGiftReady } from '../../game/progress.js';
 import { DAILY_GIFT_SPARKS } from '../../game/catalog.js';
@@ -26,7 +26,7 @@ function GiftDialog({ outcome, onClose }) {
             <Icon name="spark" size={24} /> +{outcome.sparks} sparks
           </p>
           <div className={styles.lumi}>
-            <Lumi mood="dance" size={86} line="See you tomorrow for another one!" bubbleSide="right" />
+            <LumiSays mood="dance" size={86} line="See you tomorrow for another one!" />
           </div>
         </>
       )}

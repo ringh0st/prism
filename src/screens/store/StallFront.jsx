@@ -1,4 +1,4 @@
-import Lumi from '../../components/game/Lumi.jsx';
+import LumiSays from '../../components/game/LumiSays.jsx';
 import styles from './Stall.module.css';
 
 const STRIPES = 8;
@@ -18,7 +18,7 @@ export default function StallFront({ lumiMood, lumiLine }) {
         ))}
       </svg>
       <div className={styles.counter}>
-        <Lumi mood={lumiMood} size={100} line={lumiLine} />
+        <LumiSays mood={lumiMood} size={100} line={lumiLine} />
       </div>
     </div>
   );

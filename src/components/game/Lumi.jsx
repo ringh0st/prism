@@ -29,9 +29,7 @@ const EYES = {
       <path d="M70 60q3 7 0 10q-3-3 0-10z" fill="#7cd3ff" />
     </>
   ),
-  sleepy: (
-    <path d="M31 56h14M55 56h14" stroke="#3b1a08" strokeWidth="5" strokeLinecap="round" />
-  ),
+  sleepy: <path d="M31 56h14M55 56h14" stroke="#3b1a08" strokeWidth="5" strokeLinecap="round" />,
 };
 
 const MOUTHS = {
@@ -46,7 +44,7 @@ const MOUTHS = {
  * Lumi, Lumipals' mascot: a little firefly whose glowing tail is the light you bend.
  * mood: happy | excited | worried | sad | sleepy | dance
  */
-export default function Lumi({ mood = 'happy', size = 72, line, bubbleSide = 'right', className = '' }) {
+export default function Lumi({ mood = 'happy', size = 72, line, className = '' }) {
   const face = mood === 'dance' ? 'excited' : mood;
   const clipId = `lumi-head-${useId().replace(/:/g, '')}`;
   return (
@@ -95,7 +93,7 @@ export default function Lumi({ mood = 'happy', size = 72, line, bubbleSide = 'ri
         )}
       </svg>
       {line && (
-        <p className={`${styles.bubble} ${styles[bubbleSide]}`} key={line} role="status" aria-live="polite">
+        <p className={`${styles.bubble} ${styles.top}`} key={line} role="status" aria-live="polite">
           {line}
         </p>
       )}

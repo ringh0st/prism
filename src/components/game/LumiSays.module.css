@@ -1,0 +1,12 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  text-align: left;
+}
+
+.box {
+  flex: 1;
+  min-width: 0;
+}

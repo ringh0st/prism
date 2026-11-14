@@ -1,5 +1,5 @@
 .screen {
-  --board-reserved: 400px;
+  --board-reserved: 460px;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
@@ -77,6 +77,10 @@
   flex: 1;
   display: grid;
   align-items: center;
+}
+
+.speech {
+  margin-bottom: -6px;
 }
 
 .bottom {

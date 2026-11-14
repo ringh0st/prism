@@ -20,7 +20,6 @@ import styles from './Map.module.css';
 
 const GREETING_MS = 6000;
 
-
 function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeRef, greeting, onOpenChest }) {
   const stops = useMemo(() => buildWorldStops(levelRefs), [levelRefs]);
   const height = stops.length * ROW_HEIGHT;
@@ -29,13 +28,7 @@ function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeR
 
   return (
     <section className={`${styles.world} ${styles[world.theme]}`} aria-labelledby={`world-${world.id}`}>
-      <WorldSign
-        world={world}
-        headingId={`world-${world.id}`}
-        earned={earned}
-        total={levelRefs.length * MAX_STARS}
-        className={styles.worldSign}
-      />
+      <WorldSign world={world} headingId={`world-${world.id}`} earned={earned} total={levelRefs.length * MAX_STARS} className={styles.worldSign} />
       <div className={styles.trail} style={{ height }}>
         <WorldScenery stops={stops} worldId={world.id} theme={world.theme} />
         <svg className={styles.path} viewBox={`0 0 100 ${height}`} preserveAspectRatio="none" aria-hidden="true">

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import ScreenTitle from '../../components/game/ScreenTitle.jsx';
 import Button from '../../components/Button.jsx';
-import Lumi from '../../components/game/Lumi.jsx';
+import LumiSays from '../../components/game/LumiSays.jsx';
 import GemShape from '../../components/GemShape.jsx';
 import { moveLimitFor } from '../../game/scoring.js';
 import { TILE } from '../../game/constants.js';
@@ -46,7 +46,7 @@ export default function LevelIntro({ level, title, subtitle, modifier, lumiLine,
           in <strong>{limit}</strong> moves
         </p>
         <div className={styles.lumi}>
-          <Lumi mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={110} line={lumiLine} bubbleSide="right" />
+          <LumiSays mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={110} line={lumiLine} />
         </div>
         <Button size="lg" icon="play" onClick={onDone} data-autofocus autoFocus>
           Let’s go!
