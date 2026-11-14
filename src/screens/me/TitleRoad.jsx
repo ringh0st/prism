@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { PLAYER_TITLES, titleFor } from '../../game/titles.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './TitleRoad.module.css';
 
 /** Every title on one road: the ones earned (✓), the current one, and what each next one needs. */
 export default function TitleRoad({ stars }) {
+  const { t } = useI18n();
   const { current } = titleFor(stars);
   const currentIndex = PLAYER_TITLES.indexOf(current);
   const stepsRef = useRef(null);
@@ -18,7 +20,7 @@ export default function TitleRoad({ stars }) {
   return (
     <section className={styles.road} aria-labelledby="title-road">
       <h3 id="title-road" className={styles.heading}>
-        Title road
+        {t('me.road.title')}
       </h3>
       <ol ref={stepsRef} className={styles.steps} tabIndex={0} aria-labelledby="title-road">
         {PLAYER_TITLES.map((title, i) => {
@@ -28,9 +30,9 @@ export default function TitleRoad({ stars }) {
               <span className={`${styles.dot} ${styles[title.tone]}`} aria-hidden="true">
                 <Icon name={state === 'ahead' ? 'lock' : state === 'earned' ? 'check' : 'star'} size={16} />
               </span>
-              <span className={styles.name}>{title.name}</span>
+              <span className={styles.name}>{t(`title.${title.tone}`, {}, title.name)}</span>
               <span className={styles.need}>
-                {state === 'earned' ? 'Earned' : state === 'current' ? 'You are here' : `${title.stars - stars} more ★`}
+                {state === 'earned' ? t('me.road.earned') : state === 'current' ? t('me.road.here') : t('me.road.more', { n: title.stars - stars })}
               </span>
             </li>
           );

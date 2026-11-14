@@ -68,6 +68,8 @@ export const en = {
   'play.backTo': 'Back to {place}',
   'play.boardLabel': '{name} board. Use arrow keys to move, Enter to rotate.',
   'play.restart': 'Restart level',
+  'play.status': 'Level status',
+  'play.gemsLit': '{n} of {total} gems lit',
 
   'intro.go': 'Let’s go!',
   'intro.lightGems.one': 'Light the gem',
@@ -141,6 +143,7 @@ export const en = {
   'buy.withSparksLimit.other': 'Buy {name} for {count} sparks (daily limit reached)',
   'buy.withDiamonds.one': 'Buy {name} for {count} diamond',
   'buy.withDiamonds.other': 'Buy {name} for {count} diamonds',
+  'buy.withDiamondsSignIn.one': 'Buy {name} for {count} diamond (sign in required)',
   'buy.withDiamondsSignIn.other': 'Buy {name} for {count} diamonds (sign in required)',
 
   'out.title': 'Out of moves',

@@ -8,14 +8,19 @@ import { isQuestReady, questCount, questLogFor, questsForWeek, questWeekOf } fro
 import { rewardShower } from '../../lib/effects.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './PalQuests.module.css';
+import { palName, questText } from '../../i18n/palText.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { errorText } from '../../i18n/meText.js';
 
 /** This week's three quests from your partner Pal, with progress and a button to collect each reward. */
 export default function PalQuests() {
   const { progress, claimQuest } = usePlayer();
   const [message, setMessage] = useState('');
   const cardRef = useRef(null);
+  const { t, lang } = useI18n();
   const partner = palById(progress.pal.id);
   if (!partner) return null;
+  const name = palName(lang, partner);
   const week = questWeekOf();
   const log = questLogFor(progress, week);
   const quests = questsForWeek(week);
@@ -28,7 +33,7 @@ export default function PalQuests() {
       rewardShower(cardRef.current);
       setMessage('');
     } catch (error) {
-      setMessage(error.message);
+      setMessage(errorText(t, error.message));
     }
   };
 
@@ -38,10 +43,10 @@ export default function PalQuests() {
         <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={56} alive />
         <div>
           <h2 id="quests-title" className="game-title">
-            {partner.name}’s quests
+            {t('pals.quests.title', { name })}
           </h2>
           <p className={styles.sub}>
-            {done === quests.length ? 'All done this week! New quests on Monday.' : `This week · ${done} of ${quests.length} done`}
+            {done === quests.length ? t('pals.quests.allDone') : t('pals.quests.progress', { done, total: quests.length })}
           </p>
         </div>
       </div>
@@ -56,26 +61,26 @@ export default function PalQuests() {
                 <Icon name={isClaimed ? 'check' : quest.kind === 'perfect' ? 'star' : quest.kind === 'hard' ? 'flame' : 'play'} size={16} />
               </span>
               <div className={styles.body}>
-                <p className={styles.text}>{quest.text(partner.name)}</p>
+                <p className={styles.text}>{questText(lang, quest, name)}</p>
                 <div
                   className={styles.meter}
                   role="progressbar"
                   aria-valuemin={0}
                   aria-valuemax={quest.target}
                   aria-valuenow={count}
-                  aria-label={`${count} of ${quest.target}`}
+                  aria-label={t('common.stepOf', { n: count, total: quest.target })}
                 >
                   <span style={{ width: `${(count / quest.target) * 100}%` }} />
                 </div>
               </div>
               {isReady ? (
-                <Button size="sm" variant="gold" onClick={() => collect(quest)} aria-label={`Collect ${quest.sparks} sparks`}>
+                <Button size="sm" variant="gold" onClick={() => collect(quest)} aria-label={t('pals.quests.collect', { n: quest.sparks })}>
                   <Icon name="spark" size={14} /> {quest.sparks}
                 </Button>
               ) : (
                 <span className={styles.reward}>
                   {isClaimed ? (
-                    'Done!'
+                    t('pals.quests.done')
                   ) : (
                     <>
                       {count}/{quest.target} · <Icon name="spark" size={12} /> {quest.sparks}

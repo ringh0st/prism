@@ -2,10 +2,12 @@ import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { GLOWBUGS, rescuedGlowbugs } from '../../game/glowbugs.js';
 import styles from './GlowbugGardenLink.module.css';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
 /** The way into the Glowbug Garden from the Pals screen, with how many you've found. */
 export default function GlowbugGardenLink() {
   const { progress } = usePlayer();
+  const { t } = useI18n();
   const rescued = rescuedGlowbugs(progress.levels);
   const latest = GLOWBUGS.filter((bug) => rescued.has(bug.id)).slice(-3);
   return (
@@ -16,10 +18,8 @@ export default function GlowbugGardenLink() {
         ))}
       </span>
       <span className={styles.text}>
-        <strong className="game-title">Glowbug Garden</strong>
-        <span>
-          {rescued.size} of {GLOWBUGS.length} found
-        </span>
+        <strong className="game-title">{t('pals.garden.title')}</strong>
+        <span>{t('pals.garden.found', { n: rescued.size, total: GLOWBUGS.length })}</span>
       </span>
       <span className={styles.go} aria-hidden="true">
         ›

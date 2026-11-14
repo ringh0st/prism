@@ -1,4 +1,5 @@
 import ShopItemArt from './ShopItemArt.jsx';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './Stall.module.css';
 
 /**
@@ -6,6 +7,7 @@ import styles from './Stall.module.css';
  * price tags. `tag` is an optional ribbon like "Best value". `artNode` replaces the drawn goods (e.g. a Pal in clothes).
  */
 export default function ShelfItem({ art, artNode = null, title, subtitle, badge, tag, onInfo = null, children }) {
+  const { t } = useI18n();
   const goods = (
     <>
       {artNode ?? <ShopItemArt art={art} size={88} className={styles.goodsArt} />}
@@ -16,7 +18,7 @@ export default function ShelfItem({ art, artNode = null, title, subtitle, badge,
     <li className={styles.item}>
       {tag && <span className={`game-title ${styles.ribbon}`}>{tag}</span>}
       {onInfo ? (
-        <button type="button" className={styles.goods} onClick={onInfo} aria-label={`About ${title}`}>
+        <button type="button" className={styles.goods} onClick={onInfo} aria-label={t('shop.about', { title })}>
           {goods}
         </button>
       ) : (

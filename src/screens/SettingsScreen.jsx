@@ -17,13 +17,6 @@ import HowToPlayCard from './me/HowToPlayCard.jsx';
 import LanguageCard from './me/LanguageCard.jsx';
 import { useI18n } from '../i18n/I18nContext.jsx';
 
-const SYNC_LABELS = {
-  local: 'Progress is saved on this device.',
-  syncing: 'Syncing your progress…',
-  synced: 'Progress is saved to your account.',
-  error: 'Could not sync right now. Progress is safe on this device and will sync later.',
-};
-
 function GoogleLogo() {
   return (
     <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
@@ -72,6 +65,7 @@ function Toggle({ id, label, description, checked, disabled = false, onChange })
 function AccountCard() {
   const { user, isAdmin, signInWithGoogle, signInWithApple, signOut, deleteAccount } = useAuth();
   const { syncStatus } = usePlayer();
+  const { t } = useI18n();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [error, setError] = useState('');
   // Apple sign-in: always in the iPhone app, and on the web once it's switched on in Supabase.
@@ -88,7 +82,7 @@ function AccountCard() {
   const startSignIn = async (signIn) => {
     setError('');
     const { error: signInError } = await signIn();
-    if (signInError) setError('Sign-in did not work. Please try again.');
+    if (signInError) setError(t('me.account.signInFailed'));
   };
 
   const confirmDelete = async () => {
@@ -96,43 +90,43 @@ function AccountCard() {
       await deleteAccount();
       setIsConfirmingDelete(false);
     } catch {
-      setError('Could not delete your account. Please try again or email us.');
+      setError(t('me.account.deleteFailed'));
     }
   };
 
   return (
     <section className={styles.card} aria-labelledby="account-title">
-      <h2 id="account-title">Account</h2>
+      <h2 id="account-title">{t('me.account.title')}</h2>
       {user ? (
         <>
-          <p className={styles.rowHint}>{SYNC_LABELS[syncStatus]}</p>
+          <p className={styles.rowHint}>{t(`me.sync.${syncStatus}`)}</p>
           <div className={styles.buttonRow}>
             {isAdmin && (
               <Button as="a" href="#/admin" icon="edit">
-                Level editor
+                {t('me.account.editor')}
               </Button>
             )}
             <Button variant="secondary" onClick={signOut}>
-              Sign out
+              {t('me.account.signOut')}
             </Button>
             <Button variant="ghost" onClick={() => setIsConfirmingDelete(true)}>
-              Delete account
+              {t('me.account.delete')}
             </Button>
           </div>
         </>
       ) : (
         <>
-          <p className={styles.rowHint}>You’re playing as a guest. Sign in to keep your stars, sparks and streak on all your devices.</p>
+          <p className={styles.rowHint}>{t('me.account.guest')}</p>
           <div className={styles.signInButtons}>
             {hasApple && (
               <button type="button" className={styles.appleButton} onClick={() => startSignIn(signInWithApple)}>
                 <AppleLogo />
-                <span>Sign in with Apple</span>
+                <span>{t('me.account.apple')}</span>
               </button>
             )}
             <button type="button" className={styles.googleButton} onClick={() => startSignIn(signInWithGoogle)}>
               <GoogleLogo />
-              <span>Sign in with Google</span>
+              <span>{t('me.account.google')}</span>
             </button>
           </div>
         </>
@@ -143,15 +137,13 @@ function AccountCard() {
         </p>
       )}
       {isConfirmingDelete && (
-        <Dialog title="Delete account?" onClose={() => setIsConfirmingDelete(false)}>
-          <p className={styles.dialogText}>
-            This permanently deletes your account and all saved progress from our servers. Progress on this device stays.
-          </p>
+        <Dialog title={t('me.delete.title')} onClose={() => setIsConfirmingDelete(false)}>
+          <p className={styles.dialogText}>{t('me.delete.text')}</p>
           <div className={styles.buttonRow}>
             <Button variant="secondary" onClick={() => setIsConfirmingDelete(false)} data-autofocus>
-              Cancel
+              {t('ui.cancel')}
             </Button>
-            <Button onClick={confirmDelete}>Delete forever</Button>
+            <Button onClick={confirmDelete}>{t('me.delete.confirm')}</Button>
           </div>
         </Dialog>
       )}
@@ -205,8 +197,8 @@ export default function SettingsScreen() {
         </section>
 
         <section className={styles.card} aria-labelledby="beam-title">
-          <h2 id="beam-title">Beam style</h2>
-          <p className={styles.rowHint}>Unlock new sunlight colors by collecting stars. You have {stars} ★.</p>
+          <h2 id="beam-title">{t('me.beam.title')}</h2>
+          <p className={styles.rowHint}>{t('me.beam.hint', { stars })}</p>
           <div className={styles.themes} role="radiogroup" aria-labelledby="beam-title">
             {BEAM_THEMES.map((theme) => {
               const isUnlocked = stars >= theme.starsToUnlock;
@@ -224,8 +216,10 @@ export default function SettingsScreen() {
                   <span className={styles.themeSwatch} style={{ background: theme.color, color: theme.color }}>
                     {!isUnlocked && <Icon name="lock" size={16} />}
                   </span>
-                  <span className={styles.themeName}>{theme.name}</span>
-                  <span className={styles.rowHint}>{isUnlocked ? (isSelected ? 'In use' : 'Unlocked') : `${theme.starsToUnlock} ★`}</span>
+                  <span className={styles.themeName}>{t(`beam.${theme.id}`, {}, theme.name)}</span>
+                  <span className={styles.rowHint}>
+                    {isUnlocked ? t(isSelected ? 'me.beam.inUse' : 'me.beam.unlocked') : `${theme.starsToUnlock} ★`}
+                  </span>
                 </button>
               );
             })}
@@ -235,17 +229,17 @@ export default function SettingsScreen() {
         <InstallSettingsCard className={styles.card} />
 
         <section className={styles.card} aria-labelledby="data-title">
-          <h2 id="data-title">Data</h2>
+          <h2 id="data-title">{t('me.data.title')}</h2>
           <Button variant="secondary" onClick={() => setIsConfirmingReset(true)}>
-            Reset progress on this device
+            {t('me.data.reset')}
           </Button>
           <p className={styles.links}>
-            <a href={HOME_PAGE_URL}>About Lumipals</a>
-            <a href={PRIVACY_URL}>Privacy Policy</a>
-            <a href={TERMS_URL}>Terms & refunds</a>
+            <a href={HOME_PAGE_URL}>{t('me.data.about')}</a>
+            <a href={PRIVACY_URL}>{t('me.data.privacy')}</a>
+            <a href={TERMS_URL}>{t('me.data.terms')}</a>
           </p>
           <p className={styles.about}>
-            {STORE_NAME} · Version {APP_VERSION}
+            {STORE_NAME} · {t('me.data.version', { version: APP_VERSION })}
             <br />© {COPYRIGHT_YEAR} {STUDIO_NAME}
           </p>
         </section>
@@ -253,13 +247,11 @@ export default function SettingsScreen() {
       <BottomNav active="settings" />
 
       {isConfirmingReset && (
-        <Dialog title="Reset progress?" onClose={() => setIsConfirmingReset(false)}>
-          <p className={styles.dialogText}>
-            Stars, sparks and streak on this device go back to zero. Your account progress (if signed in) is not deleted.
-          </p>
+        <Dialog title={t('me.reset.title')} onClose={() => setIsConfirmingReset(false)}>
+          <p className={styles.dialogText}>{t('me.reset.text')}</p>
           <div className={styles.buttonRow}>
             <Button variant="secondary" onClick={() => setIsConfirmingReset(false)} data-autofocus>
-              Cancel
+              {t('ui.cancel')}
             </Button>
             <Button
               onClick={() => {
@@ -267,7 +259,7 @@ export default function SettingsScreen() {
                 setIsConfirmingReset(false);
               }}
             >
-              Reset
+              {t('me.reset.confirm')}
             </Button>
           </div>
         </Dialog>

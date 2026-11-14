@@ -20,6 +20,7 @@ import LevelUp from './LevelUp.jsx';
 import ChallengeShare from './ChallengeShare.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './WinDialog.module.css';
+import { palName } from '../../i18n/palText.js';
 
 /** The headline's translation key. */
 function headlineFor({ stars, isSkipped, completesWorld, isFirstToday }, difficulty) {
@@ -174,11 +175,13 @@ export default function WinDialog({
           <div className={styles.cheerText}>
             {palGrewTo ? (
               <p role="status">
-                <strong>{t('win.grew', { name: partner.name, stage: t(`stage.${palGrewTo.id}`, {}, palGrewTo.name) })}</strong>
+                <strong>{t('win.grew', { name: palName(lang, partner), stage: t(`stage.${palGrewTo.id}`, {}, palGrewTo.name) })}</strong>
               </p>
             ) : (
               <>
-                <p className={styles.cheerLine}>{t('win.cheer', { name: partner.name, line: lang === 'en' ? cheer.line : t('win.cheerLine') })}</p>
+                <p className={styles.cheerLine}>
+                  {t('win.cheer', { name: palName(lang, partner), line: lang === 'en' ? cheer.line : t('win.cheerLine') })}
+                </p>
                 <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
               </>
             )}
@@ -192,7 +195,7 @@ export default function WinDialog({
           {result.treat && partner && (
             <span className={styles.find}>
               <span aria-hidden="true">{result.treat.emoji}</span>{' '}
-              {t('win.treat', { name: partner.name, treat: t(`treat.${result.treat.id}`, {}, withArticle(result.treat)) })}
+              {t('win.treat', { name: palName(lang, partner), treat: t(`treat.${result.treat.id}`, {}, withArticle(result.treat)) })}
             </span>
           )}
           {result.newStickers?.map(({ world, sticker }) => (

@@ -11,6 +11,7 @@ const partOfDay = (date) => (date.getHours() < 12 ? 'morning' : date.getHours() 
 import { todayKey } from '../../game/daily.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import styles from './PalHello.module.css';
+import { palName } from '../../i18n/palText.js';
 
 const STORAGE_KEY = 'prism.palHello.v1';
 const SHOW_MS = 7000;
@@ -58,11 +59,11 @@ export default function PalHello({ onHello }) {
   if (phase === 'waiting' || phase === 'gone') return null;
   return (
     <div className={`${styles.hello} ${phase === 'out' ? styles.leaving : ''}`}>
-      <a href="#/pals" className={styles.pal} aria-label={t('hello.label', { name: partner.name, line })}>
+      <a href="#/pals" className={styles.pal} aria-label={t('hello.label', { name: palName(lang, partner), line })}>
         <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={82} alive />
       </a>
       <p className={styles.bubble} role="status">
-        <span className={styles.name}>{partner.name}</span> {line}
+        <span className={styles.name}>{palName(lang, partner)}</span> {line}
       </p>
       <button type="button" className={styles.close} onClick={() => setPhase('out')} aria-label={t('common.close')}>
         <Icon name="close" size={14} strokeWidth={3} />

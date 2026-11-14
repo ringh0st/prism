@@ -16,13 +16,16 @@ import { todayKey } from '../game/daily.js';
 import { startDiamondCheckout } from '../lib/economyApi.js';
 import { PAYMENTS_ENABLED, TERMS_URL } from '../lib/config.js';
 import { sfx } from '../audio/sfx.js';
+import { useI18n } from '../i18n/I18nContext.jsx';
+import { helperText } from '../i18n/gameText.js';
+import { packTag } from '../i18n/shopText.js';
 import styles from './store/Stall.module.css';
 
 const TABS = [
-  { id: 'helpers', label: 'Helpers', icon: 'hint' },
-  { id: 'sparks', label: 'Sparks', icon: 'spark' },
-  { id: 'pals', label: 'Pals', icon: 'shirt' },
-  { id: 'diamonds', label: 'Diamonds', icon: 'diamond' },
+  { id: 'helpers', icon: 'hint' },
+  { id: 'sparks', icon: 'spark' },
+  { id: 'pals', icon: 'shirt' },
+  { id: 'diamonds', icon: 'diamond' },
 ];
 
 const helperItems = STORE_ITEMS.filter((item) => item.kind === 'helper');
@@ -35,12 +38,13 @@ function Note({ children, className = '' }) {
 }
 
 function SignInNote() {
+  const { t } = useI18n();
   return (
     <Note>
       <p className={styles.noteRow}>
         <Icon name="user" size={20} />
         <span>
-          Diamonds live in your account. <a href="#/settings">Sign in with Google</a> to earn and use them.
+          {t('shop.signInNote.before')} <a href="#/settings">{t('shop.signInNote.link')}</a> {t('shop.signInNote.after')}
         </span>
       </p>
     </Note>
@@ -49,35 +53,37 @@ function SignInNote() {
 
 function HelpersShelf({ buyProps, onInfo }) {
   const { progress } = usePlayer();
+  const { t, lang } = useI18n();
   return (
     <>
       <p className={styles.shelfIntro}>
-        Hold up to {INVENTORY_CAP} of each · spark buys left today: <strong>{sparkPurchasesLeft(progress, todayKey())}</strong>
+        {t('shop.helpers.intro', { cap: INVENTORY_CAP })} <strong>{sparkPurchasesLeft(progress, todayKey())}</strong>
       </p>
       <ul className={styles.shelf}>
         {helperItems.map((item) => {
           const helper = HELPERS[item.grants.helper];
+          const { name, description } = helperText(lang, helper.id);
           const owned = progress.helpers[helper.id] ?? 0;
           return (
             <ShelfItem
               key={item.id}
               art={helper.id}
-              title={helper.name}
+              title={name}
               badge={`×${owned}`}
               onInfo={() =>
                 onInfo({
                   item,
-                  title: helper.name,
+                  title: name,
                   art: helper.id,
-                  description: helper.description,
+                  description,
                   facts: [
-                    { icon: 'star', text: `Using it caps the level at ${helper.starCap} ★` },
-                    { icon: 'bag', text: `You have ${owned} of ${INVENTORY_CAP}` },
+                    { icon: 'star', text: t('shop.helpers.starCap', { stars: helper.starCap }) },
+                    { icon: 'bag', text: t('shop.helpers.owned', { owned, cap: INVENTORY_CAP }) },
                   ],
                 })
               }
             >
-              <BuyButtons item={item} itemName={helper.name} look="tag" {...buyProps(item)} />
+              <BuyButtons item={item} itemName={name} look="tag" {...buyProps(item)} />
             </ShelfItem>
           );
         })}
@@ -88,29 +94,33 @@ function HelpersShelf({ buyProps, onInfo }) {
 
 function SparksShelf({ buyProps, onInfo }) {
   const { isSignedIn } = usePlayer();
+  const { t } = useI18n();
   return (
     <>
-      <p className={styles.shelfIntro}>Trade diamonds for sparks. You also earn sparks from stars, chests and daily puzzles.</p>
+      <p className={styles.shelfIntro}>{t('shop.sparks.intro')}</p>
       <ul className={styles.shelf}>
-        {sparkItems.map((item, i) => (
-          <ShelfItem
-            key={item.id}
-            art={`sparks${i}`}
-            title={`${item.grants.sparks}`}
-            subtitle="sparks"
-            tag={i === sparkItems.length - 1 ? 'Best value' : null}
-            onInfo={() =>
-              onInfo({
-                item,
-                title: `${item.grants.sparks} sparks`,
-                art: `sparks${i}`,
-                description: 'Spend sparks on Hints and Lenses. Sparks can never be turned back into diamonds.',
-              })
-            }
-          >
-            <BuyButtons item={item} itemName={`${item.grants.sparks} sparks`} look="tag" {...buyProps(item)} />
-          </ShelfItem>
-        ))}
+        {sparkItems.map((item, i) => {
+          const amount = t('shop.sparks.amount', { count: item.grants.sparks });
+          return (
+            <ShelfItem
+              key={item.id}
+              art={`sparks${i}`}
+              title={`${item.grants.sparks}`}
+              subtitle={t('shop.sparks.unit')}
+              tag={i === sparkItems.length - 1 ? t('shop.bestValue') : null}
+              onInfo={() =>
+                onInfo({
+                  item,
+                  title: amount,
+                  art: `sparks${i}`,
+                  description: t('shop.sparks.description'),
+                })
+              }
+            >
+              <BuyButtons item={item} itemName={amount} look="tag" {...buyProps(item)} />
+            </ShelfItem>
+          );
+        })}
       </ul>
       {!isSignedIn && <SignInNote />}
     </>
@@ -119,6 +129,7 @@ function SparksShelf({ buyProps, onInfo }) {
 
 function DiamondsShelf({ onError }) {
   const { isSignedIn } = usePlayer();
+  const { t, lang } = useI18n();
   const [busyPack, setBusyPack] = useState(null);
 
   const buyPack = async (packId) => {
@@ -126,7 +137,7 @@ function DiamondsShelf({ onError }) {
     try {
       window.location.assign(await startDiamondCheckout(packId));
     } catch (error) {
-      onError(error.message);
+      onError(errorText(t, error.message));
       setBusyPack(null);
     }
   };
@@ -134,22 +145,20 @@ function DiamondsShelf({ onError }) {
   return (
     <>
       <Note className={styles.freeNote}>
-        <h2 className="game-title">Free diamonds!</h2>
+        <h2 className="game-title">{t('shop.free.title')}</h2>
         <ul>
           <li>
-            <Icon name="check" size={18} /> Finish a world <strong>+{DIAMOND_REWARDS.worldComplete}</strong>
+            <Icon name="check" size={18} /> {t('shop.free.world')} <strong>+{DIAMOND_REWARDS.worldComplete}</strong>
           </li>
           <li>
-            <Icon name="star" size={18} /> 3★ a whole world <strong>+{DIAMOND_REWARDS.worldPerfect}</strong>
+            <Icon name="star" size={18} /> {t('shop.free.perfect')} <strong>+{DIAMOND_REWARDS.worldPerfect}</strong>
           </li>
           <li>
-            <Icon name="flame" size={18} /> 7-day daily streak <strong>+{DIAMOND_REWARDS.streakWeek}</strong>
+            <Icon name="flame" size={18} /> {t('shop.free.streak')} <strong>+{DIAMOND_REWARDS.streakWeek}</strong>
           </li>
           <li>
-            <Icon name="trophy" size={18} /> Weekly top 3{' '}
-            <strong>
-              +{Math.min(...weeklyDiamonds)} to +{Math.max(...weeklyDiamonds)}
-            </strong>
+            <Icon name="trophy" size={18} /> {t('shop.free.weekly')}{' '}
+            <strong>{t('shop.free.range', { min: Math.min(...weeklyDiamonds), max: Math.max(...weeklyDiamonds) })}</strong>
           </li>
         </ul>
       </Note>
@@ -165,25 +174,24 @@ function DiamondsShelf({ onError }) {
                 key={pack.id}
                 art={`diamonds${i}`}
                 title={`${pack.diamonds + pack.bonus}`}
-                subtitle={pack.bonus > 0 ? `diamonds (+${pack.bonus} bonus)` : 'diamonds'}
-                tag={pack.tag}
+                subtitle={pack.bonus > 0 ? t('shop.packs.withBonus', { bonus: pack.bonus }) : t('shop.packs.unit')}
+                tag={packTag(lang, pack)}
               >
                 <Button
                   size="sm"
                   className={styles.moneyTag}
                   disabled={!isSignedIn || busyPack !== null}
                   onClick={() => buyPack(pack.id)}
-                  aria-label={`Buy ${pack.diamonds + pack.bonus} diamonds for ${pack.displayPrice}`}
+                  aria-label={t('shop.packs.buy', { count: pack.diamonds + pack.bonus, price: pack.displayPrice })}
                 >
-                  {busyPack === pack.id ? 'Opening…' : pack.displayPrice}
+                  {busyPack === pack.id ? t('shop.packs.opening') : pack.displayPrice}
                 </Button>
               </ShelfItem>
             ))}
           </ul>
 
           <p className={styles.legal}>
-            <strong>Under 18? Ask a parent or guardian before buying.</strong> One-time purchases, no subscriptions, no random rewards. Payments by
-            our partner Lemon Squeezy. <a href={TERMS_URL}>Terms & refunds</a>
+            <strong>{t('shop.packs.parent')}</strong> {t('shop.packs.legal')} <a href={TERMS_URL}>{t('shop.packs.terms')}</a>
           </p>
         </>
       )}
@@ -194,16 +202,12 @@ function DiamondsShelf({ onError }) {
 /** The shop, drawn as Lumi's market stall: an awning, a counter, signs and shelves of goods. */
 export default function StoreScreen({ isReturningFromCheckout = false }) {
   const { progress, isSignedIn, buyItem, refresh } = usePlayer();
+  const { t } = useI18n();
   const [tab, setTab] = useState(isReturningFromCheckout ? 'diamonds' : 'helpers');
   const [busyItem, setBusyItem] = useState(null);
   const [info, setInfo] = useState(null);
   const [lumi, setLumi] = useState(() =>
-    isReturningFromCheckout
-      ? { mood: 'dance', line: 'Thank you! Your diamonds are on their way!' }
-      : {
-          mood: 'happy',
-          line: 'Welcome to my stall! Tap anything for a closer look.',
-        },
+    isReturningFromCheckout ? { mood: 'dance', line: t('shop.lumi.thanks') } : { mood: 'happy', line: t('shop.lumi.welcome') },
   );
 
   // After checkout the payment webhook adds the diamonds; check back a couple of times.
@@ -218,10 +222,10 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
     try {
       await buyItem(itemId, currency);
       sfx.coin();
-      setLumi({ mood: 'dance', line: 'Ka-ching! Pleasure doing business!' });
+      setLumi({ mood: 'dance', line: t('shop.lumi.kaching') });
       setInfo(null);
     } catch (error) {
-      setLumi({ mood: 'worried', line: error.message });
+      setLumi({ mood: 'worried', line: errorText(t, error.message) });
     } finally {
       setBusyItem(null);
     }
@@ -236,24 +240,24 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
 
   return (
     <div className={styles.page}>
-      <ScreenHeader title="Shop" />
+      <ScreenHeader title={t('shop.title')} />
       <main className={styles.stall}>
         <StallFront lumiMood={lumi.mood} lumiLine={lumi.line} />
 
-        <div className={styles.signs} role="tablist" aria-label="Shop sections">
-          {TABS.map((t) => (
+        <div className={styles.signs} role="tablist" aria-label={t('shop.sections')}>
+          {TABS.map((sign) => (
             <button
-              key={t.id}
+              key={sign.id}
               type="button"
               role="tab"
-              id={`store-tab-${t.id}`}
-              aria-selected={tab === t.id}
+              id={`store-tab-${sign.id}`}
+              aria-selected={tab === sign.id}
               aria-controls="store-panel"
-              className={`${styles.sign} ${tab === t.id ? styles.signActive : ''}`}
-              onClick={() => setTab(t.id)}
+              className={`${styles.sign} ${tab === sign.id ? styles.signActive : ''}`}
+              onClick={() => setTab(sign.id)}
             >
-              <Icon name={t.icon} size={18} />
-              <span>{t.label}</span>
+              <Icon name={sign.icon} size={18} />
+              <span>{t(`shop.tab.${sign.id}`)}</span>
             </button>
           ))}
         </div>

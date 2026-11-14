@@ -15,6 +15,8 @@ import TitleRoad from './TitleRoad.jsx';
 import styles from './PlayerCard.module.css';
 import { earnedStickers } from '../../game/stickers.js';
 import { rescuedGlowbugs } from '../../game/glowbugs.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { palWithSpecies } from '../../i18n/palText.js';
 
 function Stat({ icon, tone, value, label, note = null }) {
   return (
@@ -39,6 +41,7 @@ function Stat({ icon, tone, value, label, note = null }) {
 export default function PlayerCard() {
   const { user, displayName, avatarUrl } = useAuth();
   const { progress } = usePlayer();
+  const { t, lang } = useI18n();
   const [nickname, setNickname] = useState(null);
   const [isEditingNickname, setIsEditingNickname] = useState(false);
   const shownNickname = progress.nickname ?? nickname;
@@ -50,6 +53,7 @@ export default function PlayerCard() {
   const shields = progress.daily.shields ?? 0;
   const partner = palById(progress.pal.id);
   const partnerStage = partner ? stageOf(progress.pal.owned[partner.id]) : 0;
+  const nextTitle = next && t(`title.${next.tone}`, {}, next.name);
 
   // The public nickname shown on the Top board (signed-in players only).
   useEffect(() => {
@@ -76,20 +80,23 @@ export default function PlayerCard() {
         )}
       </div>
       <h2 id="player-name" className={`game-title ${styles.name}`}>
-        {user ? displayName : 'Guest player'}
+        {user ? displayName : t('me.guest')}
       </h2>
       {partner && (
         <p className={styles.nickname}>
-          Partner: {partner.name} the {partner.species} · {palStage(partnerStage).name}
+          {t('me.partner', {
+            who: palWithSpecies(lang, partner),
+            stage: t(`stage.${palStage(partnerStage).id}`, {}, palStage(partnerStage).name),
+          })}
         </p>
       )}
       <button type="button" className={styles.nicknameButton} onClick={() => setIsEditingNickname(true)}>
         {shownNickname ? (
           <>
-            {user ? 'On the Top board as' : 'Nickname:'} <strong>{shownNickname}</strong>
+            {t(user ? 'me.nickname.onBoard' : 'me.nickname.label')} <strong>{shownNickname}</strong>
           </>
         ) : (
-          'Choose your nickname'
+          t('me.nickname.choose')
         )}
         <Icon name="edit" size={14} />
       </button>
@@ -102,7 +109,7 @@ export default function PlayerCard() {
         <div
           className={styles.track}
           role="progressbar"
-          aria-label={`Progress to Glow ${playerLevel.level + 1}`}
+          aria-label={t('me.glowProgress', { n: playerLevel.level + 1 })}
           aria-valuemin={playerLevel.from}
           aria-valuemax={playerLevel.to}
           aria-valuenow={stars}
@@ -110,11 +117,11 @@ export default function PlayerCard() {
           <span className={styles.fill} style={{ width: `${Math.round(playerLevel.progress * 100)}%` }} />
         </div>
         <p className={styles.nextTitle}>
-          {playerLevel.to - stars} more ★ to reach <strong>Glow {playerLevel.level + 1}</strong>
+          {t('me.toGlow', { count: playerLevel.to - stars })} <strong>{t('me.glow', { n: playerLevel.level + 1 })}</strong>
           {next && (
             <>
               {' '}
-              · {next.stars - stars} to become <strong>{next.name}</strong>
+              {t('me.toTitle', { n: next.stars - stars })} <strong>{nextTitle}</strong>
             </>
           )}
         </p>
@@ -122,24 +129,24 @@ export default function PlayerCard() {
       <TitleRoad stars={stars} />
 
       <ul className={styles.stats}>
-        <Stat icon="star" tone="honey" value={stars} label="stars" />
-        <Stat icon="check" tone="sage" value={solved} label="levels solved" />
-        <Stat icon="map" tone="peach" value={finishedWorldCount(progress.levels)} label="worlds finished" />
-        <Stat icon="paw" tone="mint" value={`${Object.keys(progress.pal.owned).length}/${PALS.length}`} label="Pals collected" />
+        <Stat icon="star" tone="honey" value={stars} label={t('me.stat.stars')} />
+        <Stat icon="check" tone="sage" value={solved} label={t('me.stat.solved')} />
+        <Stat icon="map" tone="peach" value={finishedWorldCount(progress.levels)} label={t('me.stat.worlds')} />
+        <Stat icon="paw" tone="mint" value={`${Object.keys(progress.pal.owned).length}/${PALS.length}`} label={t('me.stat.pals')} />
         <Stat
           icon="flame"
           tone="terracotta"
           value={streak}
-          label="day streak"
-          note={shields > 0 ? `${shields} ${shields === 1 ? 'shield' : 'shields'}` : null}
+          label={t('me.stat.streak')}
+          note={shields > 0 ? t('me.stat.shields', { count: shields }) : null}
         />
       </ul>
       <div className={styles.collections}>
         <a href="#/stickers" className={styles.collection}>
-          <Icon name="star" size={18} /> Sticker album <strong>{earnedStickers(progress.levels).size}</strong>
+          <Icon name="star" size={18} /> {t('me.stickers')} <strong>{earnedStickers(progress.levels).size}</strong>
         </a>
         <a href="#/glowbugs" className={styles.collection}>
-          <Icon name="heart" size={18} /> Glowbugs <strong>{rescuedGlowbugs(progress.levels).size}</strong>
+          <Icon name="heart" size={18} /> {t('me.glowbugs')} <strong>{rescuedGlowbugs(progress.levels).size}</strong>
         </a>
       </div>
     </section>

@@ -213,13 +213,6 @@ export const ALL_OUTFITS = [...PAL_ACCESSORIES, ...THEME_OUTFITS];
 
 export const accessoryById = (id) => ALL_OUTFITS.find((item) => item.id === id) ?? null;
 
-export function unlockText({ stars, worlds, streak, lucky }) {
-  if (lucky) return 'Lucky Pal gift';
-  if (stars) return `Collect ${stars} ★`;
-  if (worlds) return `Finish ${worlds} ${worlds === 1 ? 'world' : 'worlds'}`;
-  return `Reach a ${streak}-day streak`;
-}
-
 /** Is this Pal yours to pick? Owned Pals stay unlocked even if a streak later breaks. */
 export function isPalUnlocked(progress, pal) {
   if (progress.pal.owned[pal.id]) return true;

@@ -1,36 +1,44 @@
 import { BEAM_COLORS, FRAGILE_TURNS, TILE } from './constants.js';
+import { translate } from '../i18n/translate.js';
 
-const colorName = (color) => BEAM_COLORS[color]?.label ?? color;
-const shapeName = (color) => BEAM_COLORS[color]?.shape ?? '';
+const english = (key, params, fallback) => translate('en', key, params, fallback);
 
-/** Screen-reader description of one tile in its current state. */
-export function describeTile(tile, { orient, isLit = false, isRotatable = false, isFogged = false, turnsLeft = FRAGILE_TURNS } = {}) {
-  if (!tile) return 'Empty';
-  if (isFogged) return 'Fog: something is hidden here until light reaches it';
+/**
+ * Screen-reader description of one tile in its current state.
+ * @param t the translate function (`t` from useI18n); English by default
+ */
+export function describeTile(tile, { orient, isLit = false, isRotatable = false, isFogged = false, turnsLeft = FRAGILE_TURNS } = {}, t = english) {
+  if (!tile) return t('ui.tile.empty');
+  if (isFogged) return t('ui.tile.fog');
+  const color = t(`ui.color.${tile.color}`, {}, BEAM_COLORS[tile.color]?.label ?? tile.color);
+  const shape = t(`ui.shape.${BEAM_COLORS[tile.color]?.shape}`, {}, '');
   switch (tile.type) {
     case TILE.EMITTER:
-      return `${colorName(tile.color)} light source, shining ${tile.dir}`;
+      return t('ui.tile.emitter', { color, dir: t(`ui.dir.${tile.dir}`, {}, tile.dir) });
     case TILE.MIRROR:
     case TILE.SPLITTER: {
-      const name = tile.type === TILE.MIRROR ? 'Mirror' : 'Beam splitter';
-      const slant = orient === 0 ? 'slanted like /' : 'slanted like \\';
-      const twin = tile.link ? `, twin ${tile.link === 'a' ? 'star' : 'heart'}: turns with its twin` : '';
-      const crack = tile.fragile ? (turnsLeft > 0 ? `, cracking: ${turnsLeft} ${turnsLeft === 1 ? 'turn' : 'turns'} left` : ', cracked') : '';
-      return `${name}, ${slant}${twin}${crack}, ${isRotatable ? 'tap to rotate' : 'locked'}`;
+      const crack = tile.fragile ? (turnsLeft > 0 ? t('ui.tile.cracking', { count: turnsLeft }) : t('ui.tile.cracked')) : '';
+      return t('ui.tile.turner', {
+        name: t(tile.type === TILE.MIRROR ? 'ui.tile.mirror' : 'ui.tile.splitter'),
+        slant: t(orient === 0 ? 'ui.tile.slash' : 'ui.tile.backslash'),
+        twin: tile.link ? t(tile.link === 'a' ? 'ui.tile.twinStar' : 'ui.tile.twinHeart') : '',
+        crack,
+        state: t(isRotatable ? 'ui.tile.rotatable' : 'ui.tile.locked'),
+      });
     }
     case TILE.FILTER:
-      return `${colorName(tile.color)} ${shapeName(tile.color)} color filter`;
+      return t('ui.tile.filter', { color, shape });
     case TILE.WALL:
-      return 'Wall';
+      return t('ui.tile.wall');
     case TILE.GEM:
-      return `${colorName(tile.color)} ${shapeName(tile.color)} gem, ${isLit ? 'lit' : 'dark'}`;
+      return t(isLit ? 'ui.tile.gemLit' : 'ui.tile.gemDark', { color, shape });
     case TILE.PORTAL:
-      return `Portal with a ${tile.pair === 'a' ? 'star' : 'heart'}: light jumps to the other ${tile.pair === 'a' ? 'star' : 'heart'} portal`;
+      return t(tile.pair === 'a' ? 'ui.tile.portalStar' : 'ui.tile.portalHeart');
     case TILE.PRISM:
-      return 'Prism crystal: splits the light in two, out to both sides';
+      return t('ui.tile.prism');
     case TILE.SHADE:
-      return `Shadow crystal, ${isLit ? 'lit, keep it dark!' : 'dark, keep it dark'}`;
+      return t(isLit ? 'ui.tile.shadeLit' : 'ui.tile.shadeDark');
     default:
-      return 'Tile';
+      return t('ui.tile.unknown');
   }
 }

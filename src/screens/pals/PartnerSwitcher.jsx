@@ -5,20 +5,11 @@ import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import PalDetailDialog from './PalDetailDialog.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { palById, palStage, stageOf } from '../../game/pals.js';
-import { nextTreat, treatsWaiting, withArticle } from '../../game/treats.js';
+import { nextTreat, treatsWaiting } from '../../game/treats.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './PartnerSwitcher.module.css';
-
-const PET_LINES = ['Hehe, that tickles!', 'Do I look good?', 'Let’s play!', 'Wheee!', 'Best friends!', '*happy wiggle*'];
-const OUTFIT_LINES = ['Ooh, fancy!', 'How do I look?', 'Snazzy!', 'Strike a pose!'];
-const TRICK_LINES = {
-  backflip: '*does a backflip*',
-  twirl: '*twirls*',
-  juggle: '*juggles*',
-  hearts: '*heart eyes*',
-  bounce: '*bounces*',
-  wave: '*waves*',
-};
+import { palName, treatName } from '../../i18n/palText.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
 /**
  * Your partner Pal, big on a little stage (tap it for a hop and a word; it twirls when its outfit
@@ -27,6 +18,7 @@ const TRICK_LINES = {
 export default function PartnerSwitcher() {
   const player = usePlayer();
   const { progress } = player;
+  const { t, line, lang } = useI18n();
   const [isLooking, setIsLooking] = useState(false);
   const [moment, setMoment] = useState(null);
   const partner = palById(progress.pal.id);
@@ -37,8 +29,8 @@ export default function PartnerSwitcher() {
   useEffect(() => {
     if (lastOutfit.current === outfit) return;
     lastOutfit.current = outfit;
-    setMoment({ kind: 'twirl', line: OUTFIT_LINES[Date.now() % OUTFIT_LINES.length], key: Date.now() });
-  }, [outfit]);
+    setMoment({ kind: 'twirl', line: line('pals.partner.outfitLines'), key: Date.now() });
+  }, [outfit, line]);
 
   useEffect(() => {
     if (!moment) return undefined;
@@ -48,24 +40,30 @@ export default function PartnerSwitcher() {
 
   if (!partner) return null;
   const stage = palStage(stageOf(progress.pal.owned[partner.id]));
+  const name = palName(lang, partner);
 
   const feed = () => {
     const fed = player.feedTreat();
     if (!fed) return;
     sfx.reward();
-    setMoment({ kind: fed.trick, line: `Yum, ${withArticle(fed.treat)}! ${TRICK_LINES[fed.trick]}`, treat: fed.treat.emoji, key: Date.now() });
+    setMoment({
+      kind: fed.trick,
+      line: t('pals.partner.yum', { treat: treatName(lang, fed.treat), trick: t(`pals.trick.${fed.trick}`) }),
+      treat: fed.treat.emoji,
+      key: Date.now(),
+    });
   };
   const waiting = treatsWaiting(progress);
 
   const pet = () => {
     sfx.hello();
-    setMoment({ kind: 'hop', line: PET_LINES[Date.now() % PET_LINES.length], key: Date.now() });
+    setMoment({ kind: 'hop', line: line('pals.partner.petLines'), key: Date.now() });
   };
 
   return (
     <section className={styles.hero} aria-labelledby="partner-title">
       <div className={styles.stage}>
-        <button type="button" className={styles.pal} onClick={pet} aria-label={`Pet ${partner.name}`}>
+        <button type="button" className={styles.pal} onClick={pet} aria-label={t('pals.partner.pet', { name })}>
           <span key={moment?.key ?? 'still'} className={`${styles.body} ${moment ? styles[moment.kind] : ''}`}>
             <PalArt palId={partner.id} stage={stage.index} wearing={progress.pal.wearing} size="100%" alive />
           </span>
@@ -91,7 +89,7 @@ export default function PartnerSwitcher() {
 
       <div className={styles.info}>
         <h2 id="partner-title" className={`game-title ${styles.name}`}>
-          {partner.name} <StageBadge stage={stage} className={styles.stageChip} />
+          {name} <StageBadge stage={stage} className={styles.stageChip} />
         </h2>
         <div className={styles.growth}>
           <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} showLine={false} />
@@ -102,13 +100,13 @@ export default function PartnerSwitcher() {
               type="button"
               className={styles.feed}
               onClick={feed}
-              aria-label={`Feed ${partner.name} ${withArticle(nextTreat(progress))} (${waiting} treats)`}
+              aria-label={t('pals.partner.feedLabel', { name, treat: treatName(lang, nextTreat(progress)), n: waiting })}
             >
-              <span aria-hidden="true">{nextTreat(progress).emoji}</span> Feed ×{waiting}
+              <span aria-hidden="true">{nextTreat(progress).emoji}</span> {t('pals.partner.feed', { n: waiting })}
             </button>
           )}
           <button type="button" className={styles.forms} onClick={() => setIsLooking(true)}>
-            See all forms
+            {t('pals.partner.forms')}
           </button>
         </div>
       </div>

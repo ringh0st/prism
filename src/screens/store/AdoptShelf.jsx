@@ -7,15 +7,22 @@ import PalFormsStrip from '../../components/pals/PalFormsStrip.jsx';
 import RarityBadge from '../../components/pals/RarityBadge.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, adoptPriceOf, dailyPalPick, rarityOf, stageOf } from '../../game/pals.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { palName, palSpecies } from '../../i18n/palText.js';
 import styles from './Stall.module.css';
+import { errorText } from '../../i18n/meText.js';
+
+/** A Pal's name and species, for the {name} and {species} placeholders. */
+const palLabel = (lang, pal) => ({ name: palName(lang, pal), species: palSpecies(lang, pal) });
 
 /** Today's Legendary and Mythic picks for this player: chosen at random, but shown before buying. */
 function DailyPicks({ onChoose }) {
   const { progress, shopSeed } = usePlayer();
+  const { t, lang } = useI18n();
   const picks = ['legendary', 'mythic'].map((rarity) => ({ rarity, pal: dailyPalPick(progress, rarity, shopSeed) }));
   return (
     <>
-      <p className={styles.shelfIntro}>A special Pal picked just for you, new every day. You always see who you get.</p>
+      <p className={styles.shelfIntro}>{t('shop.picks.intro')}</p>
       <ul className={styles.dailyPicks}>
         {picks.map(({ rarity, pal }) => (
           <li key={rarity}>
@@ -24,19 +31,19 @@ function DailyPicks({ onChoose }) {
                 type="button"
                 className={`${styles.dailyPick} ${styles[rarity]}`}
                 onClick={() => onChoose(pal)}
-                aria-label={`Today's pick: ${pal.name} the ${pal.species}, ${adoptPriceOf(pal)} diamonds`}
+                aria-label={t('shop.picks.aria', { ...palLabel(lang, pal), count: adoptPriceOf(pal) })}
               >
                 <RarityBadge pal={pal} />
                 <PalArt palId={pal.id} size={96} />
-                <span className="game-title">{pal.name}</span>
-                <span className={styles.pickSpecies}>{pal.species}</span>
+                <span className="game-title">{palLabel(lang, pal).name}</span>
+                <span className={styles.pickSpecies}>{palLabel(lang, pal).species}</span>
                 <span className={styles.adoptPrice}>
                   <Icon name="diamond" size={13} /> {adoptPriceOf(pal)}
                 </span>
               </button>
             ) : (
               <div className={`${styles.dailyPick} ${styles.adoptOwned}`}>
-                <span className="game-title">You have every {rarity === 'mythic' ? 'Mythic' : 'Legendary'} Pal!</span>
+                <span className="game-title">{t(rarity === 'mythic' ? 'shop.picks.allMythic' : 'shop.picks.allLegendary')}</span>
               </div>
             )}
           </li>
@@ -49,6 +56,7 @@ function DailyPicks({ onChoose }) {
 /** Adopt Pals for diamonds: any Basic Pal you choose, plus today's Legendary and Mythic picks. Never a surprise. */
 export default function AdoptShelf({ onAdopted, onError }) {
   const { progress, isSignedIn, adoptPal } = usePlayer();
+  const { t, lang } = useI18n();
   const [choice, setChoice] = useState(null);
   const [isBusy, setIsBusy] = useState(false);
   const regulars = PALS.filter((pal) => rarityOf(pal) === 'common');
@@ -63,7 +71,7 @@ export default function AdoptShelf({ onAdopted, onError }) {
       onAdopted(choice);
       setChoice(null);
     } catch (error) {
-      onError(error.message);
+      onError(errorText(t, error.message));
     } finally {
       setIsBusy(false);
     }
@@ -71,60 +79,62 @@ export default function AdoptShelf({ onAdopted, onError }) {
 
   return (
     <>
-      <h2 className={`game-title ${styles.sectionTitle}`}>Today’s picks</h2>
+      <h2 className={`game-title ${styles.sectionTitle}`}>{t('shop.picks.title')}</h2>
       <DailyPicks onChoose={setChoice} />
-      <h2 className={`game-title ${styles.sectionTitle}`}>Adopt a Pal</h2>
+      <h2 className={`game-title ${styles.sectionTitle}`}>{t('shop.adopt.title')}</h2>
       <p className={styles.shelfIntro}>
-        Pick any Pal you don’t have yet and bring it home for <strong>{adoptPriceOf(regulars[0])} diamonds</strong>. Or keep playing to unlock them
-        for free!
+        {t('shop.adopt.introBefore')} <strong>{t('shop.adopt.price', { count: adoptPriceOf(regulars[0]) })}</strong>
+        {t('shop.adopt.introAfter')}
         {!isSignedIn && (
           <>
             {' '}
-            Diamonds need an account: <a href="#/settings">sign in</a>.
+            {t('shop.adopt.needAccount')} <a href="#/settings">{t('shop.adopt.signIn')}</a>.
           </>
         )}
       </p>
       <ul className={styles.adoptGrid}>
-        {shelf.map((pal) => (
-          <li key={pal.id}>
-            {progress.pal.owned[pal.id] ? (
-              <div className={`${styles.adoptPal} ${styles.adoptOwned}`} aria-label={`${pal.name} the ${pal.species}: owned`}>
-                <PalArt palId={pal.id} stage={stageOf(progress.pal.owned[pal.id])} size={64} />
-                <span className="game-title">{pal.name}</span>
-                <span className={styles.ownedChip}>
-                  <Icon name="check" size={13} /> Owned
-                </span>
-              </div>
-            ) : (
-              <button type="button" className={styles.adoptPal} onClick={() => setChoice(pal)} aria-label={`Adopt ${pal.name} the ${pal.species}`}>
-                <PalArt palId={pal.id} size={64} />
-                <span className="game-title">{pal.name}</span>
-                <span className={styles.adoptPrice}>
-                  <Icon name="diamond" size={13} /> {adoptPriceOf(pal)}
-                </span>
-              </button>
-            )}
-          </li>
-        ))}
+        {shelf.map((pal) => {
+          const label = palLabel(lang, pal);
+          return (
+            <li key={pal.id}>
+              {progress.pal.owned[pal.id] ? (
+                <div className={`${styles.adoptPal} ${styles.adoptOwned}`} aria-label={t('shop.adopt.ownedAria', label)}>
+                  <PalArt palId={pal.id} stage={stageOf(progress.pal.owned[pal.id])} size={64} />
+                  <span className="game-title">{label.name}</span>
+                  <span className={styles.ownedChip}>
+                    <Icon name="check" size={13} /> {t('shop.owned')}
+                  </span>
+                </div>
+              ) : (
+                <button type="button" className={styles.adoptPal} onClick={() => setChoice(pal)} aria-label={t('shop.adopt.aria', label)}>
+                  <PalArt palId={pal.id} size={64} />
+                  <span className="game-title">{label.name}</span>
+                  <span className={styles.adoptPrice}>
+                    <Icon name="diamond" size={13} /> {adoptPriceOf(pal)}
+                  </span>
+                </button>
+              )}
+            </li>
+          );
+        })}
       </ul>
       {choice && (
-        <Dialog title={`Adopt ${choice.name}?`} onClose={() => setChoice(null)}>
+        <Dialog title={t('shop.adopt.confirmTitle', palLabel(lang, choice))} onClose={() => setChoice(null)}>
           <PalArt palId={choice.id} size={120} className={styles.infoArt} />
           <p className={styles.infoText}>
-            {choice.name} the {choice.species} <RarityBadge pal={choice} /> joins your team as a Baby. Play with it as your partner and it grows into
-            a Master!
+            {t('shop.adopt.confirmName', palLabel(lang, choice))} <RarityBadge pal={choice} /> {t('shop.adopt.confirmText')}
           </p>
           <PalFormsStrip palId={choice.id} />
-          <p className={styles.legal}>Diamonds can be bought with real money. Under 18? Ask a parent first.</p>
+          <p className={styles.legal}>{t('shop.askParent')}</p>
           <div className={styles.adoptActions}>
             <Button size="lg" disabled={!isSignedIn || isBusy || progress.diamonds < price} onClick={confirm} data-autofocus>
               <Icon name="diamond" size={18} />
-              <span>{isBusy ? 'Adopting…' : `Adopt for ${price}`}</span>
+              <span>{isBusy ? t('shop.adopt.busy') : t('shop.adopt.for', { price })}</span>
             </Button>
-            {isSignedIn && progress.diamonds < price && <p className={styles.legal}>You have {progress.diamonds} diamonds.</p>}
-            {!isSignedIn && <p className={styles.legal}>Sign in to use diamonds.</p>}
+            {isSignedIn && progress.diamonds < price && <p className={styles.legal}>{t('shop.adopt.youHave', { count: progress.diamonds })}</p>}
+            {!isSignedIn && <p className={styles.legal}>{t('shop.signInToUse')}</p>}
             <Button variant="ghost" onClick={() => setChoice(null)}>
-              Not now
+              {t('shop.adopt.notNow')}
             </Button>
           </div>
         </Dialog>

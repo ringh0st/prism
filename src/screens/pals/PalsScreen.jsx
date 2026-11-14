@@ -10,6 +10,7 @@ import GroveHome from '../grove/GroveHome.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { isQuestReady, questLogFor, questsForWeek, questWeekOf } from '../../game/quests.js';
 import styles from './PalsScreen.module.css';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
 const TAB_IDS = ['team', 'wardrobe', 'grove', 'quests'];
 
@@ -20,6 +21,7 @@ const TAB_IDS = ['team', 'wardrobe', 'grove', 'quests'];
  */
 export default function PalsScreen({ initialTab }) {
   const { progress } = usePlayer();
+  const { t } = useI18n();
   const [tab, setTab] = useState(TAB_IDS.includes(initialTab) ? initialTab : 'team');
   const week = questWeekOf();
   const log = questLogFor(progress, week);
@@ -31,18 +33,24 @@ export default function PalsScreen({ initialTab }) {
   };
 
   const tabs = [
-    { id: 'team', label: 'Team', icon: 'paw' },
-    { id: 'wardrobe', label: 'Wardrobe', icon: 'shirt' },
-    { id: 'grove', label: 'Grove', icon: 'home' },
-    { id: 'quests', label: 'Quests', icon: 'star', count: questsReady || undefined, countLabel: `${questsReady} ready to collect` },
+    { id: 'team', label: t('pals.tab.team'), icon: 'paw' },
+    { id: 'wardrobe', label: t('pals.tab.wardrobe'), icon: 'shirt' },
+    { id: 'grove', label: t('pals.tab.grove'), icon: 'home' },
+    {
+      id: 'quests',
+      label: t('pals.tab.quests'),
+      icon: 'star',
+      count: questsReady || undefined,
+      countLabel: t('pals.tab.questsReady', { n: questsReady }),
+    },
   ];
 
   return (
     <div className={styles.page}>
-      <ScreenHeader title="My Pals" />
+      <ScreenHeader title={t('pals.title')} />
       <main className={styles.main}>
         <PartnerSwitcher />
-        <ChipTabs label="My Pals" idPrefix="pals" tabs={tabs} active={tab} onChange={choose} fit />
+        <ChipTabs label={t('pals.title')} idPrefix="pals" tabs={tabs} active={tab} onChange={choose} fit />
         <div id="pals-panel" role="tabpanel" aria-labelledby={`pals-${tab}`} className={styles.panel}>
           {tab === 'team' && <PalTeam />}
           {tab === 'wardrobe' && <PalWardrobe />}

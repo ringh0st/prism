@@ -10,6 +10,7 @@ import { usePlayer } from '../state/PlayerContext.jsx';
 import styles from './QuickBuyDialog.module.css';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import { helperText } from '../i18n/gameText.js';
+import { errorText } from '../i18n/meText.js';
 
 /** Shown when a player taps a helper they don't have: buy one and use it right away. */
 export default function QuickBuyDialog({ helperId, onBought, onClose }) {
@@ -29,7 +30,7 @@ export default function QuickBuyDialog({ helperId, onBought, onClose }) {
       await buyItem(helperId, currency);
       onBought();
     } catch (buyError) {
-      setError(buyError.message);
+      setError(errorText(t, buyError.message));
       setIsBusy(false);
     }
   };
@@ -48,7 +49,7 @@ export default function QuickBuyDialog({ helperId, onBought, onClose }) {
       {item.price.sparks && (
         <p className={styles.note}>{sparksLeftToday > 0 ? t('buy.sparksLeftToday', { count: sparksLeftToday }) : t('buy.noSparksToday')}</p>
       )}
-      {!isSignedIn && item.price.diamonds && <p className={styles.note}>Sign in to use diamonds.</p>}
+      {!isSignedIn && item.price.diamonds && <p className={styles.note}>{t('ui.signInDiamonds')}</p>}
       {error && (
         <p className={styles.error} role="alert">
           {error}

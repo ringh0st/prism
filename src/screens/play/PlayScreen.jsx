@@ -437,7 +437,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       try {
         if (mode !== 'playtest' && !(helperId === 'hint' && hasFreeHint)) await consumeHelper(helperId);
       } catch (error) {
-        setLumi({ mood: 'worried', line: error.message });
+        setLumi({ mood: 'worried', line: errorText(t, error.message) });
         return;
       }
       puzzle.applyHelper(helperId);
@@ -602,9 +602,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         <span className={styles.headerSpacer}>{mode !== 'playtest' && <PalBuddy reaction={palReaction} />}</span>
       </header>
 
-      <section className={styles.status} aria-label="Level status" data-tour="meter">
+      <section className={styles.status} aria-label={t('play.status')} data-tour="meter">
         {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} />}
-        <ul className={styles.gems} aria-label={`${trace.litGems.size} of ${gems.length} gems lit`}>
+        <ul className={styles.gems} aria-label={t('play.gemsLit', { n: trace.litGems.size, total: gems.length })}>
           {gems.map(({ tile, i }) => (
             <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff}>
               <GemShape color={tile.color} size={24} />

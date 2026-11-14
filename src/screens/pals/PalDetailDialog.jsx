@@ -10,6 +10,8 @@ import { PAL_GROWTH_LEVELS, PAL_STAGES, growthOf, palStage, stageOf } from '../.
 import { sfx } from '../../audio/sfx.js';
 import stageStyles from '../../components/pals/PalStage.module.css';
 import styles from './PalDetail.module.css';
+import { palName, palSpecies, stageName } from '../../i18n/palText.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
 /** Levels still to solve (as partner) before a Pal reaches form `target`. */
 const levelsUntil = (owned, target) => (target - stageOf(owned)) * PAL_GROWTH_LEVELS - growthOf(owned);
@@ -20,6 +22,9 @@ const levelsUntil = (owned, target) => (target - stageOf(owned)) * PAL_GROWTH_LE
  */
 export default function PalDetailDialog({ pal, onClose }) {
   const { progress, choosePal } = usePlayer();
+  const { t, lang } = useI18n();
+  const name = palName(lang, pal);
+  const formName = (index) => stageName(lang, palStage(index));
   const owned = progress.pal.owned[pal.id];
   const current = owned ? stageOf(owned) : 0;
   const revealedUpTo = Math.min(PAL_STAGES.length - 1, current + 1);
@@ -34,18 +39,17 @@ export default function PalDetailDialog({ pal, onClose }) {
   };
 
   let caption;
-  if (!isFuture) caption = selected === current ? `${pal.name} is a ${palStage(current).name} now.` : `${pal.name} was a ${palStage(selected).name}.`;
-  else if (!owned) caption = `Add ${pal.name} to your team to watch it grow.`;
+  if (!isFuture) caption = t(selected === current ? 'pals.detail.isNow' : 'pals.detail.was', { name, stage: formName(selected) });
+  else if (!owned) caption = t('pals.detail.addToWatch', { name });
   else {
-    const left = levelsUntil(owned, selected);
-    const form = isMystery ? 'this mystery form' : `a ${palStage(selected).name}`;
-    caption = `${left} more ${left === 1 ? 'level' : 'levels'} as your partner to grow into ${form}.`;
+    const count = levelsUntil(owned, selected);
+    caption = isMystery ? t('pals.detail.growIntoMystery', { count }) : t('pals.detail.growInto', { count, stage: formName(selected) });
   }
 
   return (
-    <Dialog title={pal.name} onClose={onClose}>
+    <Dialog title={name} onClose={onClose}>
       <p className={styles.species}>
-        {pal.species} <RarityBadge pal={pal} />
+        {palSpecies(lang, pal)} <RarityBadge pal={pal} />
       </p>
       <div
         className={`${styles.stage} ${isMystery ? styles.future : `${stageStyles.backdrop} ${stageStyles[PAL_STAGES[selected].id]}`}`}
@@ -58,7 +62,7 @@ export default function PalDetailDialog({ pal, onClose }) {
           size={150}
           alive={!isMystery}
           className={isMystery ? styles.mystery : ''}
-          label={isMystery ? 'A mystery form' : `${pal.name} as a ${palStage(selected).name}`}
+          label={isMystery ? t('pals.detail.mystery') : t('pals.detail.artLabel', { name, stage: formName(selected) })}
         />
       </div>
       <p className={styles.caption} role="status">
@@ -68,7 +72,7 @@ export default function PalDetailDialog({ pal, onClose }) {
       {owned && isPartner && <PalGrowthBar pal={pal} owned={owned} />}
       {owned && !isPartner && (
         <div className={styles.actions}>
-          <p className={styles.note}>Only your partner grows. Play with {pal.name} to grow it!</p>
+          <p className={styles.note}>{t('pals.detail.onlyPartner', { name })}</p>
           <Button
             onClick={() => {
               choosePal(pal.id);
@@ -76,7 +80,7 @@ export default function PalDetailDialog({ pal, onClose }) {
               onClose();
             }}
           >
-            Make {pal.name} my partner
+            {t('pals.detail.makePartner', { name })}
           </Button>
         </div>
       )}

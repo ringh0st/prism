@@ -2,6 +2,7 @@ import Icon from '../Icon.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { currentStreak } from '../../game/progress.js';
 import { todayKey } from '../../game/daily.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './DailyButton.module.css';
 
 /**
@@ -10,10 +11,11 @@ import styles from './DailyButton.module.css';
  */
 export default function DailyButton() {
   const { progress } = usePlayer();
+  const { t } = useI18n();
   const today = todayKey();
   if (progress.daily.lastDate === today) return null;
   const streak = currentStreak(progress, today);
-  const label = `Daily puzzle: a new puzzle and reward are waiting${streak > 1 ? `, ${streak} day streak` : ''}`;
+  const label = streak > 1 ? t('ui.daily.labelStreak', { n: streak }) : t('ui.daily.label');
   return (
     <a href="#/daily" className={styles.button} aria-label={label}>
       <Icon name="calendar" size={24} strokeWidth={2.4} />

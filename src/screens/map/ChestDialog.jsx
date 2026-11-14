@@ -5,6 +5,9 @@ import Icon from '../../components/Icon.jsx';
 import RewardShower from '../../components/RewardShower.jsx';
 import LumiSays from '../../components/game/LumiSays.jsx';
 import { HELPERS } from '../../game/catalog.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { helperText } from '../../i18n/gameText.js';
+import { errorText } from '../../i18n/meText.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './ChestDialog.module.css';
 
@@ -13,6 +16,7 @@ import styles from './ChestDialog.module.css';
  * @param opening the claim promise, started when the player tapped the chest (so it runs exactly once)
  */
 export default function ChestDialog({ opening, onClose }) {
+  const { t, lang } = useI18n();
   const [phase, setPhase] = useState('shaking'); // shaking | open | error
   const [reward, setReward] = useState(null);
   const [error, setError] = useState('');
@@ -40,7 +44,7 @@ export default function ChestDialog({ opening, onClose }) {
 
   return (
     <Dialog
-      title={phase === 'open' ? 'Treasure!' : phase === 'error' ? 'Hmm…' : 'Opening…'}
+      title={t(phase === 'open' ? 'ui.chest.treasure' : phase === 'error' ? 'ui.hmm' : 'ui.chest.opening')}
       tone="celebrate"
       onClose={phase === 'shaking' ? undefined : onClose}
     >
@@ -52,26 +56,26 @@ export default function ChestDialog({ opening, onClose }) {
         <>
           <ul className={styles.rewards}>
             <li className={styles.reward}>
-              <Icon name="spark" size={26} /> +{reward.sparks} sparks
+              <Icon name="spark" size={26} /> {t('ui.plusSparks', { count: reward.sparks })}
             </li>
             <li className={styles.reward}>
-              <Icon name={HELPERS[reward.helper].icon} size={26} /> +1 {HELPERS[reward.helper].name}
+              <Icon name={HELPERS[reward.helper].icon} size={26} /> +1 {helperText(lang, reward.helper).name}
             </li>
           </ul>
           <div className={styles.lumi}>
-            <LumiSays mood="dance" size={92} line="Shiny loot! Spend it wisely… or don’t!" />
+            <LumiSays mood="dance" size={92} line={t('ui.chest.lumi')} />
           </div>
           <Button size="lg" variant="go" onClick={onClose} data-autofocus>
-            Awesome!
+            {t('ui.chest.awesome')}
           </Button>
           <RewardShower />
         </>
       )}
       {phase === 'error' && (
         <>
-          <p className={styles.error}>{error}</p>
+          <p className={styles.error}>{errorText(t, error)}</p>
           <Button onClick={onClose} data-autofocus>
-            OK
+            {t('ui.ok')}
           </Button>
         </>
       )}

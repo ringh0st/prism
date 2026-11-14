@@ -3,13 +3,17 @@ import Button from '../Button.jsx';
 import Icon from '../Icon.jsx';
 import LumiSays from '../game/LumiSays.jsx';
 import { sfx } from '../../audio/sfx.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './Install.module.css';
 
 const PERKS = [
-  ['phone', 'Opens full screen, just like an app'],
-  ['flame', 'One tap to keep your streak going'],
-  ['check', 'Plays even without internet'],
+  ['phone', 'ui.install.perkApp'],
+  ['flame', 'ui.install.perkStreak'],
+  ['check', 'ui.install.perkOffline'],
 ];
+
+/** "Tap *Share* in…" with the *starred* button names in bold. */
+const withBold = (text) => text.split('*').map((part, i) => (i % 2 ? <strong key={i}>{part}</strong> : part));
 
 /** One step of the Safari or browser-menu instructions, with the icon to look for. */
 function Step({ number, icon, children }) {
@@ -29,6 +33,7 @@ function Step({ number, icon, children }) {
  * otherwise the Share → Add to Home Screen steps (iPhone, iPad) or the browser-menu steps.
  */
 export default function InstallDialog({ method, onInstall, onLater, onClose }) {
+  const { t } = useI18n();
   const install = async () => {
     const accepted = await onInstall();
     if (accepted) sfx.reward();
@@ -36,43 +41,43 @@ export default function InstallDialog({ method, onInstall, onLater, onClose }) {
   };
 
   return (
-    <Dialog title="Get Lumipals on your Home Screen" tone="celebrate" onClose={onClose}>
+    <Dialog title={t('ui.install.title')} tone="celebrate" onClose={onClose}>
       <div className={styles.lumi}>
-        <LumiSays mood="excited" size={76} line="Keep me on your Home Screen and I’m always one tap away!" />
+        <LumiSays mood="excited" size={76} line={t('ui.install.lumi')} />
       </div>
       <ul className={styles.perks}>
-        {PERKS.map(([icon, text]) => (
-          <li key={text}>
-            <Icon name={icon} size={18} /> {text}
+        {PERKS.map(([icon, key]) => (
+          <li key={key}>
+            <Icon name={icon} size={18} /> {t(key)}
           </li>
         ))}
       </ul>
 
       {method === 'prompt' && (
         <Button size="lg" icon="phone" onClick={install} data-autofocus>
-          Install Lumipals
+          {t('ui.install.button')}
         </Button>
       )}
       {method === 'ios' && (
         <ol className={styles.steps}>
           <Step number={1} icon="share">
-            Tap <strong>Share</strong> in Safari’s toolbar
+            {withBold(t('ui.install.ios1'))}
           </Step>
           <Step number={2} icon="addSquare">
-            Choose <strong>Add to Home Screen</strong> (scroll down if you don’t see it)
+            {withBold(t('ui.install.ios2'))}
           </Step>
           <Step number={3} icon="check">
-            Tap <strong>Add</strong>. That’s it!
+            {withBold(t('ui.install.ios3'))}
           </Step>
         </ol>
       )}
       {method === 'menu' && (
         <ol className={styles.steps}>
           <Step number={1} icon="dots">
-            Open your browser’s <strong>menu</strong>
+            {withBold(t('ui.install.menu1'))}
           </Step>
           <Step number={2} icon="addSquare">
-            Tap <strong>Install app</strong> or <strong>Add to Home screen</strong>
+            {withBold(t('ui.install.menu2'))}
           </Step>
         </ol>
       )}
@@ -80,12 +85,12 @@ export default function InstallDialog({ method, onInstall, onLater, onClose }) {
       <div className={styles.actions}>
         {method !== 'prompt' && (
           <Button onClick={onClose} data-autofocus>
-            Got it
+            {t('ui.install.gotIt')}
           </Button>
         )}
         {onLater && (
           <Button variant="secondary" onClick={onLater}>
-            Not now
+            {t('ui.notNow')}
           </Button>
         )}
       </div>

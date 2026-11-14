@@ -64,6 +64,8 @@ export const es = {
   'play.backTo': 'Volver: {place}',
   'play.boardLabel': 'Tablero de {name}. Usa las flechas para moverte y Enter para girar.',
   'play.restart': 'Empezar de nuevo',
+  'play.status': 'Estado del nivel',
+  'play.gemsLit': '{n} de {total} gemas encendidas',
 
   'intro.go': '¡Vamos!',
   'intro.lightGems.one': 'Ilumina la gema',
@@ -136,6 +138,7 @@ export const es = {
   'buy.withSparksLimit.other': 'Comprar {name} por {count} chispas (límite diario alcanzado)',
   'buy.withDiamonds.one': 'Comprar {name} por {count} diamante',
   'buy.withDiamonds.other': 'Comprar {name} por {count} diamantes',
+  'buy.withDiamondsSignIn.one': 'Comprar {name} por {count} diamante (hay que iniciar sesión)',
   'buy.withDiamondsSignIn.other': 'Comprar {name} por {count} diamantes (hay que iniciar sesión)',
 
   'out.title': 'Sin movimientos',

@@ -9,11 +9,14 @@ import { LUCKY_PAL_EVERY, palById, rarityOf } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
 import { rewardShower } from '../../lib/effects.js';
 import styles from './LuckyPal.module.css';
+import { palName, palWithSpecies } from '../../i18n/palText.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
 /** A Lucky Pal gift (every 200 levels): tap to open the box, then meet who came out. */
 export default function LuckyPalDialog() {
   const { luckyGift, dismissLuckyGift, choosePal } = usePlayer();
   const [isOpen, setIsOpen] = useState(false);
+  const { t, lang } = useI18n();
   if (!luckyGift) return null;
   const pal = palById(luckyGift.palId);
 
@@ -30,15 +33,19 @@ export default function LuckyPalDialog() {
   };
 
   return (
-    <Dialog title={isOpen ? (pal ? `${pal.name} joined you!` : 'Lucky sparks!') : 'A Lucky Pal gift!'} tone="celebrate" onClose={close}>
+    <Dialog
+      title={isOpen ? (pal ? t('pals.lucky.joined', { name: palName(lang, pal) }) : t('pals.lucky.sparksTitle')) : t('pals.lucky.giftTitle')}
+      tone="celebrate"
+      onClose={close}
+    >
       {!isOpen ? (
         <>
-          <button type="button" className={styles.box} onClick={open} aria-label="Open the gift">
+          <button type="button" className={styles.box} onClick={open} aria-label={t('pals.lucky.openLabel')}>
             <Icon name="gift" size={96} strokeWidth={1.6} />
           </button>
-          <p className={styles.text}>You solved another {LUCKY_PAL_EVERY} levels! Something is wiggling inside…</p>
+          <p className={styles.text}>{t('pals.lucky.wiggling', { n: LUCKY_PAL_EVERY })}</p>
           <Button size="lg" onClick={open} data-autofocus>
-            Open it!
+            {t('pals.lucky.open')}
           </Button>
         </>
       ) : pal ? (
@@ -47,10 +54,7 @@ export default function LuckyPalDialog() {
             <PalArt palId={pal.id} size={140} alive />
           </div>
           <p className={styles.text}>
-            <strong>
-              {pal.name} the {pal.species}
-            </strong>{' '}
-            <RarityBadge pal={pal} />
+            <strong>{palWithSpecies(lang, pal)}</strong> <RarityBadge pal={pal} />
           </p>
           <div className={styles.actions}>
             <Button
@@ -61,21 +65,21 @@ export default function LuckyPalDialog() {
               }}
               data-autofocus
             >
-              Play with {pal.name}
+              {t('pals.lucky.playWith', { name: palName(lang, pal) })}
             </Button>
             <Button variant="ghost" onClick={close}>
-              Later
+              {t('pals.later')}
             </Button>
           </div>
         </>
       ) : (
         <>
           <p className={`game-title ${styles.sparks}`}>
-            <Icon name="spark" size={26} /> +{luckyGift.sparks} sparks
+            <Icon name="spark" size={26} /> {t('pals.lucky.sparks', { n: luckyGift.sparks })}
           </p>
-          <p className={styles.text}>You already have every Pal. Amazing!</p>
+          <p className={styles.text}>{t('pals.lucky.haveAll')}</p>
           <Button size="lg" onClick={close} data-autofocus>
-            Yay!
+            {t('pals.lucky.yay')}
           </Button>
         </>
       )}

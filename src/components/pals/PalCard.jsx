@@ -2,9 +2,11 @@ import PalArt from './PalArt.jsx';
 import GrowthPips from './GrowthPips.jsx';
 import { rarityOf } from '../../game/pals.js';
 import styles from './PalCard.module.css';
+import { palName, rarityName, stageName } from '../../i18n/palText.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 
-/** What each rarity's ribbon says (a symbol plus a word, so color is never the only signal). */
-const RIBBONS = { common: 'Basic', legendary: '★ Legendary', mythic: '✦ Mythic' };
+/** The symbol before each rarity's ribbon word (so color is never the only signal). */
+const RIBBON_SYMBOLS = { common: '', legendary: '★ ', mythic: '✦ ' };
 
 /**
  * A Pal card. Every card has the same layout, so they're easy to compare at a glance:
@@ -15,31 +17,36 @@ const RIBBONS = { common: 'Basic', legendary: '★ Legendary', mythic: '✦ Myth
  * @param children the card's action (a button) or hint, at the bottom
  */
 export default function PalCard({ pal, stage = null, isUnlocked = true, isPartner = false, wearing = [], onLook, children }) {
+  const { t, lang } = useI18n();
   const rarity = rarityOf(pal);
+  const name = palName(lang, pal);
   const art = <PalArt palId={pal.id} stage={stage?.index ?? 0} wearing={wearing} size="100%" className={styles.art} />;
 
   return (
     <li className={`${styles.card} ${styles[rarity]} ${isUnlocked ? '' : styles.locked}`}>
       {rarity === 'mythic' && <span className={styles.sparkles} aria-hidden="true" />}
-      {isPartner && <span className={styles.partner}>♥ Partner</span>}
+      {isPartner && <span className={styles.partner}>{t('pals.card.partner')}</span>}
       <span className={styles.stageArt}>
         {isUnlocked && onLook ? (
-          <button type="button" className={styles.look} onClick={onLook} aria-label={`See ${pal.name}'s forms`}>
+          <button type="button" className={styles.look} onClick={onLook} aria-label={t('pals.card.see', { name })}>
             {art}
           </button>
         ) : (
           art
         )}
       </span>
-      <span className={styles.ribbon}>{RIBBONS[rarity]}</span>
-      <span className={`game-title ${styles.name}`}>{isUnlocked ? pal.name : '???'}</span>
+      <span className={styles.ribbon}>
+        {RIBBON_SYMBOLS[rarity]}
+        {rarityName(lang, rarity)}
+      </span>
+      <span className={`game-title ${styles.name}`}>{isUnlocked ? name : '???'}</span>
       {stage ? (
         <span className={styles.form}>
           <GrowthPips stageIndex={stage.index} />
-          <span className={`${styles.formName} ${styles.ageTag} ${styles[stage.id]}`}>{stage.name}</span>
+          <span className={`${styles.formName} ${styles.ageTag} ${styles[stage.id]}`}>{stageName(lang, stage)}</span>
         </span>
       ) : (
-        isUnlocked && <span className={styles.formName}>Not on your team yet</span>
+        isUnlocked && <span className={styles.formName}>{t('pals.card.notYet')}</span>
       )}
       {children}
     </li>

@@ -11,7 +11,11 @@ import { themeById, themeItemBlocker, themeItemById } from '../../game/themes.js
 import { isNativeApp } from '../../lib/platform.js';
 import { rewardShower } from '../../lib/effects.js';
 import { sfx } from '../../audio/sfx.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { shopItemName, themeText } from '../../i18n/shopText.js';
+import { palName } from '../../i18n/palText.js';
 import styles from './TryOnDialog.module.css';
+import { errorText } from '../../i18n/meText.js';
 
 const CURRENCY_ICON = { sparks: 'spark', diamonds: 'diamond' };
 
@@ -24,6 +28,7 @@ const CURRENCY_ICON = { sparks: 'spark', diamonds: 'diamond' };
  */
 export default function TryOnDialog({ item, onClose, onGetDiamonds }) {
   const player = usePlayer();
+  const { t, lang } = useI18n();
   const { progress, isSignedIn } = player;
   const [stage, setStage] = useState('preview');
   const [error, setError] = useState('');
@@ -48,7 +53,7 @@ export default function TryOnDialog({ item, onClose, onGetDiamonds }) {
       rewardShower();
       setStage('bought');
     } catch (failure) {
-      setError(failure.message);
+      setError(errorText(t, failure.message));
     }
   };
 
@@ -59,7 +64,10 @@ export default function TryOnDialog({ item, onClose, onGetDiamonds }) {
     onClose();
   };
 
-  const title = stage === 'bought' ? 'It’s yours!' : isOutfit ? `Try on: ${item.name}` : `Try out: ${item.name}`;
+  const name = shopItemName(lang, item);
+  const partner = palById(partnerId);
+  const partnerName = partner ? palName(lang, partner) : t('shop.tryOn.yourPal');
+  const title = stage === 'bought' ? t('shop.tryOn.yours') : t(isOutfit ? 'shop.tryOn.titleOutfit' : 'shop.tryOn.titleDecor', { name });
   return (
     <Dialog title={title} tone="celebrate" onClose={onClose}>
       <div className={styles.preview}>
@@ -72,26 +80,28 @@ export default function TryOnDialog({ item, onClose, onGetDiamonds }) {
         )}
       </div>
       <p className={styles.caption}>
-        {isOutfit ? `${palById(partnerId)?.name ?? 'Your Pal'} in the ${item.name.toLowerCase()}` : `Your Grove with the ${item.name.toLowerCase()}`}
-        {theme && <span className={styles.themeTag}> · {themeById(theme.theme).name} collection</span>}
+        {isOutfit
+          ? t('shop.tryOn.captionOutfit', { pal: partnerName, item: name.toLowerCase() })
+          : t('shop.tryOn.captionDecor', { item: name.toLowerCase() })}
+        {theme && <span className={styles.themeTag}> · {t('shop.tryOn.collection', { theme: themeText(lang, themeById(theme.theme)).name })}</span>}
       </p>
 
       {stage === 'bought' ? (
         <div className={styles.actions}>
           <Button size="lg" icon={isOutfit ? 'shirt' : 'home'} onClick={useItNow} data-autofocus>
-            {isOutfit ? 'Wear it now' : 'Place it now'}
+            {t(isOutfit ? 'shop.tryOn.wearNow' : 'shop.tryOn.placeNow')}
           </Button>
           <Button variant="secondary" onClick={onClose}>
-            Later
+            {t('shop.tryOn.later')}
           </Button>
         </div>
       ) : blocker === 'owned' ? (
         <div className={styles.actions}>
           <Button size="lg" icon={isOutfit ? 'shirt' : 'home'} onClick={useItNow} data-autofocus>
-            {isOutfit ? 'Wear it' : 'Place it'}
+            {t(isOutfit ? 'shop.tryOn.wear' : 'shop.tryOn.place')}
           </Button>
           <Button variant="secondary" onClick={onClose}>
-            Back
+            {t('shop.tryOn.back')}
           </Button>
         </div>
       ) : (
@@ -99,47 +109,45 @@ export default function TryOnDialog({ item, onClose, onGetDiamonds }) {
           {blocker === null && (
             <Button size="lg" variant="gold" onClick={buy} data-autofocus>
               <Icon name={CURRENCY_ICON[currency]} size={18} />
-              <span>Buy for {item.price}</span>
+              <span>{t('shop.tryOn.buyFor', { price: item.price })}</span>
             </Button>
           )}
           {blocker === 'short' && currency === 'sparks' && (
             <>
               <p className={styles.note}>
-                You need <strong>{item.price - balance} more sparks</strong>. Play a few levels to earn them!
+                {t('shop.tryOn.youNeed')} <strong>{t('shop.tryOn.moreSparks', { count: item.price - balance })}</strong>. {t('shop.tryOn.earnSparks')}
               </p>
               <Button as="a" href="#/" icon="play" data-autofocus>
-                Play
+                {t('shop.tryOn.play')}
               </Button>
             </>
           )}
           {blocker === 'short' && currency === 'diamonds' && (
             <>
               <p className={styles.note}>
-                You need <strong>{item.price - balance} more diamonds</strong>.{' '}
-                {isNativeApp
-                  ? 'Earn them by finishing worlds and keeping your streak.'
-                  : 'Get some in the Diamonds tab, or earn them by finishing worlds.'}
+                {t('shop.tryOn.youNeed')} <strong>{t('shop.tryOn.moreDiamonds', { count: item.price - balance })}</strong>.{' '}
+                {t(isNativeApp ? 'shop.tryOn.earnDiamondsApp' : 'shop.tryOn.earnDiamondsWeb')}
               </p>
               {!isNativeApp && (
                 <>
                   <Button icon="diamond" onClick={onGetDiamonds} data-autofocus>
-                    Get diamonds
+                    {t('shop.tryOn.getDiamonds')}
                   </Button>
-                  <p className={styles.legal}>Diamonds can be bought with real money. Under 18? Ask a parent first.</p>
+                  <p className={styles.legal}>{t('shop.askParent')}</p>
                 </>
               )}
             </>
           )}
           {blocker === 'signIn' && (
             <>
-              <p className={styles.note}>Diamonds need a free account, so they’re always safe.</p>
+              <p className={styles.note}>{t('shop.tryOn.needAccount')}</p>
               <Button as="a" href="#/settings" icon="user" data-autofocus>
-                Sign in
+                {t('shop.tryOn.signIn')}
               </Button>
             </>
           )}
           <Button variant="secondary" onClick={onClose}>
-            Back
+            {t('shop.tryOn.back')}
           </Button>
         </div>
       )}

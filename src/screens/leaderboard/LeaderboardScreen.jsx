@@ -15,6 +15,7 @@ import PlayerCardDialog from './PlayerCardDialog.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { withParts } from '../../i18n/extrasText.js';
 import styles from './LeaderboardScreen.module.css';
+import { errorText } from '../../i18n/meText.js';
 
 const SPARKS_FOR_TOP_TEN = WEEKLY_REWARDS.find((reward) => reward.rank === 4).sparks;
 const BUNTING = ['var(--color-sage)', 'var(--color-honey)', 'var(--color-peach)', 'var(--color-mint)'];
@@ -55,7 +56,7 @@ export default function LeaderboardScreen() {
     let isCurrent = true;
     fetchWeeklyLeaderboard()
       .then((data) => isCurrent && setBoard(data))
-      .catch((loadError) => isCurrent && setError(loadError.message));
+      .catch((loadError) => isCurrent && setError(errorText(t, loadError.message)));
     return () => {
       isCurrent = false;
     };

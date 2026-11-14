@@ -10,6 +10,7 @@ import { palById, palStage } from '../../game/pals.js';
 import { playerStatsOf, TOTAL_PALS } from '../../game/playerStats.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './PlayerCardDialog.module.css';
+import { errorText } from '../../i18n/meText.js';
 
 const STATS = [
   { key: 'score', icon: 'trophy', label: 'top.card.score' },
@@ -34,7 +35,7 @@ export default function PlayerCardDialog({ row, myScore = null, onClose }) {
     let isCurrent = true;
     fetchPlayerCard(row.rank)
       .then((data) => isCurrent && (data ? setCard(data) : setError(t('top.card.gone'))))
-      .catch((failure) => isCurrent && setError(failure.message));
+      .catch((failure) => isCurrent && setError(errorText(t, failure.message)));
     return () => {
       isCurrent = false;
     };

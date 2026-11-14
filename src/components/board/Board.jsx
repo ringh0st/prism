@@ -4,6 +4,7 @@ import BeamLayer from './BeamLayer.jsx';
 import LensPath from './LensPath.jsx';
 import GlowbugArt from '../glowbugs/GlowbugArt.jsx';
 import { glowbugById } from '../../game/glowbugs.js';
+import { glowbugName } from '../../i18n/groveText.js';
 import { describeTile } from '../../game/describe.js';
 import { isRotatable as tileIsRotatable } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
@@ -57,7 +58,7 @@ export default function Board({
   onBlocked = null,
   nudgedCell = null,
 }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { width, height, tiles } = level;
   const [focusedCell, setFocusedCell] = useState(0);
   const cellRefs = useRef([]);
@@ -135,7 +136,7 @@ export default function Board({
               const isFogged = Boolean(tile?.fog) && revealedCells !== null && !revealedCells.has(cell);
               const isLit = tileIndex >= 0 && (trace.litGems.has(tileIndex) || trace.litShades.has(tileIndex));
               const isActionable = !isLocked && (isEditing || canRotate);
-              const description = describeTile(tile, { orient: orients[tileIndex], isLit, isRotatable: canRotate, isFogged, turnsLeft: left });
+              const description = describeTile(tile, { orient: orients[tileIndex], isLit, isRotatable: canRotate, isFogged, turnsLeft: left }, t);
               return (
                 <div role="gridcell" key={col} className={styles.cellWrap}>
                   <button
@@ -150,7 +151,7 @@ export default function Board({
                       spotlightTile === tileIndex && tileIndex >= 0 ? styles.spotlight : ''
                     } ${coach?.tile === tileIndex && tileIndex >= 0 ? styles.coached : ''} ${lookHere?.has(cell) ? styles.lookHere : ''} ${(tile?.type === TILE.SHADE && isLit) || nudgedCell === cell ? styles.shake : ''}`}
                     tabIndex={cell === focusedCell ? 0 : -1}
-                    aria-label={`${description}${glowbug?.cell === cell ? `. ${glowbugById(glowbug.id).name} the Glowbug is ${glowbug.isAwake ? 'awake' : 'asleep'} here` : ''}. Row ${row + 1}, column ${col + 1}`}
+                    aria-label={`${description}${glowbug?.cell === cell ? `. ${t(glowbug.isAwake ? 'ui.cell.glowbugAwake' : 'ui.cell.glowbugAsleep', { name: glowbugName(lang, glowbugById(glowbug.id)) })}` : ''}. ${t('ui.cell.position', { row: row + 1, col: col + 1 })}`}
                     aria-disabled={!isActionable || undefined}
                     onFocus={() => setFocusedCell(cell)}
                     onKeyDown={(event) => onKeyDown(event, cell)}

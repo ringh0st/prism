@@ -12,6 +12,7 @@ import { sfx } from '../../audio/sfx.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { decorName, spotName } from '../../i18n/groveText.js';
 import styles from './Grove.module.css';
+import { errorText } from '../../i18n/meText.js';
 
 /** One piece of decor: buy it, place it, or put it away. */
 function DecorItem({ item, onDone, onError }) {
@@ -29,7 +30,7 @@ function DecorItem({ item, onDone, onError }) {
       sound();
       onDone(message);
     } catch (error) {
-      onError(error.message);
+      onError(errorText(t, error.message));
     } finally {
       setIsBusy(false);
     }

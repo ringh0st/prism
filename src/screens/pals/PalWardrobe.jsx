@@ -5,10 +5,14 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { ALL_OUTFITS, PAL_SLOTS, stageOf } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Pals.module.css';
+import { outfitName, slotName } from '../../i18n/palText.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
+import { errorText } from '../../i18n/meText.js';
 
 /** Clothes and gear you own (bought in the Shop): one per slot on your partner. */
 function Wardrobe({ onError }) {
   const { progress, wearAccessory } = usePlayer();
+  const { t, lang } = useI18n();
   const owned = ALL_OUTFITS.filter((item) => progress.pal.accessories.includes(item.id));
   const stage = stageOf(progress.pal.owned[progress.pal.id]);
   const toggle = async (itemId, isWearing) => {
@@ -16,14 +20,17 @@ function Wardrobe({ onError }) {
       await wearAccessory(itemId, isWearing);
       sfx.sparkle();
     } catch (error) {
-      onError(error.message);
+      onError(errorText(t, error.message));
     }
   };
 
   if (owned.length === 0) {
+    const [before, after] = t('pals.wardrobe.empty').split('{shop}');
     return (
       <p className={styles.growth}>
-        No clothes yet. Find hats, capes and gear in the <a href="#/store">Shop</a> (Pals section).
+        {before}
+        <a href="#/store">{t('pals.wardrobe.shop')}</a>
+        {after}
       </p>
     );
   }
@@ -32,16 +39,16 @@ function Wardrobe({ onError }) {
     if (items.length === 0) return null;
     return (
       <div key={slot.id} className={styles.slotGroup}>
-        <h4 className={styles.slotTitle}>{slot.name}</h4>
+        <h4 className={styles.slotTitle}>{slotName(lang, slot)}</h4>
         <ul className={styles.wardrobe}>
           {items.map((item) => {
             const isWorn = progress.pal.wearing.includes(item.id);
             return (
               <li key={item.id} className={`${styles.accessory} ${isWorn ? styles.worn : ''}`}>
                 <PalArt palId={progress.pal.id} stage={stage} wearing={[item.id]} size={58} />
-                <span className={styles.accessoryName}>{item.name}</span>
+                <span className={styles.accessoryName}>{outfitName(lang, item)}</span>
                 <Button size="sm" variant={isWorn ? 'secondary' : 'primary'} onClick={() => toggle(item.id, !isWorn)} aria-pressed={isWorn}>
-                  {isWorn ? 'Take off' : 'Wear'}
+                  {isWorn ? t('pals.wardrobe.takeOff') : t('pals.wardrobe.wear')}
                 </Button>
               </li>
             );
@@ -56,10 +63,11 @@ function Wardrobe({ onError }) {
 export default function PalWardrobe() {
   const { progress } = usePlayer();
   const [message, setMessage] = useState('');
+  const { t } = useI18n();
   if (!progress.pal.id) return null;
   return (
-    <section className={styles.section} aria-label="Wardrobe">
-      <p className={styles.growth}>Dress up your partner: one hat, one neck item and one piece of gear at a time.</p>
+    <section className={styles.section} aria-label={t('pals.tab.wardrobe')}>
+      <p className={styles.growth}>{t('pals.wardrobe.intro')}</p>
       <Wardrobe onError={setMessage} />
       {message && (
         <p className={styles.error} role="alert">

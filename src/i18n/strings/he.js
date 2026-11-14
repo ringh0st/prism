@@ -64,6 +64,8 @@ export const he = {
   'play.backTo': 'חזרה ל{place}',
   'play.boardLabel': 'לוח {name}. החצים לתזוזה, Enter לסיבוב.',
   'play.restart': 'להתחיל מחדש',
+  'play.status': 'מצב השלב',
+  'play.gemsLit': '{n} מתוך {total} אבני חן דולקות',
 
   'intro.go': 'יאללה!',
   'intro.lightGems.one': 'האירו את אבן החן',
@@ -136,6 +138,7 @@ export const he = {
   'buy.withSparksLimit.other': 'לקנות {name} ב-{count} ניצוצות (הגעתם למגבלה היומית)',
   'buy.withDiamonds.one': 'לקנות {name} ביהלום אחד',
   'buy.withDiamonds.other': 'לקנות {name} ב-{count} יהלומים',
+  'buy.withDiamondsSignIn.one': 'לקנות {name} ביהלום אחד (צריך להתחבר)',
   'buy.withDiamondsSignIn.other': 'לקנות {name} ב-{count} יהלומים (צריך להתחבר)',
 
   'out.title': 'נגמרו המהלכים',

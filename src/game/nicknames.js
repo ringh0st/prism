@@ -1,4 +1,5 @@
 import { PALS } from './pals.js';
+import { translate } from '../i18n/translate.js';
 
 /**
  * Public Top-board nicknames: players type their own (or roll a random one). Because the board is
@@ -44,15 +45,21 @@ const normalize = (text) =>
     .replace(/[\s_.-]/g, '')
     .replace(/[0134573@$]/g, (char) => LOOK_ALIKES[char] ?? char);
 
-/** @returns a player-facing reason, or null when the nickname is fine */
-export function nicknameProblem(raw) {
+/** Which rule a nickname breaks ({ rule, n? }: short, long, chars, digits or blocked), or null when it's fine. */
+function nicknameRule(raw) {
   const nickname = raw.trim().replace(/\s+/g, ' ');
-  if (nickname.length < NICKNAME_MIN) return `At least ${NICKNAME_MIN} characters, please.`;
-  if (nickname.length > NICKNAME_MAX) return `At most ${NICKNAME_MAX} characters, please.`;
-  if (!/^[\p{L}\p{N} ]+$/u.test(nickname)) return 'Letters, numbers and spaces only.';
-  if (/\d{5,}/.test(nickname)) return 'Too many numbers in a row.';
-  if (BLOCKED_NICKNAME_PARTS.some((part) => normalize(nickname).includes(part))) return 'Let’s pick a friendlier name.';
+  if (nickname.length < NICKNAME_MIN) return { rule: 'short', n: NICKNAME_MIN };
+  if (nickname.length > NICKNAME_MAX) return { rule: 'long', n: NICKNAME_MAX };
+  if (!/^[\p{L}\p{N} ]+$/u.test(nickname)) return { rule: 'chars' };
+  if (/\d{5,}/.test(nickname)) return { rule: 'digits' };
+  if (BLOCKED_NICKNAME_PARTS.some((part) => normalize(nickname).includes(part))) return { rule: 'blocked' };
   return null;
+}
+
+/** @returns a player-facing reason in `lang` (English by default), or null when the nickname is fine */
+export function nicknameProblem(raw, lang = 'en') {
+  const broken = nicknameRule(raw);
+  return broken && translate(lang, `me.nickname.rule.${broken.rule}`, { n: broken.n });
 }
 
 const RANDOM_WORDS = [

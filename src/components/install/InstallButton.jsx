@@ -5,6 +5,7 @@ import { useInstallApp } from '../../hooks/useInstallApp.js';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { solvedLevelCount } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
+import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './Install.module.css';
 
 /**
@@ -13,6 +14,7 @@ import styles from './Install.module.css';
  */
 export default function InstallButton() {
   const { progress } = usePlayer();
+  const { t } = useI18n();
   const app = useInstallApp(solvedLevelCount(progress.levels));
   const [isOpen, setIsOpen] = useState(false);
   if (!app.shouldSuggest && !isOpen) return null;
@@ -31,7 +33,7 @@ export default function InstallButton() {
           sfx.tap();
           setIsOpen(true);
         }}
-        aria-label="Add Lumipals to your Home Screen"
+        aria-label={t('ui.install.open')}
       >
         <Icon name="phone" size={24} strokeWidth={2.4} />
         <span className={styles.plus} aria-hidden="true">

@@ -8,6 +8,7 @@ import { sfx } from '../../audio/sfx.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { eventThemeText } from '../../i18n/extrasText.js';
 import styles from './Event.module.css';
+import { errorText } from '../../i18n/meText.js';
 
 /** The prize for finishing all 10: sparks plus the event's stamp. Opens with a shower of stars. */
 export default function EventPrize({ weekend, theme, eventProgress }) {
@@ -26,7 +27,7 @@ export default function EventPrize({ weekend, theme, eventProgress }) {
       sfx.chest();
       rewardShower(cardRef.current);
     } catch (error) {
-      setMessage(error.message);
+      setMessage(errorText(t, error.message));
     }
   };
 
