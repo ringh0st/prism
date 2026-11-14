@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ScreenHeader from '../components/game/ScreenHeader.jsx';
 import BottomNav from '../components/game/BottomNav.jsx';
 import Button from '../components/Button.jsx';
@@ -8,6 +8,7 @@ import { useAuth } from '../state/AuthContext.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
 import { BEAM_THEMES, totalStars } from '../game/progress.js';
 import { APPLE_SIGN_IN_ENABLED, PRIVACY_URL, HOME_PAGE_URL, TERMS_URL } from '../lib/config.js';
+import { fetchEnabledProviders } from '../lib/authProviders.js';
 import PlayerCard from './me/PlayerCard.jsx';
 import styles from './SettingsScreen.module.css';
 import { APP_VERSION, COPYRIGHT_YEAR, STORE_NAME, STUDIO_NAME } from '../lib/appInfo.js';
@@ -70,6 +71,16 @@ function AccountCard() {
   const { syncStatus } = usePlayer();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [error, setError] = useState('');
+  // Apple sign-in: always in the iPhone app, and on the web once it's switched on in Supabase.
+  const [hasApple, setHasApple] = useState(APPLE_SIGN_IN_ENABLED);
+  useEffect(() => {
+    if (APPLE_SIGN_IN_ENABLED || user) return undefined;
+    let isCurrent = true;
+    fetchEnabledProviders().then((providers) => isCurrent && setHasApple(Boolean(providers.apple)));
+    return () => {
+      isCurrent = false;
+    };
+  }, [user]);
 
   const startSignIn = async (signIn) => {
     setError('');
@@ -110,7 +121,7 @@ function AccountCard() {
         <>
           <p className={styles.rowHint}>You’re playing as a guest. Sign in to keep your stars, sparks and streak on all your devices.</p>
           <div className={styles.signInButtons}>
-            {APPLE_SIGN_IN_ENABLED && (
+            {hasApple && (
               <button type="button" className={styles.appleButton} onClick={() => startSignIn(signInWithApple)}>
                 <AppleLogo />
                 <span>Sign in with Apple</span>

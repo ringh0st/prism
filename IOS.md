@@ -46,7 +46,7 @@ app.lumipals://auth
 
 Google and Apple sign-in open in a secure Safari sheet and come back to the app through this address.
 
-## 4. Sign in with Apple (required by Apple, because the app offers Google sign-in)
+## 4. Sign in with Apple (in the app and on the website)
 
 Do this after your Apple Developer membership is approved. Never paste keys into chats; put them only in the
 Apple and Supabase dashboards.
@@ -60,6 +60,8 @@ Apple and Supabase dashboards.
 3. **Supabase → Authentication → Sign In / Providers → Apple**: turn it on and fill in the Services ID, your Team ID,
    the Key ID and the secret, following Supabase's guide: https://supabase.com/docs/guides/auth/social-login/auth-apple
    (Apple's secret expires every 6 months; Supabase's guide shows how to renew it.)
+4. That's all for the website: the "Sign in with Apple" button appears on lumipals.app by itself once the Apple
+   provider is on in Supabase (the game asks Supabase which sign-in methods are enabled). In the iPhone app it always shows.
 
 ## 5. Publishing (App Store Connect)
 
