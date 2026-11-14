@@ -279,7 +279,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
   return (
     <main className={`${styles.screen} ${styles[modifier] ?? ''} ${world ? `${styles.themed} ${styles[world.theme]}` : ''}`}>
-      {world && <WorldBackdrop worldId={world.id} theme={world.theme} />}
+      {world && <WorldBackdrop levelId={level.id} theme={world.theme} />}
       <header className={styles.header}>
         <Button as="a" href={backHref} variant="secondary" icon="back" label="Back to map" />
         <div className={styles.titleBlock}>

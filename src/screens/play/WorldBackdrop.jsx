@@ -1,6 +1,8 @@
 import { memo, useMemo } from 'react';
 import { createRandom } from '../../lib/random.js';
 import { BIOMES, SCENERY } from '../map/scenery/sceneryArt.jsx';
+import BackdropCreature from './backdrop/BackdropCreature.jsx';
+import { planCreatures } from './backdrop/planCreatures.js';
 import styles from './WorldBackdrop.module.css';
 
 /** Where the landscape pieces stand along the bottom (% across) and whether each is a big one. */
@@ -15,17 +17,19 @@ const SPOTS = [
 
 /**
  * The world's own landscape along the bottom of a level (pines in one world, cacti or palms in another),
- * on rolling hills in the world's colors. Decorative; the same world always looks the same.
+ * on rolling hills in the world's colors, with a couple of the world's animals going about their day.
+ * Each level arranges it differently; the same level always looks the same. Decorative.
  */
-function WorldBackdrop({ worldId, theme }) {
+function WorldBackdrop({ levelId, theme }) {
+  const creatures = useMemo(() => planCreatures(theme, levelId), [theme, levelId]);
   const pieces = useMemo(() => {
     const biome = BIOMES[theme] ?? BIOMES.sunshine;
-    const random = createRandom(`backdrop-${worldId}`);
+    const random = createRandom(`backdrop-${levelId}`);
     return SPOTS.map(([x, isBig]) => {
       const kind = random.pick(isBig ? biome.big : biome.small);
       return { kind, x, size: Math.round(SCENERY[kind].size * (isBig ? 1.5 : 1)), flip: random.chance(0.5) };
     });
-  }, [worldId, theme]);
+  }, [levelId, theme]);
 
   return (
     <div className={styles.backdrop} aria-hidden="true">
@@ -47,6 +51,9 @@ function WorldBackdrop({ worldId, theme }) {
             {SCENERY[piece.kind].art}
           </g>
         </svg>
+      ))}
+      {creatures.map((plan) => (
+        <BackdropCreature key={plan.key} plan={plan} />
       ))}
     </div>
   );

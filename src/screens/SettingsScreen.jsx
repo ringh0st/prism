@@ -10,6 +10,7 @@ import { BEAM_THEMES, totalStars } from '../game/progress.js';
 import { APPLE_SIGN_IN_ENABLED, PRIVACY_URL, HOME_PAGE_URL, TERMS_URL } from '../lib/config.js';
 import PlayerCard from './me/PlayerCard.jsx';
 import styles from './SettingsScreen.module.css';
+import { APP_VERSION, COPYRIGHT_YEAR, STORE_NAME, STUDIO_NAME } from '../lib/appInfo.js';
 
 const SYNC_LABELS = {
   local: 'Progress is saved on this device.',
@@ -197,6 +198,10 @@ export default function SettingsScreen() {
             <a href={HOME_PAGE_URL}>About Lumipals</a>
             <a href={PRIVACY_URL}>Privacy Policy</a>
             <a href={TERMS_URL}>Terms & refunds</a>
+          </p>
+          <p className={styles.about}>
+            {STORE_NAME} · Version {APP_VERSION}
+            <br />© {COPYRIGHT_YEAR} {STUDIO_NAME}
           </p>
         </section>
       </main>

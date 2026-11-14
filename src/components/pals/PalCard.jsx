@@ -10,7 +10,7 @@ const MYTHIC_SPARKLES = 5;
 /**
  * A collectible Pal card. The card's fill and corner decor show the Pal's age (fresh mint for a Baby up
  * to a dark golden Legend card), the row of icons shows its form, and the frame shows its rarity: a gold
- * frame with a ★ tab for Legendary, a sunset frame with twinkling ✦ for Mythic.
+ * frame, a ★ ribbon and a passing shine for Legendary; a sunset frame, a ✦ ribbon and twinkles for Mythic.
  * @param stage    the Pal's form (from palStage) if you have it, else null
  * @param onLook   opens the Pal's forms; without it the art isn't a button (locked Pals)
  * @param children the card's action (a button) or hint, under the name
@@ -19,7 +19,7 @@ export default function PalCard({ pal, stage = null, isUnlocked = true, isPartne
   const rarity = rarityOf(pal);
   const isSpecial = rarity !== 'common';
   const look = stage ? styles[stage.id] : styles.unowned;
-  const art = <PalArt palId={pal.id} stage={stage?.index ?? 0} wearing={wearing} size={78} className={styles.art} />;
+  const art = <PalArt palId={pal.id} stage={stage?.index ?? 0} wearing={wearing} size="100%" className={styles.art} />;
 
   return (
     <li className={`${styles.card} ${look} ${styles[rarity]} ${isUnlocked ? '' : styles.locked}`}>
@@ -30,6 +30,7 @@ export default function PalCard({ pal, stage = null, isUnlocked = true, isPartne
             ✦
           </span>
         ))}
+      {isSpecial && <span className={styles.shine} aria-hidden="true" />}
       {isSpecial && (
         <span className={styles.tab}>
           <span aria-hidden="true">{RARITY_MARKS[rarity]}</span>
@@ -46,12 +47,12 @@ export default function PalCard({ pal, stage = null, isUnlocked = true, isPartne
           art
         )}
       </span>
-      <span className={`game-title ${styles.name}`}>{isUnlocked ? pal.name : '???'}</span>
       {isSpecial && (
-        <span className={styles.rarityName} aria-hidden="true">
-          {RARITY_NAMES[rarity]}
+        <span className={styles.ribbon} aria-hidden="true">
+          {RARITY_MARKS[rarity]} {RARITY_NAMES[rarity]}
         </span>
       )}
+      <span className={`game-title ${styles.name}`}>{isUnlocked ? pal.name : '???'}</span>
       {stage && (
         <span className={styles.form}>
           <GrowthPips stageIndex={stage.index} />

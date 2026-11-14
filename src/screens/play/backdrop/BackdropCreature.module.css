@@ -1,0 +1,334 @@
+/*
+ * How the landscape animals move. A traveler crosses the screen (then waits off-screen a while, so the
+ * landscape is often quiet), and its body does its own little motion: plodding, hopping, flapping…
+ * Parts marked data-part in the art (legs, wings, tails) move too. Nothing moves for reduced motion.
+ */
+.traveler {
+  position: absolute;
+  left: 0;
+  animation-name: travel;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.reversed {
+  animation-direction: reverse;
+}
+
+.reversed .body {
+  scale: -1 1;
+}
+
+@keyframes travel {
+  from {
+    transform: translateX(-70px);
+  }
+  70%,
+  to {
+    transform: translateX(calc(100vw + 70px));
+  }
+}
+
+.body {
+  display: block;
+  transform-origin: 50% 100%;
+}
+
+.art {
+  display: block;
+  overflow: visible;
+}
+
+/* ---------- Walking: a gentle bob and swinging legs ---------- */
+.walk .body,
+.peck .body {
+  animation: bob 0.9s ease-in-out infinite;
+}
+
+.walk [data-part='legFront'],
+.walk [data-part='legBack'] {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: legSwing 0.9s ease-in-out infinite alternate;
+}
+
+.walk [data-part='legBack'] {
+  animation-delay: -0.45s;
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(-1.5px);
+  }
+}
+
+@keyframes legSwing {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(12deg);
+  }
+}
+
+[data-part='tail'] {
+  transform-box: fill-box;
+  transform-origin: 100% 100%;
+  animation: tailWag 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes tailWag {
+  to {
+    transform: rotate(-10deg);
+  }
+}
+
+/* A chicken stops to peck now and then */
+.peck .art {
+  transform-origin: 50% 100%;
+  animation: peckDown 3.2s ease-in-out infinite;
+}
+
+@keyframes peckDown {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0);
+  }
+  78%,
+  90% {
+    transform: rotate(28deg);
+  }
+  84% {
+    transform: rotate(18deg);
+  }
+}
+
+/* ---------- Crawling (snails, hedgehogs): slow, with a little stretch ---------- */
+.crawl .body {
+  animation: stretch 1.8s ease-in-out infinite;
+}
+
+@keyframes stretch {
+  50% {
+    transform: scale(1.06, 0.95);
+  }
+}
+
+/* ---------- Hopping ---------- */
+.hop .body {
+  animation: hop 0.75s cubic-bezier(0.3, 0, 0.4, 1) infinite;
+}
+
+@keyframes hop {
+  0%,
+  100% {
+    transform: translateY(0) scale(1.06, 0.92);
+  }
+  15% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-11px) scale(0.96, 1.04);
+  }
+}
+
+/* ---------- Paddling on the water ---------- */
+.paddle .body {
+  animation: paddle 2.4s ease-in-out infinite;
+}
+
+@keyframes paddle {
+  50% {
+    transform: translateY(1.5px) rotate(-3deg);
+  }
+}
+
+/* ---------- Rolling (tumbleweed) ---------- */
+.roll .body {
+  animation: bounce 1.1s ease-in-out infinite;
+}
+
+.roll [data-part='spin'] {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spin 1.1s linear infinite;
+}
+
+@keyframes bounce {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* ---------- Darting (lizards): dash, freeze, dash ---------- */
+.dart {
+  animation-name: dart;
+  animation-timing-function: ease-out;
+}
+
+@keyframes dart {
+  0% {
+    transform: translateX(-50px);
+  }
+  6%,
+  20% {
+    transform: translateX(22vw);
+  }
+  25%,
+  40% {
+    transform: translateX(46vw);
+  }
+  45%,
+  58% {
+    transform: translateX(70vw);
+  }
+  64%,
+  100% {
+    transform: translateX(calc(100vw + 50px));
+  }
+}
+
+.dart [data-part='tail'] {
+  animation-duration: 0.5s;
+}
+
+/* ---------- Flying: a wavy path and flapping wings ---------- */
+.fly .body {
+  animation: wave 2.6s ease-in-out infinite;
+}
+
+.fly [data-part='wings'] {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flap 0.28s ease-in-out infinite alternate;
+}
+
+@keyframes wave {
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes flap {
+  to {
+    transform: scaleY(-0.6);
+  }
+}
+
+/* Butterflies and dragonflies flutter in little zigzags */
+.flutter .body {
+  animation: zigzag 1.8s ease-in-out infinite;
+}
+
+.flutter [data-part='flap'] {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: flutterWings 0.22s ease-in-out infinite alternate;
+}
+
+@keyframes zigzag {
+  25% {
+    transform: translate(0, -10px) rotate(-8deg);
+  }
+  75% {
+    transform: translate(0, 6px) rotate(6deg);
+  }
+}
+
+@keyframes flutterWings {
+  to {
+    transform: scaleX(0.35);
+  }
+}
+
+/* ---------- Animals that stay put ---------- */
+.stay {
+  position: absolute;
+  margin-left: -15px;
+}
+
+/* A hawk circling high above */
+.soar .body {
+  animation-name: soar;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.soar [data-part='wings'] {
+  transform-box: fill-box;
+  transform-origin: 50% 60%;
+  animation: glide 3s ease-in-out infinite alternate;
+}
+
+@keyframes soar {
+  0% {
+    transform: translate(0, 0) rotate(-6deg);
+  }
+  25% {
+    transform: translate(40px, -14px) rotate(4deg);
+  }
+  50% {
+    transform: translate(0, -24px) rotate(8deg) scaleX(-1);
+  }
+  75% {
+    transform: translate(-40px, -10px) rotate(-4deg) scaleX(-1);
+  }
+  100% {
+    transform: translate(0, 0) rotate(-6deg);
+  }
+}
+
+@keyframes glide {
+  to {
+    transform: scaleY(0.75);
+  }
+}
+
+/* A fennec peeking over the dune now and then */
+.peek {
+  height: 26px;
+  overflow: hidden;
+}
+
+.peek .body {
+  transform: translateY(100%);
+  animation-name: peek;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes peek {
+  0%,
+  55%,
+  100% {
+    transform: translateY(100%);
+  }
+  62%,
+  72% {
+    transform: translateY(10%);
+  }
+  75% {
+    transform: translateY(10%) rotate(-8deg);
+  }
+  80%,
+  88% {
+    transform: translateY(10%) rotate(6deg);
+  }
+  94% {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .traveler,
+  .stay {
+    display: none;
+  }
+}

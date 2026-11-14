@@ -16,7 +16,7 @@
   align-content: start;
   gap: 3px;
   padding: var(--space-3) 6px var(--space-3);
-  border: 3px solid var(--frame);
+  border: 4px solid var(--frame);
   border-radius: var(--radius-lg);
   text-align: center;
   background: var(--card-fill);
@@ -91,14 +91,14 @@
 
 .tab {
   position: absolute;
-  top: -3px;
-  left: -3px;
+  top: -4px;
+  left: -4px;
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-lg) 0 12px 0;
-  font-size: 15px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-lg) 0 14px 0;
+  font-size: 17px;
   line-height: 1;
   z-index: 2;
 }
@@ -113,13 +113,68 @@
   background: #df7458;
 }
 
-.rarityName {
-  margin-top: -2px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
+/* The rarity ribbon across the card, like a trading card's banner */
+.ribbon {
+  position: relative;
+  justify-self: stretch;
+  text-align: center;
+  z-index: 1;
+  margin: -6px -10px 2px;
+  padding: 3px 14px 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--card-ink);
+  white-space: nowrap;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 50%, 100% 100%, 0 100%, 7px 50%);
+}
+
+.legendary .ribbon {
+  color: #4a3510;
+  background: linear-gradient(#f6d375, #f0c14e 60%, #e0ac36);
+}
+
+.mythic .ribbon {
+  color: #2b1a12;
+  background: linear-gradient(90deg, #e98a68, #f0b15a 50%, #e98a68);
+}
+
+/* Special cards catch the light: a soft shine sweeps across now and then */
+.shine {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: calc(var(--radius-lg) - 4px);
+  pointer-events: none;
+}
+
+.shine::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 20%;
+  background: linear-gradient(100deg, transparent, rgb(255 250 235 / 0.28) 40%, rgb(255 250 235 / 0.4) 50%, rgb(255 250 235 / 0.28) 60%, transparent);
+  transform: translateX(-140%) skewX(-12deg);
+  animation: shine 5.5s ease-in-out infinite;
+}
+
+.mythic .shine::after {
+  animation-delay: -2.4s;
+}
+
+@keyframes shine {
+  0%,
+  62% {
+    transform: translateX(-140%) skewX(-12deg);
+  }
+  90%,
+  100% {
+    transform: translateX(600%) skewX(-12deg);
+  }
 }
 
 /* Mythic cards twinkle */
@@ -229,6 +284,7 @@
 }
 
 .look {
+  width: 100%;
   padding: 0;
   border: 0;
   border-radius: var(--radius-md);
@@ -245,8 +301,14 @@
   transform: scale(0.92);
 }
 
+.stageArt {
+  width: min(100%, 128px);
+}
+
 .art {
   display: block;
+  width: 100%;
+  height: auto;
 }
 
 .locked .art {
@@ -333,6 +395,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .sparkle,
+  .shine::after,
   .stageArt::before {
     animation: none !important;
   }

@@ -53,7 +53,11 @@
 }
 
 .backdrop.legend {
-  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--color-honey) 60%, var(--surface-raised)), color-mix(in srgb, var(--color-peach) 45%, var(--surface-raised)));
+  background: radial-gradient(
+    circle at 50% 40%,
+    color-mix(in srgb, var(--color-honey) 60%, var(--surface-raised)),
+    color-mix(in srgb, var(--color-peach) 45%, var(--surface-raised))
+  );
 }
 
 /* The five stage dots, each lit in its own stage color */

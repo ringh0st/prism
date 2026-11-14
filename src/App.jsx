@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { AuthProvider } from './state/AuthContext.jsx';
 import { PlayerProvider, usePlayer } from './state/PlayerContext.jsx';
 import { LevelsProvider, useLevels } from './state/LevelsContext.jsx';
@@ -18,6 +18,7 @@ import PalUnlockNotice from './screens/pals/PalUnlockNotice.jsx';
 import LuckyPalDialog from './screens/pals/LuckyPalDialog.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
 import LoadingScreen from './screens/LoadingScreen.jsx';
+import SplashScreen from './components/splash/SplashScreen.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
 import { BEAM_THEMES } from './game/progress.js';
 import { sfx } from './audio/sfx.js';
@@ -108,7 +109,14 @@ function Routes() {
   }
 }
 
+/** The splash shows once each time the game opens (not for admin test plays); the game loads underneath. */
+const SKIP_SPLASH_ROUTES = ['admin', 'test'];
+
 export default function App() {
+  const route = useHashRoute();
+  const [showsSplash, setShowsSplash] = useState(() => !SKIP_SPLASH_ROUTES.includes(route.name));
+  const hideSplash = useCallback(() => setShowsSplash(false), []);
+
   // Browsers only allow audio after a user gesture.
   useEffect(() => {
     const unlock = () => sfx.unlock();
@@ -123,8 +131,15 @@ export default function App() {
           <GameBackground />
           <BeamThemeStyle />
           <Routes />
-          <WeeklyRewardNotice />
-          <PalNotices />
+          {/* Pop-ups wait until the splash is gone */}
+          {showsSplash ? (
+            <SplashScreen onDone={hideSplash} />
+          ) : (
+            <>
+              <WeeklyRewardNotice />
+              <PalNotices />
+            </>
+          )}
         </LevelsProvider>
       </PlayerProvider>
     </AuthProvider>

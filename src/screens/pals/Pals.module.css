@@ -103,11 +103,25 @@
 
 .collection {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  /* Three big cards per row on phones; more on wider screens */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-4) var(--space-2);
   margin: 0;
   padding: var(--space-2) 0 0;
   list-style: none;
+}
+
+@media (min-width: 600px) {
+  .collection {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--space-5) var(--space-3);
+  }
+}
+
+@media (max-width: 420px) {
+  .section {
+    padding: var(--space-3);
+  }
 }
 
 .pickButton {
