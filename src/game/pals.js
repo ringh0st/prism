@@ -79,7 +79,6 @@ export const PAL_STAGES = [
 
 export const MAX_PAL_STAGE = PAL_STAGES.length - 1;
 
-
 /** A Pal's form (0 = Baby … 4 = Legend), with the next form or null. */
 export function palStage(index = 0) {
   const safe = Math.max(0, Math.min(MAX_PAL_STAGE, index));
@@ -189,11 +188,19 @@ export function luckyRarityFor(roll) {
 export function claimLuckyPalLocally(progress, roll = Math.random(), pick = Math.random()) {
   if (luckyPalsWaiting(progress) < 1) throw new EconomyError('No Lucky Pal gift yet.');
   const missing = (rarity) => PALS.filter((pal) => rarityOf(pal) === rarity && !progress.pal.owned[pal.id]);
-  const order = { mythic: ['mythic', 'legendary', 'common'], legendary: ['legendary', 'mythic', 'common'], common: ['common', 'legendary', 'mythic'] };
+  const order = {
+    mythic: ['mythic', 'legendary', 'common'],
+    legendary: ['legendary', 'mythic', 'common'],
+    common: ['common', 'legendary', 'mythic'],
+  };
   const pool = order[luckyRarityFor(roll)].map(missing).find((pals) => pals.length > 0);
   const luckyPals = { claimed: progress.luckyPals.claimed + 1 };
   if (!pool) {
-    return { progress: { ...progress, luckyPals, sparks: progress.sparks + LUCKY_PAL_FALLBACK_SPARKS }, palId: null, sparks: LUCKY_PAL_FALLBACK_SPARKS };
+    return {
+      progress: { ...progress, luckyPals, sparks: progress.sparks + LUCKY_PAL_FALLBACK_SPARKS },
+      palId: null,
+      sparks: LUCKY_PAL_FALLBACK_SPARKS,
+    };
   }
   const pal = pool[Math.min(pool.length - 1, Math.floor(pick * pool.length))];
   const owned = { ...progress.pal.owned, [pal.id]: { stage: 0 } };

@@ -319,3 +319,17 @@
 .rarity {
   margin-bottom: 2px;
 }
+
+/* Tap a Pal to see all its forms */
+.palLook {
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out);
+}
+
+.palLook:active {
+  transform: scale(0.94);
+}

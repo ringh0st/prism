@@ -493,5 +493,5 @@ button.goods:active .goodsArt {
 .pickSpecies {
   font-size: 13px;
   font-weight: 700;
-  color: var(--text-soft);
+  color: var(--text-strong);
 }

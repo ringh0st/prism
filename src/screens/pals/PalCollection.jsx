@@ -3,6 +3,7 @@ import Icon from '../../components/Icon.jsx';
 import Button from '../../components/Button.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import RarityBadge from '../../components/pals/RarityBadge.jsx';
+import PalDetailDialog from './PalDetailDialog.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, PAL_ACCESSORIES, PAL_SLOTS, isPalUnlocked, palStage, stageOf, unlockText } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
@@ -11,6 +12,7 @@ import styles from './Pals.module.css';
 /** All Pals: yours (pick a partner), unlocked ones waiting to join, and locked ones with how to get them. */
 function Collection({ onError }) {
   const { progress, choosePal } = usePlayer();
+  const [lookingAt, setLookingAt] = useState(null);
   const pick = async (palId) => {
     try {
       await choosePal(palId);
@@ -29,7 +31,13 @@ function Collection({ onError }) {
         const stage = palStage(stageOf(owned));
         return (
           <li key={pal.id} className={`${styles.palCard} ${isPartner ? styles.partner : ''} ${isUnlocked ? '' : styles.locked}`}>
-            <PalArt palId={pal.id} stage={stage.index} wearing={isPartner ? progress.pal.wearing : []} size={76} className={styles.palArt} />
+            {isUnlocked ? (
+              <button type="button" className={styles.palLook} onClick={() => setLookingAt(pal)} aria-label={`See ${pal.name}'s forms`}>
+                <PalArt palId={pal.id} stage={stage.index} wearing={isPartner ? progress.pal.wearing : []} size={76} className={styles.palArt} />
+              </button>
+            ) : (
+              <PalArt palId={pal.id} stage={stage.index} size={76} className={styles.palArt} />
+            )}
             <span className={`game-title ${styles.palName}`}>{isUnlocked ? pal.name : '???'}</span>
             <RarityBadge pal={pal} className={styles.rarity} />
             {isPartner && <span className={styles.badge}>Partner</span>}
@@ -52,6 +60,7 @@ function Collection({ onError }) {
           </li>
         );
       })}
+      {lookingAt && <PalDetailDialog pal={lookingAt} onClose={() => setLookingAt(null)} />}
     </ul>
   );
 }

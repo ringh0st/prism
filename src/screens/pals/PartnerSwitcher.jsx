@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, palById, palStage, stageOf } from '../../game/pals.js';
+import PalDetailDialog from './PalDetailDialog.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Pals.module.css';
@@ -8,6 +10,7 @@ import styles from './Pals.module.css';
 /** Your partner Pal, how close it is to its next form, and your other Pals to switch to. */
 export default function PartnerSwitcher() {
   const { progress, choosePal } = usePlayer();
+  const [isLooking, setIsLooking] = useState(false);
   const partner = palById(progress.pal.id);
   if (!partner) return null;
   const stage = palStage(stageOf(progress.pal.owned[partner.id]));
@@ -21,7 +24,10 @@ export default function PartnerSwitcher() {
 
   return (
     <section className={styles.partnerCard} aria-labelledby="partner-title">
-      <PalArt palId={partner.id} stage={stage.index} wearing={progress.pal.wearing} size={96} className={styles.partnerArt} />
+      <button type="button" className={styles.palLook} onClick={() => setIsLooking(true)} aria-label={`See ${partner.name}'s forms`}>
+        <PalArt palId={partner.id} stage={stage.index} wearing={progress.pal.wearing} size={96} className={styles.partnerArt} />
+      </button>
+      {isLooking && <PalDetailDialog pal={partner} onClose={() => setIsLooking(false)} />}
       <div className={styles.partnerInfo}>
         <h2 id="partner-title" className={`game-title ${styles.partnerName}`}>
           {partner.name} <span className={styles.stageChip}>{stage.name}</span>

@@ -20,7 +20,12 @@ function DailyPicks({ onChoose }) {
         {picks.map(({ rarity, pal }) => (
           <li key={rarity}>
             {pal ? (
-              <button type="button" className={`${styles.dailyPick} ${styles[rarity]}`} onClick={() => onChoose(pal)} aria-label={`Today's pick: ${pal.name} the ${pal.species}, ${adoptPriceOf(pal)} diamonds`}>
+              <button
+                type="button"
+                className={`${styles.dailyPick} ${styles[rarity]}`}
+                onClick={() => onChoose(pal)}
+                aria-label={`Today's pick: ${pal.name} the ${pal.species}, ${adoptPriceOf(pal)} diamonds`}
+              >
                 <RarityBadge pal={pal} />
                 <PalArt palId={pal.id} size={96} />
                 <span className="game-title">{pal.name}</span>
@@ -70,8 +75,14 @@ export default function AdoptShelf({ onAdopted, onError }) {
       <DailyPicks onChoose={setChoice} />
       <h2 className={`game-title ${styles.sectionTitle}`}>Adopt a Pal</h2>
       <p className={styles.shelfIntro}>
-        Pick any Pal you don’t have yet and bring it home for <strong>{adoptPriceOf(regulars[0])} diamonds</strong>. Or keep playing to unlock them for free!
-        {!isSignedIn && <> Diamonds need an account: <a href="#/settings">sign in</a>.</>}
+        Pick any Pal you don’t have yet and bring it home for <strong>{adoptPriceOf(regulars[0])} diamonds</strong>. Or keep playing to unlock them
+        for free!
+        {!isSignedIn && (
+          <>
+            {' '}
+            Diamonds need an account: <a href="#/settings">sign in</a>.
+          </>
+        )}
       </p>
       <ul className={styles.adoptGrid}>
         {shelf.map((pal) => (
@@ -100,7 +111,8 @@ export default function AdoptShelf({ onAdopted, onError }) {
         <Dialog title={`Adopt ${choice.name}?`} onClose={() => setChoice(null)}>
           <PalArt palId={choice.id} size={120} className={styles.infoArt} />
           <p className={styles.infoText}>
-            {choice.name} the {choice.species} <RarityBadge pal={choice} /> joins your team as a Baby. Play with it as your partner and it grows into a Legend!
+            {choice.name} the {choice.species} <RarityBadge pal={choice} /> joins your team as a Baby. Play with it as your partner and it grows into
+            a Legend!
           </p>
           <PalFormsStrip palId={choice.id} />
           <p className={styles.legal}>Diamonds can be bought with real money. Under 18? Ask a parent first.</p>

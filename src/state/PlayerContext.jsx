@@ -79,10 +79,7 @@ export function PlayerProvider({ children }) {
     writeJson(PROGRESS_KEY, next);
   }, []);
 
-  const applyServerState = useCallback(
-    (state) => setProgress(withServerState(progressRef.current, state, todayKey())),
-    [setProgress],
-  );
+  const applyServerState = useCallback((state) => setProgress(withServerState(progressRef.current, state, todayKey())), [setProgress]);
 
   /** Open every Lucky Pal gift that's waiting (the server draws them for accounts) and queue the reveals. */
   const openLuckyPals = useCallback(async () => {
@@ -123,7 +120,9 @@ export function PlayerProvider({ children }) {
       // A Pal picked while offline (or before the account knew about Pals) is saved now.
       const localPal = progressRef.current.pal.id;
       if (localPal && !state.pal?.id) {
-        await choosePalOnServer(localPal).then(applyServerState).catch(() => {});
+        await choosePalOnServer(localPal)
+          .then(applyServerState)
+          .catch(() => {});
       }
       // The nickname chosen on this device is the one the board should show.
       if (progressRef.current.nickname) await setNicknameOnServer(progressRef.current.nickname).catch(() => {});
