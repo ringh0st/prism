@@ -1,6 +1,7 @@
 import PalArt from './PalArt.jsx';
 import Icon from '../Icon.jsx';
 import { PAL_STAGES } from '../../game/pals.js';
+import stageStyles from './PalStage.module.css';
 import styles from './PalFormsStrip.module.css';
 
 /**
@@ -15,7 +16,7 @@ export default function PalFormsStrip({ palId, current = 0, revealedUpTo = PAL_S
         const name = isHidden ? '???' : stage.name;
         const content = (
           <>
-            <span className={styles.art}>
+            <span className={`${styles.art} ${isHidden ? '' : `${stageStyles.backdrop} ${stageStyles[stage.id]}`}`}>
               <PalArt palId={palId} stage={index} size={52} portrait className={isHidden ? styles.silhouette : ''} />
               {isHidden && <Icon name="lock" size={14} className={styles.lock} />}
             </span>

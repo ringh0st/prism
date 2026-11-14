@@ -1,0 +1,78 @@
+/*
+ * Each growth stage has its own color: a tag (".badge") and a soft background behind the Pal
+ * (".backdrop"), from fresh mint for a Baby to golden for a Legend. Labels keep WCAG contrast.
+ */
+.badge {
+  display: inline-block;
+  padding: 1px 9px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge.baby {
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+}
+
+.badge.junior {
+  color: var(--action-label);
+  background: var(--action-bottom);
+}
+
+.badge.buddy {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.badge.champ {
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+}
+
+.badge.legend {
+  color: #f0c14e;
+  background: #2b2118;
+}
+
+.backdrop.baby {
+  background: color-mix(in srgb, var(--color-mint) 22%, var(--surface-raised));
+}
+
+.backdrop.junior {
+  background: color-mix(in srgb, var(--color-sage) 26%, var(--surface-raised));
+}
+
+.backdrop.buddy {
+  background: color-mix(in srgb, var(--color-honey) 30%, var(--surface-raised));
+}
+
+.backdrop.champ {
+  background: color-mix(in srgb, var(--color-peach) 34%, var(--surface-raised));
+}
+
+.backdrop.legend {
+  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--color-honey) 60%, var(--surface-raised)), color-mix(in srgb, var(--color-peach) 45%, var(--surface-raised)));
+}
+
+/* The five stage dots, each lit in its own stage color */
+.dot.baby {
+  background: var(--color-mint);
+}
+
+.dot.junior {
+  background: var(--color-sage);
+}
+
+.dot.buddy {
+  background: var(--color-honey);
+}
+
+.dot.champ {
+  background: var(--color-peach);
+}
+
+.dot.legend {
+  background: #c99a2e;
+}

@@ -8,6 +8,7 @@ import RarityBadge from '../../components/pals/RarityBadge.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PAL_GROWTH_LEVELS, PAL_STAGES, growthOf, palStage, stageOf } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
+import stageStyles from '../../components/pals/PalStage.module.css';
 import styles from './PalDetail.module.css';
 
 /** Levels still to solve (as partner) before a Pal reaches form `target`. */
@@ -46,7 +47,10 @@ export default function PalDetailDialog({ pal, onClose }) {
       <p className={styles.species}>
         {pal.species} <RarityBadge pal={pal} />
       </p>
-      <div className={`${styles.stage} ${isFuture ? styles.future : ''}`} key={selected}>
+      <div
+        className={`${styles.stage} ${isMystery ? styles.future : `${stageStyles.backdrop} ${stageStyles[PAL_STAGES[selected].id]}`}`}
+        key={selected}
+      >
         <PalArt
           palId={pal.id}
           stage={selected}

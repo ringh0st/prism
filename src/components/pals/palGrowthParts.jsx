@@ -176,7 +176,9 @@ export function Sprout({ kind, x, y, color = '#6db58c', bloom = '#f6c3b2' }) {
     case 'carrot':
       return (
         <g fill={color}>
-          <path d={`M${x} ${y + 2}c-6-6-6-14-2-18 2 6 3 12 2 18zM${x} ${y + 2}c6-6 8-12 6-16-4 4-6 10-6 16zM${x} ${y + 2}c-8-2-12-8-12-12 6 2 10 6 12 12z`} />
+          <path
+            d={`M${x} ${y + 2}c-6-6-6-14-2-18 2 6 3 12 2 18zM${x} ${y + 2}c6-6 8-12 6-16-4 4-6 10-6 16zM${x} ${y + 2}c-8-2-12-8-12-12 6 2 10 6 12 12z`}
+          />
         </g>
       );
     case 'lily':

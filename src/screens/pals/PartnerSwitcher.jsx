@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { PALS, palById, palStage, stageOf } from '../../game/pals.js';
+import { PALS, PAL_STAGES, palById, palStage, stageOf } from '../../game/pals.js';
+import StageBadge from '../../components/pals/StageBadge.jsx';
+import stageStyles from '../../components/pals/PalStage.module.css';
 import PalDetailDialog from './PalDetailDialog.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import { sfx } from '../../audio/sfx.js';
@@ -25,16 +27,26 @@ export default function PartnerSwitcher() {
   return (
     <section className={styles.partnerCard} aria-labelledby="partner-title">
       <button type="button" className={styles.palLook} onClick={() => setIsLooking(true)} aria-label={`See ${partner.name}'s forms`}>
-        <PalArt palId={partner.id} stage={stage.index} wearing={progress.pal.wearing} size={96} className={styles.partnerArt} alive />
+        <PalArt
+          palId={partner.id}
+          stage={stage.index}
+          wearing={progress.pal.wearing}
+          size={96}
+          className={`${styles.partnerArt} ${stageStyles.backdrop} ${stageStyles[stage.id]}`}
+          alive
+        />
       </button>
       {isLooking && <PalDetailDialog pal={partner} onClose={() => setIsLooking(false)} />}
       <div className={styles.partnerInfo}>
         <h2 id="partner-title" className={`game-title ${styles.partnerName}`}>
-          {partner.name} <span className={styles.stageChip}>{stage.name}</span>
+          {partner.name} <StageBadge stage={stage} className={styles.stageChip} />
         </h2>
         <div className={styles.stageDots} role="img" aria-label={`Form ${stage.index + 1} of 5`}>
           {[0, 1, 2, 3, 4].map((i) => (
-            <span key={i} className={i <= stage.index ? styles.stageDotOn : styles.stageDot} />
+            <span
+              key={i}
+              className={i <= stage.index ? `${styles.stageDotOn} ${stageStyles.dot} ${stageStyles[PAL_STAGES[i].id]}` : styles.stageDot}
+            />
           ))}
         </div>
         <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} />
@@ -48,7 +60,7 @@ export default function PartnerSwitcher() {
               role="radio"
               aria-checked={pal.id === partner.id}
               aria-label={`${pal.name} the ${pal.species}`}
-              className={`${styles.teamPal} ${pal.id === partner.id ? styles.teamPalActive : ''}`}
+              className={`${styles.teamPal} ${stageStyles.backdrop} ${stageStyles[palStage(stageOf(progress.pal.owned[pal.id])).id]} ${pal.id === partner.id ? styles.teamPalActive : ''}`}
               onClick={() => switchTo(pal.id)}
             >
               <PalArt palId={pal.id} stage={stageOf(progress.pal.owned[pal.id])} size={48} portrait />

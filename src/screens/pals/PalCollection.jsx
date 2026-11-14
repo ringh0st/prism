@@ -3,6 +3,8 @@ import Icon from '../../components/Icon.jsx';
 import Button from '../../components/Button.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import RarityBadge from '../../components/pals/RarityBadge.jsx';
+import StageBadge from '../../components/pals/StageBadge.jsx';
+import stageStyles from '../../components/pals/PalStage.module.css';
 import PalDetailDialog from './PalDetailDialog.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, PAL_ACCESSORIES, PAL_SLOTS, isPalUnlocked, palStage, stageOf, unlockText } from '../../game/pals.js';
@@ -32,7 +34,12 @@ function Collection({ onError }) {
         return (
           <li key={pal.id} className={`${styles.palCard} ${isPartner ? styles.partner : ''} ${isUnlocked ? '' : styles.locked}`}>
             {isUnlocked ? (
-              <button type="button" className={styles.palLook} onClick={() => setLookingAt(pal)} aria-label={`See ${pal.name}'s forms`}>
+              <button
+                type="button"
+                className={`${styles.palLook} ${owned ? `${stageStyles.backdrop} ${stageStyles[stage.id]}` : ''}`}
+                onClick={() => setLookingAt(pal)}
+                aria-label={`See ${pal.name}'s forms`}
+              >
                 <PalArt palId={pal.id} stage={stage.index} wearing={isPartner ? progress.pal.wearing : []} size={76} className={styles.palArt} />
               </button>
             ) : (
@@ -56,7 +63,7 @@ function Collection({ onError }) {
                 <Icon name="lock" size={12} /> {unlockText(pal.unlock)}
               </span>
             )}
-            {owned && <span className={styles.stage}>{stage.name}</span>}
+            {owned && <StageBadge stage={stage} className={styles.stage} />}
           </li>
         );
       })}
