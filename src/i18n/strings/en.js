@@ -241,7 +241,6 @@ export const en = {
   'settings.calmHint': 'Nothing moves around the board while you think',
 
   'howTo.title': 'How to play',
-  'howTo.text': 'Four quick pictures: turn mirrors, light every gem, earn stars.',
   'howTo.show': 'Show me',
 
   'tour.tap': 'Tap a mirror to turn it',

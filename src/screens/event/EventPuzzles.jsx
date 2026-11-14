@@ -28,7 +28,15 @@ export default function EventPuzzles({ stars }) {
                 aria-label={label}
               >
                 <span className={`game-title ${styles.puzzleNumber}`}>{number}</span>
-                {earned > 0 ? <Stars count={earned} size={12} /> : isHard && <span className={styles.hard}>{t('event.hard')}</span>}
+                {earned > 0 ? (
+                  <Stars count={earned} size={12} />
+                ) : (
+                  isHard && (
+                    <span className={styles.hard} aria-hidden="true">
+                      <Icon name="flame" size={12} />
+                    </span>
+                  )
+                )}
               </a>
             ) : (
               <span className={`${styles.puzzle} ${styles.lockedPuzzle}`} role="img" aria-label={label}>

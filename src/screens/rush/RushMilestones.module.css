@@ -1,0 +1,85 @@
+/* The run as a road: the fill is this week's best, the gifts sit on it at their puzzle count */
+.road {
+  position: relative;
+  padding: 18px 18px 52px;
+}
+
+.track {
+  height: 14px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-peach);
+  transition: width 600ms var(--ease-out);
+}
+
+.gifts {
+  position: absolute;
+  inset: 0 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gift {
+  position: absolute;
+  top: 6px;
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  translate: -50% 0;
+}
+
+:global([dir='rtl']) .gift {
+  translate: 50% 0;
+}
+
+.box {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  color: var(--text-soft);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.reached .box {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  animation: pop 420ms var(--ease-pop) both;
+}
+
+.at {
+  font-size: 15px;
+  line-height: 1.1;
+}
+
+.sparks {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-soft);
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reached .box {
+    animation: none;
+  }
+}

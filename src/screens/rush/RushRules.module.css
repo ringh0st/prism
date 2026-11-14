@@ -1,0 +1,76 @@
+.rules {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.chips {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 4px;
+  padding: var(--space-2) 2px;
+  border-radius: var(--radius-md);
+  text-align: center;
+  background: var(--surface-sunken);
+}
+
+.art {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 30px;
+  /* "+3" and the number read left to right in every language */
+  direction: ltr;
+  color: var(--warm-label);
+}
+
+.value {
+  font-size: 24px;
+  line-height: 1;
+  color: var(--text-strong);
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--text-soft);
+}
+
+.length .art {
+  color: var(--color-sage-deep);
+}
+
+.bonus .art {
+  color: var(--reward-label);
+}
+
+/* A slash across the bulb */
+.crossed {
+  position: relative;
+  display: inline-grid;
+  color: var(--text-soft);
+}
+
+.crossed::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -3px;
+  right: -3px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-terracotta);
+  rotate: -45deg;
+}

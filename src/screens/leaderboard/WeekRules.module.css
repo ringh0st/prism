@@ -1,0 +1,44 @@
+.rules {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 2px 12px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  /* "+1" stays left to right in Hebrew too */
+  direction: ltr;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: var(--shadow-sm);
+}
+
+.chip:nth-child(2) {
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+}
+
+.clock {
+  direction: inherit;
+  color: var(--text-strong);
+  background: var(--surface-raised);
+}

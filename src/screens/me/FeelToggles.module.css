@@ -1,0 +1,87 @@
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.switches {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.switch {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: var(--space-3) 2px var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  font: inherit;
+  color: var(--text-soft);
+  background: var(--surface-sunken);
+  cursor: pointer;
+  transition:
+    transform 160ms var(--ease-out),
+    background var(--duration-base) ease;
+}
+
+.switch:active {
+  transform: scale(0.95);
+}
+
+.switch:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.on {
+  color: var(--action-label);
+  background: var(--action-bottom);
+  box-shadow: var(--shadow-sm);
+}
+
+.art {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+/* Off: a slash across the picture (so off never reads from color alone) */
+.mark {
+  position: absolute;
+  inset: 50% -4px auto;
+  height: 3px;
+  border-radius: 2px;
+  background: currentColor;
+  rotate: -45deg;
+  transition: scale var(--duration-base) var(--ease-pop);
+}
+
+.on .mark {
+  scale: 0 1;
+}
+
+.on .art {
+  animation: pop 320ms var(--ease-pop);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+}
+
+@keyframes pop {
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .on .art {
+    animation: none;
+  }
+}

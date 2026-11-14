@@ -1,9 +1,9 @@
-.tip {
+.help {
   flex: none;
   display: inline-grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -15,28 +15,42 @@
   background: var(--surface-sunken);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
-  transition: transform 220ms var(--ease-spring);
+  transition: transform 160ms var(--ease-out);
 }
 
-.tip:active {
+.help:active {
   transform: scale(0.9);
+}
+
+.help:focus-visible {
+  outline: 3px solid var(--color-sage);
+  outline-offset: 2px;
 }
 
 .body {
   display: grid;
   gap: var(--space-2);
   margin-bottom: var(--space-4);
-  font-size: 17px;
   font-weight: 700;
-  text-align: center;
+  text-align: start;
 }
 
-.body p {
+.body ul {
+  display: grid;
+  gap: var(--space-2);
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .tip {
-    transition: none;
-  }
+.body li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.body svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--color-mint-deep);
 }

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import Button from '../../components/Button.jsx';
+import Icon from '../../components/Icon.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { fetchRushBoard } from '../../lib/economyApi.js';
 import { RUSH_LENGTH } from '../../game/rush.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
-import { withParts } from '../../i18n/extrasText.js';
 import styles from './Rush.module.css';
 
 /** This week's best Light Rush runs, under public nicknames. Signed-in players take part. */
@@ -26,7 +27,9 @@ export default function RushBoard() {
 
   return (
     <section className={styles.card} aria-labelledby="rush-board">
-      <h3 id="rush-board">{t('rush.board.title')}</h3>
+      <h3 id="rush-board" className={styles.boardTitle}>
+        <Icon name="trophy" size={20} /> {t('rush.board.title')}
+      </h3>
       {error && <p className={styles.muted}>{t(error)}</p>}
       {board && board.top.length === 0 && <p className={styles.muted}>{t('rush.board.empty')}</p>}
       {board && board.top.length > 0 && (
@@ -43,7 +46,9 @@ export default function RushBoard() {
         </ol>
       )}
       {!isSignedIn && (
-        <p className={styles.muted}>{withParts(t('rush.board.signIn'), { link: <a href="#/settings">{t('rush.board.signInLink')}</a> })}</p>
+        <Button as="a" href="#/settings" variant="secondary" icon="user" className={styles.join}>
+          {t('rush.board.join')}
+        </Button>
       )}
     </section>
   );

@@ -1,27 +1,19 @@
 import ScreenHeader from '../../components/game/ScreenHeader.jsx';
 import BottomNav from '../../components/game/BottomNav.jsx';
-import LumiSays from '../../components/game/LumiSays.jsx';
 import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { useRushRun } from '../../hooks/useRushRun.js';
 import { navigate } from '../../hooks/useHashRoute.js';
-import { RUSH_BONUS_EVERY, RUSH_BONUS_SPARE, RUSH_LENGTH, RUSH_START_SPARE, RUSH_UNLOCK_WORLDS, rushRecordFor, rushWeekOf } from '../../game/rush.js';
+import { RUSH_LENGTH, RUSH_UNLOCK_WORLDS, rushRecordFor, rushWeekOf } from '../../game/rush.js';
 import { finishedWorldCount } from '../../game/titles.js';
 import RushMilestones from './RushMilestones.jsx';
+import RushRules from './RushRules.jsx';
 import RushBoard from './RushBoard.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
-import { withParts } from '../../i18n/extrasText.js';
 import styles from './Rush.module.css';
 
-const RULES = [
-  { icon: 'map', key: 'rush.rule.length', params: { total: RUSH_LENGTH } },
-  { icon: 'bolt', key: 'rush.rule.spare', params: { spare: RUSH_START_SPARE } },
-  { icon: 'gift', key: 'rush.rule.bonus', params: { bonus: RUSH_BONUS_SPARE, every: RUSH_BONUS_EVERY } },
-  { icon: 'lock', key: 'rush.rule.noHelpers', params: {} },
-];
-
-/** Light Rush: this week's run, the rules, milestone rewards and the board. New puzzles every Monday. */
+/** Light Rush: this week's best on a road of gifts, the run, its rules as pictures, and the board. New puzzles every Monday. */
 export default function RushScreen() {
   const { progress, recordRushRun } = usePlayer();
   const rush = useRushRun();
@@ -40,34 +32,42 @@ export default function RushScreen() {
     <div className={styles.page}>
       <ScreenHeader title={t('rush.title')} />
       <main className={styles.main}>
-        <section className={styles.hero} aria-labelledby="rush-title">
-          <span className={styles.heroIcon} aria-hidden="true">
-            <Icon name="bolt" size={40} strokeWidth={2.4} />
-          </span>
-          <div>
-            <p className={styles.kicker}>{t('rush.thisWeek')}</p>
-            <h2 id="rush-title" className={`game-title ${styles.heroTitle}`}>
-              {t('rush.heroTitle')}
-            </h2>
-            <p className={styles.best}>
-              {withParts(t('rush.yourBest', { total: RUSH_LENGTH }), { best: <strong className="game-title">{record.best}</strong> })}
+        <section className={styles.hero} aria-label={t('rush.yourBest', { best: record.best, total: RUSH_LENGTH })}>
+          <div className={styles.heroTop}>
+            <span className={styles.heroIcon} aria-hidden="true">
+              <Icon name="bolt" size={36} strokeWidth={2.4} />
+            </span>
+            <p className={styles.best} aria-hidden="true">
+              <Icon name="trophy" size={22} />
+              <strong className="game-title">{record.best}</strong>
+              <span className={styles.of}>/{RUSH_LENGTH}</span>
             </p>
           </div>
+          <RushMilestones record={record} />
         </section>
 
         {!isUnlocked ? (
-          <section className={styles.card}>
-            <LumiSays mood="happy" size={72} line={t('rush.locked', { n: RUSH_UNLOCK_WORLDS })} />
+          <section className={`${styles.card} ${styles.locked}`}>
+            <span className={styles.lockIcon} aria-hidden="true">
+              <Icon name="lock" size={28} />
+            </span>
+            <p className="game-title">{t('rush.locked', { n: RUSH_UNLOCK_WORLDS })}</p>
           </section>
         ) : (
           <section className={styles.card} aria-label={t('rush.playLabel')}>
             {rush.run ? (
               <>
-                <p className={styles.runStatus}>
-                  {withParts(t('rush.inProgress', { total: RUSH_LENGTH }), {
-                    n: <strong>{rush.run.cleared + 1}</strong>,
-                    spare: <strong>{rush.run.spare}</strong>,
-                  })}
+                <p
+                  className={styles.runStatus}
+                  aria-label={t('rush.inProgress', { n: rush.run.cleared + 1, total: RUSH_LENGTH, spare: rush.run.spare })}
+                >
+                  <span className={styles.runChip} aria-hidden="true">
+                    <span className="game-title">{rush.run.cleared + 1}</span>/{RUSH_LENGTH}
+                  </span>
+                  <span className={`${styles.runChip} ${styles.spareChip}`} aria-hidden="true">
+                    <Icon name="bolt" size={18} />
+                    <span className="game-title">{rush.run.spare}</span>
+                  </span>
                 </p>
                 <Button size="lg" icon="play" onClick={() => navigate('#/rush/play')}>
                   {t('rush.continue')}
@@ -81,22 +81,11 @@ export default function RushScreen() {
                 {t('rush.start')}
               </Button>
             )}
-            <ul className={styles.rules}>
-              {RULES.map((rule) => (
-                <li key={rule.icon}>
-                  <span className={styles.ruleIcon} aria-hidden="true">
-                    <Icon name={rule.icon} size={18} />
-                  </span>
-                  {t(rule.key, rule.params)}
-                </li>
-              ))}
-            </ul>
+            <RushRules />
           </section>
         )}
 
-        <RushMilestones record={record} />
         <RushBoard />
-        <p className={styles.footnote}>{t('rush.footnote')}</p>
       </main>
       <BottomNav active="map" />
     </div>

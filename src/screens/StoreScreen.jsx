@@ -9,7 +9,7 @@ import ShelfItem from './store/ShelfItem.jsx';
 import ItemInfoDialog from './store/ItemInfoDialog.jsx';
 import DailyGift from '../components/game/DailyGift.jsx';
 import PalShop from './store/PalShop.jsx';
-import HelpTip from './store/HelpTip.jsx';
+import HelpTip from '../components/game/HelpTip.jsx';
 import SignInNote from './store/SignInNote.jsx';
 import BuysLeft from './store/BuysLeft.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';

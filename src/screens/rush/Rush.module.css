@@ -28,28 +28,45 @@
   color: var(--text-soft);
 }
 
-.muted a {
-  color: var(--text-strong);
-}
-
-/* ---------- Hero ---------- */
-.hero {
+.boardTitle {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4);
+  gap: 6px;
+}
+
+.boardTitle svg {
+  color: var(--reward-label);
+}
+
+.join {
+  justify-self: center;
+}
+
+/* ---------- Hero: this week's best on the road of gifts ---------- */
+.hero {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3) 0;
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--color-peach) 34%, var(--surface-raised));
   box-shadow: var(--highlight), var(--shadow-md);
+}
+
+.heroTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0 var(--space-2);
 }
 
 .heroIcon {
   flex: none;
   display: grid;
   place-items: center;
-  width: 68px;
-  height: 68px;
-  border-radius: 22px;
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
   color: var(--warm-label);
   background: var(--warm-bottom);
   box-shadow: var(--shadow-sm);
@@ -66,103 +83,83 @@
   }
 }
 
-.kicker {
+.best {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin: 0;
-  font-size: 12px;
+  direction: ltr;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--text-strong);
 }
 
-.heroTitle {
-  margin: 0;
-  font-size: 26px;
-  line-height: 1.1;
-}
-
-.best {
-  margin: 4px 0 0;
-  font-weight: 700;
+.best svg {
+  color: var(--reward-label);
 }
 
 .best strong {
-  font-size: 22px;
+  font-size: 40px;
+  line-height: 1;
+}
+
+.of {
+  font-size: 18px;
+  color: var(--text-soft);
 }
 
 /* ---------- Play ---------- */
-.runStatus {
-  margin: 0;
-  font-weight: 700;
+.locked {
+  justify-items: center;
   text-align: center;
 }
 
-.rules {
-  display: grid;
-  gap: var(--space-2);
+.locked p {
   margin: 0;
-  padding: 0;
-  list-style: none;
-  font-weight: 600;
+  font-size: 18px;
 }
 
-.rules li {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
-}
-
-.ruleIcon {
-  flex: none;
+.lockIcon {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  color: var(--warm-label);
-  background: color-mix(in srgb, var(--color-peach) 40%, var(--surface-raised));
-}
-
-/* ---------- Milestones ---------- */
-.milestones {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.milestones li {
-  display: grid;
-  justify-items: center;
-  padding: var(--space-2) 4px;
-  border-radius: var(--radius-md);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  color: var(--text-soft);
   background: var(--surface-sunken);
 }
 
-.milestones li.reached {
-  color: var(--reward-label);
-  background: var(--reward-bottom);
+.runStatus {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0;
 }
 
-.milestoneCount {
-  font-size: 24px;
-  line-height: 1.1;
-}
-
-.milestoneLabel {
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.milestoneReward {
+.runChip {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  margin-top: 4px;
-  font-size: 13px;
+  gap: 4px;
+  min-height: 40px;
+  padding: 4px 14px;
+  border-radius: var(--radius-pill);
+  direction: ltr;
   font-weight: 800;
+  color: var(--text-soft);
+  background: var(--surface-sunken);
+}
+
+.runChip :global(.game-title) {
+  font-size: 24px;
+  color: var(--text-strong);
+}
+
+.spareChip {
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+}
+
+.spareChip :global(.game-title) {
+  color: inherit;
 }
 
 /* ---------- Board ---------- */
@@ -204,14 +201,6 @@
 
 .score strong {
   font-size: 18px;
-}
-
-.footnote {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  text-align: center;
-  color: var(--text-soft);
 }
 
 @media (prefers-reduced-motion: reduce) {

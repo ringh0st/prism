@@ -24,10 +24,21 @@
   stroke-width: 0.4;
 }
 
+.title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.titleIcon {
+  color: var(--color-honey);
+}
+
+/* Lumi hosts; your partner Pal waits beside her, with a swap badge to change partners */
 .host {
   display: flex;
   align-items: flex-end;
-  min-height: 138px;
+  justify-content: space-between;
   padding: 0 var(--space-4);
 }
 
@@ -114,61 +125,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Paper notes, as in the shop */
-.note {
-  position: relative;
-  padding: var(--space-4);
-  border-radius: 6px;
-  font-weight: 700;
-  background: var(--paper);
-  box-shadow: var(--shadow-md);
-  transform: rotate(-0.5deg);
-}
-
-.note::before {
-  content: '';
-  position: absolute;
-  top: -6px;
-  left: 50%;
-  width: 14px;
-  height: 14px;
-  margin-inline-start: -7px;
-  border-radius: 50%;
-  background: var(--color-terracotta);
-  box-shadow: 0 2px 3px rgba(60, 40, 20, 0.35);
-}
-
-.note h2 {
-  margin-bottom: var(--space-2);
-  font-size: 20px;
-  text-align: center;
-}
-
-.noteRow {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.rules {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.rules li {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.rules svg,
-.noteRow svg {
-  color: var(--color-mint-deep);
-}
-
 .empty {
   padding: var(--space-4);
   text-align: center;
@@ -184,29 +140,38 @@
 }
 
 .playingWith {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin: 0 var(--space-3) var(--space-2);
-  padding-block: 4px;
-  padding-inline: 4px var(--space-3);
-  border-radius: var(--radius-pill);
-  font-weight: 700;
-  text-decoration: none;
-  color: var(--text-strong);
-  background: var(--surface-raised);
-  box-shadow: var(--shadow-sm);
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--space-2);
+  border-radius: 50%;
+  box-shadow: var(--shadow-md);
+  transition: transform 160ms var(--ease-out);
 }
 
-.change {
-  margin-inline-start: auto;
-  font-family: var(--font-display);
-  font-weight: 600;
-  color: var(--text-accent);
+.playingWith:active {
+  transform: scale(0.94);
 }
 
 .playingArt {
-  flex: none;
   border-radius: 50%;
-  background: var(--surface-sunken);
+  background: var(--surface-raised);
+}
+
+.swap {
+  position: absolute;
+  inset-block-end: -4px;
+  inset-inline-end: -6px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  color: var(--action-label);
+  background: var(--action-bottom);
+  box-shadow: 0 0 0 2px var(--surface-raised);
+}
+
+.join {
+  justify-self: center;
 }

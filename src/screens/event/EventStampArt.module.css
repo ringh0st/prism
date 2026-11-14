@@ -1,0 +1,45 @@
+.stamp {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 72px;
+  border: 6px solid transparent;
+  /* A perforated edge (little holes in the border) around a warm face */
+  background:
+    linear-gradient(
+        color-mix(in srgb, var(--color-peach) 26%, var(--surface-raised)),
+        color-mix(in srgb, var(--color-peach) 26%, var(--surface-raised))
+      )
+      padding-box,
+    radial-gradient(circle, var(--surface-raised) 2.5px, color-mix(in srgb, var(--color-peach) 55%, var(--surface-raised)) 3px) -1px -1px / 9px 9px
+      border-box;
+  box-shadow: var(--shadow-sm);
+  rotate: -3deg;
+}
+
+.icon {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.sm {
+  width: 44px;
+  height: 50px;
+  border-width: 5px;
+}
+
+.sm .icon {
+  font-size: 20px;
+}
+
+.ghost {
+  border: 3px dashed var(--surface-cell-edge);
+  background: var(--surface-sunken);
+  box-shadow: none;
+}
+
+.ghost .icon {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--text-soft);
+}

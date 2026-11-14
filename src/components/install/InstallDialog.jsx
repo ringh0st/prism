@@ -48,7 +48,10 @@ export default function InstallDialog({ method, onInstall, onLater, onClose }) {
       <ul className={styles.perks}>
         {PERKS.map(([icon, key]) => (
           <li key={key}>
-            <Icon name={icon} size={18} /> {t(key)}
+            <span className={styles.perkIcon} aria-hidden="true">
+              <Icon name={icon} size={22} />
+            </span>
+            {t(key)}
           </li>
         ))}
       </ul>

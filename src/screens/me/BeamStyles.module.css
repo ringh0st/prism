@@ -1,0 +1,81 @@
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.have {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 17px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.swatch {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 6px;
+  min-height: 92px;
+  padding: var(--space-3) 2px var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  font: inherit;
+  background: var(--surface-sunken);
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out);
+}
+
+.swatch:active {
+  transform: scale(0.95);
+}
+
+.selected {
+  background: var(--surface-raised);
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 0 0 3px var(--color-sage);
+}
+
+/* The beam's own light: only light glows in this game */
+.light {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: #2b2118;
+  background: var(--beam);
+  box-shadow: 0 0 14px 2px color-mix(in srgb, var(--beam) 60%, transparent);
+}
+
+.locked {
+  cursor: not-allowed;
+}
+
+.locked .light {
+  color: #fff;
+  box-shadow: none;
+  opacity: 0.55;
+  filter: saturate(0.6);
+}
+
+.need {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  direction: ltr;
+  font-size: 14px;
+  color: var(--text-soft);
+}

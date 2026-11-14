@@ -1,4 +1,4 @@
-import HelpTip from './HelpTip.jsx';
+import HelpTip from '../../components/game/HelpTip.jsx';
 import ClothesShelf from './ClothesShelf.jsx';
 import { DecorItem } from './GroveShelf.jsx';
 import { nextTheme, themeOfWeek } from '../../game/themes.js';

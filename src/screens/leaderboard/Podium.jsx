@@ -2,7 +2,6 @@ import Icon from '../../components/Icon.jsx';
 import { weeklyRewardFor } from '../../game/catalog.js';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { animalAvatar } from './animalAvatar.js';
-import TitleBadge from '../../components/game/TitleBadge.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './Podium.module.css';
 
@@ -37,17 +36,24 @@ export default function Podium({ top, onOpen }) {
               )}
               {rank === 1 && <Icon name="crown" size={26} className={styles.crown} />}
             </span>
-            <span className={styles.name}>{row ? row.nickname : t('top.upForGrabs')}</span>
-            {row?.stars != null && <TitleBadge stars={row.stars} />}
+            {row ? <span className={styles.name}>{row.nickname}</span> : <span className="visually-hidden">{t('top.upForGrabs')}</span>}
             {row && (
-              <span className={`game-title ${styles.score}`}>
-                {row.score} <span className={styles.points}>{t('top.pts')}</span>
+              <span className={`game-title ${styles.score}`} aria-hidden="true">
+                <Icon name="trophy" size={14} className={styles.points} />
+                {row.score}
               </span>
             )}
             <span className={styles.step}>
               <span className={`game-title ${styles.rank}`}>{rank}</span>
-              <span className={styles.prize} aria-label={t('top.prizeLabel', { diamonds: reward.diamonds, sparks: reward.sparks })}>
-                <Icon name="diamond" size={13} /> {reward.diamonds} <Icon name="spark" size={13} /> {reward.sparks}
+              <span className={styles.prize} role="img" aria-label={t('top.prizeLabel', { diamonds: reward.diamonds, sparks: reward.sparks })}>
+                <span className={styles.prizeItem}>
+                  <Icon name="diamond" size={14} />
+                  {reward.diamonds}
+                </span>
+                <span className={styles.prizeItem}>
+                  <Icon name="spark" size={14} />
+                  {reward.sparks}
+                </span>
               </span>
             </span>
           </li>

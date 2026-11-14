@@ -4,7 +4,7 @@ import BottomNav from '../../components/game/BottomNav.jsx';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
-import HowTip from '../../components/pals/HowTip.jsx';
+import HelpTip from '../../components/game/HelpTip.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { GLOWBUGS, rescuedGlowbugs } from '../../game/glowbugs.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
@@ -42,9 +42,9 @@ export default function GlowbugGarden() {
               {found}/{GLOWBUGS.length}
             </span>
           </div>
-          <HowTip title={t('garden.title')}>
+          <HelpTip title={t('garden.title')}>
             <p>{t('garden.how')}</p>
-          </HowTip>
+          </HelpTip>
         </section>
         <ul className={styles.grid}>
           {GLOWBUGS.map((bug) => {

@@ -22,12 +22,6 @@
   font-size: 20px;
 }
 
-.muted {
-  margin: 0;
-  font-weight: 700;
-  color: var(--text-soft);
-}
-
 /* ---------- Theme banner ---------- */
 .banner {
   display: flex;
@@ -139,11 +133,11 @@ a.puzzle:active {
 }
 
 .hard {
-  padding: 0 6px;
-  border-radius: var(--radius-pill);
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
   color: var(--warm-label);
   background: var(--warm-bottom);
 }
@@ -152,23 +146,12 @@ a.puzzle:active {
 .prize {
   display: grid;
   grid-template-columns: auto 1fr;
-  align-items: start;
+  align-items: center;
   gap: var(--space-3);
   padding: var(--space-4);
   border-radius: var(--radius-lg);
   background: var(--surface-raised);
   box-shadow: var(--highlight), var(--shadow-md);
-}
-
-.prize h2 {
-  margin: 0;
-  font-size: 20px;
-}
-
-.prize p {
-  margin: 4px 0 var(--space-2);
-  font-weight: 700;
-  color: var(--text-soft);
 }
 
 .prizeReady {
@@ -204,21 +187,65 @@ a.puzzle:active {
   }
 }
 
-.meter {
-  height: 12px;
-  margin-bottom: var(--space-2);
-  padding: 2px;
-  border-radius: var(--radius-pill);
-  background: var(--surface-sunken);
+.prizeBody {
+  display: grid;
+  gap: var(--space-2);
 }
 
-.meter span {
-  display: block;
+/* Puzzles solved: a bar with the count on it */
+.meter {
+  position: relative;
+  display: grid;
+  height: 24px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
+}
+
+.meterFill {
+  grid-area: 1 / 1;
+  justify-self: start;
   height: 100%;
-  min-width: 8px;
   border-radius: inherit;
   background: var(--color-sage);
   transition: width 500ms var(--ease-out);
+}
+
+.meterText {
+  grid-area: 1 / 1;
+  place-self: center;
+  direction: ltr;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+/* What's inside: sparks and the stamp */
+.loot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.lootSparks {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  direction: ltr;
+  font-size: 22px;
+  color: var(--reward-label);
+}
+
+.collected {
+  font-size: 18px;
+  color: var(--text-calm);
+}
+
+.prizeMessage {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-soft);
 }
 
 .prizeMessage:empty {
@@ -252,29 +279,43 @@ a.puzzle:active {
 .stamp {
   display: grid;
   justify-items: center;
-  gap: 2px;
-  padding: var(--space-3) var(--space-2);
-  border: 6px solid transparent;
+  gap: 4px;
+  padding: var(--space-2) 4px;
   text-align: center;
-  /* A postage stamp: a perforated edge (little holes in the border) around a warm face */
-  background:
-    linear-gradient(
-        color-mix(in srgb, var(--color-peach) 26%, var(--surface-raised)),
-        color-mix(in srgb, var(--color-peach) 26%, var(--surface-raised))
-      )
-      padding-box,
-    radial-gradient(circle, var(--surface-raised) 2.5px, color-mix(in srgb, var(--color-peach) 55%, var(--surface-raised)) 3px) -1px -1px / 9px 9px
-      border-box;
-  box-shadow: var(--shadow-sm);
-  rotate: -2deg;
 }
 
-.stamp:nth-child(even) {
-  rotate: 2deg;
+.stamp:nth-child(even) > :first-child {
+  rotate: 3deg;
 }
 
-.stampIcon {
-  font-size: 30px;
+.emptyStamps {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+/* Next weekend at a glance: 10 puzzles, the prize, the stamp */
+.aboutChips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aboutChips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  direction: ltr;
+  font-size: 22px;
+  color: var(--reward-label);
 }
 
 .stampName {

@@ -6,7 +6,6 @@ import Dialog from '../components/Dialog.jsx';
 import Icon from '../components/Icon.jsx';
 import { useAuth } from '../state/AuthContext.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
-import { BEAM_THEMES, totalStars } from '../game/progress.js';
 import { APPLE_SIGN_IN_ENABLED, PRIVACY_URL, HOME_PAGE_URL, TERMS_URL } from '../lib/config.js';
 import { fetchEnabledProviders } from '../lib/authProviders.js';
 import PlayerCard from './me/PlayerCard.jsx';
@@ -15,6 +14,8 @@ import { APP_VERSION, COPYRIGHT_YEAR, STORE_NAME, STUDIO_NAME } from '../lib/app
 import InstallSettingsCard from '../components/install/InstallSettingsCard.jsx';
 import HowToPlayCard from './me/HowToPlayCard.jsx';
 import LanguageCard from './me/LanguageCard.jsx';
+import FeelToggles from './me/FeelToggles.jsx';
+import BeamStyles from './me/BeamStyles.jsx';
 import { useI18n } from '../i18n/I18nContext.jsx';
 
 function GoogleLogo() {
@@ -42,25 +43,7 @@ function AppleLogo() {
   );
 }
 
-function Toggle({ id, label, description, checked, disabled = false, onChange }) {
-  return (
-    <label className={styles.toggleRow} htmlFor={id}>
-      <span>
-        <span className={styles.rowTitle}>{label}</span>
-        {description && <span className={styles.rowHint}>{description}</span>}
-      </span>
-      <input
-        id={id}
-        type="checkbox"
-        role="switch"
-        className={styles.switch}
-        checked={checked}
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.checked)}
-      />
-    </label>
-  );
-}
+const SYNC_ICONS = { local: 'phone', syncing: 'restart', synced: 'check', error: 'phone' };
 
 function AccountCard() {
   const { user, isAdmin, signInWithGoogle, signInWithApple, signOut, deleteAccount } = useAuth();
@@ -99,7 +82,9 @@ function AccountCard() {
       <h2 id="account-title">{t('me.account.title')}</h2>
       {user ? (
         <>
-          <p className={styles.rowHint}>{t(`me.sync.${syncStatus}`)}</p>
+          <p className={`${styles.sync} ${styles[syncStatus] ?? ''}`} role="status">
+            <Icon name={SYNC_ICONS[syncStatus] ?? 'check'} size={18} /> {t(`me.sync.${syncStatus}`)}
+          </p>
           <div className={styles.buttonRow}>
             {isAdmin && (
               <Button as="a" href="#/admin" icon="edit">
@@ -116,7 +101,9 @@ function AccountCard() {
         </>
       ) : (
         <>
-          <p className={styles.rowHint}>{t('me.account.guest')}</p>
+          <p className={styles.sync}>
+            <Icon name="user" size={18} /> {t('me.account.guest')}
+          </p>
           <div className={styles.signInButtons}>
             {hasApple && (
               <button type="button" className={styles.appleButton} onClick={() => startSignIn(signInWithApple)}>
@@ -152,10 +139,9 @@ function AccountCard() {
 }
 
 export default function SettingsScreen() {
-  const { progress, settings, updateSettings, setBeamTheme, resetLocalProgress } = usePlayer();
+  const { resetLocalProgress } = usePlayer();
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
   const { t } = useI18n();
-  const stars = totalStars(progress);
 
   return (
     <div className={styles.page}>
@@ -169,62 +155,9 @@ export default function SettingsScreen() {
 
         <HowToPlayCard className={styles.card} />
 
-        <section className={styles.card} aria-labelledby="feel-title">
-          <h2 id="feel-title">{t('settings.feel')}</h2>
-          <Toggle id="sound" label={t('settings.sound')} checked={settings.sound} onChange={(sound) => updateSettings({ sound })} />
-          <Toggle
-            id="music"
-            label={t('settings.music')}
-            description={t(settings.sound ? 'settings.musicHint' : 'settings.musicNeedsSound')}
-            checked={settings.music && settings.sound}
-            disabled={!settings.sound}
-            onChange={(isOn) => updateSettings({ music: isOn })}
-          />
-          <Toggle
-            id="haptics"
-            label={t('settings.vibration')}
-            description={t('settings.vibrationHint')}
-            checked={settings.haptics}
-            onChange={(haptics) => updateSettings({ haptics })}
-          />
-          <Toggle
-            id="calm-board"
-            label={t('settings.calm')}
-            description={t('settings.calmHint')}
-            checked={settings.calmBoard}
-            onChange={(calmBoard) => updateSettings({ calmBoard })}
-          />
-        </section>
+        <FeelToggles className={styles.card} />
 
-        <section className={styles.card} aria-labelledby="beam-title">
-          <h2 id="beam-title">{t('me.beam.title')}</h2>
-          <p className={styles.rowHint}>{t('me.beam.hint', { stars })}</p>
-          <div className={styles.themes} role="radiogroup" aria-labelledby="beam-title">
-            {BEAM_THEMES.map((theme) => {
-              const isUnlocked = stars >= theme.starsToUnlock;
-              const isSelected = progress.beamTheme === theme.id;
-              return (
-                <button
-                  key={theme.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  aria-disabled={!isUnlocked}
-                  className={`${styles.theme} ${isSelected ? styles.themeSelected : ''}`}
-                  onClick={() => isUnlocked && setBeamTheme(theme.id)}
-                >
-                  <span className={styles.themeSwatch} style={{ background: theme.color, color: theme.color }}>
-                    {!isUnlocked && <Icon name="lock" size={16} />}
-                  </span>
-                  <span className={styles.themeName}>{t(`beam.${theme.id}`, {}, theme.name)}</span>
-                  <span className={styles.rowHint}>
-                    {isUnlocked ? t(isSelected ? 'me.beam.inUse' : 'me.beam.unlocked') : `${theme.starsToUnlock} ★`}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
+        <BeamStyles className={styles.card} />
 
         <InstallSettingsCard className={styles.card} />
 

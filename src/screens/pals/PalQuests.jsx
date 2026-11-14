@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
-import HowTip from '../../components/pals/HowTip.jsx';
+import HelpTip from '../../components/game/HelpTip.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { palById, stageOf } from '../../game/pals.js';
 import { isQuestReady, questCount, questLogFor, questsForWeek, questWeekOf } from '../../game/quests.js';
@@ -63,9 +63,9 @@ export default function PalQuests() {
             </span>
           </p>
         </div>
-        <HowTip title={t('pals.quests.title', { name })}>
+        <HelpTip title={t('pals.quests.title', { name })}>
           <p>{t('pals.quests.how')}</p>
-        </HowTip>
+        </HelpTip>
       </div>
       <ul className={styles.list}>
         {quests.map((quest) => {

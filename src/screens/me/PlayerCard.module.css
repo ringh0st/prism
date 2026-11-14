@@ -48,13 +48,6 @@
   overflow-wrap: anywhere;
 }
 
-.nickname {
-  margin-top: -4px;
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--text-soft);
-}
-
 .title {
   display: grid;
   justify-items: center;
@@ -67,9 +60,19 @@
   justify-self: center;
 }
 
-.track {
+.glowRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   width: 100%;
-  height: 12px;
+}
+
+/* Stars toward the next Glow: a bar with the count on it, and the next Glow at its end */
+.track {
+  position: relative;
+  display: grid;
+  flex: 1;
+  height: 22px;
   overflow: hidden;
   border-radius: var(--radius-pill);
   background: var(--surface-sunken);
@@ -77,27 +80,39 @@
 }
 
 .fill {
-  display: block;
+  grid-area: 1 / 1;
+  justify-self: start;
   height: 100%;
   border-radius: inherit;
   background: var(--color-honey);
   transition: width 600ms var(--ease-out);
 }
 
-.nextTitle {
-  font-weight: 700;
+.trackText {
+  grid-area: 1 / 1;
+  place-self: center;
+  direction: ltr;
+  font-family: var(--font-display);
   font-size: 14px;
-  color: var(--text-soft);
+  font-weight: 700;
+  color: var(--text-strong);
 }
 
-.nextTitle strong {
-  color: var(--text-strong);
+.nextGlow {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
 }
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
   width: 100%;
   margin: var(--space-2) 0 0;
   padding: 0;
@@ -106,23 +121,39 @@
 
 .stat {
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
-  column-gap: var(--space-2);
-  align-items: center;
-  padding: var(--space-3);
+  justify-items: center;
+  align-content: start;
+  gap: 4px;
+  padding: var(--space-2) 2px;
   border-radius: var(--radius-md);
-  text-align: start;
+  text-align: center;
   background: var(--surface-tonal);
 }
 
 .statIcon {
-  grid-row: span 2;
+  position: relative;
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 14px;
+}
+
+/* Streak shields: a little badge on the flame */
+.shields {
+  position: absolute;
+  inset-block-start: -6px;
+  inset-inline-end: -10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 1px 5px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+  box-shadow: 0 0 0 2px var(--surface-raised);
 }
 
 .honey {
@@ -151,22 +182,17 @@
 }
 
 .statValue {
-  font-size: 22px;
+  direction: ltr;
+  font-size: 20px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
 .statLabel {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
+  line-height: 1.15;
   color: var(--text-soft);
-}
-
-.statNote {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  color: var(--text-calm);
 }
 
 .nicknameButton {
@@ -188,11 +214,6 @@
 
 .nicknameButton strong {
   color: var(--text-strong);
-}
-
-/* An odd number of stats: the last one spans the row */
-.stats > li:last-child:nth-child(odd) {
-  grid-column: 1 / -1;
 }
 
 /* Ways into the sticker album and the Glowbug Garden */

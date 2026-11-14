@@ -5,7 +5,7 @@ import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import GroveScene from '../../components/grove/GroveScene.jsx';
 import GroveItemArt from '../../components/grove/GroveItemArt.jsx';
-import HowTip from '../../components/pals/HowTip.jsx';
+import HelpTip from '../../components/game/HelpTip.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { ALL_DECOR, GROVE_ITEMS, GROVE_SPOTS } from '../../game/grove.js';
 import { finishedWorldCount } from '../../game/titles.js';
@@ -91,9 +91,9 @@ export default function GroveScreen() {
       <ScreenHeader title={t('grove.decorate')} backHref="#/pals/grove" />
       <main className={styles.main}>
         <div className={styles.preview}>
-          <HowTip title={t('grove.decorate')} className={styles.how}>
+          <HelpTip title={t('grove.decorate')} className={styles.how}>
             <p>{t('grove.decorateHelp')}</p>
-          </HowTip>
+          </HelpTip>
           <GroveScene
             placed={progress.grove.placed}
             partnerId={progress.pal.id}

@@ -1,5 +1,5 @@
 import Icon from '../../components/Icon.jsx';
-import HowTip from '../../components/pals/HowTip.jsx';
+import HelpTip from '../../components/game/HelpTip.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { LUCKY_PAL_EVERY, LUCKY_PAL_ODDS, solvedLevelCount } from '../../game/pals.js';
 import styles from './LuckyPal.module.css';
@@ -29,10 +29,10 @@ export default function LuckyPalProgress() {
         <h2 id="lucky-title" className="game-title">
           {t('pals.lucky.title')}
         </h2>
-        <HowTip title={t('pals.lucky.title')}>
+        <HelpTip title={t('pals.lucky.title')}>
           <p>{t('pals.lucky.line', { every: LUCKY_PAL_EVERY, left: LUCKY_PAL_EVERY - toward })}</p>
           <p>{oddsText}</p>
-        </HowTip>
+        </HelpTip>
       </div>
       <div className={styles.road}>
         <div

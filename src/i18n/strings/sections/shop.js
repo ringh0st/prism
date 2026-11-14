@@ -24,8 +24,6 @@ export const en = {
   'shop.helpers.helpCap': 'Hold up to {cap} of each.',
   'shop.helpers.helpDaily.other': 'Buy up to {count} with sparks each day.',
   'shop.helpers.helpStars': 'Using a helper lowers the most stars you can get in that level.',
-  'shop.help.aria': 'How it works: {topic}',
-  'shop.help.ok': 'Got it!',
 
   'shop.sparks.unit': 'sparks',
   'shop.sparks.amount.other': '{count} sparks',
@@ -196,8 +194,6 @@ export const es = {
   'shop.helpers.helpCap': 'Puedes tener hasta {cap} de cada una.',
   'shop.helpers.helpDaily.other': 'Compra hasta {count} con chispas cada día.',
   'shop.helpers.helpStars': 'Usar una ayuda baja las estrellas máximas de ese nivel.',
-  'shop.help.aria': 'Cómo funciona: {topic}',
-  'shop.help.ok': '¡Entendido!',
 
   'shop.sparks.unit': 'chispas',
   'shop.sparks.amount.one': '{count} chispa',
@@ -309,8 +305,6 @@ export const he = {
   'shop.helpers.helpCap': 'אפשר להחזיק עד {cap} מכל אחד.',
   'shop.helpers.helpDaily.other': 'אפשר לקנות עד {count} בניצוצות בכל יום.',
   'shop.helpers.helpStars': 'שימוש בעזר מוריד את מספר הכוכבים המקסימלי בשלב.',
-  'shop.help.aria': 'איך זה עובד: {topic}',
-  'shop.help.ok': 'הבנתי!',
 
   'shop.sparks.unit': 'ניצוצות',
   'shop.sparks.amount.one': 'ניצוץ אחד',

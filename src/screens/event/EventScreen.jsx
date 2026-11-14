@@ -4,8 +4,19 @@ import LumiSays from '../../components/game/LumiSays.jsx';
 import EventPuzzles from './EventPuzzles.jsx';
 import EventPrize from './EventPrize.jsx';
 import EventStamps from './EventStamps.jsx';
+import EventStampArt from './EventStampArt.jsx';
+import Icon from '../../components/Icon.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { EVENT_UNLOCK_WORLDS, eventProgressOf, eventThemeFor, eventWeekendOf, isEventPrizeReady, nextEventWeekend } from '../../game/events.js';
+import {
+  EVENT_LEVELS,
+  EVENT_PRIZE_SPARKS,
+  EVENT_UNLOCK_WORLDS,
+  eventProgressOf,
+  eventThemeFor,
+  eventWeekendOf,
+  isEventPrizeReady,
+  nextEventWeekend,
+} from '../../game/events.js';
 import { finishedWorldCount } from '../../game/titles.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { eventThemeText } from '../../i18n/extrasText.js';
@@ -21,7 +32,7 @@ function ThemeBanner({ theme, note }) {
         {theme.icon}
       </span>
       <div>
-        <p className={styles.kicker}>{note}</p>
+        {note && <p className={styles.kicker}>{note}</p>}
         <h2 className={`game-title ${styles.themeName}`}>{name}</h2>
         <p className={styles.tagline}>{tagline}</p>
       </div>
@@ -49,12 +60,12 @@ export default function EventScreen() {
       <main className={styles.main}>
         {!isUnlocked ? (
           <section className={styles.card}>
-            <LumiSays mood="happy" size={72} line={t('event.locked')} />
+            <LumiSays mood="happy" size={64} line={t('event.locked')} />
           </section>
         ) : weekend ? (
           <>
             <section className={styles.card} aria-label={t('event.thisWeekendLabel')}>
-              <ThemeBanner theme={eventThemeFor(weekend)} note={t('event.thisWeekend')} />
+              <ThemeBanner theme={eventThemeFor(weekend)} />
               <EventPuzzles stars={eventProgressOf(progress, weekend).stars} />
             </section>
             <EventPrize weekend={weekend} theme={eventThemeFor(weekend)} eventProgress={eventProgressOf(progress, weekend)} />
@@ -62,7 +73,20 @@ export default function EventScreen() {
         ) : (
           <section className={styles.card} aria-label={t('event.nextLabel')}>
             <ThemeBanner theme={eventThemeFor(nextEventWeekend())} note={t('event.comingSaturday')} />
-            <p className={styles.muted}>{t('event.about')}</p>
+            <ul className={styles.aboutChips} aria-label={t('event.about')}>
+              <li aria-hidden="true">
+                <Icon name="calendar" size={18} />
+                <span className="game-title">{EVENT_LEVELS}</span>
+              </li>
+              <li aria-hidden="true">
+                <Icon name="chest" size={18} />
+                <span className="game-title">+{EVENT_PRIZE_SPARKS}</span>
+                <Icon name="spark" size={16} />
+              </li>
+              <li aria-hidden="true">
+                <EventStampArt icon={eventThemeFor(nextEventWeekend()).icon} size="sm" />
+              </li>
+            </ul>
           </section>
         )}
         {waitingPrize && (

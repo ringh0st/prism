@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import Lumi from '../../components/game/Lumi.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
-import { PALS, palById, palStage, stageOf } from '../../game/pals.js';
+import { PALS, palById, stageOf } from '../../game/pals.js';
 import Icon from '../../components/Icon.jsx';
 import { useAuth } from '../../state/AuthContext.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { currentStreak, totalStars } from '../../game/progress.js';
-import { finishedWorldCount, playerLevelFor, titleFor } from '../../game/titles.js';
+import { finishedWorldCount, playerLevelFor } from '../../game/titles.js';
 import { todayKey } from '../../game/daily.js';
 import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
 import NicknameDialog from './NicknameDialog.jsx';
@@ -16,44 +16,36 @@ import styles from './PlayerCard.module.css';
 import { earnedStickers } from '../../game/stickers.js';
 import { rescuedGlowbugs } from '../../game/glowbugs.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
-import { palWithSpecies } from '../../i18n/palText.js';
 
-function Stat({ icon, tone, value, label, note = null }) {
+/** One stat as a picture: a colored icon, a big number and one word under it. `extra` is a small badge (streak shields). */
+function Stat({ icon, tone, value, label, extra = null }) {
   return (
     <li className={styles.stat}>
-      <span className={`${styles.statIcon} ${styles[tone]}`} aria-hidden="true">
+      <span className={`${styles.statIcon} ${styles[tone]}`}>
         <Icon name={icon} size={20} />
+        {extra}
       </span>
       <span className={`game-title ${styles.statValue}`}>{value}</span>
-      <span className={styles.statLabel}>
-        {label}
-        {note && (
-          <span className={styles.statNote}>
-            <Icon name="shield" size={13} /> {note}
-          </span>
-        )}
-      </span>
+      <span className={styles.statLabel}>{label}</span>
     </li>
   );
 }
 
-/** "Me": who you are in the game, your title, and what you've achieved. */
+/** "Me": who you are in the game, your Glow and title, and what you've achieved, as pictures and numbers. */
 export default function PlayerCard() {
   const { user, displayName, avatarUrl } = useAuth();
   const { progress } = usePlayer();
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const [nickname, setNickname] = useState(null);
   const [isEditingNickname, setIsEditingNickname] = useState(false);
   const shownNickname = progress.nickname ?? nickname;
   const stars = totalStars(progress);
-  const { next } = titleFor(stars);
   const playerLevel = playerLevelFor(stars);
   const solved = Object.values(progress.levels).filter((entry) => entry.stars > 0).length;
   const streak = currentStreak(progress, todayKey());
   const shields = progress.daily.shields ?? 0;
   const partner = palById(progress.pal.id);
   const partnerStage = partner ? stageOf(progress.pal.owned[partner.id]) : 0;
-  const nextTitle = next && t(`title.${next.tone}`, {}, next.name);
 
   // The public nickname shown on the Top board (signed-in players only).
   useEffect(() => {
@@ -82,22 +74,14 @@ export default function PlayerCard() {
       <h2 id="player-name" className={`game-title ${styles.name}`}>
         {user ? displayName : t('me.guest')}
       </h2>
-      {partner && (
-        <p className={styles.nickname}>
-          {t('me.partner', {
-            who: palWithSpecies(lang, partner),
-            stage: t(`stage.${palStage(partnerStage).id}`, {}, palStage(partnerStage).name),
-          })}
-        </p>
-      )}
-      <button type="button" className={styles.nicknameButton} onClick={() => setIsEditingNickname(true)}>
-        {shownNickname ? (
-          <>
-            {t(user ? 'me.nickname.onBoard' : 'me.nickname.label')} <strong>{shownNickname}</strong>
-          </>
-        ) : (
-          t('me.nickname.choose')
-        )}
+      <button
+        type="button"
+        className={styles.nicknameButton}
+        onClick={() => setIsEditingNickname(true)}
+        aria-label={shownNickname ? `${t(user ? 'me.nickname.onBoard' : 'me.nickname.label')} ${shownNickname}` : t('me.nickname.choose')}
+      >
+        <Icon name="trophy" size={16} />
+        {shownNickname ? <strong>{shownNickname}</strong> : t('me.nickname.choose')}
         <Icon name="edit" size={14} />
       </button>
       {isEditingNickname && (
@@ -106,25 +90,25 @@ export default function PlayerCard() {
 
       <div className={styles.title}>
         <TitleBadge stars={stars} size="lg" className={styles.titleChip} />
-        <div
-          className={styles.track}
-          role="progressbar"
-          aria-label={t('me.glowProgress', { n: playerLevel.level + 1 })}
-          aria-valuemin={playerLevel.from}
-          aria-valuemax={playerLevel.to}
-          aria-valuenow={stars}
-        >
-          <span className={styles.fill} style={{ width: `${Math.round(playerLevel.progress * 100)}%` }} />
+        <div className={styles.glowRow}>
+          <div
+            className={styles.track}
+            role="progressbar"
+            aria-label={t('me.glowProgress', { n: playerLevel.level + 1 })}
+            aria-valuemin={playerLevel.from}
+            aria-valuemax={playerLevel.to}
+            aria-valuenow={stars}
+          >
+            <span className={styles.fill} style={{ width: `${Math.round(playerLevel.progress * 100)}%` }} />
+            <span className={styles.trackText} aria-hidden="true">
+              {stars}/{playerLevel.to}
+            </span>
+          </div>
+          <span className={`game-title ${styles.nextGlow}`} aria-hidden="true">
+            <Icon name="star" size={13} />
+            {playerLevel.level + 1}
+          </span>
         </div>
-        <p className={styles.nextTitle}>
-          {t('me.toGlow', { count: playerLevel.to - stars })} <strong>{t('me.glow', { n: playerLevel.level + 1 })}</strong>
-          {next && (
-            <>
-              {' '}
-              {t('me.toTitle', { n: next.stars - stars })} <strong>{nextTitle}</strong>
-            </>
-          )}
-        </p>
       </div>
       <TitleRoad stars={stars} />
 
@@ -138,7 +122,14 @@ export default function PlayerCard() {
           tone="terracotta"
           value={streak}
           label={t('me.stat.streak')}
-          note={shields > 0 ? t('me.stat.shields', { count: shields }) : null}
+          extra={
+            shields > 0 && (
+              <span className={styles.shields} role="img" aria-label={t('me.stat.shields', { count: shields })}>
+                <Icon name="shield" size={11} />
+                {shields}
+              </span>
+            )
+          }
         />
       </ul>
       <div className={styles.collections}>

@@ -10,7 +10,7 @@ import { PALS, adoptPriceOf, dailyPalPick, rarityOf, stageOf } from '../../game/
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { palName, palSpecies } from '../../i18n/palText.js';
 import { errorText } from '../../i18n/meText.js';
-import HelpTip from './HelpTip.jsx';
+import HelpTip from '../../components/game/HelpTip.jsx';
 import SignInNote from './SignInNote.jsx';
 import AskParent from './AskParent.jsx';
 import styles from './Stall.module.css';

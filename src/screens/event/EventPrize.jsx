@@ -7,10 +7,14 @@ import { rewardShower } from '../../lib/effects.js';
 import { sfx } from '../../audio/sfx.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { eventThemeText } from '../../i18n/extrasText.js';
+import EventStampArt from './EventStampArt.jsx';
 import styles from './Event.module.css';
 import { errorText } from '../../i18n/meText.js';
 
-/** The prize for finishing all 10: sparks plus the event's stamp. Opens with a shower of stars. */
+/**
+ * The prize for finishing all 10, as pictures: the chest, a meter with the count, and what's inside (sparks
+ * and the event's stamp). Opens with a shower of stars.
+ */
 export default function EventPrize({ weekend, theme, eventProgress }) {
   const { claimEventPrize } = usePlayer();
   const { t, lang } = useI18n();
@@ -31,20 +35,15 @@ export default function EventPrize({ weekend, theme, eventProgress }) {
     }
   };
 
+  const label = eventProgress.claimed
+    ? t('event.prize.stampOwned', { theme: themeName })
+    : t('event.prize.goal', { total: EVENT_LEVELS, sparks: EVENT_PRIZE_SPARKS, theme: themeName });
   return (
-    <section ref={cardRef} className={`${styles.prize} ${isReady ? styles.prizeReady : ''}`} aria-labelledby="prize-title">
+    <section ref={cardRef} className={`${styles.prize} ${isReady ? styles.prizeReady : ''}`} aria-label={label}>
       <span className={styles.chest} aria-hidden="true">
         <Icon name={eventProgress.claimed ? 'check' : 'chest'} size={34} />
       </span>
-      <div>
-        <h2 id="prize-title" className="game-title">
-          {eventProgress.claimed ? t('event.prize.collected') : t('event.prize.title')}
-        </h2>
-        <p>
-          {eventProgress.claimed
-            ? t('event.prize.stampOwned', { theme: themeName })
-            : t('event.prize.goal', { total: EVENT_LEVELS, sparks: EVENT_PRIZE_SPARKS, theme: themeName })}
-        </p>
+      <div className={styles.prizeBody}>
         {!eventProgress.claimed && (
           <div
             className={styles.meter}
@@ -54,9 +53,20 @@ export default function EventPrize({ weekend, theme, eventProgress }) {
             aria-valuenow={solved}
             aria-label={t('event.prize.meter')}
           >
-            <span style={{ width: `${(solved / EVENT_LEVELS) * 100}%` }} />
+            <span className={styles.meterFill} style={{ width: `${(solved / EVENT_LEVELS) * 100}%` }} />
+            <span className={styles.meterText} aria-hidden="true">
+              {solved}/{EVENT_LEVELS}
+            </span>
           </div>
         )}
+        <div className={styles.loot} aria-hidden="true">
+          <span className={`game-title ${styles.lootSparks}`}>
+            +{EVENT_PRIZE_SPARKS}
+            <Icon name="spark" size={18} />
+          </span>
+          <EventStampArt icon={theme.icon} size="sm" />
+          {eventProgress.claimed && <span className={`game-title ${styles.collected}`}>{t('event.prize.collected')}</span>}
+        </div>
         {isReady && (
           <Button icon="gift" onClick={open}>
             {t('event.prize.open')}

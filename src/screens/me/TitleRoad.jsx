@@ -4,7 +4,7 @@ import { PLAYER_TITLES, titleFor } from '../../game/titles.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './TitleRoad.module.css';
 
-/** Every title on one road: the ones earned (✓), the current one, and what each next one needs. */
+/** Every title on one road, as badges: earned ones wear a ✓, the current one shines, later ones show the ★ they need. */
 export default function TitleRoad({ stars }) {
   const { t } = useI18n();
   const { current } = titleFor(stars);
@@ -18,11 +18,8 @@ export default function TitleRoad({ stars }) {
     if (stop) steps.scrollLeft = stop.offsetLeft - (steps.clientWidth - stop.clientWidth) / 2;
   }, [currentIndex]);
   return (
-    <section className={styles.road} aria-labelledby="title-road">
-      <h3 id="title-road" className={styles.heading}>
-        {t('me.road.title')}
-      </h3>
-      <ol ref={stepsRef} className={styles.steps} tabIndex={0} aria-labelledby="title-road">
+    <section className={styles.road} aria-label={t('me.road.title')}>
+      <ol ref={stepsRef} className={styles.steps} tabIndex={0} aria-label={t('me.road.title')}>
         {PLAYER_TITLES.map((title, i) => {
           const state = i < currentIndex ? 'earned' : i === currentIndex ? 'current' : 'ahead';
           return (
@@ -31,7 +28,13 @@ export default function TitleRoad({ stars }) {
                 <Icon name={state === 'ahead' ? 'lock' : state === 'earned' ? 'check' : 'star'} size={16} />
               </span>
               <span className={styles.name}>{t(`title.${title.tone}`, {}, title.name)}</span>
-              <span className={styles.need}>
+              {state === 'ahead' && (
+                <span className={`game-title ${styles.need}`} aria-hidden="true">
+                  <Icon name="star" size={11} />
+                  {title.stars}
+                </span>
+              )}
+              <span className="visually-hidden">
                 {state === 'earned' ? t('me.road.earned') : state === 'current' ? t('me.road.here') : t('me.road.more', { n: title.stars - stars })}
               </span>
             </li>

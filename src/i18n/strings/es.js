@@ -240,7 +240,6 @@ export const es = {
   'settings.calmHint': 'Nada se mueve alrededor del tablero mientras piensas',
 
   'howTo.title': 'Cómo jugar',
-  'howTo.text': 'Cuatro dibujos rápidos: gira espejos, enciende cada gema, gana estrellas.',
   'howTo.show': 'Ver',
 
   'tour.tap': 'Toca un espejo para girarlo',
@@ -355,7 +354,6 @@ export const es = {
   'quips.win3': ['¡PERFECTO! ¡Tres estrellas!', '¡Impecable!', '¡Brillante! Estoy orgulloso.'],
   'quips.win2': ['¡Muy bien! ¿Vamos por tres?', '¡Casi perfecto!'],
   'quips.win1': ['¡Resuelto! Cada estrella cuenta.', '¡Lo logramos!'],
-  'quips.outOfMoves': ['¡Sin movimientos! Pasa a todos.', '¡Uy! Los rayos se enredaron.', 'La luz necesita práctica.'],
   'quips.idle': ['Psst… prueba a tocar un espejo.', '¿Atascado? ¡Una pista puede ayudar!'],
   'quips.streak': ['¡Estás en racha! 🔥', '¡Imparable!'],
 
