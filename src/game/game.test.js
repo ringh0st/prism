@@ -73,7 +73,13 @@ test('solver finds par and hints point to a wrong piece', () => {
   const analysis = analyzeLevel(level);
   assert.equal(analysis.isSolvable, true);
   assert.equal(analysis.par, 1);
-  assert.equal(findHint(level, level.tiles.map((t) => t.orient ?? 0)), 1);
+  assert.equal(
+    findHint(
+      level,
+      level.tiles.map((t) => t.orient ?? 0),
+    ),
+    1,
+  );
 });
 
 test('stars and sparks', () => {
@@ -222,7 +228,9 @@ test('weekly rewards in the database match the game catalog', async () => {
   const { WEEKLY_REWARDS } = await import('./catalog.js');
   const sql = readFileSync(new URL('../../supabase/social.sql', import.meta.url), 'utf8');
   const rewardInSql = (rank) => {
-    for (const [, from, to, diamonds, sparks] of sql.matchAll(/when p_rank (?:= (\d+)|between (\d+) and (\d+)) then '\{"diamonds": (\d+), "sparks": (\d+)\}'/g).map((m) => [m[0], m[1] ?? m[2], m[1] ?? m[3], m[4], m[5]])) {
+    for (const [, from, to, diamonds, sparks] of sql
+      .matchAll(/when p_rank (?:= (\d+)|between (\d+) and (\d+)) then '\{"diamonds": (\d+), "sparks": (\d+)\}'/g)
+      .map((m) => [m[0], m[1] ?? m[2], m[1] ?? m[3], m[4], m[5]])) {
       if (rank >= Number(from) && rank <= Number(to)) return { diamonds: Number(diamonds), sparks: Number(sparks) };
     }
     return null;
@@ -308,12 +316,21 @@ test('pal unlocks and accessory prices match the database', async () => {
     assert.ok(sql.includes(`when '${item.id}' then '{"price": ${item.price}, "slot": "${item.slot}"}'::jsonb`), `${item.id} price and slot`);
   }
   const { ADOPT_PRICES, rarityOf, LUCKY_PAL_EVERY, LUCKY_PAL_FALLBACK_SPARKS } = await import('./pals.js');
-  assert.ok(sql.includes(`when 'mythic' then ${ADOPT_PRICES.mythic} when 'legendary' then ${ADOPT_PRICES.legendary} else ${ADOPT_PRICES.common} end`), 'adopt prices');
+  assert.ok(
+    sql.includes(`when 'mythic' then ${ADOPT_PRICES.mythic} when 'legendary' then ${ADOPT_PRICES.legendary} else ${ADOPT_PRICES.common} end`),
+    'adopt prices',
+  );
   // Same Pal order (daily picks depend on it) and the same rarities on both sides.
   const allPals = sql.slice(sql.indexOf('_all_pals()'), sql.indexOf('_pal_rarity(p_pal text)'));
-  assert.deepEqual([...allPals.matchAll(/'(\w+)'/g)].map((m) => m[1]), PALS.map((pal) => pal.id), 'pal order');
+  assert.deepEqual(
+    [...allPals.matchAll(/'(\w+)'/g)].map((m) => m[1]),
+    PALS.map((pal) => pal.id),
+    'pal order',
+  );
   for (const rarity of ['legendary', 'mythic']) {
-    const ids = PALS.filter((pal) => rarityOf(pal) === rarity).map((pal) => `'${pal.id}'`).join(', ');
+    const ids = PALS.filter((pal) => rarityOf(pal) === rarity)
+      .map((pal) => `'${pal.id}'`)
+      .join(', ');
     assert.ok(sql.includes(`when p_pal in (${ids}) then '${rarity}'`), `${rarity} list`);
   }
   assert.ok(sql.includes(`v_solved / ${LUCKY_PAL_EVERY} <=`) && sql.includes(`sparks = sparks + ${LUCKY_PAL_FALLBACK_SPARKS}`), 'lucky gift rules');
@@ -352,7 +369,11 @@ test('grove: decor is bought with sparks and placed one per spot, with the same 
   assert.deepEqual(placeGroveItemLocally(two, 'logBench', true).grove.placed, ['mushroomHouse', 'logBench']);
   assert.deepEqual(placeGroveItemLocally(two, 'mushroomHouse', false).grove.placed, []);
   // Every spot has decor, and the server charges the same.
-  for (const spot of GROVE_SPOTS) assert.ok(GROVE_ITEMS.some((item) => item.spot === spot.id), spot.id);
+  for (const spot of GROVE_SPOTS)
+    assert.ok(
+      GROVE_ITEMS.some((item) => item.spot === spot.id),
+      spot.id,
+    );
   const sql = readFileSync(new URL('../../supabase/grove.sql', import.meta.url), 'utf8');
   for (const item of GROVE_ITEMS) {
     assert.ok(sql.includes(`when '${item.id}' then '{"price": ${item.price}, "spot": "${item.spot}"}'::jsonb`), `${item.id} price and spot`);
@@ -378,7 +399,9 @@ test('pals: daily Shop picks and Lucky Pal gifts', async () => {
   assert.equal(pals.luckyRarityFor(0.2), 'legendary');
   assert.equal(pals.luckyRarityFor(0.5), 'common');
   assert.throws(() => pals.claimLuckyPalLocally(base));
-  const levels = Object.fromEntries(Array.from({ length: 200 }, (_, i) => [`w${Math.floor(i / 20) + 1}-${String((i % 20) + 1).padStart(2, '0')}`, { stars: 1 }]));
+  const levels = Object.fromEntries(
+    Array.from({ length: 200 }, (_, i) => [`w${Math.floor(i / 20) + 1}-${String((i % 20) + 1).padStart(2, '0')}`, { stars: 1 }]),
+  );
   const gift = pals.claimLuckyPalLocally({ ...base, levels }, 0.05, 0);
   assert.equal(pals.rarityOf(pals.palById(gift.palId)), 'mythic');
   assert.ok(gift.progress.pal.owned[gift.palId]);
@@ -398,8 +421,14 @@ test('pieces: at most one new piece per level, and the built-in levels teach the
       { x: 4, y: 0, type: 'filter', color: 'coral' },
     ],
   };
-  assert.deepEqual(newPiecesIn(level, []).map((piece) => piece.id), ['basics']);
-  assert.deepEqual(newPiecesIn(level, ['basics']).map((piece) => piece.id), ['wall']);
+  assert.deepEqual(
+    newPiecesIn(level, []).map((piece) => piece.id),
+    ['basics'],
+  );
+  assert.deepEqual(
+    newPiecesIn(level, ['basics']).map((piece) => piece.id),
+    ['wall'],
+  );
   assert.deepEqual(newPiecesIn(level, ['basics', 'wall', 'color']), []);
   assert.equal(firstTileOf(level, 'wall'), 2);
   assert.equal(firstTileOf(level, 'basics'), 1);
@@ -409,7 +438,7 @@ test('pieces: at most one new piece per level, and the built-in levels teach the
   const seen = [];
   let lastIntro = null;
   let previous = null;
-  for (let world = 1; world <= 5; world++) {
+  for (let world = 1; world <= 9; world++) {
     const levels = JSON.parse(readFileSync(new URL(`../data/worlds/world-${String(world).padStart(3, '0')}.json`, import.meta.url), 'utf8'));
     for (const built of levels) {
       const unseen = piecesIn(built).filter((id) => !seen.includes(id));

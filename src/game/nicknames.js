@@ -10,8 +10,30 @@ export const NICKNAME_MAX = 16;
 
 /** Blocked word parts (checked after lowercasing, removing spaces and common look-alike digits). */
 export const BLOCKED_NICKNAME_PARTS = [
-  'fuck', 'shit', 'bitch', 'cunt', 'dick', 'pussy', 'cock', 'penis', 'vagina', 'boob', 'porn', 'sex',
-  'slut', 'whore', 'nigg', 'fag', 'nazi', 'hitler', 'rape', 'kill', 'piss', 'bastard', 'admin', 'moderator',
+  'fuck',
+  'shit',
+  'bitch',
+  'cunt',
+  'dick',
+  'pussy',
+  'cock',
+  'penis',
+  'vagina',
+  'boob',
+  'porn',
+  'sex',
+  'slut',
+  'whore',
+  'nigg',
+  'fag',
+  'nazi',
+  'hitler',
+  'rape',
+  'kill',
+  'piss',
+  'bastard',
+  'admin',
+  'moderator',
 ];
 
 const LOOK_ALIKES = { 0: 'o', 1: 'i', 3: 'e', 4: 'a', 5: 's', 7: 't', '@': 'a', $: 's' };
@@ -34,8 +56,31 @@ export function nicknameProblem(raw) {
 }
 
 const RANDOM_WORDS = [
-  'Brave', 'Bright', 'Bubbly', 'Calm', 'Clever', 'Cozy', 'Dreamy', 'Fluffy', 'Gentle', 'Giggly', 'Golden', 'Happy',
-  'Jolly', 'Lucky', 'Mellow', 'Mighty', 'Nimble', 'Rosy', 'Silly', 'Sleepy', 'Sparkly', 'Sunny', 'Swift', 'Tiny', 'Zippy',
+  'Brave',
+  'Bright',
+  'Bubbly',
+  'Calm',
+  'Clever',
+  'Cozy',
+  'Dreamy',
+  'Fluffy',
+  'Gentle',
+  'Giggly',
+  'Golden',
+  'Happy',
+  'Jolly',
+  'Lucky',
+  'Mellow',
+  'Mighty',
+  'Nimble',
+  'Rosy',
+  'Silly',
+  'Sleepy',
+  'Sparkly',
+  'Sunny',
+  'Swift',
+  'Tiny',
+  'Zippy',
 ];
 const RANDOM_NAMES = [...new Set([...PALS.map((pal) => pal.animal), 'Firefly', 'Comet', 'Rainbow', 'Pixel', 'Wizard'])];
 

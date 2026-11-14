@@ -352,3 +352,21 @@
     animation: none;
   }
 }
+
+/* Portals swirl slowly */
+.portalSwirl {
+  transform-origin: 50px 50px;
+  animation: portalSpin 4s linear infinite;
+}
+
+@keyframes portalSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portalSwirl {
+    animation: none;
+  }
+}

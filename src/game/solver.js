@@ -13,32 +13,56 @@ function popcount(n) {
 }
 
 /**
- * Explore every combination of rotatable tile orientations.
- * Each rotatable tile has 2 states, so a solution's distance from the start
- * is the number of tiles whose state differs (one tap each).
+ * The independent "switches" on a board: each rotatable tile on its own, except twins, which turn
+ * together (one tap flips the whole group).
+ * @returns tile-index groups
+ */
+function switchGroups(level) {
+  const groups = [];
+  const byLink = new Map();
+  level.tiles.forEach((tile, i) => {
+    if (!isRotatable(tile)) return;
+    if (!tile.link) {
+      groups.push([i]);
+    } else if (byLink.has(tile.link)) {
+      byLink.get(tile.link).push(i);
+    } else {
+      const group = [i];
+      byLink.set(tile.link, group);
+      groups.push(group);
+    }
+  });
+  return groups;
+}
+
+const orientsFor = (startOrients, groups, mask) => {
+  const orients = startOrients.slice();
+  groups.forEach((group, bit) => {
+    if ((mask >> bit) & 1) group.forEach((tileIndex) => (orients[tileIndex] ^= 1));
+  });
+  return orients;
+};
+
+/**
+ * Explore every combination of switches (rotatable tiles; twins count as one). Each has two states,
+ * so a solution's distance from the start is the number of switches flipped (one tap each).
  *
- * @returns {{ isSolvable, par, solutionCount, solutionMasks, rotatable, tooComplex }}
- *   par: minimum taps from the starting position to any solution
+ * @returns {{ isSolvable, par, solutionCount, solutionMasks, groups, tooComplex }}
+ *   par: minimum taps from the starting position to any solution; masks are relative to the start
  */
 export function analyzeLevel(level, startOrients = level.tiles.map((t) => t.orient ?? 0)) {
-  const rotatable = level.tiles.map((t, i) => (isRotatable(t) ? i : -1)).filter((i) => i >= 0);
-  if (rotatable.length > MAX_SOLVER_PIECES) {
-    return { isSolvable: false, par: null, solutionCount: 0, solutionMasks: [], rotatable, tooComplex: true };
+  const groups = switchGroups(level);
+  if (groups.length > MAX_SOLVER_PIECES) {
+    return { isSolvable: false, par: null, solutionCount: 0, solutionMasks: [], groups, tooComplex: true };
   }
 
   const cells = buildCellIndex(level);
-  const orients = startOrients.slice();
-  const startMask = maskOf(rotatable, startOrients);
   const solutionMasks = [];
   let par = Infinity;
-
-  for (let mask = 0; mask < 1 << rotatable.length; mask++) {
-    rotatable.forEach((tileIndex, bit) => {
-      orients[tileIndex] = (mask >> bit) & 1;
-    });
-    if (traceBeams(level, orients, cells).isSolved) {
+  for (let mask = 0; mask < 1 << groups.length; mask++) {
+    if (traceBeams(level, orientsFor(startOrients, groups, mask), cells).isSolved) {
       solutionMasks.push(mask);
-      par = Math.min(par, popcount(mask ^ startMask));
+      par = Math.min(par, popcount(mask));
     }
   }
 
@@ -47,13 +71,9 @@ export function analyzeLevel(level, startOrients = level.tiles.map((t) => t.orie
     par: solutionMasks.length ? par : null,
     solutionCount: solutionMasks.length,
     solutionMasks,
-    rotatable,
+    groups,
     tooComplex: false,
   };
-}
-
-function maskOf(rotatable, orients) {
-  return rotatable.reduce((mask, tileIndex, bit) => mask | ((orients[tileIndex] & 1) << bit), 0);
 }
 
 /**
@@ -61,15 +81,10 @@ function maskOf(rotatable, orients) {
  * @returns orients array, or null if the level can't be solved
  */
 export function nearestSolution(level, currentOrients) {
-  const { isSolvable, solutionMasks, rotatable } = analyzeLevel(level, currentOrients);
+  const { isSolvable, solutionMasks, groups } = analyzeLevel(level, currentOrients);
   if (!isSolvable) return null;
-  const currentMask = maskOf(rotatable, currentOrients);
-  const best = solutionMasks.reduce((a, b) => (popcount(a ^ currentMask) <= popcount(b ^ currentMask) ? a : b));
-  const orients = currentOrients.slice();
-  rotatable.forEach((tileIndex, bit) => {
-    orients[tileIndex] = (best >> bit) & 1;
-  });
-  return orients;
+  const best = solutionMasks.reduce((a, b) => (popcount(a) <= popcount(b) ? a : b));
+  return orientsFor(currentOrients, groups, best);
 }
 
 /**

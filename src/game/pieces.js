@@ -47,6 +47,20 @@ export const PIECES = [
     lumi: 'Eek! Don’t wake the shadow crystal!',
     sample: { type: TILE.SHADE },
   },
+  {
+    id: 'twins',
+    name: 'Twin mirrors',
+    text: 'Mirrors with the same little mark are twins: turn one and its twin turns too!',
+    lumi: 'They do everything together. Cute!',
+    sample: { type: TILE.MIRROR, orient: 0, link: 'a' },
+  },
+  {
+    id: 'portal',
+    name: 'Portals',
+    text: 'Light that goes into a portal comes out of its partner (the one with the same pattern), still going the same way.',
+    lumi: 'Whoosh! Light can teleport now?!',
+    sample: { type: TILE.PORTAL, pair: 'a' },
+  },
 ];
 
 const HAS = {
@@ -56,10 +70,21 @@ const HAS = {
   splitter: (tile) => tile.type === TILE.SPLITTER,
   color: (tile) => tile.type === TILE.FILTER || (tile.type === TILE.GEM && tile.color && tile.color !== 'sun'),
   shade: (tile) => tile.type === TILE.SHADE,
+  twins: (tile) => Boolean(tile.link),
+  portal: (tile) => tile.type === TILE.PORTAL,
 };
 
 /** Where each piece is first taught (levels are built so each one brings at most one new piece). */
-export const PIECE_FIRST_LEVEL = { basics: 'w1-01', wall: 'w1-04', locked: 'w1-10', splitter: 'w2-01', color: 'w3-01', shade: 'w4-01' };
+export const PIECE_FIRST_LEVEL = {
+  basics: 'w1-01',
+  wall: 'w1-04',
+  locked: 'w1-10',
+  splitter: 'w2-01',
+  color: 'w3-01',
+  shade: 'w4-01',
+  twins: 'w6-01',
+  portal: 'w8-01',
+};
 
 /**
  * The piece to introduce in this level, if any: the first one, in teaching order, the player hasn't met.

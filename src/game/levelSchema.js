@@ -31,6 +31,9 @@ export function validateLevel(level) {
     if ([TILE.MIRROR, TILE.SPLITTER].includes(tile.type) && tile.orient !== 0 && tile.orient !== 1) {
       problems.push(`${where}: orientation must be 0 or 1.`);
     }
+    if (tile.type === TILE.PORTAL && tiles.filter((t) => t.type === TILE.PORTAL && t.pair === tile.pair).length !== 2) {
+      problems.push(`${where}: every portal needs exactly one partner with the same pair.`);
+    }
   });
   if (!tiles.some((t) => t.type === TILE.EMITTER)) problems.push('Add at least one light source.');
   if (!tiles.some((t) => t.type === TILE.GEM)) problems.push('Add at least one gem.');

@@ -13,7 +13,8 @@ export function describeTile(tile, { orient, isLit = false, isRotatable = false 
     case TILE.SPLITTER: {
       const name = tile.type === TILE.MIRROR ? 'Mirror' : 'Beam splitter';
       const slant = orient === 0 ? 'slanted like /' : 'slanted like \\';
-      return `${name}, ${slant}, ${isRotatable ? 'tap to rotate' : 'locked'}`;
+      const twin = tile.link ? `, twin ${tile.link === 'a' ? 'star' : 'heart'}: turns with its twin` : '';
+      return `${name}, ${slant}${twin}, ${isRotatable ? 'tap to rotate' : 'locked'}`;
     }
     case TILE.FILTER:
       return `${colorName(tile.color)} ${shapeName(tile.color)} color filter`;
@@ -21,6 +22,8 @@ export function describeTile(tile, { orient, isLit = false, isRotatable = false 
       return 'Wall';
     case TILE.GEM:
       return `${colorName(tile.color)} ${shapeName(tile.color)} gem, ${isLit ? 'lit' : 'dark'}`;
+    case TILE.PORTAL:
+      return `Portal with a ${tile.pair === 'a' ? 'star' : 'heart'}: light jumps to the other ${tile.pair === 'a' ? 'star' : 'heart'} portal`;
     case TILE.SHADE:
       return `Shadow crystal, ${isLit ? 'lit, keep it dark!' : 'dark, keep it dark'}`;
     default:

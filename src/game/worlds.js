@@ -101,7 +101,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
  * (bigger boards, longer solutions, more decoys), ramps inside each world, and spikes on
  * Hard and boss levels. New pieces arrive one at a time (see src/game/pieces.js): world 1 teaches
  * mirrors, then walls (1-4), then fixed mirrors (1-10); world 2 splitters; world 3 color glass;
- * world 4 shadow crystals. Later worlds mix them.
+ * world 4 shadow crystals; then twists: world 6 twin mirrors, world 8 portals. Later worlds mix them.
  */
 export function generatorPresetFor(world, index) {
   const difficulty = difficultyFor(index);
@@ -143,15 +143,43 @@ export function generatorPresetFor(world, index) {
   }
 
   // World 1 after the tutorial: walls only, then fixed mirrors from level 10.
-  if (world === 1) return { ...preset, lockedRatio: index < 10 ? 0 : index === 10 ? 0.5 : 0.1, mustHaveLocked: index === 10 };
+  if (world === 1) return { ...preset, lockedRatio: index < 10 ? 0 : index === 10 ? 0.5 : 0.1, mustHave: index === 10 ? 'locked' : null };
 
   // Which mechanics this level uses. Early worlds introduce one at a time.
   const variety = (world * 7 + index * 3) % 4;
   if (world === 2) return { ...preset, splits: 1 + (spike > 0 ? 1 : 0) };
   if (world === 3) return { ...preset, filters: 1 + (index > 10 ? 1 : 0), splits: index > 8 ? 1 : 0 };
   if (world === 4) return { ...preset, shades: 1 + Math.round(ramp * 2) + spike, splits: index > 6 ? 1 : 0 };
+  // Twists: twin mirrors from world 6 (the whole of world 6 is about them), portals from world 8.
+  const twists = {
+    twins: world === 6 ? 1 + (index > 10 ? 1 : 0) : world >= 7 && (world + index) % 3 === 0 ? 1 : 0,
+    portals: world === 8 ? 1 : world >= 9 && (world + index) % 4 === 1 ? 1 : 0,
+    mustHave: world === 6 && index === 1 ? 'twins' : world === 8 && index === 1 ? 'portal' : null,
+  };
+  // The level that introduces a twist shows it on its own: no other tricks, a smaller board.
+  if (twists.mustHave) {
+    const twins = twists.mustHave === 'twins' ? 1 : 0;
+    const portals = twists.mustHave === 'portal' ? 1 : 0;
+    return {
+      ...preset,
+      ...twists,
+      twins,
+      portals,
+      width: 6,
+      height: 6,
+      splits: 0,
+      filters: 0,
+      shades: 0,
+      decoys: 1,
+      walls: 1,
+      emitters: 1,
+      minPar: 3,
+      maxPar: 6,
+    };
+  }
   return {
     ...preset,
+    ...twists,
     splits: variety === 0 || variety === 3 || spike > 0 ? 1 + (spike === 2 ? 1 : 0) : 0,
     filters: variety === 1 || variety === 3 ? 1 + (spike > 0 ? 1 : 0) : 0,
     shades: variety === 2 || variety === 3 || spike > 0 ? 1 + spike + Math.min(2, Math.floor(tier / 3)) : 0,

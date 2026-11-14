@@ -1,5 +1,5 @@
-import { DIRECTIONS, TILE } from './constants.js';
-import { reflect, traceBeams } from './beam.js';
+import { DIRECTIONS, PAIR_NAMES, TILE } from './constants.js';
+import { isRotatable, reflect, rotationGroup, traceBeams } from './beam.js';
 import { analyzeLevel } from './solver.js';
 
 const TINTS = ['coral', 'lime', 'sky'];
@@ -17,6 +17,8 @@ const TINTS = ['coral', 'lime', 'sky'];
  * @property {number} [walls=0]
  * @property {number} [shades=0]     dark crystals that must stay unlit
  * @property {number} [lockedRatio=0] share of path mirrors that are fixed in place
+ * @property {number} [portals=0]    portal pairs the light jumps through on the solution path
+ * @property {number} [twins=0]      pairs of mirrors that turn together
  * @property {number} [minPar=1]     minimum taps needed to solve
  * @property {number} [maxPar=99]
  */
@@ -37,7 +39,7 @@ function directionName([dx, dy]) {
 
 /** Build one solved board, or return null if the random walk got stuck. */
 function buildSolvedBoard(options, random) {
-  const { width, height, emitters = 1, splits = 0, turns = [1, 2], segment = [1, 3], filters = 0 } = options;
+  const { width, height, emitters = 1, splits = 0, turns = [1, 2], segment = [1, 3], filters = 0, portals = 0 } = options;
   const tiles = [];
   const occupied = new Map();
   const beamCells = new Set();
@@ -52,6 +54,22 @@ function buildSolvedBoard(options, random) {
   const pathMirrors = [];
   let splitsLeft = splits;
   let filtersLeft = filters;
+  let portalsMade = 0;
+
+  /** Step into a portal here and come out of a new partner portal somewhere free, facing the same way. */
+  const jumpThroughPortal = (x, y, dir) => {
+    for (let tries = 0; tries < 30; tries++) {
+      const ex = random.int(0, width - 1);
+      const ey = random.int(0, height - 1);
+      if ((ex === x && ey === y) || !isFree(ex, ey) || !isFree(ex + dir[0], ey + dir[1])) continue;
+      const pair = PAIR_NAMES[portalsMade];
+      place({ x, y, type: TILE.PORTAL, pair });
+      place({ x: ex, y: ey, type: TILE.PORTAL, pair });
+      portalsMade++;
+      return [ex, ey];
+    }
+    return null;
+  };
 
   const walkBranch = (start) => {
     let { x, y } = start;
@@ -68,6 +86,14 @@ function buildSolvedBoard(options, random) {
         y += dir[1];
         beamCells.add(key(x, y));
         moved++;
+        // Sometimes the light dives into a portal on a straight stretch.
+        if (portalsMade < portals && moved < length && random.chance(0.35) && isFree(x + dir[0], y + dir[1])) {
+          const exit = jumpThroughPortal(x, y, dir);
+          if (exit) {
+            [x, y] = exit;
+            continue;
+          }
+        }
         // Drop a color filter on a straight stretch, never on the final cell.
         if (filtersLeft > 0 && moved < length && random.chance(0.35) && isFree(x + dir[0], y + dir[1])) {
           color = random.pick(TINTS);
@@ -114,7 +140,7 @@ function buildSolvedBoard(options, random) {
   while (pendingBranches.length) {
     if (!walkBranch(pendingBranches.shift())) return null;
   }
-  if (splitsLeft > 0) return null;
+  if (splitsLeft > 0 || portalsMade < portals) return null;
   return { tiles, occupied, beamCells, pathMirrors, isFree };
 }
 
@@ -157,15 +183,28 @@ function decorate(board, options, random) {
   for (const { tile } of pathMirrors) {
     if (tile.type === TILE.MIRROR && random.chance(lockedRatio)) tile.locked = true;
   }
+
+  // Twins: pairs of mirrors that turn together. At least one of each pair is on the light's path.
+  const pathPool = random.shuffle(pathMirrors.map(({ tile }) => tile).filter((tile) => tile.type === TILE.MIRROR && !tile.locked));
+  const anyPool = random.shuffle(tiles.filter((tile) => tile.type === TILE.MIRROR && !tile.locked));
+  for (let pair = 0; pair < (options.twins ?? 0); pair++) {
+    const first = pathPool.find((tile) => !tile.link);
+    const second = first && anyPool.find((tile) => tile !== first && !tile.link);
+    if (!first || !second) break;
+    first.link = PAIR_NAMES[pair];
+    second.link = PAIR_NAMES[pair];
+  }
 }
 
 function toLevelTiles(tiles) {
-  return tiles.map(({ x, y, type, dir, color, orient, locked }) => {
+  return tiles.map(({ x, y, type, dir, color, orient, locked, pair, link }) => {
     const tile = { x, y, type };
     if (dir !== undefined) tile.dir = typeof dir === 'string' ? dir : directionName(dir);
     if (color !== undefined) tile.color = color;
     if (orient !== undefined) tile.orient = orient;
     if (locked) tile.locked = true;
+    if (pair) tile.pair = pair;
+    if (link) tile.link = link;
     return tile;
   });
 }
@@ -185,12 +224,16 @@ export function generateLevel(options, random, maxAttempts = 400) {
     const level = { width, height, tiles: toLevelTiles(board.tiles) };
     if (!traceBeams(level).isSolved) continue;
 
-    const rotatable = level.tiles.filter((t) => (t.type === TILE.MIRROR || t.type === TILE.SPLITTER) && !t.locked);
+    const rotatable = level.tiles.filter(isRotatable);
     if (rotatable.length < minPar) continue;
+    if ((options.twins ?? 0) > 0 && !level.tiles.some((t) => t.link)) continue;
     for (let scramble = 0; scramble < 12; scramble++) {
       const scrambled = { ...level, tiles: level.tiles.map((t) => ({ ...t })) };
-      scrambled.tiles.forEach((t) => {
-        if ((t.type === TILE.MIRROR || t.type === TILE.SPLITTER) && !t.locked && random.chance(0.65)) t.orient ^= 1;
+      // Scramble by taps (twins turn together), so the starting board is always reachable.
+      scrambled.tiles.forEach((t, i) => {
+        if (!isRotatable(t) || random.chance(0.35)) return;
+        if (t.link && scrambled.tiles.findIndex((other) => other.link === t.link) !== i) return;
+        for (const j of rotationGroup(scrambled.tiles, i)) scrambled.tiles[j].orient ^= 1;
       });
       if (traceBeams(scrambled).isSolved) continue;
       const analysis = analyzeLevel(scrambled);

@@ -38,7 +38,45 @@ export function TileDefs() {
   );
 }
 
-function Mirror({ turns, isSplitter, isLocked }) {
+/** Each pair (portals or twin mirrors) has its own color and its own shape, so color is never the only clue. */
+const PAIR_LOOKS = {
+  a: { color: '#F0C14E', ink: '#8a6410', symbol: 'M0-7l2 5 5 .5-4 3.5 1.3 5L0 8.3-4.3 11l1.3-5-4-3.5 5-.5z' },
+  b: { color: '#F2A67E', ink: '#9c4f2c', symbol: 'M0 7C-8 2-8-5-4-6-2-6.5 0-5 0-3c0-2 2-3.5 4-3 4 1 4 8-4 13z' },
+};
+
+function TwinMark({ link }) {
+  const look = PAIR_LOOKS[link] ?? PAIR_LOOKS.a;
+  return (
+    <g>
+      <circle cx="50" cy="50" r="12" fill={look.color} stroke="#fff" strokeWidth="3" />
+      <path d={look.symbol} transform="translate(50 49) scale(.9)" fill={look.ink} />
+    </g>
+  );
+}
+
+function Portal({ pair }) {
+  const look = PAIR_LOOKS[pair] ?? PAIR_LOOKS.a;
+  return (
+    <g className={styles.portal}>
+      <circle cx="50" cy="50" r="38" fill={look.color} opacity="0.3" />
+      <circle cx="50" cy="50" r="32" fill="none" stroke={look.color} strokeWidth="8" />
+      <g className={styles.portalSwirl}>
+        <path
+          d="M50 28a22 22 0 0 1 22 22M50 72a22 22 0 0 1-22-22"
+          stroke={look.ink}
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+          opacity=".55"
+        />
+      </g>
+      <circle cx="50" cy="50" r="14" fill="#fffaf2" />
+      <path d={look.symbol} transform="translate(50 49) scale(1.1)" fill={look.ink} />
+    </g>
+  );
+}
+
+function Mirror({ turns, isSplitter, isLocked, link }) {
   const angle = -45 + turns * 90;
   return (
     <>
@@ -67,7 +105,11 @@ function Mirror({ turns, isSplitter, isLocked }) {
           <rect x="16" y="45" width="68" height="3.5" rx="2" fill="#fff" opacity="0.55" />
         )}
       </g>
-      <circle cx="50" cy="50" r="6.5" fill={isLocked ? '#9c8873' : 'var(--color-sage)'} stroke="#fff" strokeWidth="2.5" />
+      {link ? (
+        <TwinMark link={link} />
+      ) : (
+        <circle cx="50" cy="50" r="6.5" fill={isLocked ? '#9c8873' : 'var(--color-sage)'} stroke="#fff" strokeWidth="2.5" />
+      )}
     </>
   );
 }
@@ -138,7 +180,7 @@ function TileArt({ tile, turns = 0, isLit = false, isRotatable = false }) {
   switch (tile.type) {
     case TILE.MIRROR:
     case TILE.SPLITTER:
-      art = <Mirror turns={turns} isSplitter={tile.type === TILE.SPLITTER} isLocked={!isRotatable} />;
+      art = <Mirror turns={turns} isSplitter={tile.type === TILE.SPLITTER} isLocked={!isRotatable} link={tile.link} />;
       break;
     case TILE.EMITTER:
       art = <Emitter dir={tile.dir} color={tile.color} />;
@@ -154,6 +196,9 @@ function TileArt({ tile, turns = 0, isLit = false, isRotatable = false }) {
       break;
     case TILE.WALL:
       art = <Wall />;
+      break;
+    case TILE.PORTAL:
+      art = <Portal pair={tile.pair} />;
       break;
     default:
       return null;

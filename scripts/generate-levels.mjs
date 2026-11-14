@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { generateLevel } from '../src/game/generator.js';
 import { analyzeLevel } from '../src/game/solver.js';
 import { validateLevel } from '../src/game/levelSchema.js';
+import { piecesIn } from '../src/game/pieces.js';
 import { difficultyFor, generatorPresetFor, levelId, LEVELS_PER_WORLD, WORLD_COUNT } from '../src/game/worlds.js';
 import { createRandom } from '../src/lib/random.js';
 import { LEVEL_SCHEMA_VERSION } from '../src/game/constants.js';
@@ -39,7 +40,7 @@ function bestLevelFor(world, index) {
       const random = createRandom(`prism-${levelId(world, index)}-${attempt}-${seed}`);
       const level = generateLevel({ ...variant, minPar: Math.min(variant.minPar, 2) }, random, 25);
       // A level that introduces a piece must actually contain it.
-      const hasRequired = !preset.mustHaveLocked || level?.tiles.some((tile) => tile.locked);
+      const hasRequired = !preset.mustHave || (level && piecesIn(level).includes(preset.mustHave));
       if (level && hasRequired && level.par <= preset.maxPar && (!best || level.par > best.par)) best = level;
       if (best && best.par >= preset.minPar) return best;
     }

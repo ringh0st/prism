@@ -8,7 +8,11 @@ export const TILE = Object.freeze({
   WALL: 'wall',
   GEM: 'gem',
   SHADE: 'shade',
+  PORTAL: 'portal',
 });
+
+/** Portal and twin-mirror pairs are named by these letters (each pair has its own look). */
+export const PAIR_NAMES = Object.freeze(['a', 'b']);
 
 /** Grid directions. y grows downwards. */
 export const DIRECTIONS = Object.freeze({

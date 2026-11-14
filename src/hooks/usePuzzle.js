@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { traceBeams } from '../game/beam.js';
+import { rotationGroup, traceBeams } from '../game/beam.js';
 import { findHint, nearestSolution } from '../game/solver.js';
 import { starCapForHelpers } from '../game/catalog.js';
 
@@ -8,11 +8,14 @@ const initialState = (level) => {
   return { orients, turns: orients.slice(), moves: 0, usedHelpers: [], hintTile: null, ghostSegments: null };
 };
 
-const rotated = (s, tileIndex) => {
+/** One tap: the tile turns, along with its twins. */
+const rotated = (s, tiles, tileIndex) => {
   const orients = s.orients.slice();
   const turns = s.turns.slice();
-  orients[tileIndex] ^= 1;
-  turns[tileIndex] += 1;
+  for (const i of rotationGroup(tiles, tileIndex)) {
+    orients[i] ^= 1;
+    turns[i] += 1;
+  }
   return { ...s, orients, turns, moves: s.moves + 1, hintTile: s.hintTile === tileIndex ? null : s.hintTile };
 };
 
@@ -27,7 +30,7 @@ export function usePuzzle(level) {
 
   const trace = useMemo(() => traceBeams(level, current.orients), [level, current.orients]);
 
-  const rotate = useCallback((tileIndex) => setState((s) => rotated(s, tileIndex)), []);
+  const rotate = useCallback((tileIndex) => setState((s) => rotated(s, level.tiles, tileIndex)), [level.tiles]);
 
   const restart = useCallback(() => setState({ levelId: level.id, ...initialState(level) }), [level]);
 
@@ -51,7 +54,7 @@ export function usePuzzle(level) {
       const tileIndex = findHint(level, current.orients);
       if (tileIndex === null) return false;
       if (helperId === 'hint') setState((s) => markUsed(s, { hintTile: tileIndex }));
-      if (helperId === 'autoturn') setState((s) => markUsed(rotated(s, tileIndex)));
+      if (helperId === 'autoturn') setState((s) => markUsed(rotated(s, level.tiles, tileIndex)));
       return true;
     },
     [level, current.orients],

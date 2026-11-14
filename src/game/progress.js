@@ -63,8 +63,7 @@ export const totalStars = (progress) => Object.values(progress.levels).reduce((s
 
 export const starsFor = (progress, levelId) => progress.levels[levelId]?.stars ?? 0;
 
-export const isWorldComplete = (progress, worldLevels) =>
-  worldLevels.length > 0 && worldLevels.every((level) => starsFor(progress, level.id) > 0);
+export const isWorldComplete = (progress, worldLevels) => worldLevels.length > 0 && worldLevels.every((level) => starsFor(progress, level.id) > 0);
 
 /**
  * Record a finished level.

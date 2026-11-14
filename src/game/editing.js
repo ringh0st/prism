@@ -35,7 +35,10 @@ export function placeTile(level, tile) {
 }
 
 export function removeTileAt(level, x, y) {
-  return withTiles(level, level.tiles.filter((t) => !isAt(x, y)(t)));
+  return withTiles(
+    level,
+    level.tiles.filter((t) => !isAt(x, y)(t)),
+  );
 }
 
 /** "Rotate" tool: turn mirrors, point emitters, recolor gems and filters. */
@@ -53,7 +56,13 @@ export function cycleTileAt(level, x, y) {
         case TILE.GEM:
           return { ...tile, color: cycle(BEAM_COLOR_NAMES, tile.color) };
         case TILE.FILTER:
-          return { ...tile, color: cycle(BEAM_COLOR_NAMES.filter((c) => c !== 'sun'), tile.color) };
+          return {
+            ...tile,
+            color: cycle(
+              BEAM_COLOR_NAMES.filter((c) => c !== 'sun'),
+              tile.color,
+            ),
+          };
         default:
           return tile;
       }
@@ -77,9 +86,15 @@ export function resizeLevel(level, width, height) {
 
 /** Rotate pieces into the solution closest to the current position. */
 export function applyNearestSolution(level) {
-  const target = nearestSolution(level, level.tiles.map((t) => t.orient ?? 0));
+  const target = nearestSolution(
+    level,
+    level.tiles.map((t) => t.orient ?? 0),
+  );
   if (!target) return level;
-  return withTiles(level, level.tiles.map((tile, i) => (target[i] === (tile.orient ?? 0) ? tile : { ...tile, orient: target[i] })));
+  return withTiles(
+    level,
+    level.tiles.map((tile, i) => (target[i] === (tile.orient ?? 0) ? tile : { ...tile, orient: target[i] })),
+  );
 }
 
 /**

@@ -9,6 +9,24 @@ export function isRotatable(tile) {
   return (tile.type === TILE.MIRROR || tile.type === TILE.SPLITTER) && !tile.locked;
 }
 
+/** The tiles that turn together when this one is tapped: itself, plus its twins (same `link`). */
+export function rotationGroup(tiles, tileIndex) {
+  const { link } = tiles[tileIndex];
+  if (!link) return [tileIndex];
+  return tiles.map((tile, i) => (tile.link === link && isRotatable(tile) ? i : -1)).filter((i) => i >= 0);
+}
+
+/** For each portal, the index of its partner (the other portal with the same `pair`). */
+function portalPartners(tiles) {
+  const partners = new Map();
+  tiles.forEach((tile, i) => {
+    if (tile.type !== TILE.PORTAL) return;
+    const other = tiles.findIndex((t, j) => j !== i && t.type === TILE.PORTAL && t.pair === tile.pair);
+    if (other >= 0) partners.set(i, other);
+  });
+  return partners;
+}
+
 /** Index tiles by cell so tracing is O(1) per step. */
 export function buildCellIndex({ width, height, tiles }) {
   const cells = new Int16Array(width * height).fill(-1);
@@ -30,11 +48,12 @@ export function buildCellIndex({ width, height, tiles }) {
  */
 export function traceBeams(level, orients = null, cells = buildCellIndex(level)) {
   const { width, height, tiles } = level;
-  const orientOf = (i) => (orients ? orients[i] : tiles[i].orient ?? 0);
+  const orientOf = (i) => (orients ? orients[i] : (tiles[i].orient ?? 0));
   const segments = [];
   const hits = new Map();
   const visited = new Set();
   const queue = [];
+  const partners = portalPartners(tiles);
 
   tiles.forEach((tile) => {
     if (tile.type === TILE.EMITTER) {
@@ -86,6 +105,12 @@ export function traceBeams(level, orients = null, cells = buildCellIndex(level))
         break;
       }
       endSegment(x, y);
+      // Into one portal, out of its partner, still heading the same way.
+      if (tile.type === TILE.PORTAL && partners.has(i)) {
+        const exit = tiles[partners.get(i)];
+        x = exit.x;
+        y = exit.y;
+      }
       startX = x;
       startY = y;
       if (tile.type === TILE.FILTER) {
