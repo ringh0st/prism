@@ -213,9 +213,14 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     (_cell, tileIndex) => {
       if (isOver || tileIndex < 0 || moves >= moveLimit) return;
       sfx.rotate();
+      // A cracking mirror's last turn: crack! (it stays put from now on)
+      if (puzzle.turnsLeft[tileIndex] === 1) {
+        sfx.crack();
+        say('worried', 'crack');
+      }
       puzzle.rotate(tileIndex);
     },
-    [isOver, moves, moveLimit, puzzle],
+    [isOver, moves, moveLimit, puzzle, say],
   );
 
   const restart = useCallback(() => {
@@ -340,6 +345,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           onActivate={onActivate}
           highlightTile={puzzle.hintTile ?? (moves === 0 && spotlightTile >= 0 ? spotlightTile : null)}
           ghostSegments={puzzle.ghostSegments}
+          turnsLeft={puzzle.turnsLeft}
+          revealedCells={puzzle.revealedCells}
           isLocked={isOver}
           mood={modifier}
           label={`${levelName} board. Use arrow keys to move, Enter to rotate.`}

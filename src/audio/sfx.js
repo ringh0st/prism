@@ -141,6 +141,12 @@ export const sfx = {
     tone(196, 165, 0.25, { type: 'triangle', volume: 0.04 });
     feel('light');
   },
+  /** A cracking mirror used its last turn: a little glassy crack (gentle, not scary). */
+  crack() {
+    tone(1800, 900, 0.09, { type: 'triangle', volume: 0.05, delay: 0.05 });
+    tone(2400, 1200, 0.07, { type: 'triangle', volume: 0.04, delay: 0.1 });
+    feel('medium');
+  },
   /** A level begins: a little swoosh, then the world's own motif (and its nature sound). */
   levelStart() {
     tone(260, 620, 0.22, { volume: 0.05, attack: 0.08 });

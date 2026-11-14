@@ -12,6 +12,7 @@ const QUIPS = {
   disco: ['DISCO LEVEL! Everybody dance!', 'Funky photons ahead!', 'Ooh, party lights!'],
   night: ['It’s night mode. Spooky… but glowy.', 'Shh, the gems are sleeping. Wake them up!'],
   gem: ['Shiny!', 'Ooooh!', 'Ding!', 'Nice bend!', 'Gem-tastic!', 'That one blushed.', 'Sparkle get!'],
+  crack: ['Crrrack! That mirror is stuck now.', 'Oops, it cracked! Plan around it… or restart.', 'Crack! It won’t turn anymore.'],
   shade: ['Eek! Keep that one dark!', 'Too spooky, turn it back!', 'The shadow crystal hates light. Rude, but true.'],
   lastMove: ['Last move! No pressure. (A little pressure.)', 'Final move… choose wisely!', 'One left. I’m holding my breath. I don’t breathe.'],
   win3: ['PERFECT! Three stars!', 'Flawless! The gems are applauding.', 'You’re basically a laser wizard.', 'Brilliant! I’m glowing with pride.'],

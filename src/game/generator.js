@@ -19,6 +19,9 @@ const TINTS = ['coral', 'lime', 'sky'];
  * @property {number} [lockedRatio=0] share of path mirrors that are fixed in place
  * @property {number} [portals=0]    portal pairs the light jumps through on the solution path
  * @property {number} [twins=0]      pairs of mirrors that turn together
+ * @property {number} [fragile=0]    path mirrors that crack after a few turns
+ * @property {number} [fog=0]        gems, walls or shades hidden under fog
+ * @property {number} [prisms=0]     prism crystals that split the light to both sides
  * @property {number} [minPar=1]     minimum taps needed to solve
  * @property {number} [maxPar=99]
  */
@@ -39,7 +42,7 @@ function directionName([dx, dy]) {
 
 /** Build one solved board, or return null if the random walk got stuck. */
 function buildSolvedBoard(options, random) {
-  const { width, height, emitters = 1, splits = 0, turns = [1, 2], segment = [1, 3], filters = 0, portals = 0 } = options;
+  const { width, height, emitters = 1, splits = 0, turns = [1, 2], segment = [1, 3], filters = 0, portals = 0, prisms = 0 } = options;
   const tiles = [];
   const occupied = new Map();
   const beamCells = new Set();
@@ -55,6 +58,7 @@ function buildSolvedBoard(options, random) {
   let splitsLeft = splits;
   let filtersLeft = filters;
   let portalsMade = 0;
+  let prismsLeft = prisms;
 
   /** Step into a portal here and come out of a new partner portal somewhere free, facing the same way. */
   const jumpThroughPortal = (x, y, dir) => {
@@ -109,6 +113,14 @@ function buildSolvedBoard(options, random) {
       }
 
       const turnChoices = random.shuffle([reflect(dir, 0), reflect(dir, 1)]);
+      // A prism crystal: the light splits out to both sides (a fixed piece, so it adds no taps).
+      if (prismsLeft > 0 && turnChoices.every(([dx, dy]) => isFree(x + dx, y + dy)) && random.chance(0.5)) {
+        place({ x, y, type: TILE.PRISM });
+        prismsLeft--;
+        pendingBranches.push({ x, y, dir: turnChoices[1], color });
+        dir = turnChoices[0];
+        continue;
+      }
       const newDir = turnChoices.find(([dx, dy]) => isFree(x + dx, y + dy));
       if (!newDir) return false;
       const slashDir = reflect(dir, 0);
@@ -140,7 +152,7 @@ function buildSolvedBoard(options, random) {
   while (pendingBranches.length) {
     if (!walkBranch(pendingBranches.shift())) return null;
   }
-  if (splitsLeft > 0 || portalsMade < portals) return null;
+  if (splitsLeft > 0 || portalsMade < portals || prismsLeft > 0) return null;
   return { tiles, occupied, beamCells, pathMirrors, isFree };
 }
 
@@ -184,9 +196,15 @@ function decorate(board, options, random) {
     if (tile.type === TILE.MIRROR && random.chance(lockedRatio)) tile.locked = true;
   }
 
+  // Cracking mirrors: some path mirrors can only turn a few times.
+  const crackable = random.shuffle(pathMirrors.map(({ tile }) => tile).filter((tile) => tile.type === TILE.MIRROR && !tile.locked));
+  crackable.slice(0, options.fragile ?? 0).forEach((tile) => {
+    tile.fragile = true;
+  });
+
   // Twins: pairs of mirrors that turn together. At least one of each pair is on the light's path.
-  const pathPool = random.shuffle(pathMirrors.map(({ tile }) => tile).filter((tile) => tile.type === TILE.MIRROR && !tile.locked));
-  const anyPool = random.shuffle(tiles.filter((tile) => tile.type === TILE.MIRROR && !tile.locked));
+  const pathPool = random.shuffle(pathMirrors.map(({ tile }) => tile).filter((tile) => tile.type === TILE.MIRROR && !tile.locked && !tile.fragile));
+  const anyPool = random.shuffle(tiles.filter((tile) => tile.type === TILE.MIRROR && !tile.locked && !tile.fragile));
   for (let pair = 0; pair < (options.twins ?? 0); pair++) {
     const first = pathPool.find((tile) => !tile.link);
     const second = first && anyPool.find((tile) => tile !== first && !tile.link);
@@ -194,10 +212,16 @@ function decorate(board, options, random) {
     first.link = PAIR_NAMES[pair];
     second.link = PAIR_NAMES[pair];
   }
+
+  // Fog: hide some gems, walls and shadow crystals until the light reaches them.
+  const foggable = random.shuffle(tiles.filter((tile) => [TILE.GEM, TILE.WALL, TILE.SHADE].includes(tile.type)));
+  foggable.slice(0, options.fog ?? 0).forEach((tile) => {
+    tile.fog = true;
+  });
 }
 
 function toLevelTiles(tiles) {
-  return tiles.map(({ x, y, type, dir, color, orient, locked, pair, link }) => {
+  return tiles.map(({ x, y, type, dir, color, orient, locked, pair, link, fragile, fog }) => {
     const tile = { x, y, type };
     if (dir !== undefined) tile.dir = typeof dir === 'string' ? dir : directionName(dir);
     if (color !== undefined) tile.color = color;
@@ -205,6 +229,8 @@ function toLevelTiles(tiles) {
     if (locked) tile.locked = true;
     if (pair) tile.pair = pair;
     if (link) tile.link = link;
+    if (fragile) tile.fragile = true;
+    if (fog) tile.fog = true;
     return tile;
   });
 }

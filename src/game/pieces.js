@@ -61,6 +61,27 @@ export const PIECES = [
     lumi: 'Whoosh! Light can teleport now?!',
     sample: { type: TILE.PORTAL, pair: 'a' },
   },
+  {
+    id: 'fragile',
+    name: 'Cracking mirrors',
+    text: 'Mirrors with little dots can only turn 3 times. Then they crack and stay put, so think before you tap!',
+    lumi: 'Careful… crrrack!',
+    sample: { type: TILE.MIRROR, orient: 0, fragile: true },
+  },
+  {
+    id: 'fog',
+    name: 'Fog',
+    text: 'Fog hides what’s underneath (a gem? a wall?) until your light touches it. Explore with your beam!',
+    lumi: 'Spooky! What’s in there?',
+    sample: { type: TILE.GEM, color: 'sun', fog: true },
+  },
+  {
+    id: 'prism',
+    name: 'Prism crystals',
+    text: 'A prism crystal splits the light in two: one beam goes out each side. It can’t be turned.',
+    lumi: 'One beam in, two beams out!',
+    sample: { type: TILE.PRISM },
+  },
 ];
 
 const HAS = {
@@ -72,6 +93,9 @@ const HAS = {
   shade: (tile) => tile.type === TILE.SHADE,
   twins: (tile) => Boolean(tile.link),
   portal: (tile) => tile.type === TILE.PORTAL,
+  fragile: (tile) => Boolean(tile.fragile),
+  fog: (tile) => Boolean(tile.fog),
+  prism: (tile) => tile.type === TILE.PRISM,
 };
 
 /** Where each piece is first taught (levels are built so each one brings at most one new piece). */
@@ -84,6 +108,9 @@ export const PIECE_FIRST_LEVEL = {
   shade: 'w4-01',
   twins: 'w6-01',
   portal: 'w8-01',
+  fragile: 'w10-01',
+  fog: 'w12-01',
+  prism: 'w14-01',
 };
 
 /**

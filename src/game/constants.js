@@ -9,7 +9,11 @@ export const TILE = Object.freeze({
   GEM: 'gem',
   SHADE: 'shade',
   PORTAL: 'portal',
+  PRISM: 'prism',
 });
+
+/** A cracking mirror (`fragile`) can be turned this many times, then it cracks and stays put. */
+export const FRAGILE_TURNS = 3;
 
 /** Portal and twin-mirror pairs are named by these letters (each pair has its own look). */
 export const PAIR_NAMES = Object.freeze(['a', 'b']);

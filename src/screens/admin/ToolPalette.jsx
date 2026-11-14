@@ -12,6 +12,7 @@ export const TOOLS = [
   { id: TILE.FILTER, label: 'Color filter' },
   { id: TILE.WALL, label: 'Wall' },
   { id: TILE.SHADE, label: 'Shadow crystal' },
+  { id: TILE.PRISM, label: 'Prism crystal' },
   { id: 'lock', label: 'Lock / unlock', hint: 'Locked mirrors can’t be rotated by players' },
   { id: 'erase', label: 'Eraser' },
 ];
@@ -24,6 +25,7 @@ const PREVIEW = {
   [TILE.FILTER]: { type: TILE.FILTER, color: 'coral' },
   [TILE.WALL]: { type: TILE.WALL },
   [TILE.SHADE]: { type: TILE.SHADE },
+  [TILE.PRISM]: { type: TILE.PRISM },
 };
 
 const TEXT_ICON = { cycle: '↻', lock: '🔒', erase: '⌫' };

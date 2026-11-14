@@ -96,12 +96,16 @@ export function builtInLevelRefs(worldId) {
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
+/** The first level of these worlds introduces a twist (see src/game/pieces.js). */
+const TWIST_INTROS = { '6-1': 'twins', '8-1': 'portal', '10-1': 'fragile', '12-1': 'fog', '14-1': 'prism' };
+
 /**
  * Generator settings for a world/level. The difficulty curve rises across all 50 worlds
  * (bigger boards, longer solutions, more decoys), ramps inside each world, and spikes on
  * Hard and boss levels. New pieces arrive one at a time (see src/game/pieces.js): world 1 teaches
  * mirrors, then walls (1-4), then fixed mirrors (1-10); world 2 splitters; world 3 color glass;
- * world 4 shadow crystals; then twists: world 6 twin mirrors, world 8 portals. Later worlds mix them.
+ * world 4 shadow crystals; then twists: world 6 twin mirrors, world 8 portals, world 10 cracking mirrors,
+ * world 12 fog, world 14 prism crystals. Later worlds mix them.
  */
 export function generatorPresetFor(world, index) {
   const difficulty = difficultyFor(index);
@@ -150,21 +154,27 @@ export function generatorPresetFor(world, index) {
   if (world === 2) return { ...preset, splits: 1 + (spike > 0 ? 1 : 0) };
   if (world === 3) return { ...preset, filters: 1 + (index > 10 ? 1 : 0), splits: index > 8 ? 1 : 0 };
   if (world === 4) return { ...preset, shades: 1 + Math.round(ramp * 2) + spike, splits: index > 6 ? 1 : 0 };
-  // Twists: twin mirrors from world 6 (the whole of world 6 is about them), portals from world 8.
+  // Twists, each the theme of its own world, then mixed in later: twin mirrors (world 6), portals (8),
+  // cracking mirrors (10), fog (12) and prism crystals (14).
   const twists = {
     twins: world === 6 ? 1 + (index > 10 ? 1 : 0) : world >= 7 && (world + index) % 3 === 0 ? 1 : 0,
     portals: world === 8 ? 1 : world >= 9 && (world + index) % 4 === 1 ? 1 : 0,
-    mustHave: world === 6 && index === 1 ? 'twins' : world === 8 && index === 1 ? 'portal' : null,
+    fragile: world === 10 ? 2 : world >= 11 && (world + index) % 3 === 2 ? 1 : 0,
+    fog: world === 12 ? 2 : world >= 13 && (world + index) % 4 === 2 ? 2 : 0,
+    prisms: world === 14 ? 1 : world >= 15 && (world + index) % 5 === 3 ? 1 : 0,
+    mustHave: TWIST_INTROS[`${world}-${index}`] ?? null,
   };
   // The level that introduces a twist shows it on its own: no other tricks, a smaller board.
   if (twists.mustHave) {
-    const twins = twists.mustHave === 'twins' ? 1 : 0;
-    const portals = twists.mustHave === 'portal' ? 1 : 0;
+    const only = twists.mustHave;
     return {
       ...preset,
       ...twists,
-      twins,
-      portals,
+      twins: only === 'twins' ? 1 : 0,
+      portals: only === 'portal' ? 1 : 0,
+      fragile: only === 'fragile' ? 2 : 0,
+      fog: only === 'fog' ? 2 : 0,
+      prisms: only === 'prism' ? 1 : 0,
       width: 6,
       height: 6,
       splits: 0,

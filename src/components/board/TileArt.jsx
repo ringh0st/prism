@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { TILE } from '../../game/constants.js';
+import { FRAGILE_TURNS, TILE } from '../../game/constants.js';
 import { beamColorVar, shapePathFor } from '../GemShape.jsx';
 import styles from './Board.module.css';
 
@@ -114,6 +114,66 @@ function Mirror({ turns, isSplitter, isLocked, link }) {
   );
 }
 
+/** A cracking mirror's turns left: three little dots that go out one by one, then a crack. */
+function CrackMarks({ turnsLeft }) {
+  if (turnsLeft <= 0) {
+    return (
+      <g className={styles.cracked}>
+        <path
+          d="M30 26l12 16-6 6 14 12-4 10M70 30l-10 14 8 8-12 10"
+          fill="none"
+          stroke="#5e5047"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+    );
+  }
+  return (
+    <g>
+      {[0, 1, 2].map((i) => (
+        <circle
+          key={i}
+          cx={38 + i * 12}
+          cy="88"
+          r="4.5"
+          fill={i < turnsLeft ? 'var(--color-peach)' : 'rgba(94, 80, 71, 0.25)'}
+          stroke="#fff"
+          strokeWidth="1.5"
+        />
+      ))}
+    </g>
+  );
+}
+
+/** Fog: a soft cloud over a cell until light reaches it. */
+function Fog() {
+  return (
+    <g className={styles.fog}>
+      <rect x="6" y="6" width="88" height="88" rx="16" fill="#e9e1d4" />
+      <path d="M24 64a14 14 0 0 1 6-26 18 18 0 0 1 34-4 14 14 0 0 1 12 30z" fill="#f8f3ea" />
+      <path d="M36 74a10 10 0 0 1 4-18 13 13 0 0 1 24 0 10 10 0 0 1 4 18z" fill="#fffaf2" opacity="0.8" />
+      <text x="50" y="58" textAnchor="middle" fontSize="22" fontWeight="800" fill="#a99a88" fontFamily="var(--font-display)">
+        ?
+      </text>
+    </g>
+  );
+}
+
+/** A prism crystal: light comes out of both sides. */
+function Prism() {
+  return (
+    <g>
+      <path d="M50 12L86 76H14z" fill="#f6e3c6" stroke="#d9a066" strokeWidth="4" strokeLinejoin="round" />
+      <path d="M50 12L50 76H14z" fill="#f2a67e" opacity="0.45" />
+      <path d="M50 12L68 44 50 76z" fill="#58ac82" opacity="0.35" />
+      <path d="M50 12L86 76H50z" fill="#f0c14e" opacity="0.35" />
+      <path d="M38 40l8-14" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
+    </g>
+  );
+}
+
 function Emitter({ dir, color }) {
   return (
     <g style={{ transform: `rotate(${DIRECTION_ANGLE[dir]}deg)`, transformOrigin: '50px 50px' }}>
@@ -174,13 +234,27 @@ function Wall() {
   );
 }
 
-/** Visual for one tile. Pure presentation: no interaction here. */
-function TileArt({ tile, turns = 0, isLit = false, isRotatable = false }) {
+/**
+ * Visual for one tile. Pure presentation: no interaction here.
+ * turnsLeft: a cracking mirror's remaining turns. isFogged: hidden under fog until light reaches it.
+ */
+function TileArt({ tile, turns = 0, isLit = false, isRotatable = false, turnsLeft = FRAGILE_TURNS, isFogged = false }) {
   let art = null;
-  switch (tile.type) {
+  switch (isFogged ? 'fog' : tile.type) {
+    case 'fog':
+      art = <Fog />;
+      break;
     case TILE.MIRROR:
     case TILE.SPLITTER:
-      art = <Mirror turns={turns} isSplitter={tile.type === TILE.SPLITTER} isLocked={!isRotatable} link={tile.link} />;
+      art = (
+        <>
+          <Mirror turns={turns} isSplitter={tile.type === TILE.SPLITTER} isLocked={!isRotatable} link={tile.link} />
+          {tile.fragile && <CrackMarks turnsLeft={turnsLeft} />}
+        </>
+      );
+      break;
+    case TILE.PRISM:
+      art = <Prism />;
       break;
     case TILE.EMITTER:
       art = <Emitter dir={tile.dir} color={tile.color} />;

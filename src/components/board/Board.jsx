@@ -19,6 +19,8 @@ import styles from './Board.module.css';
  * @param isEditing    in the editor every cell is actionable
  * @param ghostSegments faint preview of the solved light path (Lens helper)
  * @param mood         surprise look: normal | disco | night | boss
+ * @param turnsLeft    turns each cracking mirror has left (a cracked one can't turn)
+ * @param revealedCells cells the light has reached (fog lifts there); null shows everything (editor)
  */
 export default function Board({
   level,
@@ -32,6 +34,8 @@ export default function Board({
   ghostSegments = null,
   mood = 'normal',
   label = 'Puzzle board',
+  turnsLeft = null,
+  revealedCells = null,
 }) {
   const { width, height, tiles } = level;
   const [focusedCell, setFocusedCell] = useState(0);
@@ -104,10 +108,12 @@ export default function Board({
               const cell = row * width + col;
               const tileIndex = tileAtCell[cell];
               const tile = tileIndex >= 0 ? tiles[tileIndex] : null;
-              const canRotate = tile ? tileIsRotatable(tile) : false;
+              const left = turnsLeft?.[tileIndex] ?? Infinity;
+              const canRotate = tile ? tileIsRotatable(tile) && left > 0 : false;
+              const isFogged = Boolean(tile?.fog) && revealedCells !== null && !revealedCells.has(cell);
               const isLit = tileIndex >= 0 && (trace.litGems.has(tileIndex) || trace.litShades.has(tileIndex));
               const isActionable = !isLocked && (isEditing || canRotate);
-              const description = describeTile(tile, { orient: orients[tileIndex], isLit, isRotatable: canRotate });
+              const description = describeTile(tile, { orient: orients[tileIndex], isLit, isRotatable: canRotate, isFogged, turnsLeft: left });
               return (
                 <div role="gridcell" key={col} className={styles.cellWrap}>
                   <button
@@ -125,7 +131,16 @@ export default function Board({
                     onKeyDown={(event) => onKeyDown(event, cell)}
                     onClick={() => isActionable && onActivate(cell, tileIndex)}
                   >
-                    {tile && <TileArt tile={tile} turns={turns[tileIndex] ?? orients[tileIndex] ?? 0} isLit={isLit} isRotatable={canRotate} />}
+                    {tile && (
+                      <TileArt
+                        tile={tile}
+                        turns={turns[tileIndex] ?? orients[tileIndex] ?? 0}
+                        isLit={isLit}
+                        isRotatable={canRotate}
+                        turnsLeft={left}
+                        isFogged={isFogged}
+                      />
+                    )}
                   </button>
                 </div>
               );

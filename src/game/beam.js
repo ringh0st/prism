@@ -120,6 +120,10 @@ export function traceBeams(level, orients = null, cells = buildCellIndex(level))
       } else if (tile.type === TILE.SPLITTER) {
         queue.push({ x, y, dir, color });
         dir = reflect(dir, orientOf(i));
+      } else if (tile.type === TILE.PRISM) {
+        // A prism crystal splits the light in two, out to both sides.
+        queue.push({ x, y, dir: reflect(dir, 0), color });
+        dir = reflect(dir, 1);
       }
     }
   }

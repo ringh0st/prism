@@ -31,7 +31,7 @@ export default function NewPieceDialog({ pieces, onDone }) {
     <Dialog title={step === 0 && piece.id === 'basics' ? 'How to play' : 'New piece!'} tone="celebrate" onClose={onDone}>
       <div className={styles.showcase} aria-hidden="true">
         <div className={styles.plate} key={piece.id}>
-          <TileArt tile={piece.sample} turns={turns} isLit={piece.sample.type === 'gem'} isRotatable={canTurn} />
+          <TileArt tile={piece.sample} turns={turns} isLit={piece.sample.type === 'gem'} isRotatable={canTurn} isFogged={Boolean(piece.sample.fog)} />
         </div>
       </div>
       <h3 className={`game-title ${styles.name}`}>{piece.name}</h3>
