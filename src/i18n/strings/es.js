@@ -1,4 +1,10 @@
 /* Español. Keys match en.js; anything missing falls back to English. */
+import * as me from './sections/me.js';
+import * as pals from './sections/pals.js';
+import * as shop from './sections/shop.js';
+import * as grove from './sections/grove.js';
+import * as extras from './sections/extras.js';
+
 export const es = {
   'common.gotIt': '¡Entendido!',
   'common.next': 'Siguiente',
@@ -339,4 +345,10 @@ export const es = {
   'quips.outOfMoves': ['¡Sin movimientos! Pasa a todos.', '¡Uy! Los rayos se enredaron.', 'La luz necesita práctica.'],
   'quips.idle': ['Psst… prueba a tocar un espejo.', '¿Atascado? ¡Una pista puede ayudar!'],
   'quips.streak': ['¡Estás en racha! 🔥', '¡Imparable!'],
+
+  ...me.es,
+  ...pals.es,
+  ...shop.es,
+  ...grove.es,
+  ...extras.es,
 };

@@ -1,4 +1,10 @@
 /* עברית. Keys match en.js; anything missing falls back to English. The page reads right to left. */
+import * as me from './sections/me.js';
+import * as pals from './sections/pals.js';
+import * as shop from './sections/shop.js';
+import * as grove from './sections/grove.js';
+import * as extras from './sections/extras.js';
+
 export const he = {
   'common.gotIt': 'הבנתי!',
   'common.next': 'הבא',
@@ -322,4 +328,10 @@ export const he = {
   'quips.outOfMoves': ['נגמרו המהלכים! קורה לכולם.', 'אופס! הקרניים הסתבכו.', 'גם לאור צריך אימון.'],
   'quips.idle': ['פססט… נסו להקיש על מראה.', 'תקועים? רמז יכול לעזור!'],
   'quips.streak': ['אתם בוערים! 🔥', 'אי אפשר לעצור אתכם!'],
+
+  ...me.he,
+  ...pals.he,
+  ...shop.he,
+  ...grove.he,
+  ...extras.he,
 };

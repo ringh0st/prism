@@ -3,6 +3,12 @@
  * keeps its English in the game modules; only translations need those keys.
  * Plural keys: "key.one" / "key.other" (picked by the `count` param).
  */
+import * as me from './sections/me.js';
+import * as pals from './sections/pals.js';
+import * as shop from './sections/shop.js';
+import * as grove from './sections/grove.js';
+import * as extras from './sections/extras.js';
+
 export const en = {
   'common.gotIt': 'Got it!',
   'common.next': 'Next',
@@ -228,4 +234,10 @@ export const en = {
   'tour.gems': 'Light up every gem',
   'tour.stars': 'Fewer taps, more stars',
   'tour.pal': 'Your Pal grows as you play',
+
+  ...me.en,
+  ...pals.en,
+  ...shop.en,
+  ...grove.en,
+  ...extras.en,
 };

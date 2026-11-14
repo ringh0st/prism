@@ -862,7 +862,7 @@ test('translations: every language uses the same keys and placeholders as Englis
   const { es } = await import('../i18n/strings/es.js');
   const { he } = await import('../i18n/strings/he.js');
   // Keys for game content (pieces, flavors, helpers…) only exist in translations: English lives in the game modules.
-  const CONTENT = /^(piece|recipe|helper|stage|title|treat|sticker|quips|combo)\./;
+  const CONTENT = /^(piece|recipe|helper|stage|title|treat|sticker|quips|combo|palName|palBio|outfit|decor|themeSet|bug|quest|eventTheme|beam|item)\./;
   const base = (key) => key.replace(/\.(zero|one|two|few|many|other)$/, '');
   const enBases = new Set(Object.keys(en).map(base));
   const placeholders = (text) => (typeof text === 'string' ? [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).filter((n) => n !== 'count').sort() : []);
