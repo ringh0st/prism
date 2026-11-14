@@ -167,3 +167,24 @@
   gap: 3px;
   color: var(--text-calm);
 }
+
+.nicknameButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  margin-top: -4px;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-soft);
+  background: var(--surface-tonal);
+  cursor: pointer;
+}
+
+.nicknameButton strong {
+  color: var(--text-strong);
+}

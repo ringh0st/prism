@@ -9,6 +9,7 @@ import { currentStreak, totalStars } from '../../game/progress.js';
 import { finishedWorldCount, titleFor } from '../../game/titles.js';
 import { todayKey } from '../../game/daily.js';
 import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
+import NicknameDialog from './NicknameDialog.jsx';
 import styles from './PlayerCard.module.css';
 
 function Stat({ icon, tone, value, label, note = null }) {
@@ -35,6 +36,7 @@ export default function PlayerCard() {
   const { user, displayName, avatarUrl } = useAuth();
   const { progress } = usePlayer();
   const [nickname, setNickname] = useState(null);
+  const [isEditingNickname, setIsEditingNickname] = useState(false);
   const stars = totalStars(progress);
   const { current, next, progress: toNext } = titleFor(stars);
   const solved = Object.values(progress.levels).filter((entry) => entry.stars > 0).length;
@@ -75,7 +77,28 @@ export default function PlayerCard() {
           Partner: {partner.name} the {partner.species} · {palStage(partnerXp).name}
         </p>
       )}
-      {nickname && <p className={styles.nickname}>On the Top board as {nickname}</p>}
+      {user && (
+        <button type="button" className={styles.nicknameButton} onClick={() => setIsEditingNickname(true)}>
+          {nickname ? (
+            <>
+              On the Top board as <strong>{nickname}</strong>
+            </>
+          ) : (
+            'Choose your Top board nickname'
+          )}
+          <Icon name="edit" size={14} />
+        </button>
+      )}
+      {isEditingNickname && (
+        <NicknameDialog
+          current={nickname}
+          onSaved={(saved) => {
+            setNickname(saved);
+            setIsEditingNickname(false);
+          }}
+          onClose={() => setIsEditingNickname(false)}
+        />
+      )}
 
       <div className={styles.title}>
         <span className={`game-title ${styles.titleChip}`}>{current.name}</span>

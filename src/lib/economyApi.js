@@ -5,6 +5,10 @@ import { EconomyError } from '../game/progress.js';
 function friendlyError(error) {
   const message = error?.message ?? '';
   if (/fetch|network|timeout/i.test(message)) return new EconomyError('You seem to be offline. Please try again.');
+  // The database is missing a newer function (its SQL script hasn't been run yet).
+  if (/could not find the function|schema cache/i.test(message)) {
+    return new EconomyError('This isn’t ready on our server yet. Please try again a bit later!');
+  }
   return new EconomyError(message || 'Something went wrong. Please try again.');
 }
 
@@ -33,6 +37,9 @@ export const buyStoreItemOnServer = (itemId, currency) => rpc('buy_store_item', 
 export const consumeHelperOnServer = (helperId) => rpc('use_helper', { p_helper: helperId });
 
 export const claimChestOnServer = (world, chestNumber) => rpc('claim_chest', { p_world: world, p_chest: chestNumber });
+
+/** Sets the public nickname from the two word lists. @returns state with `nickname` */
+export const setNicknameOnServer = (word, name) => rpc('set_nickname', { p_word: word, p_name: name });
 
 export const choosePalOnServer = (palId) => rpc('choose_pal', { p_pal: palId });
 

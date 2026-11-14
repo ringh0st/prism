@@ -115,8 +115,14 @@ export default function MapScreen() {
 
   // The current level is always the main view: centered in the space between the HUD and the PLAY button
   // (see .currentNode scroll-margin). Lumi says hello there, then lets the player focus.
+  // Runs again if the current level only becomes known after the levels load.
   useEffect(() => {
-    currentNodeRef.current?.scrollIntoView({ block: 'center' });
+    if (!currentRef) return undefined;
+    const frame = requestAnimationFrame(() => currentNodeRef.current?.scrollIntoView({ block: 'center' }));
+    return () => cancelAnimationFrame(frame);
+  }, [currentRef?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     const timer = setTimeout(() => setGreeting(null), GREETING_MS);
     return () => clearTimeout(timer);
   }, []);

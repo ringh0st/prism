@@ -38,7 +38,7 @@ function Collection({ onError }) {
             )}
             {!owned && isUnlocked && (
               <button type="button" className={`${styles.pickButton} ${styles.newPal}`} onClick={() => pick(pal.id)}>
-                New! Add to team
+                {progress.pal.id ? 'New! Add to team' : 'Choose as starter'}
               </button>
             )}
             {!isUnlocked && (

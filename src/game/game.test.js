@@ -295,3 +295,11 @@ test('pal unlocks and accessory prices match the database', async () => {
     assert.ok(sql.includes(`when '${item.id}' then ${item.price}`), `${item.id} price`);
   }
 });
+
+test('nickname word lists match the database', async () => {
+  const { NICKNAME_WORDS, NICKNAME_NAMES } = await import('./nicknames.js');
+  const sql = readFileSync(new URL('../../supabase/nicknames.sql', import.meta.url), 'utf8');
+  const list = (items) => `array[${items.map((item) => `'${item}'`).join(', ')}]`;
+  assert.ok(sql.includes(list(NICKNAME_WORDS)), 'words');
+  assert.ok(sql.includes(list(NICKNAME_NAMES)), 'names');
+});

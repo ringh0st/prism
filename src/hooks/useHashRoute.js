@@ -14,9 +14,12 @@ export function navigate(path) {
 export function useHashRoute() {
   const [route, setRoute] = useState(() => parseHash(window.location.hash));
   useEffect(() => {
+    // Each screen decides its own scroll position (the map centers the current level).
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
     const onChange = () => {
-      setRoute(parseHash(window.location.hash));
+      // Reset first, so it can never override a screen that scrolls itself on mount.
       window.scrollTo(0, 0);
+      setRoute(parseHash(window.location.hash));
     };
     window.addEventListener('hashchange', onChange);
     return () => window.removeEventListener('hashchange', onChange);
