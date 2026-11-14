@@ -120,7 +120,6 @@
   transform: rotate(45deg);
 }
 
-
 .top {
   left: 50%;
   bottom: calc(var(--size) * 1.15);

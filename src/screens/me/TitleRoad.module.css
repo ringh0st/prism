@@ -130,3 +130,9 @@
   color: #f0c14e;
   background: #2b2118;
 }
+
+.steps:focus-visible {
+  outline: 3px solid var(--color-sage);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}

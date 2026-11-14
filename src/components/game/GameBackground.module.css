@@ -8,9 +8,7 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(60vmax 40vmax at 78% -6%, var(--scene-sun), transparent 70%),
-    var(--surface-page);
+  background: radial-gradient(60vmax 40vmax at 78% -6%, var(--scene-sun), transparent 70%), var(--surface-page);
 }
 
 .hills {

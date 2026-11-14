@@ -12,6 +12,9 @@ import QuickBuyDialog from '../../components/QuickBuyDialog.jsx';
 import StarMeter from './StarMeter.jsx';
 import LevelIntro from './LevelIntro.jsx';
 import ChallengeResultDialog from './ChallengeResultDialog.jsx';
+import RushClearedDialog from '../rush/RushClearedDialog.jsx';
+import RushOverDialog from '../rush/RushOverDialog.jsx';
+import { RUSH_LENGTH, rushMoveLimit } from '../../game/rush.js';
 import NewPieceDialog from './NewPieceDialog.jsx';
 import WorldBackdrop from './WorldBackdrop.jsx';
 import { WORLDS } from '../../game/worlds.js';
@@ -60,8 +63,9 @@ function seenPieces(progress) {
 /**
  * mode: 'level' (records progress) | 'daily' (streak + sparks) | 'event' (weekend event puzzle) | 'playtest' (admin preview, free helpers, records nothing)
  * | 'challenge' (a friend's "beat my score" link: no helpers, records nothing; `challenge` is { levelId, moves, name })
+ * | 'rush' (Light Rush: no helpers, the run's spare moves set the limit; `rush` is from RushRoute)
  */
-export default function PlayScreen({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey, challenge = null }) {
+export default function PlayScreen({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey, challenge = null, rush = null }) {
   const { progress, finishLevel, finishDaily, finishEventLevel, consumeHelper } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
@@ -88,6 +92,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     if (isGlowbugAwake) sfx.sparkle();
   }, [isGlowbugAwake]);
   const [isOutOfMoves, setIsOutOfMoves] = useState(false);
+  const [rushOver, setRushOver] = useState(null);
   const [showIntro, setShowIntro] = useState(true);
   // Pieces this player meets for the first time get a "New piece!" card before the level starts.
   const [newPieces, setNewPieces] = useState(() => (mode === 'playtest' ? [] : newPiecesIn(level, seenPieces(progress))));
@@ -105,16 +110,17 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const react = useCallback((name) => setPalReaction({ name, key: Date.now() }), []);
 
   const modifier = useMemo(() => levelModifierFor(level), [level]);
-  const moveLimit = moveLimitFor(level.par, level.difficulty);
+  const moveLimit = mode === 'rush' ? rushMoveLimit(rush.run, level.par) : moveLimitFor(level.par, level.difficulty);
   const gems = level.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
   const helpersAllowed = helpersAllowedFor(level.difficulty);
   // Daily and event puzzles can't be skipped.
-  const offeredHelpers = mode === 'challenge' ? [] : mode === 'daily' || mode === 'event' ? HELPER_IDS.filter((id) => id !== 'skip') : HELPER_IDS;
+  const offeredHelpers =
+    mode === 'challenge' || mode === 'rush' ? [] : mode === 'daily' || mode === 'event' ? HELPER_IDS.filter((id) => id !== 'skip') : HELPER_IDS;
   const levelName = title || levelNameFor(level);
   const levelLabel = `${level.world}-${level.index}`;
   // Built-in worlds have their own look (board colors and landscape) and show their name.
-  const world = mode === 'level' || mode === 'challenge' ? WORLDS[level.world - 1] : null;
-  const backName = mode === 'event' ? 'event' : 'map';
+  const world = ['level', 'challenge', 'rush'].includes(mode) ? WORLDS[level.world - 1] : null;
+  const backName = mode === 'event' ? 'event' : mode === 'rush' ? 'Light Rush' : 'map';
   const eventSpot = useMemo(() => (mode === 'event' ? parseEventLevelId(level.id) : null), [mode, level.id]);
   const subtitle = level.isDaily
     ? 'Daily puzzle'
@@ -124,10 +130,17 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         ? 'Test play'
         : mode === 'challenge'
           ? `Challenge from ${challenge.name ?? 'a friend'}`
-          : `${world ? `${world.name} · ` : ''}${level.world}-${level.index}`;
+          : mode === 'rush'
+            ? `Light Rush · ${rush.number}/${RUSH_LENGTH}`
+            : `${world ? `${world.name} · ` : ''}${level.world}-${level.index}`;
   const introLine = useMemo(
-    () => (challenge ? `Beat ${challenge.moves} moves! Fewer moves wins.` : quipFor(modifier === 'normal' ? 'start' : modifier)),
-    [modifier, challenge],
+    () =>
+      challenge
+        ? `Beat ${challenge.moves} moves! Fewer moves wins.`
+        : rush
+          ? `Puzzle ${rush.number}: ${rush.run.spare} spare moves left. Make them count!`
+          : quipFor(modifier === 'normal' ? 'start' : modifier),
+    [modifier, challenge], // eslint-disable-line react-hooks/exhaustive-deps -- the rush line is set once per puzzle
   );
   const isOver = trace.isSolved || isOutOfMoves || Boolean(result);
 
@@ -219,6 +232,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         );
       } else if (mode === 'event') {
         outcome = finishEventLevel(level, { ...eventSpot, moves, starCap: puzzle.starCap });
+      } else if (mode === 'rush') {
+        const spareBefore = rush.run.spare;
+        outcome = rush.onSolved(moves).then((rushOutcome) => ({ stars, sparksEarned: rushOutcome.sparksWon, rush: { ...rushOutcome, spareBefore } }));
       } else if (mode === 'daily') {
         outcome = finishDaily(dateKey).then((daily) => ({ ...daily, stars, isNewBest: false }));
       } else {
@@ -298,6 +314,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
   const restart = useCallback(() => {
     sfx.restart();
+    if (mode === 'rush' && moves > 0) rush.onRestart(moves);
     puzzle.restart();
     playStats.start();
     setResult(null);
@@ -306,7 +323,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     hasRecordedWin.current = false;
     say('happy', 'start');
     setPalReaction(null);
-  }, [puzzle, say, playStats]);
+  }, [puzzle, say, playStats, mode, moves, rush]);
 
   /** Spend one helper from the inventory (free in playtest) and apply it. */
   const spendHelper = useCallback(
@@ -380,6 +397,15 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     sfx.setWorldVoice(world?.theme ?? null);
     return () => sfx.setWorldVoice(null);
   }, [world?.theme]);
+
+  // Light Rush: every move is saved with the run (leaving mid-puzzle spends them), and running out ends the run.
+  useEffect(() => {
+    if (mode === 'rush' && !trace.isSolved) rush.onMove(moves);
+  }, [moves]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (mode !== 'rush' || !isOutOfMoves) return;
+    rush.onRunOver().then(setRushOver);
+  }, [isOutOfMoves]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Soft background music in this world's voice while the level is being played; it fades out for the win.
   const isMusicPlaying = !showIntro && !isOver;
@@ -505,7 +531,21 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           </div>
         </Dialog>
       )}
-      {isOutOfMoves && !result && (
+      {isOutOfMoves && !result && mode === 'rush' && rushOver && (
+        <RushOverDialog {...rushOver} onNewRun={rush.onNewRun} onBack={() => navigate(backHref)} />
+      )}
+      {result && mode === 'rush' && (
+        <RushClearedDialog
+          number={rush.number}
+          par={level.par}
+          moves={result.moves}
+          spareBefore={result.rush.spareBefore}
+          outcome={result.rush}
+          onNext={rush.onNext}
+          onBack={() => navigate(backHref)}
+        />
+      )}
+      {isOutOfMoves && !result && mode !== 'rush' && (
         <OutOfMovesDialog
           backName={backName}
           gemsLeft={gems.length - trace.litGems.size}
@@ -533,7 +573,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           onHome={() => navigate('#/')}
         />
       )}
-      {result && mode !== 'challenge' && (
+      {result && mode !== 'challenge' && mode !== 'rush' && (
         <WinDialog
           challenge={mode === 'level' && !result.isSkipped ? { levelId: level.id, levelLabel, moves: result.moves } : null}
           backName={backName}

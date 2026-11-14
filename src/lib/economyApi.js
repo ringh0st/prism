@@ -98,6 +98,13 @@ export const fetchMyQuests = () => rpc('my_quests');
 
 export const claimQuestOnServer = (questId) => rpc('claim_pal_quest', { p_quest: questId });
 
+/** Light Rush (supabase/rush.sql): a run's puzzles cleared (pays new milestones), this week's record, and the board. */
+export const recordRushRunOnServer = (cleared) => rpc('record_rush_run', { p_cleared: cleared });
+
+export const fetchMyRush = () => rpc('my_rush');
+
+export const fetchRushBoard = () => rpc('rush_board');
+
 /** A player's card from this week's Top board (supabase/player_cards.sql), looked up by their place. */
 export const fetchPlayerCard = (rank) => rpc('player_card', { p_rank: rank });
 

@@ -8,6 +8,8 @@ import GameBackground from './components/game/GameBackground.jsx';
 import MapScreen from './screens/map/MapScreen.jsx';
 import PlayScreen from './screens/play/PlayScreen.jsx';
 import ChallengeRoute from './screens/play/ChallengeRoute.jsx';
+import RushScreen from './screens/rush/RushScreen.jsx';
+import RushRoute from './screens/rush/RushRoute.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
 import StoreScreen from './screens/StoreScreen.jsx';
 import LeaderboardScreen from './screens/leaderboard/LeaderboardScreen.jsx';
@@ -83,6 +85,8 @@ function Routes() {
       return <MapScreen />;
     case 'play':
       return <LevelRoute levelId={route.params[0]} />;
+    case 'rush':
+      return route.params[0] === 'play' ? <RushRoute /> : <RushScreen />;
     case 'challenge':
       return <ChallengeRoute params={route.params} />;
     case 'daily': {

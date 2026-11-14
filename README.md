@@ -53,6 +53,7 @@ Every push to `main` runs the tests, builds the game into `dist/play`, adds the 
 3. Run `supabase/make-admin.sql` to make your account an admin. **Settings → Level editor** then appears in the game.
 4. Run `supabase/economy.sql` for diamonds, helpers and the store.
 5. Run `supabase/progression.sql` for the 1000-level pack and reward chests.
-6. Run `supabase/play_stats.sql` for the anonymous play counts behind **Level editor → Stats** (where players get stuck).
+6. Run `supabase/rush.sql` for Light Rush (weekly runs, milestone sparks and its board).
+7. Run `supabase/play_stats.sql` for the anonymous play counts behind **Level editor → Stats** (where players get stuck).
 
 Payments setup: see [PAYMENTS.md](PAYMENTS.md).

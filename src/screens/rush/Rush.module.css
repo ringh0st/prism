@@ -1,0 +1,221 @@
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 var(--space-3) 130px;
+}
+
+.main {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
+}
+
+.card h3 {
+  font-size: 18px;
+}
+
+.muted {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.muted a {
+  color: var(--text-strong);
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-peach) 34%, var(--surface-raised));
+  box-shadow: var(--highlight), var(--shadow-md);
+}
+
+.heroIcon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 22px;
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+  box-shadow: var(--shadow-sm);
+  animation: zap 2.6s ease-in-out infinite;
+}
+
+@keyframes zap {
+  8%,
+  16% {
+    transform: rotate(-8deg) scale(1.06);
+  }
+  12% {
+    transform: rotate(8deg) scale(1.06);
+  }
+}
+
+.kicker {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.1;
+}
+
+.best {
+  margin: 4px 0 0;
+  font-weight: 700;
+}
+
+.best strong {
+  font-size: 22px;
+}
+
+/* ---------- Play ---------- */
+.runStatus {
+  margin: 0;
+  font-weight: 700;
+  text-align: center;
+}
+
+.rules {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-weight: 600;
+}
+
+.rules li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.ruleIcon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  color: var(--warm-label);
+  background: color-mix(in srgb, var(--color-peach) 40%, var(--surface-raised));
+}
+
+/* ---------- Milestones ---------- */
+.milestones {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.milestones li {
+  display: grid;
+  justify-items: center;
+  padding: var(--space-2) 4px;
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.milestones li.reached {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.milestoneCount {
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.milestoneLabel {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.milestoneReward {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+/* ---------- Board ---------- */
+.board {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.board li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.board li.me {
+  box-shadow: inset 0 0 0 3px var(--color-sage);
+}
+
+.rank {
+  width: 28px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.nickname {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score strong {
+  font-size: 18px;
+}
+
+.footnote {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroIcon {
+    animation: none;
+  }
+}

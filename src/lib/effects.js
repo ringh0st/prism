@@ -51,11 +51,22 @@ export function celebrate({ stars = 3, isBig = false, from = null } = {}) {
     }, 220);
   }
   if (isBig) {
-    setTimeout(() => fire({ origin: { x: 0.5, y: 0 }, angle: 270, spread: 140, particleCount: 80, startVelocity: 20, gravity: 0.7, shapes: [STAR], scalar: 1.2 }), 520);
+    setTimeout(
+      () =>
+        fire({ origin: { x: 0.5, y: 0 }, angle: 270, spread: 140, particleCount: 80, startVelocity: 20, gravity: 0.7, shapes: [STAR], scalar: 1.2 }),
+      520,
+    );
   }
 }
 
 /** A soft shower of stars for rewards (chests, gifts, prizes, new Pals). */
 export function rewardShower(from = null) {
-  fire({ origin: from ? originOf(from) : { x: 0.5, y: 0.35 }, particleCount: 70, spread: 100, startVelocity: 30, shapes: [STAR, 'circle'], scalar: 1.1 });
+  fire({
+    origin: from ? originOf(from) : { x: 0.5, y: 0.35 },
+    particleCount: 70,
+    spread: 100,
+    startVelocity: 30,
+    shapes: [STAR, 'circle'],
+    scalar: 1.1,
+  });
 }

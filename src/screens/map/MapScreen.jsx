@@ -10,6 +10,7 @@ import WorldSign from './scenery/WorldSign.jsx';
 import DailyGift from '../../components/game/DailyGift.jsx';
 import DailyButton from '../../components/game/DailyButton.jsx';
 import InstallButton from '../../components/install/InstallButton.jsx';
+import RushButton from '../../components/game/RushButton.jsx';
 import EventButton from '../../components/game/EventButton.jsx';
 import PalHello from '../../components/pals/PalHello.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
@@ -130,6 +131,7 @@ export default function MapScreen() {
         <div className={styles.hudStart}>
           <DailyButton />
           <EventButton />
+          <RushButton />
           <DailyGift />
           <InstallButton />
         </div>

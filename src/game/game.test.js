@@ -765,3 +765,51 @@ test('challenge links carry the level, moves and a safe nickname', async () => {
   assert.equal(parseChallenge(['w4-06', '2.5']), null);
   assert.deepEqual([challengeOutcome(4, 5), challengeOutcome(5, 5), challengeOutcome(6, 5)], ['win', 'tie', 'lose']);
 });
+
+test('Light Rush: the same 30 levels for everyone each week, climbing through the worlds', async () => {
+  const { rushLevelIds, RUSH_LENGTH } = await import('./rush.js');
+  const ids = rushLevelIds('2026-11-09');
+  assert.equal(ids.length, RUSH_LENGTH);
+  assert.deepEqual(ids, rushLevelIds('2026-11-09'));
+  assert.notDeepEqual(ids, rushLevelIds('2026-11-16'));
+  assert.equal(new Set(ids).size, RUSH_LENGTH);
+  assert.equal(ids[0].startsWith('w1-'), true);
+  assert.equal(ids[29].startsWith('w15-'), true);
+  assert.equal(
+    ids.slice(0, 20).every((id) => Number(id.split('-')[1]) % 5 !== 0),
+    true,
+  );
+  assert.equal(
+    ids.every((id) => Number(id.split('-')[1]) !== 20),
+    true,
+  );
+});
+
+test('Light Rush: spare moves, bonuses, restarts and milestone sparks', async () => {
+  const { newRun, afterRushSolve, afterRushRestart, rushMoveLimit, recordRushRunLocally, RUSH_START_SPARE } = await import('./rush.js');
+  let run = newRun('2026-11-09');
+  assert.equal(rushMoveLimit(run, 5), 5 + RUSH_START_SPARE);
+  run = afterRushSolve(run, 5, 5);
+  assert.equal(run.spare, RUSH_START_SPARE);
+  run = afterRushSolve(run, 5, 8);
+  assert.equal(run.spare, RUSH_START_SPARE - 3);
+  run = afterRushRestart(run, 4);
+  assert.equal(run.spare, RUSH_START_SPARE - 7);
+  run = { ...run, cleared: 4 };
+  assert.equal(afterRushSolve(run, 4, 4).spare, RUSH_START_SPARE - 7 + 3);
+  const start = { sparks: 10, rush: null };
+  const first = recordRushRunLocally(start, '2026-11-09', 12);
+  assert.equal(first.sparksWon, 60);
+  assert.deepEqual(first.progress.rush, { week: '2026-11-09', best: 12, paid: [5, 10] });
+  const again = recordRushRunLocally(first.progress, '2026-11-09', 7);
+  assert.equal(again.sparksWon, 0);
+  assert.equal(again.progress.rush.best, 12);
+});
+
+test('Light Rush milestones match the database', async () => {
+  const { RUSH_MILESTONES, RUSH_LENGTH } = await import('./rush.js');
+  const sql = readFileSync(new URL('../../supabase/rush.sql', import.meta.url), 'utf8');
+  for (const { cleared, sparks } of RUSH_MILESTONES) assert.match(sql, new RegExp(`when ${cleared} then ${sparks}\\b`));
+  assert.match(sql, new RegExp(`unnest\\(array\\[${RUSH_MILESTONES.map((m) => m.cleared).join(', ')}\\]\\)`));
+  assert.match(sql, new RegExp(`p_cleared > ${RUSH_LENGTH}`));
+});

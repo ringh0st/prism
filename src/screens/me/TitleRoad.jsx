@@ -20,7 +20,7 @@ export default function TitleRoad({ stars }) {
       <h3 id="title-road" className={styles.heading}>
         Title road
       </h3>
-      <ol ref={stepsRef} className={styles.steps}>
+      <ol ref={stepsRef} className={styles.steps} tabIndex={0} aria-labelledby="title-road">
         {PLAYER_TITLES.map((title, i) => {
           const state = i < currentIndex ? 'earned' : i === currentIndex ? 'current' : 'ahead';
           return (

@@ -6,6 +6,8 @@ import {
   claimChestOnServer,
   claimEventPrizeOnServer,
   fetchMyEvents,
+  fetchMyRush,
+  recordRushRunOnServer,
   fetchMyQuests,
   claimQuestOnServer,
   recordEventLevelOnServer,
@@ -43,6 +45,7 @@ import {
 } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
 import { claimEventPrizeLocally, EVENT_PRIZE_SPARKS, recordEventLevelLocally } from '../game/events.js';
+import { recordRushRunLocally, rushWeekOf } from '../game/rush.js';
 import { starsForMoves } from '../game/scoring.js';
 import { claimQuestLocally, questWeekOf, questsForWeek, recordQuestProgress } from '../game/quests.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
@@ -144,6 +147,8 @@ export function PlayerProvider({ children }) {
       if (events?.events) setProgress({ ...progressRef.current, events: events.events });
       const quests = await fetchMyQuests().catch(() => null);
       if (quests?.quests) setProgress({ ...progressRef.current, quests: quests.quests });
+      const rush = await fetchMyRush().catch(() => null);
+      if (rush?.rush) setProgress({ ...progressRef.current, rush: rush.rush });
       // Finished last week in the top 10? Collect the reward (the server pays it only once).
       const claimed = await claimWeeklyRewardOnServer().catch(() => null);
       if (claimed?.reward) {
@@ -256,6 +261,24 @@ export function PlayerProvider({ children }) {
         }
         applyServerState(await claimEventPrizeOnServer(weekend));
         return EVENT_PRIZE_SPARKS;
+      },
+
+      /** A Light Rush run reached `cleared` puzzles: keeps the week's best and pays new milestones. @returns sparks won */
+      async recordRushRun(cleared) {
+        const week = rushWeekOf();
+        if (!userId) {
+          const outcome = recordRushRunLocally(progressRef.current, week, cleared);
+          setProgress(outcome.progress);
+          return outcome.sparksWon;
+        }
+        try {
+          const state = await recordRushRunOnServer(cleared);
+          applyServerState(state);
+          return state.sparksEarned ?? 0;
+        } catch {
+          setSyncStatus('error');
+          return 0;
+        }
       },
 
       /** @returns Promise<{ sparksEarned, diamondsEarned, streak, isFirstToday }> */
