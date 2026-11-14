@@ -1,0 +1,135 @@
+/* The map's "add to Home Screen" button and its how-to dialog */
+.button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+  box-shadow: var(--shadow-button);
+  cursor: pointer;
+  animation: nudge 5s ease-in-out 2s infinite;
+  transition: transform 220ms var(--ease-spring);
+}
+
+.button:active {
+  transform: scale(0.92);
+}
+
+@keyframes nudge {
+  0%,
+  86%,
+  100% {
+    rotate: 0deg;
+  }
+  89%,
+  95% {
+    rotate: -10deg;
+  }
+  92%,
+  98% {
+    rotate: 10deg;
+  }
+}
+
+.plus {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: var(--action-label);
+  background: var(--action-bottom);
+  box-shadow: 0 0 0 2px var(--surface-page);
+}
+
+.lumi {
+  margin-bottom: var(--space-3);
+}
+
+.perks {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+  font-weight: 700;
+  text-align: left;
+}
+
+.perks li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.perks svg {
+  flex: none;
+  color: var(--color-sage);
+}
+
+.steps {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.number {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 15px;
+  color: var(--action-label);
+  background: var(--action-bottom);
+}
+
+.stepText {
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.stepIcon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  color: var(--text-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.actions {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    animation: none;
+  }
+}

@@ -11,6 +11,10 @@ import './styles/global.css';
 import App from './App.jsx';
 import { startAutoUpdate } from './lib/autoUpdate.js';
 import { isNativeApp } from './lib/platform.js';
+import { listenForInstallPrompt } from './lib/installApp.js';
+
+// Catch the browser's install offer early, for the Home Screen helper.
+listenForInstallPrompt();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

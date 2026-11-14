@@ -498,3 +498,21 @@ test('the partner Pal cheers louder for bigger wins', async () => {
   assert.equal(cheerFor({ stars: 1 }, 0, 0.99).isBig, false);
   assert.ok(cheerFor({ stars: 1 }, 0, 0.99).line);
 });
+
+test('the Home Screen helper waits for a few levels and backs off after "Not now"', async () => {
+  const { shouldSuggestInstall } = await import('./installNudge.js');
+  const day = 86_400_000;
+  assert.equal(shouldSuggestInstall({ solvedCount: 2 }), false);
+  assert.equal(shouldSuggestInstall({ solvedCount: 3 }), true);
+  assert.equal(shouldSuggestInstall({ solvedCount: 9, dismissedAt: 10 * day, timesDismissed: 1, now: 12 * day }), false);
+  assert.equal(shouldSuggestInstall({ solvedCount: 9, dismissedAt: 10 * day, timesDismissed: 1, now: 17 * day }), true);
+  assert.equal(shouldSuggestInstall({ solvedCount: 9, dismissedAt: 0, timesDismissed: 3, now: 99 * day }), false);
+});
+
+test('iPhones and iPads add apps through Share, other browsers through their menu', async () => {
+  const { installMethod } = await import('../lib/installApp.js');
+  assert.equal(installMethod('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)'), 'ios');
+  assert.equal(installMethod('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 5), 'ios');
+  assert.equal(installMethod('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 0), 'menu');
+  assert.equal(installMethod('Mozilla/5.0 (Linux; Android 14)'), 'menu');
+});

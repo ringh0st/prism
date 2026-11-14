@@ -11,6 +11,7 @@ import { APPLE_SIGN_IN_ENABLED, PRIVACY_URL, HOME_PAGE_URL, TERMS_URL } from '..
 import PlayerCard from './me/PlayerCard.jsx';
 import styles from './SettingsScreen.module.css';
 import { APP_VERSION, COPYRIGHT_YEAR, STORE_NAME, STUDIO_NAME } from '../lib/appInfo.js';
+import InstallSettingsCard from '../components/install/InstallSettingsCard.jsx';
 
 const SYNC_LABELS = {
   local: 'Progress is saved on this device.',
@@ -188,6 +189,8 @@ export default function SettingsScreen() {
             })}
           </div>
         </section>
+
+        <InstallSettingsCard className={styles.card} />
 
         <section className={styles.card} aria-labelledby="data-title">
           <h2 id="data-title">Data</h2>
