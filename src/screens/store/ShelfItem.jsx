@@ -3,12 +3,12 @@ import styles from './Stall.module.css';
 
 /**
  * One item on a shelf: the illustrated goods (tap for details when `onInfo` is given), a count badge, the name and
- * price tags. `tag` is an optional ribbon like "Best value".
+ * price tags. `tag` is an optional ribbon like "Best value". `artNode` replaces the drawn goods (e.g. a Pal in clothes).
  */
-export default function ShelfItem({ art, title, subtitle, badge, tag, onInfo = null, children }) {
+export default function ShelfItem({ art, artNode = null, title, subtitle, badge, tag, onInfo = null, children }) {
   const goods = (
     <>
-      <ShopItemArt art={art} size={88} className={styles.goodsArt} />
+      {artNode ?? <ShopItemArt art={art} size={88} className={styles.goodsArt} />}
       {badge && <span className={`game-title ${styles.count}`}>{badge}</span>}
     </>
   );

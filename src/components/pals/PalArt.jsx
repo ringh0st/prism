@@ -485,6 +485,22 @@ function Accessory({ id, hat, neck }) {
           ))}
         </g>
       );
+    case 'headphones':
+      return (
+        <g>
+          <path d={`M${hx - 25} ${hy + 24}Q${hx} ${hy - 12} ${hx + 25} ${hy + 24}`} stroke="#4a3e36" strokeWidth="5" fill="none" strokeLinecap="round" />
+          <rect x={hx - 32} y={hy + 16} width="12" height="18" rx="5" fill="#58ac82" />
+          <rect x={hx + 20} y={hy + 16} width="12" height="18" rx="5" fill="#58ac82" />
+        </g>
+      );
+    case 'crown':
+      return (
+        <g transform={`translate(${hx} ${hy})`}>
+          <path d="M-15 2-17-14l9 7 8-12 8 12 9-7-2 16z" fill="#f0c14e" />
+          <rect x="-15" y="0" width="30" height="5" rx="2" fill="#c99a2e" />
+          <circle cx="0" cy="-4" r="2.6" fill="#df7458" />
+        </g>
+      );
     default:
       return null;
   }

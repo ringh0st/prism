@@ -6,6 +6,7 @@ import {
   claimChestOnServer,
   claimDailyGiftOnServer,
   choosePalOnServer,
+  setNicknameOnServer,
   glowUpPalOnServer,
   buyAccessoryOnServer,
   equipAccessoryOnServer,
@@ -29,10 +30,12 @@ import {
   recordLevelResult,
   upgradeProgress,
   withServerState,
+  EconomyError,
 } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
 import { DAILY_GIFT_SPARKS } from '../game/catalog.js';
+import { nicknameProblem } from '../game/nicknames.js';
 import { buyAccessoryLocally, choosePalLocally, equipAccessoryLocally, glowUpPalLocally, glowUpsEarned } from '../game/pals.js';
 import { sfx } from '../audio/sfx.js';
 
@@ -87,6 +90,8 @@ export function PlayerProvider({ children }) {
       if (localPal && !state.pal?.id) {
         await choosePalOnServer(localPal).then(applyServerState).catch(() => {});
       }
+      // The nickname chosen on this device is the one the board should show.
+      if (progressRef.current.nickname) await setNicknameOnServer(progressRef.current.nickname).catch(() => {});
       // Finished last week in the top 10? Collect the reward (the server pays it only once).
       const claimed = await claimWeeklyRewardOnServer().catch(() => null);
       if (claimed?.reward) {
@@ -183,6 +188,25 @@ export function PlayerProvider({ children }) {
           applyServerState(await choosePalOnServer(palId));
         } catch {
           // Kept on this device and sent again on the next sync.
+          setSyncStatus('error');
+        }
+      },
+
+      /** Set the public nickname: saved here at once, then on the account. @throws EconomyError if it breaks the rules */
+      async setNickname(nickname) {
+        const problem = nicknameProblem(nickname);
+        if (problem) throw new EconomyError(problem);
+        const clean = nickname.trim().replace(/\s+/g, ' ');
+        setProgress({ ...progressRef.current, nickname: clean });
+        if (!userId) return;
+        try {
+          await setNicknameOnServer(clean);
+        } catch (error) {
+          // A rule the server enforces (rare): undo, so the player can pick another.
+          if (!/server yet|offline/i.test(error.message)) {
+            setProgress({ ...progressRef.current, nickname: null });
+            throw error;
+          }
           setSyncStatus('error');
         }
       },

@@ -5,13 +5,12 @@ import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { stageOf } from '../../game/pals.js';
 import { NICKNAME_MAX, nicknameProblem, randomNickname } from '../../game/nicknames.js';
-import { setNicknameOnServer } from '../../lib/economyApi.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './NicknameDialog.module.css';
 
 /** Type your Top-board nickname, or roll a random one. Checked here and again on the server. */
 export default function NicknameDialog({ current, onSaved, onClose }) {
-  const { progress, refresh } = usePlayer();
+  const { progress, setNickname: saveNickname } = usePlayer();
   const inputId = useId();
   const hintId = useId();
   const [nickname, setNickname] = useState(current ?? randomNickname());
@@ -31,10 +30,9 @@ export default function NicknameDialog({ current, onSaved, onClose }) {
     setIsSaving(true);
     setError('');
     try {
-      const state = await setNicknameOnServer(nickname);
+      await saveNickname(nickname);
       sfx.sparkle();
-      refresh();
-      onSaved(state.nickname);
+      onSaved();
     } catch (saveError) {
       setError(saveError.message);
       setIsSaving(false);

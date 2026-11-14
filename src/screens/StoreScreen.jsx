@@ -8,6 +8,8 @@ import StallFront from './store/StallFront.jsx';
 import ShelfItem from './store/ShelfItem.jsx';
 import ItemInfoDialog from './store/ItemInfoDialog.jsx';
 import DailyGift from '../components/game/DailyGift.jsx';
+import PalArt from '../components/pals/PalArt.jsx';
+import { PAL_ACCESSORIES, stageOf } from '../game/pals.js';
 import { usePlayer } from '../state/PlayerContext.jsx';
 import { DIAMOND_PACKS, DIAMOND_REWARDS, HELPERS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS } from '../game/catalog.js';
 import { sparkPurchasesLeft } from '../game/progress.js';
@@ -20,6 +22,7 @@ import styles from './store/Stall.module.css';
 const TABS = [
   { id: 'helpers', label: 'Helpers', icon: 'hint' },
   { id: 'sparks', label: 'Sparks', icon: 'spark' },
+  { id: 'clothes', label: 'Clothes', icon: 'shirt' },
   { id: 'diamonds', label: 'Diamonds', icon: 'diamond' },
 ];
 
@@ -111,6 +114,59 @@ function SparksShelf({ buyProps, onInfo }) {
         ))}
       </ul>
       {!isSignedIn && <SignInNote />}
+    </>
+  );
+}
+
+/** Clothes for Pals, bought once with sparks. You put them on (or take them off) in Me. */
+function ClothesShelf({ onBought, onError }) {
+  const { progress, buyAccessory } = usePlayer();
+  const [busyItem, setBusyItem] = useState(null);
+  const model = progress.pal.id ?? 'ember';
+  const modelStage = stageOf(progress.pal.owned[model]);
+
+  const buy = async (item) => {
+    setBusyItem(item.id);
+    try {
+      await buyAccessory(item.id);
+      onBought(item);
+    } catch (error) {
+      onError(error.message);
+    } finally {
+      setBusyItem(null);
+    }
+  };
+
+  return (
+    <>
+      <p className={styles.shelfIntro}>
+        Dress up your Pals! Clothes are yours forever. Put them on in <a href="#/settings">Me → Wardrobe</a>.
+      </p>
+      <ul className={styles.shelf}>
+        {PAL_ACCESSORIES.map((item) => {
+          const isOwned = progress.pal.accessories.includes(item.id);
+          return (
+            <ShelfItem key={item.id} artNode={<PalArt palId={model} stage={modelStage} accessory={item.id} size={92} className={styles.goodsArt} />} title={item.name}>
+              {isOwned ? (
+                <span className={styles.ownedTag}>
+                  <Icon name="check" size={16} /> Owned
+                </span>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="gold"
+                  disabled={busyItem !== null || progress.sparks < item.price}
+                  onClick={() => buy(item)}
+                  aria-label={`Buy ${item.name} for ${item.price} sparks`}
+                >
+                  <Icon name="spark" size={16} />
+                  <span>{item.price}</span>
+                </Button>
+              )}
+            </ShelfItem>
+          );
+        })}
+      </ul>
     </>
   );
 }
@@ -252,6 +308,15 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
           <DailyGift look="note" />
           {tab === 'helpers' && <HelpersShelf buyProps={buyProps} onInfo={setInfo} />}
           {tab === 'sparks' && <SparksShelf buyProps={buyProps} onInfo={setInfo} />}
+          {tab === 'clothes' && (
+            <ClothesShelf
+              onBought={(item) => {
+                sfx.sparkle();
+                setLumi({ mood: 'dance', line: `Ooh, the ${item.name.toLowerCase()}! Try it on in Me.` });
+              }}
+              onError={(message) => setLumi({ mood: 'worried', line: message })}
+            />
+          )}
           {tab === 'diamonds' && <DiamondsShelf onError={(message) => setLumi({ mood: 'worried', line: message })} />}
         </section>
       </main>

@@ -59,8 +59,10 @@ export default function LeaderboardScreen() {
   // Your own rows always show the Pal you're playing with right now, even before the board reloads.
   const withMyPal = (row) =>
     row.isMe && progress.pal.id
-      ? { ...row, pal: progress.pal.id, palStage: stageOf(progress.pal.owned[progress.pal.id]), accessory: progress.pal.accessory }
-      : row;
+      ? { ...row, pal: progress.pal.id, palStage: stageOf(progress.pal.owned[progress.pal.id]), accessory: progress.pal.accessory, nickname: progress.nickname ?? row.nickname }
+      : row.isMe && progress.nickname
+        ? { ...row, nickname: progress.nickname }
+        : row;
   const top = board?.top.map(withMyPal) ?? [];
   const rest = top.filter((row) => row.rank > 3);
   const isMeListed = top.some((row) => row.isMe);

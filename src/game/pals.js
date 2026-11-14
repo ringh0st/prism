@@ -82,6 +82,8 @@ export const PAL_ACCESSORIES = [
   { id: 'bow', name: 'Bow tie', price: 50 },
   { id: 'partyHat', name: 'Party hat', price: 60 },
   { id: 'flowerCrown', name: 'Flower crown', price: 80 },
+  { id: 'headphones', name: 'Headphones', price: 100 },
+  { id: 'crown', name: 'Royal crown', price: 150 },
 ];
 
 export const accessoryById = (id) => PAL_ACCESSORIES.find((item) => item.id === id) ?? null;

@@ -32,6 +32,7 @@ export function createEmptyProgress() {
     hotStreak: 0,
     giftDate: null,
     pal: { id: null, owned: {}, accessories: [], accessory: null },
+    nickname: null,
   };
 }
 

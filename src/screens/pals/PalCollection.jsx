@@ -55,45 +55,41 @@ function Collection({ onError }) {
   );
 }
 
-/** Accessories: buy once with sparks, then wear one on your partner. */
+/** Clothes you own (bought in the Shop): put one on your partner, or take it off. */
 function Wardrobe({ onError }) {
-  const { progress, buyAccessory, equipAccessory } = usePlayer();
-  const act = async (fn) => {
+  const { progress, equipAccessory } = usePlayer();
+  const owned = PAL_ACCESSORIES.filter((item) => progress.pal.accessories.includes(item.id));
+  const wear = async (itemId) => {
     try {
-      await fn();
+      await equipAccessory(itemId);
       sfx.sparkle();
     } catch (error) {
       onError(error.message);
     }
   };
 
+  if (owned.length === 0) {
+    return (
+      <p className={styles.growth}>
+        No clothes yet. Find scarves, hats and crowns in the <a href="#/store">Shop</a>.
+      </p>
+    );
+  }
   return (
     <ul className={styles.wardrobe}>
-      {PAL_ACCESSORIES.map((item) => {
-        const isOwned = progress.pal.accessories.includes(item.id);
+      {owned.map((item) => {
         const isWorn = progress.pal.accessory === item.id;
         return (
-          <li key={item.id} className={styles.accessory}>
-            <PalArt palId={progress.pal.id} stage={1} accessory={item.id} size={58} />
+          <li key={item.id} className={`${styles.accessory} ${isWorn ? styles.worn : ''}`}>
+            <PalArt palId={progress.pal.id} stage={stageOf(progress.pal.owned[progress.pal.id])} accessory={item.id} size={58} />
             <span className={styles.accessoryName}>{item.name}</span>
             {isWorn ? (
-              <Button size="sm" variant="secondary" onClick={() => act(() => equipAccessory(null))}>
+              <Button size="sm" variant="secondary" onClick={() => wear(null)}>
                 Take off
               </Button>
-            ) : isOwned ? (
-              <Button size="sm" onClick={() => act(() => equipAccessory(item.id))}>
-                Wear
-              </Button>
             ) : (
-              <Button
-                size="sm"
-                variant="gold"
-                disabled={progress.sparks < item.price}
-                onClick={() => act(() => buyAccessory(item.id))}
-                aria-label={`Buy ${item.name} for ${item.price} sparks`}
-              >
-                <Icon name="spark" size={14} />
-                <span>{item.price}</span>
+              <Button size="sm" onClick={() => wear(item.id)}>
+                Wear
               </Button>
             )}
           </li>
@@ -118,7 +114,7 @@ export default function PalCollection() {
       {partner && (
         <>
           <h3 className={`game-title ${styles.subheading}`}>Wardrobe</h3>
-          <p className={styles.growth}>Dress up your partner. Bought with sparks, worn by any Pal.</p>
+          <p className={styles.growth}>Dress up your partner. Any Pal can wear your clothes.</p>
           <Wardrobe onError={setMessage} />
         </>
       )}

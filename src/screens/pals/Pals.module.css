@@ -365,3 +365,11 @@
   background: var(--color-honey);
   box-shadow: none;
 }
+
+.worn {
+  background: color-mix(in srgb, var(--color-sage) 26%, var(--surface-raised));
+}
+
+.worn :global(button) {
+  background: var(--surface-raised);
+}

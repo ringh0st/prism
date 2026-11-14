@@ -101,6 +101,8 @@ as $$
     when 'bow' then 50
     when 'partyHat' then 60
     when 'flowerCrown' then 80
+    when 'headphones' then 100
+    when 'crown' then 150
     else null
   end;
 $$;

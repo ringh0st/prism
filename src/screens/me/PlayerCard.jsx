@@ -38,6 +38,7 @@ export default function PlayerCard() {
   const { progress } = usePlayer();
   const [nickname, setNickname] = useState(null);
   const [isEditingNickname, setIsEditingNickname] = useState(false);
+  const shownNickname = progress.nickname ?? nickname;
   const stars = totalStars(progress);
   const { current, next, progress: toNext } = titleFor(stars);
   const solved = Object.values(progress.levels).filter((entry) => entry.stars > 0).length;
@@ -78,25 +79,20 @@ export default function PlayerCard() {
           Partner: {partner.name} the {partner.species} · {palStage(partnerStage).name}
         </p>
       )}
-      {user && (
-        <button type="button" className={styles.nicknameButton} onClick={() => setIsEditingNickname(true)}>
-          {nickname ? (
-            <>
-              On the Top board as <strong>{nickname}</strong>
-            </>
-          ) : (
-            'Choose your Top board nickname'
-          )}
-          <Icon name="edit" size={14} />
-        </button>
-      )}
+      <button type="button" className={styles.nicknameButton} onClick={() => setIsEditingNickname(true)}>
+        {shownNickname ? (
+          <>
+            {user ? 'On the Top board as' : 'Nickname:'} <strong>{shownNickname}</strong>
+          </>
+        ) : (
+          'Choose your nickname'
+        )}
+        <Icon name="edit" size={14} />
+      </button>
       {isEditingNickname && (
         <NicknameDialog
-          current={nickname}
-          onSaved={(saved) => {
-            setNickname(saved);
-            setIsEditingNickname(false);
-          }}
+          current={shownNickname}
+          onSaved={() => setIsEditingNickname(false)}
           onClose={() => setIsEditingNickname(false)}
         />
       )}
