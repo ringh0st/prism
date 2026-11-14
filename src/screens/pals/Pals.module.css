@@ -103,60 +103,18 @@
 
 .collection {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-  gap: var(--space-2);
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: var(--space-4) var(--space-2);
   margin: 0;
-  padding: 0;
+  padding: var(--space-2) 0 0;
   list-style: none;
-}
-
-.palCard {
-  position: relative;
-  display: grid;
-  justify-items: center;
-  align-content: start;
-  gap: 2px;
-  padding: var(--space-2) 4px var(--space-3);
-  border-radius: var(--radius-md);
-  text-align: center;
-  background: var(--surface-tonal);
-}
-
-.partner {
-  background: color-mix(in srgb, var(--color-sage) 26%, var(--surface-raised));
-}
-
-.locked .palArt {
-  filter: brightness(0) opacity(0.18);
-}
-
-.palName {
-  font-size: 16px;
-}
-
-.badge {
-  padding: 1px 8px;
-  border-radius: var(--radius-pill);
-  font-size: 11.5px;
-  font-weight: 800;
-}
-
-.badge {
-  color: var(--action-label);
-  background: var(--action-bottom);
-}
-
-.stage {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  font-size: 11.5px;
 }
 
 .pickButton {
   min-height: 32px;
   margin-top: 2px;
   padding: 0 10px;
+  white-space: nowrap;
   border: 0;
   border-radius: var(--radius-pill);
   font-family: var(--font-display);
@@ -319,11 +277,6 @@
   font-weight: 600;
   font-size: 15px;
   color: var(--text-soft);
-}
-
-/* Legendary and Mythic Pals: a badge under the name */
-.rarity {
-  margin-bottom: 2px;
 }
 
 /* Tap a Pal to see all its forms */
