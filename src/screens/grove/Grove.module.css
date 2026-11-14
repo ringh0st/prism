@@ -79,10 +79,13 @@
   align-content: start;
   gap: 6px;
   padding: var(--space-3) var(--space-2);
+  border: 2px solid color-mix(in srgb, var(--text-strong) 8%, transparent);
   border-radius: var(--radius-lg);
   text-align: center;
   background: var(--surface-raised);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 1px 2px rgb(43 33 24 / 0.06),
+    0 6px 16px -6px rgb(43 33 24 / 0.18);
 }
 
 .placed {

@@ -98,12 +98,16 @@
   text-decoration: none;
   color: var(--text-strong);
   background: var(--surface-tonal);
-  box-shadow: 0 4px 0 color-mix(in srgb, var(--surface-tonal) 75%, var(--text-strong));
+  border: 2px solid color-mix(in srgb, var(--text-strong) 8%, transparent);
+  /* A soft lift, like the Pal cards (no heavy ledge) */
+  box-shadow:
+    0 1px 2px rgb(43 33 24 / 0.06),
+    0 6px 16px -6px rgb(43 33 24 / 0.18);
   transition: transform 200ms var(--ease-spring);
 }
 
 a.puzzle:active {
-  transform: translateY(3px);
+  transform: scale(0.95);
 }
 
 .puzzleNumber {
@@ -124,7 +128,7 @@ a.puzzle:active {
 @keyframes glow {
   50% {
     box-shadow:
-      0 4px 0 color-mix(in srgb, var(--action-bottom) 70%, #000),
+      0 6px 16px -6px rgb(43 33 24 / 0.18),
       0 0 0 5px color-mix(in srgb, var(--color-sage) 30%, transparent);
   }
 }
