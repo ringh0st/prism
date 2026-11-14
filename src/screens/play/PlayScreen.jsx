@@ -294,6 +294,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     setNewPieces([]);
   };
 
+  // In-level sounds speak in this world's voice (a desert pluck, lagoon drops…); back to normal after.
+  useEffect(() => {
+    sfx.setWorldVoice(world?.theme ?? null);
+    return () => sfx.setWorldVoice(null);
+  }, [world?.theme]);
+
   const dismissIntro = useCallback(() => {
     sfx.unlock();
     sfx.levelStart();

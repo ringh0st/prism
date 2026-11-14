@@ -2,6 +2,7 @@
 // One soft "music box" family: bell tones in a pentatonic scale through a warm low-pass,
 // so even many sounds in a row stay calm. Each moment has its own sound and haptic strength.
 import { haptic } from './haptics.js';
+import { DEFAULT_VOICE, voiceFor } from './worldVoices.js';
 
 let context = null;
 let output = null;
@@ -61,6 +62,51 @@ function feel(strength) {
   if (hapticsEnabled) haptic(strength);
 }
 
+/** The current world's voice (scale and instrument) for in-level sounds. */
+let voice = DEFAULT_VOICE;
+const voiceNote = (i) => voice.notes[Math.max(0, Math.min(voice.notes.length - 1, i))];
+
+/** One note in the current world's instrument. */
+function play(frequency, { delay = 0, volume = 0.1, duration = 0.5 } = {}) {
+  switch (voice.timbre) {
+    case 'pluck': // koto / oud: a bright attack that fades fast
+      tone(frequency * 1.003, frequency, duration * 0.7, { type: 'triangle', volume, delay, attack: 0.002 });
+      tone(frequency * 2, frequency * 2, duration * 0.25, { volume: volume * 0.3, delay, attack: 0.002 });
+      break;
+    case 'marimba': // a round wooden bar
+      tone(frequency, frequency, duration * 0.5, { volume: volume * 1.1, delay, attack: 0.003 });
+      tone(frequency * 4, frequency * 4, 0.05, { volume: volume * 0.2, delay, attack: 0.002 });
+      break;
+    case 'wood': // a soft woodblock with a warm body
+      tone(frequency, frequency * 0.99, duration * 0.4, { type: 'triangle', volume, delay, attack: 0.003 });
+      tone(frequency / 2, frequency / 2, duration * 0.3, { volume: volume * 0.4, delay, attack: 0.003 });
+      break;
+    case 'drop': // a water drop: a quick upward plink
+      tone(frequency * 0.7, frequency * 1.3, 0.12, { volume, delay, attack: 0.004 });
+      tone(frequency, frequency, duration * 0.5, { volume: volume * 0.4, delay: delay + 0.05, attack: 0.01 });
+      break;
+    case 'crystal': // a high bell with an echo off the mountains
+      bell(frequency, { delay, volume: volume * 0.8, duration });
+      bell(frequency, { delay: delay + 0.22, volume: volume * 0.25, duration });
+      break;
+    default:
+      bell(frequency, { delay, volume, duration });
+  }
+}
+
+/** A little nature sound for a world's start-up jingle. */
+const ACCENTS = {
+  chirp: (delay) => {
+    tone(2600, 3400, 0.06, { volume: 0.03, delay });
+    tone(2800, 3600, 0.07, { volume: 0.03, delay: delay + 0.09 });
+  },
+  hoot: (delay) => {
+    tone(420, 380, 0.25, { volume: 0.05, delay, attack: 0.05 });
+    tone(400, 360, 0.35, { volume: 0.05, delay: delay + 0.32, attack: 0.05 });
+  },
+  splash: (delay) => [0, 0.07, 0.15].forEach((d, i) => tone(900 + i * 300, 1500 + i * 300, 0.06, { volume: 0.03, delay: delay + d })),
+};
+
 // C major pentatonic, from C5 up.
 const NOTES = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51, 1567.98, 1760, 2093];
 const note = (i) => NOTES[Math.max(0, Math.min(NOTES.length - 1, i))];
@@ -73,6 +119,10 @@ export const sfx = {
   unlock() {
     audio();
   },
+  /** In-level sounds use this world's voice (null for daily puzzles, events and menus). */
+  setWorldVoice(theme) {
+    voice = voiceFor(theme);
+  },
 
   // --- Playing a level ---
   /** A piece turns: a little wooden tick. */
@@ -82,7 +132,7 @@ export const sfx = {
   },
   /** Another gem lights up: each one a step higher. */
   gemLit(count) {
-    bell(note(count + 1), { volume: 0.11, duration: 0.5 });
+    play(voiceNote(count + 1), { volume: 0.11, duration: 0.5 });
     feel('light');
   },
   /** The beam hits a shadow crystal: a soft "hmm", not an error buzz. */
@@ -91,10 +141,11 @@ export const sfx = {
     tone(196, 165, 0.25, { type: 'triangle', volume: 0.04 });
     feel('light');
   },
-  /** A level begins: a little swoosh up into a bell. */
+  /** A level begins: a little swoosh, then the world's own motif (and its nature sound). */
   levelStart() {
     tone(260, 620, 0.22, { volume: 0.05, attack: 0.08 });
-    bell(note(3), { delay: 0.18, volume: 0.08 });
+    voice.motif.forEach((step, i) => play(voiceNote(step), { delay: 0.18 + i * 0.11, volume: 0.07, duration: 0.45 }));
+    ACCENTS[voice.accent]?.(0.25 + voice.motif.length * 0.11);
   },
   /** Back to the start: a quick little rewind. */
   restart() {
@@ -116,9 +167,9 @@ export const sfx = {
   /** Solved! The fanfare grows with the stars, and bosses get an extra flourish. */
   win({ stars = 3, isBig = false } = {}) {
     const run = [0, 2, 3, 5, 7, 8, 10].slice(0, 3 + stars + (isBig ? 1 : 0));
-    run.forEach((step, i) => bell(note(step), { delay: i * 0.08, volume: 0.1, duration: 0.5 }));
+    run.forEach((step, i) => play(voiceNote(step), { delay: i * 0.08, volume: 0.1, duration: 0.5 }));
     const end = run.length * 0.08;
-    [0, 3, 5].forEach((step) => bell(note(step + (stars === 3 ? 2 : 0)), { delay: end + 0.05, volume: 0.06, duration: 0.9 }));
+    [0, 3, 5].forEach((step) => play(voiceNote(step + (stars === 3 ? 2 : 0)), { delay: end + 0.05, volume: 0.06, duration: 0.9 }));
     feel(stars === 3 || isBig ? 'celebrate' : 'success');
   },
   /** Each star landing on the win screen: a rising ding. */

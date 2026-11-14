@@ -562,3 +562,15 @@ test('Pal of the day leads with news, otherwise says hello for the time of day',
   assert.match(palGreetingFor(fresh, new Date(2026, 10, 14, 15), 0), /weekend/);
   assert.match(palGreetingFor(fresh, new Date(2026, 10, 18, 8), 0), /morning/i);
 });
+
+test('every world theme has its own musical voice', async () => {
+  const { WORLD_VOICES } = await import('../audio/worldVoices.js');
+  const { WORLD_THEMES } = await import('./worlds.js');
+  for (const theme of WORLD_THEMES) {
+    const voice = WORLD_VOICES[theme];
+    assert.ok(voice, theme);
+    assert.equal(voice.notes.length, 11, `${theme} has 11 notes`);
+    voice.notes.forEach((hz, i) => i > 0 && assert.ok(hz > voice.notes[i - 1], `${theme} rises`));
+    voice.motif.forEach((step) => assert.ok(step < voice.notes.length));
+  }
+});
