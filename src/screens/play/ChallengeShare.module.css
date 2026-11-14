@@ -1,0 +1,12 @@
+.challenge {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.feedback {
+  min-height: 1.3em;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-soft);
+}

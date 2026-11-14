@@ -11,6 +11,7 @@ import HelperBar from '../../components/HelperBar.jsx';
 import QuickBuyDialog from '../../components/QuickBuyDialog.jsx';
 import StarMeter from './StarMeter.jsx';
 import LevelIntro from './LevelIntro.jsx';
+import ChallengeResultDialog from './ChallengeResultDialog.jsx';
 import NewPieceDialog from './NewPieceDialog.jsx';
 import WorldBackdrop from './WorldBackdrop.jsx';
 import { WORLDS } from '../../game/worlds.js';
@@ -58,8 +59,9 @@ function seenPieces(progress) {
 
 /**
  * mode: 'level' (records progress) | 'daily' (streak + sparks) | 'event' (weekend event puzzle) | 'playtest' (admin preview, free helpers, records nothing)
+ * | 'challenge' (a friend's "beat my score" link: no helpers, records nothing; `challenge` is { levelId, moves, name })
  */
-export default function PlayScreen({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey }) {
+export default function PlayScreen({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey, challenge = null }) {
   const { progress, finishLevel, finishDaily, finishEventLevel, consumeHelper } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
@@ -107,10 +109,11 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const gems = level.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
   const helpersAllowed = helpersAllowedFor(level.difficulty);
   // Daily and event puzzles can't be skipped.
-  const offeredHelpers = mode === 'daily' || mode === 'event' ? HELPER_IDS.filter((id) => id !== 'skip') : HELPER_IDS;
+  const offeredHelpers = mode === 'challenge' ? [] : mode === 'daily' || mode === 'event' ? HELPER_IDS.filter((id) => id !== 'skip') : HELPER_IDS;
   const levelName = title || levelNameFor(level);
+  const levelLabel = `${level.world}-${level.index}`;
   // Built-in worlds have their own look (board colors and landscape) and show their name.
-  const world = mode === 'level' ? WORLDS[level.world - 1] : null;
+  const world = mode === 'level' || mode === 'challenge' ? WORLDS[level.world - 1] : null;
   const backName = mode === 'event' ? 'event' : 'map';
   const eventSpot = useMemo(() => (mode === 'event' ? parseEventLevelId(level.id) : null), [mode, level.id]);
   const subtitle = level.isDaily
@@ -119,8 +122,13 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       ? `Weekend event · ${eventSpot.number}/${EVENT_LEVELS}`
       : mode === 'playtest'
         ? 'Test play'
-        : `${world ? `${world.name} · ` : ''}${level.world}-${level.index}`;
-  const introLine = useMemo(() => quipFor(modifier === 'normal' ? 'start' : modifier), [modifier]);
+        : mode === 'challenge'
+          ? `Challenge from ${challenge.name ?? 'a friend'}`
+          : `${world ? `${world.name} · ` : ''}${level.world}-${level.index}`;
+  const introLine = useMemo(
+    () => (challenge ? `Beat ${challenge.moves} moves! Fewer moves wins.` : quipFor(modifier === 'normal' ? 'start' : modifier)),
+    [modifier, challenge],
+  );
   const isOver = trace.isSolved || isOutOfMoves || Boolean(result);
 
   const say = useCallback((mood, event) => setLumi({ mood, line: event ? quipFor(event) : '' }), []);
@@ -515,8 +523,19 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           onMap={() => navigate(backHref)}
         />
       )}
-      {result && (
+      {result && mode === 'challenge' && (
+        <ChallengeResultDialog
+          challenge={challenge}
+          levelLabel={levelLabel}
+          stars={result.stars}
+          moves={result.moves}
+          onRetry={restart}
+          onHome={() => navigate('#/')}
+        />
+      )}
+      {result && mode !== 'challenge' && (
         <WinDialog
+          challenge={mode === 'level' && !result.isSkipped ? { levelId: level.id, levelLabel, moves: result.moves } : null}
           backName={backName}
           replay={mode === 'playtest' ? null : { level, history: puzzle.history, title: levelName, subtitle }}
           result={result}

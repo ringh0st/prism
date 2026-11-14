@@ -1,0 +1,64 @@
+.stars {
+  justify-self: center;
+}
+
+.scores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scores li {
+  display: grid;
+  justify-items: center;
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+}
+
+/* The winner (both on a tie) gets the honey card and a crown, so it isn't told by color alone. */
+.scores li.winner {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.scores li.winner .who::before {
+  content: '👑 ';
+}
+
+.who {
+  max-width: 100%;
+  overflow: hidden;
+  font-weight: 800;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.moves {
+  font-size: 40px;
+  line-height: 1.1;
+}
+
+.unit {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lumi {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  text-align: start;
+  font-weight: 700;
+}
+
+.actions {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+}

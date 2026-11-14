@@ -17,6 +17,7 @@ import StickerBadge from '../../components/stickers/StickerBadge.jsx';
 import { withArticle } from '../../game/treats.js';
 import { cheerFor } from '../../game/palCheers.js';
 import LevelUp from './LevelUp.jsx';
+import ChallengeShare from './ChallengeShare.jsx';
 import styles from './WinDialog.module.css';
 
 function headlineFor({ stars, isSkipped, completesWorld, isFirstToday }, difficulty) {
@@ -49,6 +50,7 @@ function ShareResult({ text }) {
 /**
  * backName says where onMap goes: 'map', or 'event' for weekend-event puzzles.
  * replay: { level, history, title, subtitle } for the "Share replay" video (null to hide it).
+ * challenge: { levelId, levelLabel, moves } for "Challenge a friend" (null to hide it).
  */
 export default function WinDialog({
   result,
@@ -58,6 +60,7 @@ export default function WinDialog({
   hasNext,
   shareMessage = null,
   replay = null,
+  challenge = null,
   backName = 'map',
   onNext,
   onReplay,
@@ -183,6 +186,7 @@ export default function WinDialog({
         </div>
       )}
       {shareMessage && <ShareResult text={shareMessage} />}
+      {challenge && <ChallengeShare {...challenge} />}
       {replay && !isSkipped && <ReplayShare replay={{ ...replay, stars, moves }} />}
       {completesWorld && !isSignedIn && (
         <p className={styles.nudge}>

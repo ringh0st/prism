@@ -753,3 +753,15 @@ test('play counts: walls are levels with enough attempts and a low win rate, har
     ['w3-17', 'w2-11'],
   );
 });
+
+test('challenge links carry the level, moves and a safe nickname', async () => {
+  const { challengePath, parseChallenge, challengeOutcome } = await import('./challenges.js');
+  assert.equal(challengePath('w4-06', 5, 'Sunny Otter'), '#/challenge/w4-06/5/Sunny%20Otter');
+  assert.equal(challengePath('w4-06', 5, 'x'), '#/challenge/w4-06/5');
+  assert.deepEqual(parseChallenge(['w4-06', '5', 'Sunny Otter']), { levelId: 'w4-06', moves: 5, name: 'Sunny Otter' });
+  assert.equal(parseChallenge(['w4-06', '5', '<script>']).name, null);
+  assert.equal(parseChallenge(['daily', '5']), null);
+  assert.equal(parseChallenge(['w4-06', '0']), null);
+  assert.equal(parseChallenge(['w4-06', '2.5']), null);
+  assert.deepEqual([challengeOutcome(4, 5), challengeOutcome(5, 5), challengeOutcome(6, 5)], ['win', 'tie', 'lose']);
+});
