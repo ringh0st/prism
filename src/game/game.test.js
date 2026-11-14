@@ -320,3 +320,12 @@ test('nicknames: friendly rules, random names and the same blocked list as the d
   const sql = readFileSync(new URL('../../supabase/nicknames.sql', import.meta.url), 'utf8');
   assert.ok(sql.includes(`array[${BLOCKED_NICKNAME_PARTS.map((part) => `'${part}'`).join(', ')}]`), 'blocked list');
 });
+
+test('pals: the growth bar tracks the unfinished world nearest to done', async () => {
+  const { nextGlowUpProgress } = await import('./pals.js');
+  const solved = (world, count) => Object.fromEntries(Array.from({ length: count }, (_, i) => [`w${world}-${String(i + 1).padStart(2, '0')}`, { stars: 1 }]));
+  assert.deepEqual(nextGlowUpProgress({}), { world: 1, solved: 0, needed: 20 });
+  assert.deepEqual(nextGlowUpProgress({ ...solved(1, 20), ...solved(2, 7) }), { world: 2, solved: 7, needed: 20 });
+  assert.deepEqual(nextGlowUpProgress(solved(1, 20)), { world: 2, solved: 0, needed: 20 });
+  assert.deepEqual(nextGlowUpProgress({ ...solved(2, 3), ...solved(3, 9) }), { world: 3, solved: 9, needed: 20 });
+});

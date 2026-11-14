@@ -31,7 +31,7 @@ export default function PartnerSwitcher() {
             <span key={i} className={i <= stage.index ? styles.stageDotOn : styles.stageDot} />
           ))}
         </div>
-        <GlowUpStatus />
+        <GlowUpStatus partner={partner} stage={stage} />
       </div>
       {team.length > 1 && (
         <div className={styles.team} role="radiogroup" aria-label="Play with">

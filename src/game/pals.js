@@ -1,5 +1,5 @@
 import { EconomyError, totalStars } from './progress.js';
-import { finishedWorldCount } from './titles.js';
+import { finishedWorldCount, solvedCountByWorld } from './titles.js';
 
 /**
  * Pals: profile characters. You pick one starter on your first game, then unlock the rest by playing.
@@ -67,6 +67,24 @@ export const stageOf = (owned) => owned?.stage ?? 0;
 
 /** One Glow-up for every finished world. */
 export const glowUpsEarned = (progress) => finishedWorldCount(progress.levels);
+
+/**
+ * How close the next Glow-up is: the unfinished world nearest to done (the lowest one on a tie).
+ * @returns {{ world: number, solved: number, needed: number }}
+ */
+export function nextGlowUpProgress(levels, levelsPerWorld = 20) {
+  const counts = solvedCountByWorld(levels);
+  let best = null;
+  for (const [world, solved] of [...counts].sort(([a], [b]) => a - b)) {
+    if (solved < levelsPerWorld && (!best || solved > best.solved)) best = { world, solved };
+  }
+  if (!best) {
+    let world = 1;
+    while (counts.has(world)) world += 1;
+    best = { world, solved: 0 };
+  }
+  return { ...best, needed: levelsPerWorld };
+}
 
 /** Glow-ups earned by finishing worlds, minus those already spent growing Pals. */
 export function glowUpsAvailable(progress) {

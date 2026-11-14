@@ -18,12 +18,17 @@ export function titleFor(stars) {
   return { current, next, progress };
 }
 
-/** Worlds where every built-in level ("w3-01" … "w3-20") has at least one star. */
-export function finishedWorldCount(levels, levelsPerWorld = 20) {
+/** Solved built-in levels ("w3-01" … "w3-20", at least one star) per world number. */
+export function solvedCountByWorld(levels) {
   const solvedPerWorld = new Map();
   for (const [id, entry] of Object.entries(levels)) {
     const world = /^w(\d+)-\d{2}$/.exec(id)?.[1];
-    if (world && entry.stars > 0) solvedPerWorld.set(world, (solvedPerWorld.get(world) ?? 0) + 1);
+    if (world && entry.stars > 0) solvedPerWorld.set(Number(world), (solvedPerWorld.get(Number(world)) ?? 0) + 1);
   }
-  return [...solvedPerWorld.values()].filter((count) => count >= levelsPerWorld).length;
+  return solvedPerWorld;
+}
+
+/** Worlds where every built-in level has at least one star. */
+export function finishedWorldCount(levels, levelsPerWorld = 20) {
+  return [...solvedCountByWorld(levels).values()].filter((count) => count >= levelsPerWorld).length;
 }

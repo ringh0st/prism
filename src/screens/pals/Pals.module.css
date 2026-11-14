@@ -319,6 +319,7 @@
 }
 
 .glowReady {
+  justify-self: start;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -384,4 +385,46 @@
   font-weight: 600;
   font-size: 15px;
   color: var(--text-soft);
+}
+
+/* The partner's growth bar */
+.growthBox {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+
+.growthHead {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.growthCount {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-strong);
+}
+
+.growthTrack {
+  height: 14px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  box-shadow: var(--shadow-inset);
+}
+
+.growthFill {
+  display: block;
+  height: 100%;
+  min-width: 14px;
+  border-radius: inherit;
+  background: var(--color-sage);
+  transition: width 600ms var(--ease-out);
+}
+
+.growthTrackFull .growthFill {
+  background: var(--color-honey);
 }
