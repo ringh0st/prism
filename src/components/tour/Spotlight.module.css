@@ -31,6 +31,42 @@
   }
 }
 
+/* A bouncing arrow from the bubble to the highlighted thing */
+.pointer {
+  position: fixed;
+  z-index: 1;
+  display: grid;
+  translate: -50% 0;
+  animation: point 0.9s ease-in-out infinite alternate;
+}
+
+.pointDown svg {
+  rotate: 180deg;
+}
+
+@keyframes point {
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+.pointDown {
+  animation-name: pointDown;
+}
+
+@keyframes pointDown {
+  to {
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pointer,
+  .hole {
+    animation: none;
+  }
+}
+
 .dim {
   position: fixed;
   inset: 0;
@@ -83,7 +119,7 @@
 
 .title {
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1.15;
 }
 

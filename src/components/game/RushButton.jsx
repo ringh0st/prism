@@ -5,7 +5,7 @@ import { finishedWorldCount } from '../../game/titles.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './EventButton.module.css';
 
-/** On the map's top bar once World 3 is done: this week's Light Rush and the best run so far. */
+/** On the map's top bar once World 3 is done: this week's Light Rush, a one-word caption and the best run so far. */
 export default function RushButton() {
   const { progress } = usePlayer();
   const { t } = useI18n();
@@ -19,6 +19,9 @@ export default function RushButton() {
           {best}
         </span>
       )}
+      <span className={styles.caption} aria-hidden="true">
+        {t('map.extra.rush')}
+      </span>
     </a>
   );
 }

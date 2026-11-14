@@ -7,6 +7,7 @@ import Lumi from '../../components/game/Lumi.jsx';
 import SpeechBox from '../../components/game/SpeechBox.jsx';
 import { celebrate } from '../../lib/effects.js';
 import GemShape from '../../components/GemShape.jsx';
+import Stars from '../../components/Stars.jsx';
 import HelperBar from '../../components/HelperBar.jsx';
 import QuickBuyDialog from '../../components/QuickBuyDialog.jsx';
 import StarMeter from './StarMeter.jsx';
@@ -193,16 +194,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           : mode === 'rush'
             ? t('play.rushSpot', { n: rush.number, total: RUSH_LENGTH })
             : world && lang !== 'en'
-              ? worldName(lang, world) // the title already says "שלב 5-16"
+              ? '' // the title already says "שלב 5-16"
               : `${world ? `${worldName(lang, world)} · ` : ''}${level.world}-${level.index}`;
+  // The intro speaks only when the picture can't say it: a friend's score to beat, or the Rush's spare moves.
   const introLine = useMemo(
-    () =>
-      challenge
-        ? t('intro.challenge', { count: challenge.moves })
-        : rush
-          ? t('intro.rush', { n: rush.number, count: rush.run.spare })
-          : line(`quips.${modifier === 'normal' ? 'start' : modifier}`, quipLines(modifier === 'normal' ? 'start' : modifier)),
-    [modifier, challenge], // eslint-disable-line react-hooks/exhaustive-deps -- the rush line is set once per puzzle
+    () => (challenge ? t('intro.challenge', { count: challenge.moves }) : rush ? t('intro.rush', { count: rush.run.spare }) : ''),
+    [challenge], // eslint-disable-line react-hooks/exhaustive-deps -- the rush line is set once per puzzle
   );
   const isOver = trace.isSolved || isOutOfMoves || Boolean(result);
 
@@ -554,9 +551,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       };
     });
     const showsTips = ['level', 'daily', 'event'].includes(mode) && !isFirstSteps && pieceSteps.length === 0;
-    const tipSteps = showsTips
-      ? unseenTips(readJson(SEEN_TIPS_KEY, [])).map((tip) => ({ ...tip, title: t(`tip.${tip.id}.title`), text: t(`tip.${tip.id}.text`) }))
-      : [];
+    const tipSteps = showsTips ? unseenTips(readJson(SEEN_TIPS_KEY, [])).map((tip) => ({ ...tip, title: t(`tip.${tip.id}.title`) })) : [];
     return [...pieceSteps, ...tipSteps];
   };
 
@@ -640,7 +635,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       <header className={styles.header}>
         <Button as="a" href={backHref} variant="secondary" icon="back" label={t('play.backTo', { place: backName })} />
         <div className={styles.titleBlock}>
-          <p className={styles.subtitle}>{subtitle}</p>
+          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
           <ScreenTitle as="h1" size="sm" tone={modifier === 'boss' ? 'boss' : 'calm'}>
             {levelName}
           </ScreenTitle>
@@ -657,11 +652,6 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
               <GemShape color={tile.color} size={24} />
             </li>
           ))}
-          {gems.length > 1 && (
-            <li className={`game-title ${styles.gemCount}`} aria-hidden="true">
-              {trace.litGems.size}/{gems.length}
-            </li>
-          )}
         </ul>
       </section>
 
@@ -753,7 +743,11 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       )}
       {isConfirmingSkip && (
         <Dialog title={t('skip.title')} onClose={() => setIsConfirmingSkip(false)}>
-          <p className={styles.dialogText}>{t('skip.text')}</p>
+          {/* What a Skip gives, as a picture: one star of three (the words are for screen readers). */}
+          <p className={styles.dialogText}>
+            <Stars count={1} size={40} />
+            <span className="visually-hidden">{t('skip.text')}</span>
+          </p>
           <div className={styles.dialogActions}>
             <Button variant="secondary" onClick={() => setIsConfirmingSkip(false)} data-autofocus>
               {t('skip.keepTrying')}
@@ -787,10 +781,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       {isOutOfMoves && !result && mode !== 'rush' && (
         <OutOfMovesDialog
           backName={backName}
-          gemsLeft={gems.length - trace.litGems.size}
-          gemsLit={trace.litGems.size}
-          lumiLine={line('quips.outOfMoves', quipLines('outOfMoves'))}
-          hintsOwned={progress.helpers.hint ?? 0}
+          gems={gems.map(({ tile, i }) => ({ color: tile.color, isLit: trace.litGems.has(i) }))}
+          extraMoves={KEEP_GOING_MOVES}
           onRetry={restart}
           onKeepGoing={
             canKeepGoing

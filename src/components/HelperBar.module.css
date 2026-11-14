@@ -6,7 +6,7 @@
 
 .buttons {
   display: grid;
-  grid-template-columns: repeat(var(--helper-count, 4), minmax(0, 84px));
+  grid-template-columns: repeat(var(--helper-count, 4), minmax(0, 68px));
   justify-content: center;
   gap: var(--space-2);
   width: 100%;
@@ -57,9 +57,14 @@
 }
 
 .name {
+  max-width: 100%;
+  overflow: hidden;
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
+  line-height: 1.1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .count {
@@ -80,16 +85,28 @@
   box-shadow: 0 0 0 2px var(--surface-raised);
 }
 
-.empty .count {
-  color: var(--calm-label);
-  background: var(--color-mint);
-  box-shadow: 0 0 0 2px var(--surface-raised);
+.empty .name {
+  color: var(--text-soft);
 }
 
+/* Helpers used in this try: one dot each, filled once used */
 .limit {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-soft);
+  display: flex;
+  gap: 5px;
+}
+
+.pip,
+.pipUsed {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(var(--shadow-color), 0.14);
+  box-shadow: var(--shadow-inset);
+}
+
+.pipUsed {
+  background: var(--reward-bottom);
+  box-shadow: none;
 }
 
 /* "Stuck? Try me": a friendly wiggle when the player has been still for a while. */

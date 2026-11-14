@@ -11,7 +11,7 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 const DIFFICULTY_LABEL = { [DIFFICULTY.HARD]: 'map.node.hard', [DIFFICULTY.EXTRA]: 'map.node.boss' };
 
 /** One level bubble on the map. */
-export default function LevelNode({ stop, stars, isUnlocked, isCurrent, greeting = null, nodeRef }) {
+export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef }) {
   const { t } = useI18n();
   // A Glowbug still waiting to be rescued here (three stars frees it).
   const glowbug = isUnlocked && stars < 3 ? glowbugForLevel(stop.ref.id) : null;
@@ -58,7 +58,7 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, greeting
       )}
       {isCurrent && (
         <span className={`${styles.lumiOnNode} ${x > 50 ? styles.lumiLeft : styles.lumiRight}`} aria-hidden="true">
-          <Lumi mood="excited" size={80} line={greeting} />
+          <Lumi mood="excited" size={80} />
         </span>
       )}
     </>

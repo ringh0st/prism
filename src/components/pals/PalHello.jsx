@@ -6,12 +6,12 @@ import { useIsSplashShowing } from '../../state/SplashContext.jsx';
 import { palById, stageOf } from '../../game/pals.js';
 import { palGreetingFor } from '../../game/palGreetings.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
-
-const partOfDay = (date) => (date.getHours() < 12 ? 'morning' : date.getHours() < 18 ? 'afternoon' : 'evening');
 import { todayKey } from '../../game/daily.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import styles from './PalHello.module.css';
 import { palName } from '../../i18n/palText.js';
+
+const partOfDay = (date) => (date.getHours() < 12 ? 'morning' : date.getHours() < 18 ? 'afternoon' : 'evening');
 
 const STORAGE_KEY = 'prism.palHello.v1';
 const SHOW_MS = 7000;
@@ -19,10 +19,9 @@ const LEAVE_MS = 400;
 
 /**
  * Pal of the day: the first time you open the map each day, your partner pops up beside PLAY, waves and
- * says something that fits (almost grown, an event weekend, your streak…). Tap it to visit your Pals.
- * `onHello` is called when it starts talking (so Lumi can stay quiet meanwhile).
+ * says something short that fits (almost grown, an event weekend, your streak…). Tap it to visit your Pals.
  */
-export default function PalHello({ onHello }) {
+export default function PalHello() {
   const { progress } = usePlayer();
   const isSplashShowing = useIsSplashShowing();
   const partner = palById(progress.pal.id);
@@ -41,8 +40,7 @@ export default function PalHello({ onHello }) {
     // The greetings are English wordplay; other languages get a warm hello for the time of day.
     setLine(lang === 'en' ? palGreetingFor(progress) : t(`hello.${partOfDay(new Date())}`));
     setPhase('in');
-    onHello?.();
-  }, [isSplashShowing, phase, partner, progress, onHello]);
+  }, [isSplashShowing, phase, partner, progress]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (phase !== 'in') return undefined;
@@ -63,7 +61,7 @@ export default function PalHello({ onHello }) {
         <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={82} alive />
       </a>
       <p className={styles.bubble} role="status">
-        <span className={styles.name}>{palName(lang, partner)}</span> {line}
+        {line}
       </p>
       <button type="button" className={styles.close} onClick={() => setPhase('out')} aria-label={t('common.close')}>
         <Icon name="close" size={14} strokeWidth={3} />

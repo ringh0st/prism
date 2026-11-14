@@ -1,17 +1,100 @@
-.progress {
-  margin-bottom: var(--space-4);
-  font-weight: 700;
-  color: var(--text-soft);
+/* The gems: lit ones ticked, the missing ones waiting with a "?" and a soft pulse */
+.gems {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
 }
 
-.quip {
-  display: block;
-  margin-top: 2px;
-  font-weight: 600;
+.lit,
+.missing {
+  position: relative;
+  display: grid;
+  animation: gemIn 380ms var(--ease-pop) calc(var(--i) * 90ms) both;
+}
+
+.missing svg {
+  opacity: 0.35;
+  filter: grayscale(0.6);
+}
+
+.missing {
+  animation:
+    gemIn 380ms var(--ease-pop) calc(var(--i) * 90ms) both,
+    waiting 1.6s ease-in-out 600ms infinite;
+}
+
+.mark {
+  position: absolute;
+  inset-inline-end: -6px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 0 0 2px var(--surface-raised);
+}
+
+.lit .mark {
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+}
+
+.missing .mark {
+  color: var(--warm-label);
+  background: var(--warm-bottom);
 }
 
 .actions {
   display: grid;
   justify-items: center;
   gap: var(--space-2);
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.keepGoing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 22px;
+}
+
+.cap {
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+@keyframes gemIn {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes waiting {
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lit,
+  .missing {
+    animation: none;
+  }
 }

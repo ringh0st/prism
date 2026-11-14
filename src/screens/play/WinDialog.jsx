@@ -21,6 +21,7 @@ import { withArticle } from '../../game/treats.js';
 import { cheerFor } from '../../game/palCheers.js';
 import LevelUp from './LevelUp.jsx';
 import ChallengeShare from './ChallengeShare.jsx';
+import TapIcon from './TapIcon.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './WinDialog.module.css';
 import { palName } from '../../i18n/palText.js';
@@ -113,68 +114,90 @@ export default function WinDialog({
   return (
     <Dialog title={t(headlineFor(result, difficulty))} tone="celebrate" onClose={onMap} closesOnBackdrop={false}>
       <Stars count={stars} size={46} animate className={styles.stars} />
-      {isSkipped ? <p className={styles.summary}>{t('win.comeBack')}</p> : <p className={styles.summary}>{t('win.solvedIn', { count: moves })}</p>}
-      {!isSkipped && stars < 3 && <p className={styles.tip}>{t('win.starTip', { count: par })}</p>}
+      {/* Moves used, and (short of ★★★) the moves that would earn it: numbers and pictures, words for screen readers. */}
+      {isSkipped ? (
+        <p className={styles.tip}>{t('win.comeBack')}</p>
+      ) : (
+        <p className={styles.summary}>
+          <span className={`game-title ${styles.moves}`} role="img" aria-label={t('win.solvedIn', { count: moves })}>
+            <TapIcon size={24} />
+            <span dir="ltr">{moves}</span>
+          </span>
+          {stars < 3 && (
+            <span className={`game-title ${styles.tip}`} role="img" aria-label={t('win.starTip', { count: par })}>
+              <span className={styles.tipStars}>★★★</span>
+              <TapIcon size={18} />
+              <span dir="ltr">{par}</span>
+            </span>
+          )}
+        </p>
+      )}
 
       {isFirstToday && (
-        <p className={`game-title ${styles.dailyReward}`}>
-          <Icon name="gift" size={22} /> {t('win.dailyReward')}
+        <p className={`game-title ${styles.dailyReward}`} role="img" aria-label={t('win.dailyReward')}>
+          <Icon name="gift" size={26} />
+          <Icon name="check" size={20} strokeWidth={3.2} />
         </p>
       )}
       <div className={styles.rewards}>
         {sparksEarned > 0 && (
           <span className={styles.reward}>
-            <Icon name="spark" size={18} /> {t('win.sparks', { count: shownSparks })}
+            <Icon name="spark" size={18} />
+            <span dir="ltr" aria-hidden="true">
+              +{shownSparks}
+            </span>
+            <span className="visually-hidden">{t('win.sparks', { count: sparksEarned })}</span>
           </span>
         )}
         {diamondsEarned > 0 && (
           <span className={`${styles.reward} ${styles.diamond}`}>
-            <Icon name="diamond" size={18} /> {t('win.diamonds', { count: diamondsEarned })}
+            <Icon name="diamond" size={18} />
+            <span dir="ltr" aria-hidden="true">
+              +{diamondsEarned}
+            </span>
+            <span className="visually-hidden">{t('win.diamonds', { count: diamondsEarned })}</span>
           </span>
         )}
         {isNewBest && <span className={`${styles.reward} ${styles.best}`}>{t('win.newBest')}</span>}
         {hotStreak >= 2 && (
-          <span className={`${styles.reward} ${styles.streak}`}>
-            <Icon name="flame" size={18} /> {t('win.perfectRow', { count: hotStreak })}
+          <span className={`${styles.reward} ${styles.streak}`} role="img" aria-label={t('win.perfectRow', { count: hotStreak })}>
+            <Icon name="flame" size={18} />
+            <span dir="ltr">×{hotStreak}</span>
           </span>
         )}
         {streak > 0 && (
-          <span className={`${styles.reward} ${styles.streak}`}>
-            <Icon name="flame" size={18} /> {t('win.dayStreak', { count: streak })}
+          <span className={`${styles.reward} ${styles.streak}`} role="img" aria-label={t('win.dayStreak', { count: streak })}>
+            <Icon name="calendar" size={18} />
+            <Icon name="flame" size={16} />
+            <span dir="ltr">{streak}</span>
           </span>
         )}
         {shieldsUsed > 0 && (
-          <span className={`${styles.reward} ${styles.shield}`}>
-            <Icon name="shield" size={18} /> {t('win.shieldsUsed', { count: shieldsUsed })}
+          <span className={`${styles.reward} ${styles.shield}`} role="img" aria-label={t('win.shieldsUsed', { count: shieldsUsed })}>
+            <Icon name="shield" size={18} />
+            <span dir="ltr">−{shieldsUsed}</span>
           </span>
         )}
         {shieldEarned && (
-          <span className={`${styles.reward} ${styles.shield}`}>
-            <Icon name="shield" size={18} /> {t('win.shieldEarned')}
+          <span className={`${styles.reward} ${styles.shield}`} role="img" aria-label={t('win.shieldEarned')}>
+            <Icon name="shield" size={18} />
+            <span dir="ltr">+1</span>
           </span>
         )}
       </div>
-      {/* Next comes right under the result, so carrying on is always one tap away; extras follow below. */}
+      {/* One big Next right under the result; Play again and the map are round icon buttons beside it. */}
       <div className={styles.actions}>
+        <Button variant="secondary" icon="restart" label={t('win.playAgain')} onClick={onReplay} className={styles.round} />
         {hasNext ? (
-          <Button size="lg" icon="play" onClick={onNext} data-autofocus>
+          <Button size="lg" icon="play" onClick={onNext} data-autofocus className={styles.next}>
             {t('win.next')}
           </Button>
         ) : (
-          <Button size="lg" onClick={onMap} data-autofocus>
+          <Button size="lg" icon="map" onClick={onMap} data-autofocus className={styles.next}>
             {t('play.backTo', { place: backName })}
           </Button>
         )}
-        <div className={styles.secondary}>
-          <Button variant="secondary" icon="restart" onClick={onReplay}>
-            {t('win.playAgain')}
-          </Button>
-          {hasNext && (
-            <Button variant="secondary" onClick={onMap}>
-              {backName}
-            </Button>
-          )}
-        </div>
+        {hasNext && <Button variant="secondary" icon="map" label={t('play.backTo', { place: backName })} onClick={onMap} className={styles.round} />}
       </div>
       {/* The extras pop in one by one once the stars and sparks have landed, so the result reads first. */}
       <div className={styles.extras} style={{ '--extras-at': `${rewardsAt + 700}ms` }}>
@@ -204,27 +227,50 @@ export default function WinDialog({
         {(result.levelUp || result.newTitle) && <LevelUp level={result.levelUp} title={result.newTitle} />}
         {(result.treat || result.newStickers?.length > 0) && (
           <div className={styles.finds}>
+            {/* Finds as pictures: the treat and each new sticker, with a "+" (words for screen readers). */}
             {result.treat && partner && (
-              <span className={styles.find}>
-                <span aria-hidden="true">{result.treat.emoji}</span>{' '}
-                {t('win.treat', { name: palName(lang, partner), treat: t(`treat.${result.treat.id}`, {}, withArticle(result.treat)) })}
-              </span>
+              <a
+                href="#/pals"
+                className={styles.find}
+                aria-label={t('win.treat', { name: palName(lang, partner), treat: t(`treat.${result.treat.id}`, {}, withArticle(result.treat)) })}
+              >
+                <span className={styles.findPlus} aria-hidden="true">
+                  +
+                </span>
+                <span className={styles.treat} aria-hidden="true">
+                  {result.treat.emoji}
+                </span>
+              </a>
             )}
             {result.newStickers?.map(({ world, sticker }) => (
-              <a key={sticker.id} href="#/stickers" className={styles.find}>
-                <StickerBadge sticker={sticker} world={world} size={30} />{' '}
-                {t('win.sticker', { name: t(`sticker.${sticker.id}`, {}, sticker.name), world })}
+              <a
+                key={sticker.id}
+                href="#/stickers"
+                className={styles.find}
+                aria-label={t('win.sticker', { name: t(`sticker.${sticker.id}`, {}, sticker.name), world })}
+              >
+                <span className={styles.findPlus} aria-hidden="true">
+                  +
+                </span>
+                <StickerBadge sticker={sticker} world={world} size={40} />
               </a>
             ))}
           </div>
         )}
-        {shareMessage && <ShareResult text={shareMessage} />}
-        {challenge && <ChallengeShare {...challenge} />}
-        {replay && !isSkipped && <ReplayShare replay={{ ...replay, stars, moves }} />}
+        {(shareMessage || challenge || (replay && !isSkipped)) && (
+          <div className={styles.shareRow}>
+            {shareMessage && <ShareResult text={shareMessage} />}
+            {challenge && <ChallengeShare {...challenge} label={t('win.challenge')} />}
+            {replay && !isSkipped && <ReplayShare replay={{ ...replay, stars, moves }} />}
+          </div>
+        )}
         {completesWorld && !isSignedIn && (
-          <p className={styles.nudge}>
-            <Icon name="diamond" size={16} /> {t('win.worldDiamond')} <a href="#/settings">{t('common.signIn')}</a>
-          </p>
+          <a href="#/settings" className={styles.nudge} aria-label={`${t('win.worldDiamond')} ${t('common.signIn')}`}>
+            <Icon name="diamond" size={18} />
+            <span dir="ltr">+1</span>
+            <Icon name="user" size={18} />
+            <span>{t('win.signIn')}</span>
+          </a>
         )}
       </div>
     </Dialog>

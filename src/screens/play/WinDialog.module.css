@@ -4,13 +4,34 @@
 }
 
 .summary {
-  font-size: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.moves,
+.tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.moves {
+  font-size: 26px;
 }
 
 .tip {
-  margin-top: var(--space-1);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 17px;
   color: var(--text-soft);
-  font-size: 15px;
+  background: var(--surface-sunken);
+}
+
+.tipStars {
+  color: var(--color-honey);
 }
 
 .rewards {
@@ -54,7 +75,23 @@
   display: grid;
   justify-items: center;
   gap: 4px;
-  margin-bottom: var(--space-4);
+}
+
+/* Sharing extras sit small, side by side, below everything that matters */
+.shareRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.shareRow button {
+  min-height: 40px;
+  padding-block: 6px;
+  padding-inline: 12px 14px;
+  font-size: 14px;
 }
 
 .shareFeedback {
@@ -85,15 +122,23 @@
 }
 
 .actions {
-  display: grid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
 }
 
-.secondary {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-2);
+.actions .next {
+  flex: 1;
+  max-width: 260px;
+}
+
+.actions .round {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
 }
 
 .diamond {
@@ -110,10 +155,16 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin: calc(-1 * var(--space-2)) 0 var(--space-4);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-soft);
+  width: fit-content;
+  margin: 0 auto var(--space-4);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  color: var(--text-strong);
+  background: var(--surface-sunken);
 }
 
 .nudge svg {
@@ -201,8 +252,10 @@
 
 /* Treats found and new stickers */
 .finds {
-  display: grid;
-  gap: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
   margin-bottom: var(--space-3);
   animation: pop 500ms var(--ease-pop) 1.6s both;
 }
@@ -211,11 +264,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 6px 12px;
+  gap: 4px;
+  padding: 6px 14px 6px 10px;
   border-radius: var(--radius-pill);
+  font-family: var(--font-display);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 20px;
   text-decoration: none;
   color: var(--text-strong);
   background: var(--surface-sunken);
@@ -258,4 +312,13 @@
   .extras > * {
     animation: none;
   }
+}
+
+.findPlus {
+  color: var(--text-soft);
+}
+
+.treat {
+  font-size: 30px;
+  line-height: 1;
 }

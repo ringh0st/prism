@@ -6,6 +6,7 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 
 const GAP = 10; // space around the highlighted element
 const BUBBLE_ROOM = 230; // height the bubble needs below the element, or it goes above
+const POINTER_ROOM = 34; // space between the element and the bubble for the bouncing pointer
 
 function measure(selector) {
   const element = document.querySelector(selector);
@@ -15,11 +16,11 @@ function measure(selector) {
 }
 
 /**
- * Dims the screen except one element (found by `target`, a CSS selector) and explains it in a few
- * words: "this is new, here's what it does". Like a game's tutorial highlight. "Got it!" (or Escape,
- * or tapping the highlight) moves on. `art` is a small picture of the thing; `step`/`total` show dots.
+ * Dims the screen except one element (found by `target`, a CSS selector), points at it with a bouncing arrow
+ * and names it in a few words (`text` is an optional short second line). Like a game's tutorial highlight.
+ * "Got it!" (or Escape, or tapping the highlight) moves on. `art` is a small picture of the thing; `step`/`total` show dots.
  */
-export default function Spotlight({ target, title, text, art = null, step = 0, total = 1, onNext }) {
+export default function Spotlight({ target, title, text = '', art = null, step = 0, total = 1, onNext }) {
   const titleId = useId();
   const [hole, setHole] = useState(null);
   const { t } = useI18n();
@@ -52,8 +53,12 @@ export default function Spotlight({ target, title, text, art = null, step = 0, t
   const bubblePosition = !hole
     ? { top: '50%', transform: 'translateY(-50%)' }
     : isBubbleAbove
-      ? { bottom: window.innerHeight - hole.top + 14 }
-      : { top: hole.top + hole.height + 14 };
+      ? { bottom: window.innerHeight - hole.top + POINTER_ROOM }
+      : { top: hole.top + hole.height + POINTER_ROOM };
+  const pointerPosition = hole && {
+    left: hole.left + hole.width / 2,
+    ...(isBubbleAbove ? { bottom: window.innerHeight - hole.top + 2 } : { top: hole.top + hole.height + 2 }),
+  };
 
   return (
     <div className={styles.layer} role="dialog" aria-modal="true" aria-labelledby={titleId}>
@@ -61,6 +66,13 @@ export default function Spotlight({ target, title, text, art = null, step = 0, t
         <button type="button" className={styles.hole} style={hole} onClick={onNext} aria-label={t('common.gotIt')} tabIndex={-1} />
       ) : (
         <div className={styles.dim} />
+      )}
+      {hole && (
+        <span className={`${styles.pointer} ${isBubbleAbove ? styles.pointDown : ''}`} style={pointerPosition} aria-hidden="true">
+          <svg viewBox="0 0 24 16" width="28" height="19">
+            <path d="M12 2 22 14H2Z" fill="var(--color-honey)" stroke="var(--reward-ledge)" strokeWidth="2" strokeLinejoin="round" />
+          </svg>
+        </span>
       )}
       <div className={`${styles.bubble} ${isBubbleAbove ? styles.above : styles.below}`} style={bubblePosition} key={target}>
         <div className={styles.content}>
@@ -73,7 +85,7 @@ export default function Spotlight({ target, title, text, art = null, step = 0, t
             <h2 id={titleId} className={`game-title ${styles.title}`}>
               {title}
             </h2>
-            <p className={styles.text}>{text}</p>
+            {text && <p className={styles.text}>{text}</p>}
           </div>
         </div>
         <div className={styles.footer}>

@@ -27,10 +27,34 @@
   box-shadow: 0 0 0 2px var(--surface-page);
 }
 
+.date {
+  position: absolute;
+  top: 21px;
+  left: 0;
+  right: 0;
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+}
+
+/* A one-word caption under the button, so its meaning never depends on the icon alone */
+.caption {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  translate: -50% 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: var(--text-strong);
+}
+
 .streak {
   position: absolute;
-  bottom: -7px;
-  inset-inline-end: -8px;
+  top: -7px;
+  inset-inline-start: -8px;
   display: inline-flex;
   align-items: center;
   gap: 1px;

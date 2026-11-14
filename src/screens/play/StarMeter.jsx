@@ -2,10 +2,11 @@ import { useEffect, useRef } from 'react';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { sfx } from '../../audio/sfx.js';
 import Icon from '../../components/Icon.jsx';
+import TapIcon from './TapIcon.jsx';
 import styles from './StarMeter.module.css';
 
 /**
- * Moves left, a bar that drains with every move, and the best stars still possible: a star drops off
+ * Moves left (a number over a tapping finger, no words), a bar that drains with every move, and the best stars still possible: a star drops off
  * the moment it can't be reached any more (moves so far plus the fewest taps left), never later. `isSimple`
  * (the first levels) leaves the stars out, so there's less to take in.
  */
@@ -36,7 +37,7 @@ export default function StarMeter({ moves, par, limit, starCap, tapsLeft = 0, is
         <span className={`game-title ${styles.count}`} key={left}>
           {left}
         </span>
-        <span className={styles.caption}>{t('meter.caption')}</span>
+        <TapIcon size={18} className={styles.caption} />
       </div>
       <div className={styles.track}>
         <div className={`${styles.fill} ${tone}`} style={{ width: `${fill}%` }} />

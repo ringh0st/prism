@@ -19,11 +19,6 @@
 
 .caption {
   margin-top: 2px;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: var(--text-soft);
 }
 

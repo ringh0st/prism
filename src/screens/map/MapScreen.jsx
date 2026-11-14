@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import CurrencyHud from '../../components/game/CurrencyHud.jsx';
 import BottomNav from '../../components/game/BottomNav.jsx';
 import Icon from '../../components/Icon.jsx';
@@ -21,14 +21,11 @@ import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
 import { chestId } from '../../game/surprises.js';
 import { MAX_STARS } from '../../game/scoring.js';
-import { quipLines } from '../../game/quips.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { buildWorldStops, pathThrough, ROW_HEIGHT } from './mapLayout.js';
 import styles from './Map.module.css';
 
-const GREETING_MS = 6000;
-
-function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeRef, greeting, onOpenChest }) {
+function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeRef, onOpenChest }) {
   const stops = useMemo(() => buildWorldStops(levelRefs), [levelRefs]);
   const height = stops.length * ROW_HEIGHT;
   const earned = levelRefs.reduce((sum, ref) => sum + starsFor(progress, ref.id), 0);
@@ -67,7 +64,6 @@ function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeR
                   stars={starsFor(progress, stop.ref.id)}
                   isUnlocked={isLevelUnlocked(position)}
                   isCurrent={isCurrent}
-                  greeting={isCurrent ? greeting : null}
                   nodeRef={isCurrent ? currentNodeRef : undefined}
                 />
               </li>
@@ -88,9 +84,13 @@ function LockedWorld({ world, stars }) {
     <section className={`${styles.world} ${styles.lockedWorld} ${styles[world.theme]}`} aria-labelledby={`world-${world.id}`}>
       <div className={styles.lockedView} style={{ height: LOCKED_PREVIEW_STOPS.length * ROW_HEIGHT }}>
         <WorldScenery stops={LOCKED_PREVIEW_STOPS} worldId={world.id} theme={world.theme} />
-        <div className={styles.gate}>
+        {/* Locked: the stars still needed, as a number (the sentence is for screen readers). */}
+        <div className={styles.gate} role="img" aria-label={t('map.toUnlock', { count: world.starsToUnlock - stars })}>
           <Icon name="lock" size={40} strokeWidth={2.6} />
-          <p className="game-title">{t('map.toUnlock', { count: world.starsToUnlock - stars })}</p>
+          <p className={`game-title ${styles.gateStars}`}>
+            <Icon name="star" size={26} />
+            <span dir="ltr">{world.starsToUnlock - stars}</span>
+          </p>
         </div>
       </div>
       <WorldSign world={world} headingId={`world-${world.id}`} isLocked className={styles.worldSign} />
@@ -108,9 +108,7 @@ export default function MapScreen() {
   const currentNodeRef = useRef(null);
   const stars = totalStars(progress);
   const solvedCount = Object.values(progress.levels).filter((entry) => entry.stars > 0).length;
-  const { t, line } = useI18n();
-  const [greeting, setGreeting] = useState(() => line('quips.start', quipLines('start')));
-  const hushLumi = useCallback(() => setGreeting(null), []);
+  const { t } = useI18n();
 
   const unlockedWorlds = worlds.filter((world) => stars >= world.starsToUnlock);
   const nextLockedWorld = worlds.find((world) => stars < world.starsToUnlock);
@@ -122,18 +120,13 @@ export default function MapScreen() {
   const worldsLeft = worlds.length - unlockedWorlds.length - (nextLockedWorld ? 1 : 0);
 
   // The current level is always the main view: centered in the space between the HUD and the PLAY button
-  // (see .currentNode scroll-margin). Lumi says hello there, then lets the player focus.
+  // (see .currentNode scroll-margin), with Lumi bouncing beside it.
   // Runs again if the current level only becomes known after the levels load.
   useEffect(() => {
     if (!currentRef) return undefined;
     const frame = requestAnimationFrame(() => currentNodeRef.current?.scrollIntoView({ block: 'center' }));
     return () => cancelAnimationFrame(frame);
   }, [currentRef?.id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    const timer = setTimeout(() => setGreeting(null), GREETING_MS);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <div className={styles.page}>
@@ -163,29 +156,45 @@ export default function MapScreen() {
             progress={progress}
             currentLevelId={currentRef?.id}
             currentNodeRef={currentNodeRef}
-            greeting={greeting}
             onOpenChest={(worldId, chestNumber) => setChestOpening(claimChest(worldId, chestNumber))}
           />
         ))}
         {nextLockedWorld && <LockedWorld world={nextLockedWorld} stars={stars} />}
-        {worldsLeft > 0 && <p className={`game-title ${styles.teaser}`}>{t('map.teaser', { count: worldsLeft, levels: worldsLeft * 20 })}</p>}
+        {worldsLeft > 0 && (
+          <p className={`game-title ${styles.teaser}`} role="img" aria-label={t('map.teaser', { count: worldsLeft, levels: worldsLeft * 20 })}>
+            <Icon name="map" size={22} />
+            <span dir="ltr">+{worldsLeft}</span>
+          </p>
+        )}
         {currentRef && (
-          <a href={`#/play/${currentRef.id}`} className={styles.playButton}>
+          <a
+            href={`#/play/${currentRef.id}`}
+            className={styles.playButton}
+            aria-label={[
+              t('map.play'),
+              t('level.title', { label: `${currentRef.world}-${currentRef.index}` }),
+              progress.hotStreak >= 2 && t('map.hotStreak', { count: progress.hotStreak }),
+            ]
+              .filter(Boolean)
+              .join(', ')}
+          >
             <span className="game-title on-color">{t('map.play')}</span>
             {progress.hotStreak >= 2 && (
-              <span className={styles.hotStreak} role="img" aria-label={t('map.hotStreak', { count: progress.hotStreak })}>
+              <span className={styles.hotStreak} aria-hidden="true">
                 <Icon name="flame" size={12} />
                 <span className="game-title on-color">{progress.hotStreak}</span>
               </span>
             )}
-            <span className={styles.playLevel}>{t('level.title', { label: `${currentRef.world}-${currentRef.index}` })}</span>
+            <span className={styles.playLevel} dir="ltr" aria-hidden="true">
+              {currentRef.world}-{currentRef.index}
+            </span>
           </a>
         )}
       </main>
 
-      {/* The partner Pal says hello once a day (Lumi lets them talk), or holds up a waiting present. */}
+      {/* The partner Pal says hello once a day, or holds up a waiting present. */}
       {currentRef && <PalPresent />}
-      {currentRef && presentsWaiting(progress) === 0 && <PalHello onHello={hushLumi} />}
+      {currentRef && presentsWaiting(progress) === 0 && <PalHello />}
       <BottomNav active="map" />
       {chestOpening && <ChestDialog opening={chestOpening} onClose={() => setChestOpening(null)} />}
     </div>

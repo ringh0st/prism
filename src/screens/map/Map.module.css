@@ -458,14 +458,28 @@ a.node:active {
   color: var(--text-strong);
 }
 
-.gate p {
-  font-size: 20px;
+.gateStars {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 26px;
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.gateStars svg {
+  color: var(--color-honey);
 }
 
 .teaser {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   padding: var(--space-3) 0 var(--space-5);
-  font-size: 18px;
-  text-align: center;
+  font-size: 22px;
   color: var(--text-soft);
 }
 

@@ -3,6 +3,7 @@ import Dialog from './Dialog.jsx';
 import Button from './Button.jsx';
 import Icon from './Icon.jsx';
 import BuyButtons from './BuyButtons.jsx';
+import Stars from './Stars.jsx';
 import { HELPERS, storeItem } from '../game/catalog.js';
 import { sparkPurchasesLeft } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
@@ -41,7 +42,11 @@ export default function QuickBuyDialog({ helperId, onBought, onClose }) {
         <Icon name={helper.icon} size={34} />
       </div>
       <p className={styles.description}>{text.description}</p>
-      <p className={styles.cap}>{t('buy.cap', { count: helper.starCap })}</p>
+      {/* Using a helper caps the stars: shown as the stars still possible (the sentence is for screen readers). */}
+      <p className={styles.cap}>
+        <Stars count={helper.starCap} size={24} />
+        <span className="visually-hidden">{t('buy.cap', { count: helper.starCap })}</span>
+      </p>
 
       <div className={styles.buy}>
         <BuyButtons item={item} itemName={text.name} progress={progress} isSignedIn={isSignedIn} isBusy={isBusy} onBuy={buy} />

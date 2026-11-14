@@ -3,9 +3,9 @@ import styles from './Scenery.module.css';
 import { useI18n } from '../../../i18n/I18nContext.jsx';
 import { worldName } from '../../../i18n/gameText.js';
 
-/** The wooden signpost at the start of each world: number, name, tagline and stars. */
+/** The wooden signpost at the start of each world: its name and the stars earned there. */
 export default function WorldSign({ world, headingId, earned = 0, total = 0, isLocked = false, className = '' }) {
-  const { lang } = useI18n();
+  const { t, lang } = useI18n();
   return (
     <div className={`${styles.signpost} ${className}`}>
       <div className={styles.board}>
@@ -14,10 +14,12 @@ export default function WorldSign({ world, headingId, earned = 0, total = 0, isL
           {worldName(lang, world)}
         </h2>
         {!isLocked && (
-          <p className={styles.tagline}>
-            {lang === 'en' && `${world.tagline} · `}
+          <p className={styles.tagline} role="img" aria-label={t('map.sign.stars', { count: earned, total })}>
             <span className={styles.stars}>
-              <Icon name="star" size={14} /> {earned}/{total}
+              <Icon name="star" size={16} />
+              <span dir="ltr">
+                {earned}/{total}
+              </span>
             </span>
           </p>
         )}

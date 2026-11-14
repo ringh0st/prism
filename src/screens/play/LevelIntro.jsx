@@ -2,33 +2,41 @@ import { useEffect } from 'react';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import ScreenTitle from '../../components/game/ScreenTitle.jsx';
 import Button from '../../components/Button.jsx';
+import Icon from '../../components/Icon.jsx';
+import Lumi from '../../components/game/Lumi.jsx';
 import LumiSays from '../../components/game/LumiSays.jsx';
 import GemShape from '../../components/GemShape.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
+import TapIcon from './TapIcon.jsx';
 import { glowbugById } from '../../game/glowbugs.js';
 import { glowbugName } from '../../i18n/groveText.js';
 import { moveLimitFor } from '../../game/scoring.js';
 import { TILE } from '../../game/constants.js';
 import styles from './LevelIntro.module.css';
 
-const DIFFICULTY_STICKERS = {
-  hard: { key: 'intro.sticker.hard', className: 'hard' },
-};
+/** A crescent moon for night levels (the icon set has none). */
+const moon = (
+  <svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true">
+    <path d="M19 15.5A8 8 0 0 1 8.5 5a8 8 0 1 0 10.5 10.5Z" fill="currentColor" />
+  </svg>
+);
 
-const STICKERS = {
-  boss: { key: 'intro.sticker.boss', className: 'boss' },
-  disco: { key: 'intro.sticker.disco', className: 'disco' },
-  night: { key: 'intro.sticker.night', className: 'night' },
+/** Each special level wears its mood: a medallion with a symbol and the card's own colors (the word is for screen readers). */
+const MOODS = {
+  hard: { key: 'intro.sticker.hard', art: <Icon name="flame" size={30} /> },
+  boss: { key: 'intro.sticker.boss', art: <Icon name="crown" size={32} /> },
+  disco: { key: 'intro.sticker.disco', art: <Icon name="spark" size={30} /> },
+  night: { key: 'intro.sticker.night', art: moon },
 };
 
 /** How long the intro stays before the level starts by itself (any tap starts it sooner). */
 const INTRO_MS = 3500;
-/** Levels with a flavor stay up longer, so there's time to read what's different. */
-const FLAVOR_INTRO_MS = 4500;
 
 /**
- * "Level 7 · The Sneaky Pickle · Light 2 gems in 6 moves". Tap anywhere or wait to start.
- * `flavor` ({ name, goal }, see recipes.js) says what's different about this level.
+ * The level at a glance, almost no words: its name, the gems to light, ★★★ and the moves for it (a tapping
+ * finger), and the mood of a special level as the card's look. Tap anywhere or wait to start.
+ * `lumiLine` is only for what the picture can't say (a friend's challenge, the Rush's spare moves).
+ * `flavor` ({ name, goal }, see recipes.js) is read out to screen readers; Lumi says its goal once the level starts.
  * `waitsForTap` keeps it up until the player taps (the very first levels, for new players).
  */
 export default function LevelIntro({
@@ -36,7 +44,7 @@ export default function LevelIntro({
   title,
   subtitle,
   modifier,
-  lumiLine,
+  lumiLine = '',
   moveLimit,
   showsStarTarget = true,
   flavor = null,
@@ -44,56 +52,77 @@ export default function LevelIntro({
   glowbugId = null,
   onDone,
 }) {
+  const mood = MOODS[modifier] ? modifier : MOODS[level.difficulty] ? level.difficulty : null;
   useEffect(() => {
     if (waitsForTap) return undefined;
-    const timer = setTimeout(onDone, flavor ? FLAVOR_INTRO_MS : modifier === 'normal' ? INTRO_MS : INTRO_MS * 1.6);
+    const timer = setTimeout(onDone, mood ? INTRO_MS * 1.3 : INTRO_MS);
     return () => clearTimeout(timer);
   }, [onDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { t, lang } = useI18n();
   const gems = level.tiles.filter((tile) => tile.type === TILE.GEM);
   const limit = moveLimit ?? moveLimitFor(level.par, level.difficulty);
-  // Hard and Extra Hard levels get their own stamp, so a tougher level is never a surprise.
-  const sticker = STICKERS[modifier] ?? DIFFICULTY_STICKERS[level.difficulty];
+  const moves = showsStarTarget ? level.par : limit;
+  const goalLabel = [
+    mood && t(MOODS[mood].key),
+    flavor?.name,
+    t('intro.lightGems', { count: gems.length }),
+    showsStarTarget ? t('intro.starTarget', { count: level.par }) : t('intro.inMoves', { count: limit }),
+  ]
+    .filter(Boolean)
+    .join('. ');
 
   return (
     // Clicking anywhere also starts; the button is the keyboard and screen-reader path.
-    <div className={`${styles.overlay} ${sticker ? styles[sticker.className] : ''}`} onClick={onDone} role="presentation">
-      <div className={styles.card} onClick={(event) => event.stopPropagation()} role="presentation">
-        <p className={styles.subtitle}>{subtitle}</p>
+    <div className={styles.overlay} onClick={onDone} role="presentation">
+      <div className={`${styles.card} ${mood ? styles[mood] : ''}`} onClick={(event) => event.stopPropagation()} role="presentation">
+        {mood && (
+          <span className={styles.medallion} aria-hidden="true">
+            {MOODS[mood].art}
+          </span>
+        )}
+        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         <ScreenTitle as="h1" size="lg" tone={modifier === 'boss' ? 'boss' : 'calm'}>
           {title}
         </ScreenTitle>
-        {sticker && <p className={`game-title ${styles.sticker}`}>{t(sticker.key)}</p>}
-        {flavor && <p className={`game-title ${styles.flavor}`}>✨ {flavor.name}</p>}
-        {/* The goal at a glance: the gems to light, then the stars (words only for screen readers). */}
-        <p
-          className={styles.goal}
-          aria-label={`${t('intro.lightGems', { count: gems.length })}. ${showsStarTarget ? t('intro.starTarget', { count: level.par }) : t('intro.inMoves', { count: limit })}`}
-        >
-          <span className={styles.gems} aria-hidden="true">
+        {/* The goal as pictures: the gems to light, then ★★★ and the moves (words only for screen readers). */}
+        <div className={styles.goal} role="img" aria-label={goalLabel}>
+          <span className={styles.gems}>
             {gems.map((gem, i) => (
-              <GemShape key={i} color={gem.color} size={34} />
+              <span key={i} className={styles.gem} style={{ '--i': i }}>
+                <GemShape color={gem.color} size={40} />
+              </span>
             ))}
           </span>
-          <span className={`game-title ${styles.together}`} aria-hidden="true">
-            {showsStarTarget ? t('intro.starTarget', { count: level.par }) : t('intro.inMoves', { count: limit })}
-          </span>
-        </p>
-        {glowbugId && (
-          <p className={styles.glowbug} aria-label={t('intro.rescue', { name: glowbugName(lang, glowbugById(glowbugId)) })}>
-            <GlowbugArt id={glowbugId} size={44} isAwake={false} />
-            <span className="game-title" aria-hidden="true">
-              ★★★
+          <span className={`game-title ${styles.target}`}>
+            {showsStarTarget && <span className={styles.stars}>★★★</span>}
+            <span className={styles.moves}>
+              <span dir="ltr">{moves}</span>
+              <TapIcon size={26} />
             </span>
+          </span>
+        </div>
+        {glowbugId && (
+          <p className={styles.glowbug} role="img" aria-label={t('intro.rescue', { name: glowbugName(lang, glowbugById(glowbugId)) })}>
+            <GlowbugArt id={glowbugId} size={44} isAwake={false} />
+            <span className="game-title">★★★</span>
           </p>
         )}
-        <div className={styles.lumi}>
-          <LumiSays mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={84} line={lumiLine} />
+        {lumiLine ? (
+          <div className={styles.lumiSays}>
+            <LumiSays mood="excited" size={72} line={lumiLine} />
+          </div>
+        ) : null}
+        <div className={styles.footer}>
+          {!lumiLine && (
+            <span className={styles.lumi} aria-hidden="true">
+              <Lumi mood={modifier === 'disco' ? 'dance' : modifier === 'boss' ? 'worried' : 'excited'} size={64} />
+            </span>
+          )}
+          <Button size="lg" icon="play" onClick={onDone} data-autofocus autoFocus>
+            {t('intro.go')}
+          </Button>
         </div>
-        <Button size="lg" icon="play" onClick={onDone} data-autofocus autoFocus>
-          {t('intro.go')}
-        </Button>
       </div>
     </div>
   );
