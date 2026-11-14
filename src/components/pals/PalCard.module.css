@@ -4,8 +4,7 @@
  * Age    → the five growth icons and the age's name under the Pal's name.
  */
 .card {
-  --frame: color-mix(in srgb, var(--text-strong) 10%, var(--surface-raised));
-  --ledge: color-mix(in srgb, var(--frame) 70%, var(--text-strong));
+  --frame: color-mix(in srgb, var(--text-strong) 8%, var(--surface-raised));
 
   position: relative;
   display: grid;
@@ -13,23 +12,32 @@
   align-content: start;
   gap: 4px;
   padding: var(--space-3) 6px var(--space-3);
-  border: 4px solid var(--frame);
+  border: 2px solid var(--frame);
   border-radius: var(--radius-lg);
   text-align: center;
   background: var(--surface-raised);
+  /* A soft, modern lift (no heavy ledge under the card) */
   box-shadow:
-    0 4px 0 var(--ledge),
-    var(--shadow-sm);
+    0 1px 2px rgb(43 33 24 / 0.06),
+    0 6px 16px -6px rgb(43 33 24 / 0.18);
   isolation: isolate;
+  transition:
+    transform 220ms var(--ease-spring, ease),
+    box-shadow 220ms ease;
+}
+
+.card:has(.look:active) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 2px 4px rgb(43 33 24 / 0.08),
+    0 12px 24px -8px rgb(43 33 24 / 0.24);
 }
 
 .legendary {
   --frame: #f0c14e;
-  --ledge: #c99a2e;
 }
 
 .mythic {
-  --ledge: #b85a40;
   border-color: transparent;
   background:
     linear-gradient(var(--surface-raised), var(--surface-raised)) padding-box,
@@ -178,7 +186,8 @@
     animation: none;
   }
 
-  .look {
+  .look,
+  .card {
     transition: none;
   }
 }
