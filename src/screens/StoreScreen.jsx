@@ -8,10 +8,7 @@ import StallFront from './store/StallFront.jsx';
 import ShelfItem from './store/ShelfItem.jsx';
 import ItemInfoDialog from './store/ItemInfoDialog.jsx';
 import DailyGift from '../components/game/DailyGift.jsx';
-import PalArt from '../components/pals/PalArt.jsx';
-import { PAL_ACCESSORIES, PAL_SLOTS, stageOf } from '../game/pals.js';
-import AdoptShelf from './store/AdoptShelf.jsx';
-import GroveShelf from './store/GroveShelf.jsx';
+import PalShop from './store/PalShop.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
 import { DIAMOND_PACKS, DIAMOND_REWARDS, HELPERS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS } from '../game/catalog.js';
 import { sparkPurchasesLeft } from '../game/progress.js';
@@ -19,7 +16,6 @@ import { todayKey } from '../game/daily.js';
 import { startDiamondCheckout } from '../lib/economyApi.js';
 import { PAYMENTS_ENABLED, TERMS_URL } from '../lib/config.js';
 import { sfx } from '../audio/sfx.js';
-import { rewardShower } from '../lib/effects.js';
 import styles from './store/Stall.module.css';
 
 const TABS = [
@@ -117,70 +113,6 @@ function SparksShelf({ buyProps, onInfo }) {
         ))}
       </ul>
       {!isSignedIn && <SignInNote />}
-    </>
-  );
-}
-
-/** Clothes for Pals, bought once with sparks. You put them on (or take them off) in Pals. */
-function ClothesShelf({ onBought, onError }) {
-  const { progress, buyAccessory } = usePlayer();
-  const [busyItem, setBusyItem] = useState(null);
-  const model = progress.pal.id ?? 'ember';
-  const modelStage = stageOf(progress.pal.owned[model]);
-
-  const buy = async (item) => {
-    setBusyItem(item.id);
-    try {
-      await buyAccessory(item.id);
-      onBought(item);
-    } catch (error) {
-      onError(error.message);
-    } finally {
-      setBusyItem(null);
-    }
-  };
-
-  return (
-    <>
-      <p className={styles.shelfIntro}>
-        Clothes and gear are yours forever. Put them on in <a href="#/pals">Pals → Wardrobe</a>.
-      </p>
-      {PAL_SLOTS.map((slot) => (
-        <section key={slot.id} aria-labelledby={`slot-${slot.id}`}>
-          <h3 id={`slot-${slot.id}`} className={`game-title ${styles.slotHeading}`}>
-            {slot.name}
-          </h3>
-          <ul className={styles.shelf}>
-            {PAL_ACCESSORIES.filter((item) => item.slot === slot.id).map((item) => {
-              const isOwned = progress.pal.accessories.includes(item.id);
-              return (
-                <ShelfItem
-                  key={item.id}
-                  artNode={<PalArt palId={model} stage={modelStage} wearing={[item.id]} size={92} className={styles.goodsArt} />}
-                  title={item.name}
-                >
-                  {isOwned ? (
-                    <span className={styles.ownedTag}>
-                      <Icon name="check" size={16} /> Owned
-                    </span>
-                  ) : (
-                    <Button
-                      size="sm"
-                      variant="gold"
-                      disabled={busyItem !== null || progress.sparks < item.price}
-                      onClick={() => buy(item)}
-                      aria-label={`Buy ${item.name} for ${item.price} sparks`}
-                    >
-                      <Icon name="spark" size={16} />
-                      <span>{item.price}</span>
-                    </Button>
-                  )}
-                </ShelfItem>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
     </>
   );
 }
@@ -330,40 +262,7 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
           <DailyGift look="note" />
           {tab === 'helpers' && <HelpersShelf buyProps={buyProps} onInfo={setInfo} />}
           {tab === 'sparks' && <SparksShelf buyProps={buyProps} onInfo={setInfo} />}
-          {tab === 'pals' && (
-            <>
-              <AdoptShelf
-                onAdopted={(pal) => {
-                  sfx.newPal();
-                  rewardShower();
-                  setLumi({
-                    mood: 'dance',
-                    line: `Welcome home, ${pal.name}! Find them in Pals.`,
-                  });
-                }}
-                onError={(message) => setLumi({ mood: 'worried', line: message })}
-              />
-              <h2 className={`game-title ${styles.sectionTitle}`}>Clothes & gear</h2>
-              <ClothesShelf
-                onBought={(item) => {
-                  sfx.coin();
-                  setLumi({
-                    mood: 'dance',
-                    line: `Ooh, the ${item.name.toLowerCase()}! Try it on in Pals.`,
-                  });
-                }}
-                onError={(message) => setLumi({ mood: 'worried', line: message })}
-              />
-              <h2 className={`game-title ${styles.sectionTitle}`}>Grove decor</h2>
-              <GroveShelf
-                onBought={(item) => {
-                  sfx.coin();
-                  setLumi({ mood: 'dance', line: `The ${item.name.toLowerCase()} will look lovely in the Grove!` });
-                }}
-                onError={(message) => setLumi({ mood: 'worried', line: message })}
-              />
-            </>
-          )}
+          {tab === 'pals' && <PalShop onLumi={setLumi} />}
           {tab === 'diamonds' && <DiamondsShelf onError={(message) => setLumi({ mood: 'worried', line: message })} />}
         </section>
       </main>
