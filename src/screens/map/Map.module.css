@@ -27,21 +27,11 @@
   gap: var(--space-2);
 }
 
-.logo img {
-  display: block;
-  border-radius: 14px;
-  box-shadow: var(--shadow-md);
-}
-
-.logo {
-  position: relative;
-}
-
-/* The hot streak sits on the logo's corner as a small flame badge */
+/* The hot streak sits on the PLAY button's corner as a small flame badge */
 .hotStreak {
   position: absolute;
-  right: -8px;
-  bottom: -6px;
+  right: -4px;
+  top: -8px;
   display: inline-flex;
   align-items: center;
   gap: 1px;

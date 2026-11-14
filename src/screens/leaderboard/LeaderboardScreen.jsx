@@ -8,7 +8,8 @@ import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
 import { WEEKLY_POINTS, WEEKLY_REWARDS } from '../../game/catalog.js';
 import Podium from './Podium.jsx';
 import { stageOf } from '../../game/pals.js';
-import PartnerSwitcher from '../pals/PartnerSwitcher.jsx';
+import PalArt from '../../components/pals/PalArt.jsx';
+import { palById } from '../../game/pals.js';
 import RankRow from './RankRow.jsx';
 import styles from './LeaderboardScreen.module.css';
 
@@ -65,6 +66,7 @@ export default function LeaderboardScreen() {
         : row;
   const top = board?.top.map(withMyPal) ?? [];
   const rest = top.filter((row) => row.rank > 3);
+  const partner = palById(progress.pal.id);
   const isMeListed = top.some((row) => row.isMe);
   const lumiLine = board?.me ? `You’re #${board.me.rank} this week. Keep shining!` : 'Who will shine brightest this week?';
 
@@ -77,7 +79,15 @@ export default function LeaderboardScreen() {
           <Lumi mood="excited" size={86} line={lumiLine} />
         </div>
 
-        <PartnerSwitcher />
+        {partner && (
+          <a href="#/pals" className={styles.playingWith}>
+            <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={44} />
+            <span>
+              Playing with <strong>{partner.name}</strong>
+            </span>
+            <span className={styles.change}>Change</span>
+          </a>
+        )}
         {error && <p className={styles.empty}>{error}</p>}
         {!board && !error && <p className={styles.empty}>Loading the board…</p>}
         {board && <Podium top={top} />}

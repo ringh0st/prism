@@ -119,7 +119,7 @@ function SparksShelf({ buyProps, onInfo }) {
   );
 }
 
-/** Clothes for Pals, bought once with sparks. You put them on (or take them off) in Me. */
+/** Clothes for Pals, bought once with sparks. You put them on (or take them off) in Pals. */
 function ClothesShelf({ onBought, onError }) {
   const { progress, buyAccessory } = usePlayer();
   const [busyItem, setBusyItem] = useState(null);
@@ -141,7 +141,7 @@ function ClothesShelf({ onBought, onError }) {
   return (
     <>
       <p className={styles.shelfIntro}>
-        Clothes and gear are yours forever. Put them on in <a href="#/settings">Me → Wardrobe</a>.
+        Clothes and gear are yours forever. Put them on in <a href="#/pals">Pals → Wardrobe</a>.
       </p>
       {PAL_SLOTS.map((slot) => (
         <section key={slot.id} aria-labelledby={`slot-${slot.id}`}>
@@ -331,7 +331,7 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
                   sfx.win();
                   setLumi({
                     mood: 'dance',
-                    line: `Welcome home, ${pal.name}! Find them in Me.`,
+                    line: `Welcome home, ${pal.name}! Find them in Pals.`,
                   });
                 }}
                 onError={(message) => setLumi({ mood: 'worried', line: message })}
@@ -342,7 +342,7 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
                   sfx.sparkle();
                   setLumi({
                     mood: 'dance',
-                    line: `Ooh, the ${item.name.toLowerCase()}! Try it on in Me.`,
+                    line: `Ooh, the ${item.name.toLowerCase()}! Try it on in Pals.`,
                   });
                 }}
                 onError={(message) => setLumi({ mood: 'worried', line: message })}

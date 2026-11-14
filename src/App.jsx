@@ -10,6 +10,7 @@ import PlayScreen from './screens/play/PlayScreen.jsx';
 import SettingsScreen from './screens/SettingsScreen.jsx';
 import StoreScreen from './screens/StoreScreen.jsx';
 import LeaderboardScreen from './screens/leaderboard/LeaderboardScreen.jsx';
+import PalsScreen from './screens/pals/PalsScreen.jsx';
 import WeeklyRewardDialog from './screens/leaderboard/WeeklyRewardDialog.jsx';
 import StarterPicker from './screens/pals/StarterPicker.jsx';
 import PalUnlockNotice from './screens/pals/PalUnlockNotice.jsx';
@@ -40,7 +41,7 @@ function WeeklyRewardNotice() {
 }
 
 /** First game: pick a starter Pal. Later: celebrate newly unlocked Pals. Only on menu screens, never mid-level. */
-const PAL_NOTICE_ROUTES = ['map', 'settings', 'store', 'top'];
+const PAL_NOTICE_ROUTES = ['map', 'pals', 'settings', 'store', 'top'];
 
 function PalNotices() {
   const { progress } = usePlayer();
@@ -87,6 +88,8 @@ function Routes() {
       );
     case 'top':
       return <LeaderboardScreen />;
+    case 'pals':
+      return <PalsScreen />;
     case 'settings':
       return <SettingsScreen />;
     case 'store':

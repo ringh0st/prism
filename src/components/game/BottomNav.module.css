@@ -65,44 +65,9 @@
   animation: hop 420ms var(--ease-pop);
 }
 
-.dot {
-  position: absolute;
-  top: 0;
-  right: 4px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-mint-deep);
-  box-shadow: 0 0 0 2px var(--surface-raised);
-  animation: ping 1.6s ease-in-out infinite;
-}
-
-.streak {
-  position: absolute;
-  bottom: -2px;
-  right: -4px;
-  min-width: 18px;
-  height: 17px;
-  padding: 0 4px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 11px;
-  line-height: 17px;
-  text-align: center;
-  color: var(--warm-label);
-  background: var(--color-tangerine);
-  box-shadow: 0 0 0 2px var(--surface-raised);
-}
-
 @keyframes hop {
   40% {
     transform: translateY(-4px) scale(1.12);
   }
 }
 
-@keyframes ping {
-  50% {
-    transform: scale(1.3);
-  }
-}

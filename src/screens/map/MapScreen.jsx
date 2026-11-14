@@ -8,6 +8,7 @@ import ChestDialog from './ChestDialog.jsx';
 import WorldScenery from './scenery/WorldScenery.jsx';
 import WorldSign from './scenery/WorldSign.jsx';
 import DailyGift from '../../components/game/DailyGift.jsx';
+import DailyButton from '../../components/game/DailyButton.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
@@ -15,7 +16,6 @@ import { chestId } from '../../game/surprises.js';
 import { MAX_STARS } from '../../game/scoring.js';
 import { quipFor } from '../../game/quips.js';
 import { buildWorldStops, pathThrough, ROW_HEIGHT } from './mapLayout.js';
-import logoUrl from '../../assets/logo.png';
 import styles from './Map.module.css';
 
 const GREETING_MS = 6000;
@@ -131,15 +131,7 @@ export default function MapScreen() {
     <div className={styles.page}>
       <header className={styles.hud}>
         <div className={styles.hudStart}>
-          <a href="#/" className={styles.logo} aria-label="Rinny's Prism">
-            <img src={logoUrl} alt="" width="44" height="44" />
-            {progress.hotStreak >= 2 && (
-              <span className={styles.hotStreak} role="img" aria-label={`Hot streak: ${progress.hotStreak} perfect levels in a row`}>
-                <Icon name="flame" size={12} />
-                <span className="game-title on-color">{progress.hotStreak}</span>
-              </span>
-            )}
-          </a>
+          <DailyButton />
           <DailyGift />
         </div>
         <CurrencyHud />
@@ -167,6 +159,12 @@ export default function MapScreen() {
         {currentRef && (
           <a href={`#/play/${currentRef.id}`} className={styles.playButton}>
             <span className="game-title on-color">PLAY</span>
+            {progress.hotStreak >= 2 && (
+              <span className={styles.hotStreak} role="img" aria-label={`Hot streak: ${progress.hotStreak} perfect levels in a row`}>
+                <Icon name="flame" size={12} />
+                <span className="game-title on-color">{progress.hotStreak}</span>
+              </span>
+            )}
             <span className={styles.playLevel}>
               Level {currentRef.world}-{currentRef.index}
             </span>

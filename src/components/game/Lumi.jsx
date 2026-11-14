@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import styles from './Lumi.module.css';
 
 const EYES = {
@@ -47,6 +48,7 @@ const MOUTHS = {
  */
 export default function Lumi({ mood = 'happy', size = 72, line, bubbleSide = 'right', className = '' }) {
   const face = mood === 'dance' ? 'excited' : mood;
+  const clipId = `lumi-head-${useId().replace(/:/g, '')}`;
   return (
     <div className={`${styles.lumi} ${styles[mood] ?? ''} ${className}`} style={{ '--size': `${size}px` }}>
       <svg viewBox="0 0 100 110" width={size} height={size * 1.1} className={styles.body} aria-hidden="true">
@@ -74,7 +76,13 @@ export default function Lumi({ mood = 'happy', size = 72, line, bubbleSide = 'ri
         <ellipse cx="44" cy="88" rx="6" ry="3" fill="#fff6c9" />
         {/* head */}
         <circle cx="50" cy="58" r="30" fill="#f2a67e" />
-        <path d="M24 50a30 30 0 0 1 34-21c-18 5-28 18-30 36z" fill="#f8b991" />
+        {/* soft light on the upper left, kept inside the round head */}
+        <g clipPath={`url(#${clipId})`}>
+          <circle cx="38" cy="46" r="24" fill="#f8b991" />
+        </g>
+        <clipPath id={clipId}>
+          <circle cx="50" cy="58" r="30" />
+        </clipPath>
         <ellipse cx="36" cy="38" rx="7" ry="4" fill="#fff" opacity=".55" transform="rotate(-30 36 38)" />
         <ellipse cx="29" cy="68" rx="6.5" ry="4" fill="#ff7a6a" opacity=".55" />
         <ellipse cx="71" cy="68" rx="6.5" ry="4" fill="#ff7a6a" opacity=".55" />

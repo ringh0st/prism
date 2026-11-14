@@ -9,7 +9,6 @@ import { usePlayer } from '../state/PlayerContext.jsx';
 import { BEAM_THEMES, totalStars } from '../game/progress.js';
 import { PRIVACY_URL, HOME_PAGE_URL, TERMS_URL } from '../lib/config.js';
 import PlayerCard from './me/PlayerCard.jsx';
-import PalCollection from './pals/PalCollection.jsx';
 import styles from './SettingsScreen.module.css';
 
 const SYNC_LABELS = {
@@ -126,7 +125,6 @@ export default function SettingsScreen() {
       <ScreenHeader title="Me" />
       <main className={styles.main}>
         <PlayerCard />
-        <PalCollection />
 
         <AccountCard />
 

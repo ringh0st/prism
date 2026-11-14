@@ -4,7 +4,6 @@ import Button from '../../components/Button.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, PAL_ACCESSORIES, PAL_SLOTS, isPalUnlocked, palStage, stageOf, unlockText } from '../../game/pals.js';
-import GlowUpStatus from './GlowUpStatus.jsx';
 import { sfx } from '../../audio/sfx.js';
 import styles from './Pals.module.css';
 
@@ -101,7 +100,7 @@ function Wardrobe({ onError }) {
   });
 }
 
-/** The "My Pals" section on the Me screen. */
+/** The team and wardrobe sections of the Pals screen. */
 export default function PalCollection() {
   const { progress } = usePlayer();
   const [message, setMessage] = useState('');
@@ -109,9 +108,8 @@ export default function PalCollection() {
   return (
     <section className={styles.section} aria-labelledby="pals-title">
       <h2 id="pals-title" className="game-title">
-        My Pals
+        Team
       </h2>
-      {partner && <GlowUpStatus />}
       <Collection onError={setMessage} />
       {partner && (
         <>

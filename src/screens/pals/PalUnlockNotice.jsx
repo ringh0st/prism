@@ -36,7 +36,7 @@ export default function PalUnlockNotice() {
         <Button
           size="lg"
           as="a"
-          href="#/settings"
+          href="#/pals"
           onClick={close}
           data-autofocus
         >
