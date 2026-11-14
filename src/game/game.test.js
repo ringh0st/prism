@@ -454,3 +454,19 @@ test('pieces: at most one new piece per level, and the built-in levels teach the
     }
   }
 });
+
+test('grove life: time of day, naps and what the Pal does next', async () => {
+  const { timeOfDay, isNapTime, nextActivity, napSpot, SPOT_VISITS } = await import('./groveLife.js');
+  const at = (hour) => new Date(2026, 5, 1, hour, 30);
+  assert.equal(timeOfDay(at(7)), 'dawn');
+  assert.equal(timeOfDay(at(12)), 'day');
+  assert.equal(timeOfDay(at(19)), 'dusk');
+  assert.equal(timeOfDay(at(23)), 'night');
+  assert.equal(isNapTime(at(23)), true);
+  assert.equal(isNapTime(at(14)), false);
+  // A low roll visits a placed piece of decor; otherwise it wanders inside the clearing.
+  assert.deepEqual(nextActivity(['seat', 'water'], [0.1, 0.9, 0, 0]), SPOT_VISITS.water);
+  const wander = nextActivity([], [0.5, 0, 0.5, 0.5]);
+  assert.ok(wander.left >= 24 && wander.left <= 76 && wander.top >= 70 && wander.top <= 84);
+  assert.deepEqual(napSpot(['home']), SPOT_VISITS.home);
+});

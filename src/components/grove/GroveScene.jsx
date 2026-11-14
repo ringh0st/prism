@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { usePalLife } from '../../hooks/usePalLife.js';
 import PalArt from '../pals/PalArt.jsx';
 import GroveItemShape from './GroveItemShape.jsx';
 import { groveItemById } from '../../game/grove.js';
@@ -18,17 +19,42 @@ const SPOT_PLACES = {
 /** Draw order: far things first. */
 const DRAW_ORDER = ['sky', 'home', 'light', 'seat', 'garden', 'water'];
 
-/** Where your partner stands, as % of the scene (by its feet), and how wide it is. */
-const PARTNER_PLACE = { left: 50, top: 74, size: 30 };
+/** How wide your partner is, as % of the scene. */
+const PAL_SIZE = 30;
 
-const HELLOS = ['Hi there!', 'I love it here!', 'Let’s play!', 'Wheee!', 'So cozy!', '*happy wiggle*'];
+const HELLOS = ['Hi there!', 'I love it here!', 'Let’s play!', 'Wheee!', 'So cozy!', '*happy wiggle*', 'You’re the best!'];
 
-/** Hills and trees; the sun steps aside when the moon is up. */
-function ForestBackdrop({ hasMoon }) {
+/** The sky through the day: soft pink mornings, warm days, peach evenings, quiet starry nights. */
+const SKIES = {
+  dawn: { sky: '#F8E4D4', sun: '#F9C9A0', tint: null },
+  day: { sky: '#F6EED9', sun: '#FBE3A6', tint: null },
+  dusk: { sky: '#F3D2B5', sun: '#F2A67E', tint: 'rgba(223, 116, 88, 0.12)' },
+  night: { sky: '#3A3530', sun: null, tint: 'rgba(28, 26, 22, 0.42)' },
+};
+
+/** Hills and trees under the sky of the moment; at night the moon and stars come out. */
+function ForestBackdrop({ time, hasMoon }) {
+  const sky = SKIES[time];
+  const isNight = time === 'night';
   return (
     <>
-      <rect width="400" height="280" fill={hasMoon ? '#EDE6D6' : '#F6EED9'} />
-      {!hasMoon && <circle cx="330" cy="46" r="26" fill="#FBE3A6" />}
+      <rect width="400" height="280" fill={hasMoon && !isNight ? '#EDE6D6' : sky.sky} />
+      {isNight && (
+        <g fill="#FFF1C2">
+          <path d="M338 30a18 18 0 1 0 14 30 15 15 0 1 1-14-30z" />
+          {[
+            [60, 30],
+            [120, 18],
+            [200, 36],
+            [260, 14],
+            [300, 60],
+            [90, 64],
+          ].map(([x, y]) => (
+            <circle key={x} className={styles.star} cx={x} cy={y} r="1.6" style={{ animationDelay: `${-x / 40}s` }} />
+          ))}
+        </g>
+      )}
+      {sky.sun && !hasMoon && <circle cx="330" cy={time === 'day' ? 46 : 70} r="26" fill={sky.sun} />}
       <path
         className={styles.cloud}
         d="M30 60a10 10 0 0 1 3-19 15 15 0 0 1 28-4 12 12 0 0 1 22 3 11 11 0 0 1 18 10 8 8 0 0 1 5 10z"
@@ -73,6 +99,16 @@ function Butterfly() {
   );
 }
 
+/** A pair of birds crossing the sky now and then (mornings and days). */
+function Birds() {
+  return (
+    <g className={styles.birds} aria-hidden="true" fill="none" stroke="#5E5047" strokeWidth="1.6" strokeLinecap="round">
+      <path className={styles.bird} d="M0 0q4-4 8 0q4-4 8 0" />
+      <path className={styles.bird} d="M14 10q3-3 6 0q3-3 6 0" style={{ animationDelay: '-0.2s' }} />
+    </g>
+  );
+}
+
 function Fireflies() {
   return (
     <g className={styles.fireflies} aria-hidden="true">
@@ -94,23 +130,27 @@ function Fireflies() {
 }
 
 /**
- * The Grove: your partner Pal's home in the enchanted forest, with the decor you placed.
- * Tap the Pal to say hello.
+ * The Grove: your partner Pal's home in the enchanted forest, with the decor you placed. The Pal wanders,
+ * visits the decor, shows little moods, follows the time of day and naps late at night. Tap it to pet it.
  */
 export default function GroveScene({ placed, partnerId, stage = 0, wearing = [] }) {
-  const [hello, setHello] = useState(null);
+  const [pet, setPet] = useState(null);
   const bySpot = Object.fromEntries(placed.map((id) => [groveItemById(id)?.spot, id]).filter(([spot]) => spot));
   const partner = palById(partnerId);
+  const life = usePalLife(Object.keys(bySpot));
+  const sky = SKIES[life.time];
 
-  const sayHello = () => {
-    setHello({ line: HELLOS[Date.now() % HELLOS.length], key: Date.now() });
+  const petPal = () => {
+    const line = life.isNapping ? 'Five more minutes…' : HELLOS[Date.now() % HELLOS.length];
+    setPet({ line, key: Date.now() });
     sfx.hello();
   };
+  const talk = pet?.line ?? life.emote?.line;
 
   return (
-    <div className={styles.scene}>
-      <svg className={styles.art} viewBox="0 0 400 280" role="img" aria-label={sceneLabel(bySpot, partner)} focusable="false">
-        <ForestBackdrop hasMoon={bySpot.sky === 'moonStars'} />
+    <div className={`${styles.scene} ${styles[life.time]}`}>
+      <svg className={styles.art} viewBox="0 0 400 280" role="img" aria-label={sceneLabel(bySpot, partner, life)} focusable="false">
+        <ForestBackdrop time={life.time} hasMoon={bySpot.sky === 'moonStars'} />
         {DRAW_ORDER.map((spot) =>
           bySpot[spot] ? (
             <g key={spot} transform={SPOT_PLACES[spot]}>
@@ -118,24 +158,38 @@ export default function GroveScene({ placed, partnerId, stage = 0, wearing = [] 
             </g>
           ) : null,
         )}
+        {sky.tint && <rect width="400" height="280" fill={sky.tint} />}
+        {(life.time === 'dawn' || life.time === 'day') && <Birds />}
         <Fireflies />
-        <Butterfly />
+        {life.time !== 'night' && <Butterfly />}
       </svg>
       {partner && (
         <button
           type="button"
-          className={styles.pal}
-          style={{ left: `${PARTNER_PLACE.left}%`, top: `${PARTNER_PLACE.top}%`, width: `${PARTNER_PLACE.size}%` }}
-          onClick={sayHello}
-          aria-label={`Say hi to ${partner.name}, ${palStage(stage).name}`}
+          className={`${styles.pal} ${life.isWalking ? styles.walking : ''}`}
+          style={{ left: `${life.place.left}%`, top: `${life.place.top}%`, width: `${PAL_SIZE}%`, transitionDuration: `${life.walkMs}ms` }}
+          onClick={petPal}
+          aria-label={`Pet ${partner.name}, ${palStage(stage).name}${life.isNapping ? ' (napping)' : ''}`}
         >
-          {/* A new key on every hello replays the hop. */}
-          <span key={hello?.key ?? 'still'} className={`${styles.body} ${hello ? styles.hop : ''}`}>
-            <PalArt palId={partner.id} stage={stage} wearing={wearing} size="100%" alive />
+          {/* A new key on every pet replays the hop. */}
+          <span key={pet?.key ?? 'still'} className={`${styles.body} ${pet ? styles.hop : ''}`} style={{ '--facing': life.facing }}>
+            <PalArt palId={partner.id} stage={stage} wearing={wearing} size="100%" alive={!life.isNapping} />
           </span>
-          {hello && (
-            <span key={hello.key} className={styles.bubble} role="status">
-              {hello.line}
+          {life.emote && !pet && (
+            <span key={life.emote.key} className={`${styles.emote} ${life.emote.symbol === 'z' ? styles.snore : ''}`} aria-hidden="true">
+              {life.emote.symbol}
+            </span>
+          )}
+          {pet && (
+            <span key={pet.key} className={styles.hearts} aria-hidden="true">
+              <span>♥</span>
+              <span>♥</span>
+              <span>♥</span>
+            </span>
+          )}
+          {talk && (
+            <span key={talk} className={styles.bubble} role="status">
+              {talk}
             </span>
           )}
         </button>
@@ -144,8 +198,8 @@ export default function GroveScene({ placed, partnerId, stage = 0, wearing = [] 
   );
 }
 
-function sceneLabel(bySpot, partner) {
+function sceneLabel(bySpot, partner, life) {
   const decor = Object.values(bySpot).map((id) => groveItemById(id).name.toLowerCase());
-  const living = partner ? `${partner.name} lives here` : 'Choose a Pal to live here';
+  const living = partner ? `${partner.name} lives here${life.isNapping ? ' and is napping' : ''}` : 'Choose a Pal to live here';
   return `Your Grove in the enchanted forest. ${living}${decor.length ? `, with a ${decor.join(', a ')}` : ''}.`;
 }
