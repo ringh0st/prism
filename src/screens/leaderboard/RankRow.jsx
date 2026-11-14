@@ -9,7 +9,7 @@ export default function RankRow({ row }) {
     <li className={`${styles.row} ${row.isMe ? styles.me : ''}`} aria-current={row.isMe ? 'true' : undefined}>
       <span className={`game-title ${styles.rank}`}>{row.rank}</span>
       <span className={styles.rowAvatar} aria-hidden="true">
-        {row.pal ? <PalArt palId={row.pal} stage={row.palStage} wearing={row.wearing ?? []} size={38} /> : animalAvatar(row.nickname)}
+        {row.pal ? <PalArt palId={row.pal} stage={row.palStage} wearing={row.wearing ?? []} size={36} portrait /> : animalAvatar(row.nickname)}
       </span>
       <span className={styles.who}>
         <span className={styles.name}>

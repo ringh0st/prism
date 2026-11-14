@@ -592,8 +592,18 @@ const STAGE_LOOKS = [
   { scale: 1.04, feature: true, gem: true, aura: 0.38, wings: true, halo: true, sparkles: true },
 ];
 
-/** A Pal in one of its five forms, wearing up to one item per slot (head, neck, hand). Decorative unless `label` is given. */
-export default function PalArt({ palId, stage = 0, wearing = [], size = 64, label, className }) {
+/** The square to show: the whole stage, or (as a portrait) just the Pal, so small forms still fill a round avatar. */
+function viewBoxFor(scale, isPortrait) {
+  if (!isPortrait) return '0 0 100 100';
+  const side = Math.min(100, 92 * scale);
+  return `${50 - side / 2} ${100 - side} ${side} ${side}`;
+}
+
+/**
+ * A Pal in one of its five forms, wearing up to one item per slot (head, neck, hand). Decorative unless `label` is given.
+ * `portrait` zooms in on the Pal, for round avatars.
+ */
+export default function PalArt({ palId, stage = 0, wearing = [], size = 64, portrait = false, label, className }) {
   const art = ART[palId];
   if (!art) return null;
   const look = STAGE_LOOKS[palStage(stage).index];
@@ -603,7 +613,7 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, labe
       className={className}
       width={size}
       height={size}
-      viewBox="0 0 100 100"
+      viewBox={viewBoxFor(look.scale, portrait)}
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}

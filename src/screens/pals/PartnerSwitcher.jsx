@@ -45,7 +45,7 @@ export default function PartnerSwitcher() {
               className={`${styles.teamPal} ${pal.id === partner.id ? styles.teamPalActive : ''}`}
               onClick={() => switchTo(pal.id)}
             >
-              <PalArt palId={pal.id} stage={stageOf(progress.pal.owned[pal.id])} size={48} />
+              <PalArt palId={pal.id} stage={stageOf(progress.pal.owned[pal.id])} size={48} portrait />
             </button>
           ))}
         </div>

@@ -19,7 +19,7 @@ export default function Podium({ top }) {
           <li key={rank} className={`${styles.place} ${styles[PLACE_CLASS[rank]]} ${row?.isMe ? styles.me : ''}`} value={rank}>
             <span className={styles.avatar} aria-hidden="true">
               {row?.pal ? (
-                <PalArt palId={row.pal} stage={row.palStage} wearing={row.wearing ?? []} size={rank === 1 ? 70 : 56} />
+                <PalArt palId={row.pal} stage={row.palStage} wearing={row.wearing ?? []} size={rank === 1 ? 72 : 58} portrait />
               ) : row ? (
                 animalAvatar(row.nickname)
               ) : (

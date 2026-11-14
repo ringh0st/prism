@@ -1,7 +1,6 @@
 /* One color per title, climbing from calm to golden. Labels keep WCAG contrast on each fill. */
 .badge {
   display: inline-block;
-  justify-self: start;
   border-radius: var(--radius-pill);
   white-space: nowrap;
 }
@@ -17,9 +16,10 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* sage-tinted so it reads on the stall wall and on raised cards */
 .scout {
   color: var(--text-strong);
-  background: var(--surface-tonal);
+  background: color-mix(in srgb, var(--color-sage) 30%, var(--surface-raised));
 }
 
 .bender {

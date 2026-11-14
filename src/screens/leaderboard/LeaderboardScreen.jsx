@@ -81,7 +81,7 @@ export default function LeaderboardScreen() {
 
         {partner && (
           <a href="#/pals" className={styles.playingWith}>
-            <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={44} />
+            <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={42} portrait className={styles.playingArt} />
             <span>
               Playing with <strong>{partner.name}</strong>
             </span>

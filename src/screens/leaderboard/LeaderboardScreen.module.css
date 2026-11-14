@@ -71,6 +71,7 @@
 
 .rowAvatar {
   display: grid;
+  overflow: hidden;
   place-items: center;
   width: 36px;
   height: 36px;
@@ -163,8 +164,10 @@
   color: var(--text-soft);
 }
 
+/* the name, then the title badge under it (left-aligned, at its own width) */
 .who {
   display: grid;
+  justify-items: start;
   min-width: 0;
 }
 
@@ -187,4 +190,10 @@
   font-family: var(--font-display);
   font-weight: 600;
   color: var(--text-accent);
+}
+
+.playingArt {
+  flex: none;
+  border-radius: 50%;
+  background: var(--surface-sunken);
 }
