@@ -404,7 +404,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           turns={puzzle.turns}
           trace={trace}
           onActivate={onActivate}
-          highlightTile={puzzle.hintTile ?? (moves === 0 && spotlightTile >= 0 ? spotlightTile : null)}
+          highlightTile={puzzle.hintTile}
+          spotlightTile={moves === 0 && spotlightTile >= 0 ? spotlightTile : null}
           ghostSegments={puzzle.ghostSegments}
           turnsLeft={puzzle.turnsLeft}
           revealedCells={puzzle.revealedCells}

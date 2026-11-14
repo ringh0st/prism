@@ -52,7 +52,7 @@ const ART = {
     ),
   },
   mossy: {
-    hat: [50, 28],
+    hat: [50, 25],
     neck: 66,
     grown: (
       <g fill="#3f8a64" opacity=".55">
@@ -508,7 +508,8 @@ function partsPal({
       <ellipse cx="50" cy="86" rx="18" ry="9" fill={color} />
     ) : null;
   return {
-    hat: [50, shape === 'star' ? 22 : 32],
+    // Hats sit well above the eyes, so Pals with high eyes (Ribbit) wear them higher.
+    hat: [50, shape === 'star' ? 22 : Math.max(14, Math.min(30, faceY - 25))],
     neck: shape === 'cloud' ? 74 : 80,
     grown: <Tail type={tail} color={color} inner={inner} />,
     base: (
@@ -765,6 +766,7 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
       aria-label={label}
       aria-hidden={label ? undefined : true}
       focusable="false"
+      overflow="visible"
     >
       <ellipse cx="50" cy="95" rx="24" ry="4" fill="rgba(60,40,20,.14)" />
       <g transform={`translate(50 94) scale(${scale}) translate(-50 -94)`}>

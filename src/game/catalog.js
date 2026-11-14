@@ -21,7 +21,7 @@ export const HELPERS = {
     id: 'lens',
     name: 'Lens',
     icon: 'lens',
-    description: 'Shows the solved light path for 3 seconds.',
+    description: 'Shows the solved light path for 6 seconds.',
     starCap: 2,
   },
   autoturn: {
@@ -55,7 +55,7 @@ export const HELPERS_PER_ATTEMPT = {
   [DIFFICULTY.EXTRA]: 1,
 };
 
-export const LENS_DURATION_MS = 3000;
+export const LENS_DURATION_MS = 6000;
 
 /**
  * Store items. `price` lists every currency the item can be bought with.

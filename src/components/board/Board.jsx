@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import TileArt, { TileDefs } from './TileArt.jsx';
 import BeamLayer from './BeamLayer.jsx';
+import LensPath from './LensPath.jsx';
 import GlowbugArt from '../glowbugs/GlowbugArt.jsx';
 import { glowbugById } from '../../game/glowbugs.js';
 import { describeTile } from '../../game/describe.js';
@@ -17,7 +18,8 @@ import styles from './Board.module.css';
  * @param turns        rotation count per tile index (drives the rotate animation)
  * @param trace        result of traceBeams()
  * @param onActivate   (cellIndex, tileIndex|-1) when a cell is tapped or Enter/Space is pressed
- * @param highlightTile tile index to pulse (hints)
+ * @param highlightTile tile index the Hint points at (ring and "turn me" badge)
+ * @param spotlightTile tile index to gently pulse (a newly introduced piece)
  * @param isEditing    in the editor every cell is actionable
  * @param ghostSegments faint preview of the solved light path (Lens helper)
  * @param mood         surprise look: normal | disco | night | boss
@@ -32,6 +34,7 @@ export default function Board({
   trace,
   onActivate,
   highlightTile = null,
+  spotlightTile = null,
   isEditing = false,
   isLocked = false,
   ghostSegments = null,
@@ -104,7 +107,7 @@ export default function Board({
           <span key={cell} className={styles.plate} />
         ))}
       </div>
-      <BeamLayer width={width} height={height} segments={trace.segments} ghostSegments={ghostSegments} />
+      <BeamLayer width={width} height={height} segments={trace.segments} />
       <div className={styles.cells} role="grid" aria-label={label} aria-rowcount={height} aria-colcount={width}>
         {Array.from({ length: height }, (_, row) => (
           <div role="row" key={row} className={styles.row}>
@@ -127,6 +130,8 @@ export default function Board({
                     type="button"
                     className={`${styles.cell} ${isActionable ? styles.actionable : ''} ${
                       highlightTile === tileIndex && tileIndex >= 0 ? styles.hint : ''
+                    } ${
+                      spotlightTile === tileIndex && tileIndex >= 0 ? styles.spotlight : ''
                     } ${tile?.type === TILE.SHADE && isLit ? styles.shake : ''}`}
                     tabIndex={cell === focusedCell ? 0 : -1}
                     aria-label={`${description}${glowbug?.cell === cell ? `. ${glowbugById(glowbug.id).name} the Glowbug is ${glowbug.isAwake ? 'awake' : 'asleep'} here` : ''}. Row ${row + 1}, column ${col + 1}`}
@@ -157,6 +162,7 @@ export default function Board({
           </div>
         ))}
       </div>
+      {ghostSegments && <LensPath width={width} height={height} segments={ghostSegments} />}
     </div>
   );
 }
