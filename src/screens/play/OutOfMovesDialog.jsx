@@ -5,8 +5,18 @@ import styles from './OutOfMovesDialog.module.css';
 /**
  * Shown when the move limit runs out before every gem is lit. Kept light and quick:
  * the board stays visible, retrying is one tap, and a hint is offered as a gentle way forward.
+ * In the early worlds `onKeepGoing` adds a few moves instead (for 1 star), so new players never hit a wall.
  */
-export default function OutOfMovesDialog({ gemsLeft, lumiLine, hintsOwned = 0, backName = 'map', onRetry, onRetryWithHint = null, onMap }) {
+export default function OutOfMovesDialog({
+  gemsLeft,
+  lumiLine,
+  hintsOwned = 0,
+  backName = 'map',
+  onRetry,
+  onKeepGoing = null,
+  onRetryWithHint = null,
+  onMap,
+}) {
   const isClose = gemsLeft <= 1;
   return (
     <Dialog title={isClose ? 'So close!' : 'Out of moves'} tone="gentle" onClose={onMap} closesOnBackdrop={false}>
@@ -14,7 +24,18 @@ export default function OutOfMovesDialog({ gemsLeft, lumiLine, hintsOwned = 0, b
         {gemsLeft === 1 ? 'Just 1 gem to go.' : `${gemsLeft} gems to go.`} <span className={styles.quip}>Lumi: “{lumiLine}”</span>
       </p>
       <div className={styles.actions}>
-        <Button size="lg" icon="restart" onClick={onRetry} data-autofocus>
+        {onKeepGoing && (
+          <Button size="lg" icon="play" onClick={onKeepGoing} data-autofocus>
+            Keep going (1 ★)
+          </Button>
+        )}
+        <Button
+          size={onKeepGoing ? 'md' : 'lg'}
+          variant={onKeepGoing ? 'secondary' : 'primary'}
+          icon="restart"
+          onClick={onRetry}
+          data-autofocus={!onKeepGoing || undefined}
+        >
           Try again
         </Button>
         {onRetryWithHint && (

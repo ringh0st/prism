@@ -104,10 +104,14 @@ export default function WinDialog({
         <p className={styles.summary}>Come back any time to earn all three stars.</p>
       ) : (
         <p className={styles.summary}>
-          Solved in <strong>{moves}</strong> {moves === 1 ? 'move' : 'moves'} · par {par}
+          Solved in <strong>{moves}</strong> {moves === 1 ? 'move' : 'moves'}
         </p>
       )}
-      {!isSkipped && stars < 3 && <p className={styles.tip}>Match par ({par} moves) without helpers for all three stars.</p>}
+      {!isSkipped && stars < 3 && (
+        <p className={styles.tip}>
+          Get ★★★ in {par} {par === 1 ? 'move' : 'moves'}.
+        </p>
+      )}
 
       {isFirstToday && (
         <p className={`game-title ${styles.dailyReward}`}>
@@ -146,6 +150,28 @@ export default function WinDialog({
             <Icon name="shield" size={18} /> +1 streak shield
           </span>
         )}
+      </div>
+      {/* Next comes right under the result, so carrying on is always one tap away; extras follow below. */}
+      <div className={styles.actions}>
+        {hasNext ? (
+          <Button size="lg" icon="play" onClick={onNext} data-autofocus>
+            {nextLabel}
+          </Button>
+        ) : (
+          <Button size="lg" onClick={onMap} data-autofocus>
+            Back to {backName}
+          </Button>
+        )}
+        <div className={styles.secondary}>
+          <Button variant="secondary" icon="restart" onClick={onReplay}>
+            Replay
+          </Button>
+          {hasNext && (
+            <Button variant="secondary" onClick={onMap}>
+              {backName === 'event' ? 'Event' : 'Map'}
+            </Button>
+          )}
+        </div>
       </div>
       {partner && !isSkipped && (
         <div className={`${styles.evolved} ${palGrewTo ? styles.grew : ''}`}>
@@ -195,28 +221,6 @@ export default function WinDialog({
           <Icon name="diamond" size={16} /> Finishing a world earns a diamond. <a href="#/settings">Sign in</a> to collect it.
         </p>
       )}
-
-      <div className={styles.actions}>
-        {hasNext ? (
-          <Button size="lg" icon="play" onClick={onNext} data-autofocus>
-            {nextLabel}
-          </Button>
-        ) : (
-          <Button size="lg" onClick={onMap} data-autofocus>
-            Back to {backName}
-          </Button>
-        )}
-        <div className={styles.secondary}>
-          <Button variant="secondary" icon="restart" onClick={onReplay}>
-            Replay
-          </Button>
-          {hasNext && (
-            <Button variant="secondary" onClick={onMap}>
-              {backName === 'event' ? 'Event' : 'Map'}
-            </Button>
-          )}
-        </div>
-      </div>
     </Dialog>
   );
 }

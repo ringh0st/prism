@@ -54,7 +54,12 @@ import { comboFor } from '../../game/combos.js';
 import styles from './PlayScreen.module.css';
 
 const WIN_DIALOG_DELAY_MS = 900;
-const IDLE_AFTER_MS = 15000;
+const IDLE_AFTER_MS = 30000;
+/** Taps in a row that light no new gem before Lumi suggests a Hint. */
+const STUCK_AFTER_MOVES = 6;
+/** Worlds where running out of moves offers "Keep going" (for 1 star) instead of a fail. */
+const KEEP_GOING_WORLDS = 2;
+const KEEP_GOING_MOVES = 5;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const SEEN_PIECES_KEY = 'prism.seenPieces.v1';
@@ -111,6 +116,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     if (isGlowbugAwake) sfx.sparkle();
   }, [isGlowbugAwake]);
   const [isOutOfMoves, setIsOutOfMoves] = useState(false);
+  // Early worlds forgive running out: "Keep going" adds moves, for 1 star at most.
+  const [bonusMoves, setBonusMoves] = useState(0);
   const [rushOver, setRushOver] = useState(null);
   const [showIntro, setShowIntro] = useState(true);
   // Pieces this player meets for the first time get a "New piece!" card before the level starts.
@@ -133,7 +140,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const modifier = useMemo(() => levelModifierFor(level), [level]);
   const isFirstSteps = isFirstStepsLevel(level, mode);
   const flavor = recipeOf(level);
-  const moveLimit = mode === 'rush' ? rushMoveLimit(rush.run, level.par) : moveLimitFor(level.par, level.difficulty);
+  const moveLimit = (mode === 'rush' ? rushMoveLimit(rush.run, level.par) : moveLimitFor(level.par, level.difficulty)) + bonusMoves;
+  const starCap = bonusMoves > 0 ? Math.min(1, puzzle.starCap) : puzzle.starCap;
+  const canKeepGoing = mode === 'level' && level.world <= KEEP_GOING_WORLDS;
   const gems = level.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
   const helpersAllowed = helpersAllowedFor(level.difficulty);
   // Daily and event puzzles can't be skipped.
@@ -174,6 +183,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   useEffect(() => {
     setResult(null);
     setIsOutOfMoves(false);
+    setBonusMoves(0);
     setShowIntro(true);
     setNewPieces(piecesToIntroduce(level, mode, progress));
     setSpotlightTile(-1);
@@ -191,18 +201,26 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   // Nothing happening for a while: Lumi suggests a Hint and the Hint button wiggles (where helpers are on).
   const [isNudgingHint, setIsNudgingHint] = useState(false);
   const isTouring = tour.steps.length > 0;
+  const canSuggestHint = !isFirstSteps && offeredHelpers.includes('hint') && puzzle.usedHelpers.length < helpersAllowed;
+  const suggestHint = () => {
+    setLumi({ mood: 'happy', line: 'Stuck? Tap Hint and I’ll show you a mirror!' });
+    setIsNudgingHint(true);
+  };
+  // Many taps without lighting anything new also counts as stuck.
+  const lastGemMove = useRef(0);
   useEffect(() => {
-    setIsNudgingHint(false);
+    if (trace.litGems.size > lastLitCount.current || moves === 0) {
+      lastGemMove.current = moves;
+      setIsNudgingHint(false);
+    }
+    if (!isOver && canSuggestHint && moves - lastGemMove.current >= STUCK_AFTER_MOVES && !isNudgingHint) suggestHint();
+  }, [moves]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!canSuggestHint) setIsNudgingHint(false);
+  }, [canSuggestHint]);
+  useEffect(() => {
     if (isOver || showIntro || isTouring) return undefined;
-    const timer = setTimeout(() => {
-      const canHint = !isFirstSteps && offeredHelpers.includes('hint') && puzzle.usedHelpers.length < helpersAllowed;
-      if (canHint) {
-        setLumi({ mood: 'happy', line: 'Stuck? Tap Hint and I’ll show you a mirror!' });
-        setIsNudgingHint(true);
-      } else {
-        say('sleepy', 'idle');
-      }
-    }, IDLE_AFTER_MS);
+    const timer = setTimeout(() => (canSuggestHint ? suggestHint() : say('sleepy', 'idle')), IDLE_AFTER_MS);
     return () => clearTimeout(timer);
   }, [moves, isOver, showIntro, isTouring, say]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -252,7 +270,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       hasRecordedWin.current = true;
       playStats.end(isSkipped ? 'quit' : 'win');
 
-      const stars = isSkipped ? 1 : Math.min(starsForMoves(moves, level.par, level.difficulty), puzzle.starCap);
+      const stars = isSkipped ? 1 : Math.min(starsForMoves(moves, level.par, level.difficulty), starCap);
       setSolvedStars(stars);
       const isBig = modifier === 'boss' || level.difficulty === DIFFICULTY.EXTRA;
       sfx.win({ stars, isBig });
@@ -265,12 +283,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
       let outcome;
       if (mode === 'level') {
-        outcome = finishLevel(
-          level,
-          isSkipped ? { moves: null, forcedStars: 1, usedHelpers: true } : { moves, starCap: puzzle.starCap, usedHelpers },
-        );
+        outcome = finishLevel(level, isSkipped ? { moves: null, forcedStars: 1, usedHelpers: true } : { moves, starCap, usedHelpers });
       } else if (mode === 'event') {
-        outcome = finishEventLevel(level, { ...eventSpot, moves, starCap: puzzle.starCap });
+        outcome = finishEventLevel(level, { ...eventSpot, moves, starCap });
       } else if (mode === 'rush') {
         const spareBefore = rush.run.spare;
         outcome = rush.onSolved(moves).then((rushOutcome) => ({ stars, sparksEarned: rushOutcome.sparksWon, rush: { ...rushOutcome, spareBefore } }));
@@ -301,7 +316,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       moves,
       level,
       modifier,
-      puzzle.starCap,
+      starCap,
       puzzle.usedHelpers.length,
       mode,
       levelRefsInWorld,
@@ -358,6 +373,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     playStats.start();
     setResult(null);
     setIsOutOfMoves(false);
+    setBonusMoves(0);
     setSolvedStars(0);
     hasRecordedWin.current = false;
     say('happy', 'start');
@@ -525,13 +541,18 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       </header>
 
       <section className={styles.status} aria-label="Level status" data-tour="meter">
-        <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={puzzle.starCap} isSimple={isFirstSteps} />
+        {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} />}
         <ul className={styles.gems} aria-label={`${trace.litGems.size} of ${gems.length} gems lit`}>
           {gems.map(({ tile, i }) => (
             <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff}>
               <GemShape color={tile.color} size={24} />
             </li>
           ))}
+          {gems.length > 1 && (
+            <li className={`game-title ${styles.gemCount}`} aria-hidden="true">
+              {trace.litGems.size}/{gems.length}
+            </li>
+          )}
         </ul>
       </section>
 
@@ -651,6 +672,15 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           lumiLine={quipFor('outOfMoves')}
           hintsOwned={progress.helpers.hint ?? 0}
           onRetry={restart}
+          onKeepGoing={
+            canKeepGoing
+              ? () => {
+                  setBonusMoves((extra) => extra + KEEP_GOING_MOVES);
+                  setIsOutOfMoves(false);
+                  setLumi({ mood: 'happy', line: 'Take your time. You’ve got this!' });
+                }
+              : null
+          }
           onRetryWithHint={
             offeredHelpers.includes('hint') && helpersAllowed > 0
               ? () => {

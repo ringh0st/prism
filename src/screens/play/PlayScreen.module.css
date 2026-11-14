@@ -63,6 +63,12 @@
   transition: all var(--duration-base) ease;
 }
 
+.gemCount {
+  align-self: center;
+  margin-left: 4px;
+  font-size: 18px;
+}
+
 .gemOn {
   animation: gemOn 500ms var(--ease-pop);
 }
