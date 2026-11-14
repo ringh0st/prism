@@ -1,0 +1,74 @@
+.showcase {
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--space-2);
+}
+
+/* The piece on a board tile, big */
+.plate {
+  display: grid;
+  place-items: center;
+  width: 128px;
+  height: 128px;
+  border-radius: 28px;
+  background: var(--surface-board);
+  box-shadow: var(--shadow-md);
+  animation: present 600ms var(--ease-wobble) both;
+}
+
+.plate svg {
+  width: 84%;
+  height: 84%;
+}
+
+@keyframes present {
+  from {
+    opacity: 0;
+    transform: scale(0.4) rotate(-10deg);
+  }
+}
+
+.name {
+  margin-bottom: var(--space-1);
+  font-size: 22px;
+  text-align: center;
+}
+
+.text {
+  margin-bottom: var(--space-3);
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.lumi {
+  display: flex;
+  justify-content: flex-start;
+  min-height: 110px;
+  margin-bottom: var(--space-2);
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: var(--space-3);
+}
+
+.dot,
+.dotOn {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--surface-sunken);
+}
+
+.dotOn {
+  background: var(--color-sage);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate {
+    animation: none;
+  }
+}

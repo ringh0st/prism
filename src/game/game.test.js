@@ -386,3 +386,21 @@ test('pals: daily Shop picks and Lucky Pal gifts', async () => {
   // Legendary Pals can't be unlocked by stars; only gifts or the Shop.
   assert.equal(pals.isPalUnlocked({ ...base, levels }, pals.palById('leo')), false);
 });
+
+test('pieces: each new kind of piece is introduced once, in teaching order', async () => {
+  const { newPiecesIn, firstTileOf } = await import('./pieces.js');
+  const level = {
+    tiles: [
+      { x: 0, y: 0, type: 'emitter', dir: 'right', color: 'sun' },
+      { x: 1, y: 0, type: 'mirror', orient: 0 },
+      { x: 2, y: 0, type: 'wall' },
+      { x: 3, y: 0, type: 'gem', color: 'coral' },
+      { x: 4, y: 0, type: 'filter', color: 'coral' },
+    ],
+  };
+  assert.deepEqual(newPiecesIn(level, []).map((piece) => piece.id), ['basics', 'wall', 'color', 'filter']);
+  assert.deepEqual(newPiecesIn(level, ['basics', 'wall', 'color']).map((piece) => piece.id), ['filter']);
+  assert.deepEqual(newPiecesIn(level, ['basics', 'wall', 'color', 'filter']), []);
+  assert.equal(firstTileOf(level, 'wall'), 2);
+  assert.equal(firstTileOf(level, 'basics'), 1);
+});

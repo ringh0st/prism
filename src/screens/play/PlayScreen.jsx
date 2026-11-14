@@ -10,6 +10,7 @@ import HelperBar from '../../components/HelperBar.jsx';
 import QuickBuyDialog from '../../components/QuickBuyDialog.jsx';
 import StarMeter from './StarMeter.jsx';
 import LevelIntro from './LevelIntro.jsx';
+import NewPieceDialog from './NewPieceDialog.jsx';
 import OutOfMovesDialog from './OutOfMovesDialog.jsx';
 import WinDialog from './WinDialog.jsx';
 import { usePuzzle } from '../../hooks/usePuzzle.js';
@@ -26,11 +27,22 @@ import { levelNameFor } from '../../game/levelNames.js';
 import { levelModifierFor } from '../../game/surprises.js';
 import { quipFor } from '../../game/quips.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
+import { firstTileOf, newPiecesIn } from '../../game/pieces.js';
+import { readJson, writeJson } from '../../lib/storage.js';
 import styles from './PlayScreen.module.css';
 
 const WIN_DIALOG_DELAY_MS = 900;
 const IDLE_AFTER_MS = 15000;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const SEEN_PIECES_KEY = 'prism.seenPieces.v1';
+
+/** Pieces already introduced on this device. Players who have solved levels already know the basics. */
+function seenPieces(progress) {
+  const saved = readJson(SEEN_PIECES_KEY, null);
+  if (saved) return saved;
+  return Object.keys(progress.levels).length > 0 ? ['basics'] : [];
+}
 
 /**
  * mode: 'level' (records progress) | 'daily' (streak + sparks) | 'playtest' (admin preview, free helpers, records nothing)
@@ -43,6 +55,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const [result, setResult] = useState(null);
   const [isOutOfMoves, setIsOutOfMoves] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
+  // Pieces this player meets for the first time get a "New piece!" card before the level starts.
+  const [newPieces, setNewPieces] = useState(() => (mode === 'playtest' ? [] : newPiecesIn(level, seenPieces(progress))));
+  const [spotlightTile, setSpotlightTile] = useState(-1);
   const [lumi, setLumi] = useState({ mood: 'happy', line: '' });
   const [buyingHelper, setBuyingHelper] = useState(null);
   const [isConfirmingSkip, setIsConfirmingSkip] = useState(false);
@@ -69,6 +84,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     setResult(null);
     setIsOutOfMoves(false);
     setShowIntro(true);
+    setNewPieces(mode === 'playtest' ? [] : newPiecesIn(level, seenPieces(progress)));
+    setSpotlightTile(-1);
     setLumi({ mood: 'happy', line: '' });
     hasRecordedWin.current = false;
   }, [level.id]);
@@ -240,6 +257,13 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [restart, requestHelper, showIntro]);
 
+  const finishPieceIntro = () => {
+    writeJson(SEEN_PIECES_KEY, [...seenPieces(progress), ...newPieces.map((piece) => piece.id)]);
+    // Point at the newest piece on the board until the first move.
+    setSpotlightTile(firstTileOf(level, newPieces[newPieces.length - 1].id));
+    setNewPieces([]);
+  };
+
   const dismissIntro = useCallback(() => {
     sfx.unlock();
     sfx.levelStart();
@@ -277,7 +301,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           turns={puzzle.turns}
           trace={trace}
           onActivate={onActivate}
-          highlightTile={puzzle.hintTile}
+          highlightTile={puzzle.hintTile ?? (moves === 0 && spotlightTile >= 0 ? spotlightTile : null)}
           ghostSegments={puzzle.ghostSegments}
           isLocked={isOver}
           mood={modifier}
@@ -302,7 +326,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         </div>
       </div>
 
-      {showIntro && <LevelIntro level={level} title={levelName} subtitle={subtitle} modifier={modifier} lumiLine={introLine} onDone={dismissIntro} />}
+      {newPieces.length > 0 && <NewPieceDialog pieces={newPieces} onDone={finishPieceIntro} />}
+      {showIntro && newPieces.length === 0 && (
+        <LevelIntro level={level} title={levelName} subtitle={subtitle} modifier={modifier} lumiLine={introLine} onDone={dismissIntro} />
+      )}
       {buyingHelper && (
         <QuickBuyDialog
           helperId={buyingHelper}

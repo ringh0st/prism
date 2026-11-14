@@ -1,0 +1,78 @@
+import { TILE } from './constants.js';
+
+/*
+ * The pieces a player meets along the way. The first level that has a piece they've never seen
+ * introduces it ("New piece!"), Candy Crush style. Order = the order they're shown in.
+ */
+export const PIECES = [
+  {
+    id: 'basics',
+    name: 'Mirrors and gems',
+    text: 'Tap a mirror to turn it. Bend the light from the lamp into every gem to light it up!',
+    lumi: 'This is where the magic starts!',
+    sample: { type: TILE.MIRROR, orient: 0 },
+  },
+  {
+    id: 'wall',
+    name: 'Walls',
+    text: 'Walls block the light. Find a way around them.',
+    lumi: 'Bonk! Light can’t go through.',
+    sample: { type: TILE.WALL },
+  },
+  {
+    id: 'locked',
+    name: 'Fixed mirrors',
+    text: 'These mirrors are stuck in place. You can’t turn them, so plan around them.',
+    lumi: 'This one won’t budge. I tried!',
+    sample: { type: TILE.MIRROR, orient: 1, locked: true },
+  },
+  {
+    id: 'splitter',
+    name: 'Splitters',
+    text: 'A splitter lets light go straight through and bounces a copy sideways. One beam becomes two!',
+    lumi: 'Twice the light, twice the fun!',
+    sample: { type: TILE.SPLITTER, orient: 0 },
+  },
+  {
+    id: 'color',
+    name: 'Colored gems',
+    text: 'Colored gems only light up with light of their own color. Look at the shape on the gem too.',
+    lumi: 'Picky gems! They want their own color.',
+    sample: { type: TILE.GEM, color: 'coral' },
+  },
+  {
+    id: 'filter',
+    name: 'Color glass',
+    text: 'Light that passes through colored glass takes on its color. Use it to reach colored gems.',
+    lumi: 'Instant makeover for your light!',
+    sample: { type: TILE.FILTER, color: 'lime' },
+  },
+  {
+    id: 'shade',
+    name: 'Shadow crystals',
+    text: 'Never let the light touch a shadow crystal! Keep your beams away from it.',
+    lumi: 'Eek! Don’t wake the shadow crystal!',
+    sample: { type: TILE.SHADE },
+  },
+];
+
+const HAS = {
+  basics: () => true,
+  wall: (tile) => tile.type === TILE.WALL,
+  locked: (tile) => tile.type === TILE.MIRROR && tile.locked,
+  splitter: (tile) => tile.type === TILE.SPLITTER,
+  color: (tile) => tile.type === TILE.GEM && tile.color && tile.color !== 'sun',
+  filter: (tile) => tile.type === TILE.FILTER,
+  shade: (tile) => tile.type === TILE.SHADE,
+};
+
+/** Pieces in this level the player hasn't been introduced to yet, in teaching order. */
+export function newPiecesIn(level, seenIds) {
+  return PIECES.filter((piece) => !seenIds.includes(piece.id) && level.tiles.some(HAS[piece.id]));
+}
+
+/** The first tile of a piece in a level (to point at it on the board), or -1. */
+export function firstTileOf(level, pieceId) {
+  if (pieceId === 'basics') return level.tiles.findIndex((tile) => tile.type === TILE.MIRROR && !tile.locked);
+  return level.tiles.findIndex(HAS[pieceId]);
+}
