@@ -1,3 +1,4 @@
+import Icon from '../../components/Icon.jsx';
 import GroveItemArt from '../../components/grove/GroveItemArt.jsx';
 import ShelfItem from './ShelfItem.jsx';
 import PriceTag from './PriceTag.jsx';
@@ -28,9 +29,10 @@ export default function GroveShelf({ onTry }) {
   const { t, lang } = useI18n();
   return (
     <>
-      <p className={styles.shelfIntro}>
-        {t('shop.grove.intro')} <a href="#/grove">{t('shop.grove.link')}</a>.
-      </p>
+      <a href="#/grove" className={styles.goLink}>
+        <Icon name="home" size={18} />
+        {t('shop.grove.link')}
+      </a>
       {GROVE_SPOTS.map((spot) => (
         <section key={spot.id} aria-labelledby={`grove-${spot.id}`}>
           <h3 id={`grove-${spot.id}`} className={`game-title ${styles.slotHeading}`}>

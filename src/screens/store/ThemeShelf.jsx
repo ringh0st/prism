@@ -1,3 +1,4 @@
+import HelpTip from './HelpTip.jsx';
 import ClothesShelf from './ClothesShelf.jsx';
 import { DecorItem } from './GroveShelf.jsx';
 import { nextTheme, themeOfWeek } from '../../game/themes.js';
@@ -21,11 +22,17 @@ export default function ThemeShelf({ onTry }) {
         <span className={styles.themeIcon} aria-hidden="true">
           {theme.icon}
         </span>
-        <div>
-          <p className={styles.themeKicker}>{t('shop.theme.kicker')}</p>
-          <h2 className={`game-title ${styles.themeName}`}>{name}</h2>
-          <p className={styles.themeTagline}>{tagline}</p>
-        </div>
+        <h2 className={`game-title ${styles.themeName}`}>
+          <span className="visually-hidden">{t('shop.theme.kicker')}: </span>
+          {name}
+        </h2>
+        <HelpTip title={name} className={styles.themeHelp}>
+          <p>{tagline}</p>
+          <p>{t('shop.theme.comesBack')}</p>
+          <p>
+            {t('shop.theme.next')} <strong>{themeText(lang, nextTheme()).name}</strong>
+          </p>
+        </HelpTip>
       </div>
       <h3 className={`game-title ${styles.slotHeading}`}>{t('shop.theme.outfits')}</h3>
       <ClothesShelf items={outfits} onTry={onTry} intro={false} />
@@ -35,9 +42,6 @@ export default function ThemeShelf({ onTry }) {
           <DecorItem key={item.id} item={item} onTry={onTry} />
         ))}
       </ul>
-      <p className={styles.shelfIntro}>
-        {t('shop.theme.next')} <strong>{themeText(lang, nextTheme()).name}</strong>. {t('shop.theme.comesBack')}
-      </p>
     </>
   );
 }

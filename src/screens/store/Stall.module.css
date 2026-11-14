@@ -104,13 +104,6 @@
   padding: var(--space-2) var(--space-3) var(--space-5);
 }
 
-.shelfIntro {
-  padding: 0 4px;
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--text-soft);
-}
-
 .shelf {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -242,83 +235,212 @@ button.goods:active .goodsArt {
 }
 
 .moneyTag {
-  min-width: 92px;
+  min-width: 104px;
+  font-size: 20px;
 }
 
-/* ---------- Pinned paper notes ---------- */
-.note {
-  position: relative;
-  padding: var(--space-4);
-  border-radius: 6px;
-  font-weight: 700;
-  color: var(--text-strong);
-  background: var(--paper);
-  box-shadow: var(--shadow-md);
-  transform: rotate(-0.6deg);
-}
-
-.note::before {
-  content: '';
-  position: absolute;
-  top: -6px;
-  left: 50%;
-  width: 14px;
-  height: 14px;
-  margin-inline-start: -7px;
-  border-radius: 50%;
-  background: var(--color-terracotta);
-  box-shadow: 0 2px 3px rgba(60, 40, 20, 0.35);
-}
-
-.noteRow {
+/* ---------- Small notes on the wall ---------- */
+.signInNote {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-strong);
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
 }
 
-.noteRow svg {
+.signInNote > svg {
   color: var(--color-mint-deep);
 }
 
+.signInLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-start: auto;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  color: var(--action-label);
+  background: var(--action-bottom);
+  text-decoration: none;
+}
+
+/* Free diamonds: four tiles, each an icon, a big number and one or two words. */
 .freeNote {
-  transform: rotate(0.8deg);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  box-shadow: var(--shadow-md);
 }
 
 .freeNote h2 {
-  margin-bottom: var(--space-3);
-  font-size: 22px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0 0 var(--space-3);
+  font-size: 20px;
+}
+
+.freeNote h2 svg {
+  color: var(--color-mint-deep);
 }
 
 .freeNote ul {
   display: grid;
-  gap: 8px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .freeNote li {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 2px;
+  padding: var(--space-2) 2px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  background: color-mix(in srgb, var(--color-mint) 16%, var(--paper));
 }
 
-.freeNote svg {
+.freeNote li svg {
   color: var(--color-mint-deep);
 }
 
 .freeNote strong {
-  margin-inline-start: auto;
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 20px;
+  line-height: 1.1;
   color: var(--text-calm);
 }
 
+.freeNote li span {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-soft);
+}
+
+.bonusChip {
+  display: inline-block;
+  padding: 1px 10px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+}
+
 .legal {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
   padding: 0 4px;
   font-size: 13px;
   color: var(--text-soft);
+}
+
+.legal > svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--color-honey-deep);
+}
+
+/* ---------- Helper shelf bar: today's buys left and the "?" ---------- */
+.shelfBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 0 4px;
+}
+
+.buysLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.buysLabel {
+  margin-inline-end: 2px;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.bagLeft,
+.bagUsed {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.bagLeft {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: var(--shadow-sm);
+  animation: pop 420ms var(--ease-spring) both;
+}
+
+.bagLeft:nth-of-type(3) {
+  animation-delay: 80ms;
+}
+
+.bagLeft:nth-of-type(4) {
+  animation-delay: 160ms;
+}
+
+/* A used buy: an empty dashed ring (shape, not only color) */
+.bagUsed {
+  border: 2px dashed color-mix(in srgb, var(--text-soft) 55%, transparent);
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+
+/* A row with a heading and its "?" */
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.titleRow h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+/* A small link chip under a shelf (to the Wardrobe or the Grove) */
+.goLink {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--action-label);
+  background: var(--action-bottom);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
 }
 
 /* ---------- Item details sheet ---------- */
@@ -381,10 +503,6 @@ button.goods:active .goodsArt {
 }
 
 /* ---------- Adopt a Pal ---------- */
-.sectionTitle {
-  margin-top: var(--space-2);
-  font-size: 22px;
-}
 
 .adoptGrid {
   display: grid;
@@ -496,12 +614,6 @@ button.goods:active .goodsArt {
   background: color-mix(in srgb, var(--color-peach) 24%, var(--paper));
 }
 
-.pickSpecies {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-strong);
-}
-
 .palShopTabs {
   --chips-bg: var(--stall-wall);
 }
@@ -533,23 +645,27 @@ button.goods:active .goodsArt {
   box-shadow: var(--shadow-sm);
 }
 
-.themeKicker {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-strong);
-}
-
 .themeName {
+  flex: 1;
   margin: 0;
   font-size: 24px;
   line-height: 1.1;
 }
 
-.themeTagline {
-  margin: 2px 0 0;
-  font-weight: 700;
-  color: var(--text-strong);
+.themeHelp {
+  align-self: start;
+}
+
+/* "You have N diamonds" under a buy you can't afford yet */
+.shortBy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  font-weight: 800;
+  color: var(--text-soft);
+}
+
+.shortBy svg {
+  color: var(--color-mint-deep);
 }

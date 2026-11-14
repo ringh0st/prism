@@ -1,3 +1,4 @@
+import Icon from '../../components/Icon.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import ShelfItem from './ShelfItem.jsx';
 import PriceTag from './PriceTag.jsx';
@@ -7,7 +8,7 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 import { shopItemName } from '../../i18n/shopText.js';
 import styles from './Stall.module.css';
 
-/** Outfit pieces on your own Pal. Tap one to try it on (and buy it); put them on in Pals → Wardrobe. */
+/** Outfit pieces on your own Pal. Tap one to try it on (and buy it); the Wardrobe chip is where you put them on. */
 export default function ClothesShelf({ items, onTry, intro = true }) {
   const { progress } = usePlayer();
   const { t, lang } = useI18n();
@@ -16,9 +17,10 @@ export default function ClothesShelf({ items, onTry, intro = true }) {
   return (
     <>
       {intro && (
-        <p className={styles.shelfIntro}>
-          {t('shop.clothes.intro')} <a href="#/pals/wardrobe">{t('shop.clothes.link')}</a>.
-        </p>
+        <a href="#/pals/wardrobe" className={styles.goLink}>
+          <Icon name="shirt" size={18} />
+          {t('shop.clothes.link')}
+        </a>
       )}
       <ul className={styles.shelf}>
         {items.map((item) => (

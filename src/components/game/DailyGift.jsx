@@ -5,7 +5,7 @@ import LumiSays from './LumiSays.jsx';
 import GiftReveal from '../gifts/GiftReveal.jsx';
 import GiftCalendar from '../gifts/GiftCalendar.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { calendarDay, calendarGift, isDailyGiftReady } from '../../game/gifts.js';
+import { GIFT_CALENDAR, calendarDay, calendarGift, isDailyGiftReady } from '../../game/gifts.js';
 import { todayKey } from '../../game/daily.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './DailyGift.module.css';
@@ -40,19 +40,35 @@ export default function DailyGift({ look = 'button', className = '' }) {
   );
 
   if (look === 'note') {
+    // Days already opened this week (after day 7 is opened the calendar wraps to 0: show the full week).
+    const opened = !isReady && calendarDay(progress.giftDays) === 0 ? GIFT_CALENDAR.length : calendarDay(progress.giftDays);
     return (
       <div className={`${styles.note} ${className}`}>
         <span className={`${styles.noteIcon} ${isReady ? styles.ready : ''}`} aria-hidden="true">
           <Icon name="gift" size={26} />
         </span>
-        <p className={styles.noteText}>
+        <div className={styles.noteText}>
           <strong>{t('ui.gift.name')}</strong>
-          <span>{isReady ? t('gift.note.ready', { n: day }) : t('ui.gift.collected')}</span>
-        </p>
-        {isReady && (
+          <span className="visually-hidden">{isReady ? t('gift.note.ready', { n: day }) : t('ui.gift.collected')}</span>
+          <ol className={styles.pips} aria-hidden="true">
+            {GIFT_CALENDAR.map((gift, i) => (
+              <li
+                key={i}
+                className={`${styles.pip} ${i < opened ? styles.pipOpened : ''} ${isReady && i === opened ? styles.pipToday : ''} ${gift.isBig ? styles.pipBig : ''}`}
+              >
+                {i < opened ? <Icon name="check" size={12} /> : gift.isBig ? <Icon name="gift" size={12} /> : null}
+              </li>
+            ))}
+          </ol>
+        </div>
+        {isReady ? (
           <Button size="sm" variant="gold" onClick={open}>
             {t('ui.gift.collect')}
           </Button>
+        ) : (
+          <span className={styles.doneMark} aria-hidden="true">
+            <Icon name="check" size={20} />
+          </span>
         )}
         {dialog}
       </div>

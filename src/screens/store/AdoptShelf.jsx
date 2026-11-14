@@ -9,8 +9,11 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, adoptPriceOf, dailyPalPick, rarityOf, stageOf } from '../../game/pals.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { palName, palSpecies } from '../../i18n/palText.js';
-import styles from './Stall.module.css';
 import { errorText } from '../../i18n/meText.js';
+import HelpTip from './HelpTip.jsx';
+import SignInNote from './SignInNote.jsx';
+import AskParent from './AskParent.jsx';
+import styles from './Stall.module.css';
 
 /** A Pal's name and species, for the {name} and {species} placeholders. */
 const palLabel = (lang, pal) => ({ name: palName(lang, pal), species: palSpecies(lang, pal) });
@@ -22,7 +25,12 @@ function DailyPicks({ onChoose }) {
   const picks = ['legendary', 'mythic'].map((rarity) => ({ rarity, pal: dailyPalPick(progress, rarity, shopSeed) }));
   return (
     <>
-      <p className={styles.shelfIntro}>{t('shop.picks.intro')}</p>
+      <div className={styles.titleRow}>
+        <h2 className="game-title">{t('shop.picks.title')}</h2>
+        <HelpTip title={t('shop.picks.title')}>
+          <p>{t('shop.picks.help')}</p>
+        </HelpTip>
+      </div>
       <ul className={styles.dailyPicks}>
         {picks.map(({ rarity, pal }) => (
           <li key={rarity}>
@@ -36,7 +44,6 @@ function DailyPicks({ onChoose }) {
                 <RarityBadge pal={pal} />
                 <PalArt palId={pal.id} size={96} />
                 <span className="game-title">{palLabel(lang, pal).name}</span>
-                <span className={styles.pickSpecies}>{palLabel(lang, pal).species}</span>
                 <span className={styles.adoptPrice}>
                   <Icon name="diamond" size={13} /> {adoptPriceOf(pal)}
                 </span>
@@ -79,19 +86,14 @@ export default function AdoptShelf({ onAdopted, onError }) {
 
   return (
     <>
-      <h2 className={`game-title ${styles.sectionTitle}`}>{t('shop.picks.title')}</h2>
       <DailyPicks onChoose={setChoice} />
-      <h2 className={`game-title ${styles.sectionTitle}`}>{t('shop.adopt.title')}</h2>
-      <p className={styles.shelfIntro}>
-        {t('shop.adopt.introBefore')} <strong>{t('shop.adopt.price', { count: adoptPriceOf(regulars[0]) })}</strong>
-        {t('shop.adopt.introAfter')}
-        {!isSignedIn && (
-          <>
-            {' '}
-            {t('shop.adopt.needAccount')} <a href="#/settings">{t('shop.adopt.signIn')}</a>.
-          </>
-        )}
-      </p>
+      <div className={styles.titleRow}>
+        <h2 className="game-title">{t('shop.adopt.title')}</h2>
+        <HelpTip title={t('shop.adopt.title')}>
+          <p>{t('shop.adopt.help', { count: adoptPriceOf(regulars[0]) })}</p>
+        </HelpTip>
+      </div>
+      {!isSignedIn && <SignInNote />}
       <ul className={styles.adoptGrid}>
         {shelf.map((pal) => {
           const label = palLabel(lang, pal);
@@ -122,17 +124,21 @@ export default function AdoptShelf({ onAdopted, onError }) {
         <Dialog title={t('shop.adopt.confirmTitle', palLabel(lang, choice))} onClose={() => setChoice(null)}>
           <PalArt palId={choice.id} size={120} className={styles.infoArt} />
           <p className={styles.infoText}>
-            {t('shop.adopt.confirmName', palLabel(lang, choice))} <RarityBadge pal={choice} /> {t('shop.adopt.confirmText')}
+            {t('shop.adopt.confirmName', palLabel(lang, choice))} <RarityBadge pal={choice} />
           </p>
           <PalFormsStrip palId={choice.id} />
-          <p className={styles.legal}>{t('shop.askParent')}</p>
+          <AskParent />
           <div className={styles.adoptActions}>
             <Button size="lg" disabled={!isSignedIn || isBusy || progress.diamonds < price} onClick={confirm} data-autofocus>
               <Icon name="diamond" size={18} />
               <span>{isBusy ? t('shop.adopt.busy') : t('shop.adopt.for', { price })}</span>
             </Button>
-            {isSignedIn && progress.diamonds < price && <p className={styles.legal}>{t('shop.adopt.youHave', { count: progress.diamonds })}</p>}
-            {!isSignedIn && <p className={styles.legal}>{t('shop.signInToUse')}</p>}
+            {isSignedIn && progress.diamonds < price && (
+              <p className={styles.shortBy}>
+                <Icon name="diamond" size={16} /> {t('shop.adopt.youHave', { count: progress.diamonds })}
+              </p>
+            )}
+            {!isSignedIn && <SignInNote />}
             <Button variant="ghost" onClick={() => setChoice(null)}>
               {t('shop.adopt.notNow')}
             </Button>

@@ -9,8 +9,11 @@ import ShelfItem from './store/ShelfItem.jsx';
 import ItemInfoDialog from './store/ItemInfoDialog.jsx';
 import DailyGift from '../components/game/DailyGift.jsx';
 import PalShop from './store/PalShop.jsx';
+import HelpTip from './store/HelpTip.jsx';
+import SignInNote from './store/SignInNote.jsx';
+import BuysLeft from './store/BuysLeft.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
-import { DIAMOND_PACKS, DIAMOND_REWARDS, HELPERS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS } from '../game/catalog.js';
+import { DAILY_SPARK_PURCHASE_LIMIT, DIAMOND_PACKS, DIAMOND_REWARDS, HELPERS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS } from '../game/catalog.js';
 import { sparkPurchasesLeft } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
 import { startDiamondCheckout } from '../lib/economyApi.js';
@@ -19,6 +22,7 @@ import { sfx } from '../audio/sfx.js';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import { helperText } from '../i18n/gameText.js';
 import { packTag } from '../i18n/shopText.js';
+import { errorText } from '../i18n/meText.js';
 import styles from './store/Stall.module.css';
 
 const TABS = [
@@ -32,33 +36,19 @@ const helperItems = STORE_ITEMS.filter((item) => item.kind === 'helper');
 const sparkItems = STORE_ITEMS.filter((item) => item.kind === 'sparks');
 const weeklyDiamonds = WEEKLY_REWARDS.filter((reward) => reward.diamonds > 0).map((reward) => reward.diamonds);
 
-/** A pinned paper note on the stall wall. */
-function Note({ children, className = '' }) {
-  return <div className={`${styles.note} ${className}`}>{children}</div>;
-}
-
-function SignInNote() {
-  const { t } = useI18n();
-  return (
-    <Note>
-      <p className={styles.noteRow}>
-        <Icon name="user" size={20} />
-        <span>
-          {t('shop.signInNote.before')} <a href="#/settings">{t('shop.signInNote.link')}</a> {t('shop.signInNote.after')}
-        </span>
-      </p>
-    </Note>
-  );
-}
-
 function HelpersShelf({ buyProps, onInfo }) {
   const { progress } = usePlayer();
   const { t, lang } = useI18n();
   return (
     <>
-      <p className={styles.shelfIntro}>
-        {t('shop.helpers.intro', { cap: INVENTORY_CAP })} <strong>{sparkPurchasesLeft(progress, todayKey())}</strong>
-      </p>
+      <div className={styles.shelfBar}>
+        <BuysLeft left={sparkPurchasesLeft(progress, todayKey())} />
+        <HelpTip title={t('shop.helpers.helpTitle')}>
+          <p>{t('shop.helpers.helpCap', { cap: INVENTORY_CAP })}</p>
+          <p>{t('shop.helpers.helpDaily', { count: DAILY_SPARK_PURCHASE_LIMIT })}</p>
+          <p>{t('shop.helpers.helpStars')}</p>
+        </HelpTip>
+      </div>
       <ul className={styles.shelf}>
         {helperItems.map((item) => {
           const helper = HELPERS[item.grants.helper];
@@ -69,7 +59,7 @@ function HelpersShelf({ buyProps, onInfo }) {
               key={item.id}
               art={helper.id}
               title={name}
-              badge={`×${owned}`}
+              badge={`${owned}/${INVENTORY_CAP}`}
               onInfo={() =>
                 onInfo({
                   item,
@@ -97,7 +87,6 @@ function SparksShelf({ buyProps, onInfo }) {
   const { t } = useI18n();
   return (
     <>
-      <p className={styles.shelfIntro}>{t('shop.sparks.intro')}</p>
       <ul className={styles.shelf}>
         {sparkItems.map((item, i) => {
           const amount = t('shop.sparks.amount', { count: item.grants.sparks });
@@ -127,6 +116,34 @@ function SparksShelf({ buyProps, onInfo }) {
   );
 }
 
+/** Ways to earn diamonds for free, as icon tiles with big numbers. */
+function FreeDiamonds() {
+  const { t } = useI18n();
+  const ways = [
+    // Isolated so "+1" keeps its sign in front in right-to-left text.
+    { id: 'world', icon: 'check', amount: `\u2066+${DIAMOND_REWARDS.worldComplete}\u2069` },
+    { id: 'perfect', icon: 'star', amount: `\u2066+${DIAMOND_REWARDS.worldPerfect}\u2069` },
+    { id: 'streak', icon: 'flame', amount: `\u2066+${DIAMOND_REWARDS.streakWeek}\u2069` },
+    { id: 'weekly', icon: 'trophy', amount: t('shop.free.range', { min: Math.min(...weeklyDiamonds), max: Math.max(...weeklyDiamonds) }) },
+  ];
+  return (
+    <section className={styles.freeNote} aria-labelledby="free-diamonds">
+      <h2 id="free-diamonds" className="game-title">
+        <Icon name="diamond" size={20} /> {t('shop.free.title')}
+      </h2>
+      <ul>
+        {ways.map((way) => (
+          <li key={way.id}>
+            <Icon name={way.icon} size={22} />
+            <strong>{way.amount}</strong>
+            <span>{t(`shop.free.${way.id}`)}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function DiamondsShelf({ onError }) {
   const { isSignedIn } = usePlayer();
   const { t, lang } = useI18n();
@@ -144,24 +161,7 @@ function DiamondsShelf({ onError }) {
 
   return (
     <>
-      <Note className={styles.freeNote}>
-        <h2 className="game-title">{t('shop.free.title')}</h2>
-        <ul>
-          <li>
-            <Icon name="check" size={18} /> {t('shop.free.world')} <strong>+{DIAMOND_REWARDS.worldComplete}</strong>
-          </li>
-          <li>
-            <Icon name="star" size={18} /> {t('shop.free.perfect')} <strong>+{DIAMOND_REWARDS.worldPerfect}</strong>
-          </li>
-          <li>
-            <Icon name="flame" size={18} /> {t('shop.free.streak')} <strong>+{DIAMOND_REWARDS.streakWeek}</strong>
-          </li>
-          <li>
-            <Icon name="trophy" size={18} /> {t('shop.free.weekly')}{' '}
-            <strong>{t('shop.free.range', { min: Math.min(...weeklyDiamonds), max: Math.max(...weeklyDiamonds) })}</strong>
-          </li>
-        </ul>
-      </Note>
+      <FreeDiamonds />
 
       {!isSignedIn && <SignInNote />}
 
@@ -174,11 +174,10 @@ function DiamondsShelf({ onError }) {
                 key={pack.id}
                 art={`diamonds${i}`}
                 title={`${pack.diamonds + pack.bonus}`}
-                subtitle={pack.bonus > 0 ? t('shop.packs.withBonus', { bonus: pack.bonus }) : t('shop.packs.unit')}
+                subtitle={pack.bonus > 0 ? <span className={styles.bonusChip}>{t('shop.packs.bonus', { bonus: pack.bonus })}</span> : null}
                 tag={packTag(lang, pack)}
               >
                 <Button
-                  size="sm"
                   className={styles.moneyTag}
                   disabled={!isSignedIn || busyPack !== null}
                   onClick={() => buyPack(pack.id)}
@@ -191,7 +190,10 @@ function DiamondsShelf({ onError }) {
           </ul>
 
           <p className={styles.legal}>
-            <strong>{t('shop.packs.parent')}</strong> {t('shop.packs.legal')} <a href={TERMS_URL}>{t('shop.packs.terms')}</a>
+            <Icon name="shield" size={16} />
+            <span>
+              <strong>{t('shop.packs.parent')}</strong> {t('shop.packs.legal')} <a href={TERMS_URL}>{t('shop.packs.terms')}</a>
+            </span>
           </p>
         </>
       )}

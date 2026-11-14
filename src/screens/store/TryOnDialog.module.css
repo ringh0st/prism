@@ -17,15 +17,33 @@
   height: auto;
 }
 
-.caption {
-  margin: 0 0 var(--space-3);
-  font-weight: 700;
-  text-align: center;
-  color: var(--text-soft);
+/* This week's collection, as a small chip under the preview */
+.themeTag {
+  justify-self: center;
+  width: fit-content;
+  margin: 0 auto var(--space-3);
+  padding: 2px 12px;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
 }
 
-.themeTag {
-  color: var(--reward-label);
+/* How much is missing: the currency icon and a big number */
+.short {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--text-strong);
+}
+
+.short > span[aria-hidden] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .actions {
@@ -38,14 +56,6 @@
   margin: 0;
   font-weight: 700;
   text-align: center;
-}
-
-.legal {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 700;
-  text-align: center;
-  color: var(--text-soft);
 }
 
 .error {

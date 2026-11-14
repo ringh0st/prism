@@ -5,7 +5,7 @@ import Icon from '../../components/Icon.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import GroveScene from '../../components/grove/GroveScene.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { accessoryById, palById, stageOf } from '../../game/pals.js';
+import { accessoryById, stageOf } from '../../game/pals.js';
 import { groveItemById } from '../../game/grove.js';
 import { themeById, themeItemBlocker, themeItemById } from '../../game/themes.js';
 import { isNativeApp } from '../../lib/platform.js';
@@ -13,9 +13,10 @@ import { rewardShower } from '../../lib/effects.js';
 import { sfx } from '../../audio/sfx.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { shopItemName, themeText } from '../../i18n/shopText.js';
-import { palName } from '../../i18n/palText.js';
-import styles from './TryOnDialog.module.css';
 import { errorText } from '../../i18n/meText.js';
+import AskParent from './AskParent.jsx';
+import SignInNote from './SignInNote.jsx';
+import styles from './TryOnDialog.module.css';
 
 const CURRENCY_ICON = { sparks: 'spark', diamonds: 'diamond' };
 
@@ -65,8 +66,6 @@ export default function TryOnDialog({ item, onClose, onGetDiamonds }) {
   };
 
   const name = shopItemName(lang, item);
-  const partner = palById(partnerId);
-  const partnerName = partner ? palName(lang, partner) : t('shop.tryOn.yourPal');
   const title = stage === 'bought' ? t('shop.tryOn.yours') : t(isOutfit ? 'shop.tryOn.titleOutfit' : 'shop.tryOn.titleDecor', { name });
   return (
     <Dialog title={title} tone="celebrate" onClose={onClose}>
@@ -79,12 +78,11 @@ export default function TryOnDialog({ item, onClose, onGetDiamonds }) {
           <GroveScene placed={placed} partnerId={progress.pal.id} owned={{}} wearing={progress.pal.wearing} worldsFinished={0} />
         )}
       </div>
-      <p className={styles.caption}>
-        {isOutfit
-          ? t('shop.tryOn.captionOutfit', { pal: partnerName, item: name.toLowerCase() })
-          : t('shop.tryOn.captionDecor', { item: name.toLowerCase() })}
-        {theme && <span className={styles.themeTag}> · {t('shop.tryOn.collection', { theme: themeText(lang, themeById(theme.theme)).name })}</span>}
-      </p>
+      {theme && (
+        <p className={styles.themeTag}>
+          <span aria-hidden="true">{themeById(theme.theme).icon}</span> {themeText(lang, themeById(theme.theme)).name}
+        </p>
+      )}
 
       {stage === 'bought' ? (
         <div className={styles.actions}>
@@ -112,40 +110,31 @@ export default function TryOnDialog({ item, onClose, onGetDiamonds }) {
               <span>{t('shop.tryOn.buyFor', { price: item.price })}</span>
             </Button>
           )}
+          {blocker === 'short' && (
+            <p className={styles.short}>
+              <span aria-hidden="true">
+                <Icon name={CURRENCY_ICON[currency]} size={20} /> {t('shop.tryOn.need', { count: item.price - balance })}
+              </span>
+              <span className="visually-hidden">
+                {t(currency === 'diamonds' ? 'shop.tryOn.moreDiamonds' : 'shop.tryOn.moreSparks', { count: item.price - balance })}
+              </span>
+            </p>
+          )}
           {blocker === 'short' && currency === 'sparks' && (
+            <Button as="a" href="#/" icon="play" data-autofocus>
+              {t('shop.tryOn.play')}
+            </Button>
+          )}
+          {blocker === 'short' && currency === 'diamonds' && isNativeApp && <p className={styles.note}>{t('shop.tryOn.earnDiamondsApp')}</p>}
+          {blocker === 'short' && currency === 'diamonds' && !isNativeApp && (
             <>
-              <p className={styles.note}>
-                {t('shop.tryOn.youNeed')} <strong>{t('shop.tryOn.moreSparks', { count: item.price - balance })}</strong>. {t('shop.tryOn.earnSparks')}
-              </p>
-              <Button as="a" href="#/" icon="play" data-autofocus>
-                {t('shop.tryOn.play')}
+              <Button icon="diamond" onClick={onGetDiamonds} data-autofocus>
+                {t('shop.tryOn.getDiamonds')}
               </Button>
+              <AskParent />
             </>
           )}
-          {blocker === 'short' && currency === 'diamonds' && (
-            <>
-              <p className={styles.note}>
-                {t('shop.tryOn.youNeed')} <strong>{t('shop.tryOn.moreDiamonds', { count: item.price - balance })}</strong>.{' '}
-                {t(isNativeApp ? 'shop.tryOn.earnDiamondsApp' : 'shop.tryOn.earnDiamondsWeb')}
-              </p>
-              {!isNativeApp && (
-                <>
-                  <Button icon="diamond" onClick={onGetDiamonds} data-autofocus>
-                    {t('shop.tryOn.getDiamonds')}
-                  </Button>
-                  <p className={styles.legal}>{t('shop.askParent')}</p>
-                </>
-              )}
-            </>
-          )}
-          {blocker === 'signIn' && (
-            <>
-              <p className={styles.note}>{t('shop.tryOn.needAccount')}</p>
-              <Button as="a" href="#/settings" icon="user" data-autofocus>
-                {t('shop.tryOn.signIn')}
-              </Button>
-            </>
-          )}
+          {blocker === 'signIn' && <SignInNote />}
           <Button variant="secondary" onClick={onClose}>
             {t('shop.tryOn.back')}
           </Button>

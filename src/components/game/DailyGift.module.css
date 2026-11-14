@@ -84,6 +84,7 @@
 
 .noteText {
   display: grid;
+  gap: 4px;
   font-size: 14px;
   font-weight: 700;
   color: var(--text-soft);
@@ -93,6 +94,52 @@
   font-family: var(--font-display);
   font-size: 18px;
   color: var(--text-strong);
+}
+
+/* The week's seven gifts: opened ones carry a check, today's glows, the big day-7 gift is larger. */
+.pips {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pip {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px dashed color-mix(in srgb, var(--text-soft) 50%, transparent);
+  color: var(--text-soft);
+}
+
+.pipBig {
+  width: 24px;
+  height: 24px;
+}
+
+.pipOpened {
+  border: 0;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.pipToday {
+  border: 3px solid var(--color-honey-deep);
+  animation: wiggle 2.4s ease-in-out infinite;
+}
+
+.doneMark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--action-label);
+  background: var(--action-bottom);
 }
 
 /* ---------- Opened gift ---------- */
