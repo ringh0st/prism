@@ -18,19 +18,19 @@
 
 .swatches {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
+  margin-top: var(--space-2);
 }
 
 .swatch {
+  position: relative;
   display: grid;
-  justify-items: center;
-  align-content: start;
-  gap: 6px;
-  min-height: 92px;
-  padding: var(--space-3) 2px var(--space-2);
+  place-items: center;
+  min-height: 56px;
+  padding: var(--space-2) var(--space-3);
   border: 0;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-pill);
   font: inherit;
   background: var(--surface-sunken);
   cursor: pointer;
@@ -38,7 +38,7 @@
 }
 
 .swatch:active {
-  transform: scale(0.95);
+  transform: scale(0.96);
 }
 
 .selected {
@@ -48,34 +48,77 @@
     inset 0 0 0 3px var(--color-sage);
 }
 
-/* The beam's own light: only light glows in this game */
-.light {
+/* The beam is drawn left to right like on the board, in both reading directions */
+.beam {
+  width: 100%;
+  max-width: 140px;
+  height: 36px;
+  overflow: visible;
+}
+
+.glow {
+  stroke: var(--beam);
+  stroke-width: 12;
+  stroke-linecap: round;
+  opacity: 0.35;
+  filter: blur(3px);
+}
+
+.ray {
+  stroke: var(--beam);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.lamp {
+  fill: #f2a67e;
+}
+
+.bulb {
+  fill: #fff6e0;
+}
+
+.check {
+  position: absolute;
+  top: -6px;
+  inset-inline-end: -4px;
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  color: #2b2118;
-  background: var(--beam);
-  box-shadow: 0 0 14px 2px color-mix(in srgb, var(--beam) 60%, transparent);
+  color: var(--action-label);
+  background: var(--action-bottom);
+  box-shadow: 0 0 0 3px var(--surface-raised);
 }
 
 .locked {
   cursor: not-allowed;
 }
 
-.locked .light {
-  color: #fff;
-  box-shadow: none;
-  opacity: 0.55;
-  filter: saturate(0.6);
+.locked .beam {
+  opacity: 0.4;
+  filter: grayscale(0.7);
+}
+
+.locked .ray {
+  stroke-dasharray: 6 8;
+}
+
+.locked .glow {
+  display: none;
 }
 
 .need {
+  position: absolute;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
   direction: ltr;
   font-size: 14px;
-  color: var(--text-soft);
+  color: var(--text-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
 }

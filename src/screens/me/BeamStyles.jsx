@@ -6,8 +6,8 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './BeamStyles.module.css';
 
 /**
- * The light's color, as glowing swatches: the one in use wears a check, locked ones a lock and the
- * ★ they need. Your own ★ count sits by the heading.
+ * The light's color: each style is a little lamp shining its glowing beam. The one in use wears a check,
+ * locked ones show a lock and the ★ they need. Your own ★ count sits by the heading.
  */
 export default function BeamStyles({ className = '' }) {
   const { progress, setBeamTheme } = usePlayer();
@@ -46,12 +46,21 @@ export default function BeamStyles({ className = '' }) {
               className={`${styles.swatch} ${isSelected ? styles.selected : ''} ${isUnlocked ? '' : styles.locked}`}
               onClick={() => pick(theme)}
             >
-              <span className={styles.light} style={{ '--beam': theme.color }} aria-hidden="true">
-                {isSelected && <Icon name="check" size={22} strokeWidth={3} />}
-                {!isUnlocked && <Icon name="lock" size={18} />}
-              </span>
+              {/* A little lamp shining its beam, in this style's color (only light glows in this game) */}
+              <svg className={styles.beam} viewBox="0 0 120 36" style={{ '--beam': theme.color }} aria-hidden="true" focusable="false">
+                <line className={styles.glow} x1="22" y1="18" x2="112" y2="18" />
+                <line className={styles.ray} x1="22" y1="18" x2="112" y2="18" />
+                <circle className={styles.lamp} cx="14" cy="18" r="10" />
+                <circle className={styles.bulb} cx="14" cy="18" r="4.5" />
+              </svg>
+              {isSelected && (
+                <span className={styles.check} aria-hidden="true">
+                  <Icon name="check" size={16} strokeWidth={3} />
+                </span>
+              )}
               {!isUnlocked && (
                 <span className={`game-title ${styles.need}`} aria-hidden="true">
+                  <Icon name="lock" size={14} />
                   <Icon name="star" size={12} />
                   {theme.starsToUnlock}
                 </span>
