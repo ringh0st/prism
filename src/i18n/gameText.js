@@ -2,6 +2,7 @@ import { translate } from './translate.js';
 import { recipeOf } from '../game/recipes.js';
 import { levelNameFor } from '../game/levelNames.js';
 import { HELPERS } from '../game/catalog.js';
+import { eventThemeFor, parseEventLevelId } from '../game/events.js';
 
 /*
  * Game content in the player's language. The game modules keep the English text (pieces.js,
@@ -34,6 +35,15 @@ export const helperText = (lang, id) => ({
 /** "Sunrise Sandbox" in English; "Mundo 1" / "עולם 1" elsewhere (the world names are English wordplay). */
 export const worldName = (lang, world) => (lang === 'en' ? world.name : translate(lang, 'world.number', { n: world.id }));
 
-/** The level's title: its funny English name, or "Nivel 1-6" / "שלב 1-6" in other languages. */
-export const levelTitle = (lang, level) =>
-  lang === 'en' || !Number.isInteger(level.world) ? levelNameFor(level) : translate(lang, 'level.title', { label: `${level.world}-${level.index}` });
+/**
+ * The level's title: its funny English name, or "Nivel 1-6" / "שלב 1-6" in other languages. A weekend-event
+ * level is its theme's name and number in every language ("Portal Party 3").
+ */
+export function levelTitle(lang, level) {
+  if (lang === 'en') return levelNameFor(level);
+  if (Number.isInteger(level.world)) return translate(lang, 'level.title', { label: `${level.world}-${level.index}` });
+  const event = parseEventLevelId(level.id);
+  if (!event) return levelNameFor(level);
+  const theme = eventThemeFor(event.weekend);
+  return `${translate(lang, `eventTheme.${theme.id}.name`, {}, theme.name)} ${event.number}`;
+}

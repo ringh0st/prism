@@ -62,11 +62,13 @@ function ShareResult({ text }) {
  * backName says where onMap goes: 'map', or 'event' for weekend-event puzzles.
  * replay: { level, history, title, subtitle } for the "Share replay" video (null to hide it).
  * challenge: { levelId, levelLabel, moves } for "Challenge a friend" (null to hide it).
+ * cap: { stars, icon } when a helper (or Keep going) held the stars down, so the screen shows why.
  */
 export default function WinDialog({
   result,
   par,
   difficulty,
+  cap = null,
   showWinGifts = false,
   hotStreak = 0,
   hasNext,
@@ -123,12 +125,23 @@ export default function WinDialog({
             <TapIcon size={24} />
             <span dir="ltr">{moves}</span>
           </span>
-          {stars < 3 && (
-            <span className={`game-title ${styles.tip}`} role="img" aria-label={t('win.starTip', { count: par })}>
-              <span className={styles.tipStars}>★★★</span>
-              <TapIcon size={18} />
-              <span dir="ltr">{par}</span>
+          {cap && stars >= cap.stars ? (
+            // A helper kept the stars down: its picture, then the most it allows.
+            <span className={`game-title ${styles.tip}`} role="img" aria-label={t('win.capped', { count: cap.stars })}>
+              <Icon name={cap.icon} size={20} />
+              <span className={styles.capArrow} aria-hidden="true">
+                →
+              </span>
+              <span className={styles.tipStars}>{'★'.repeat(cap.stars)}</span>
             </span>
+          ) : (
+            stars < 3 && (
+              <span className={`game-title ${styles.tip}`} role="img" aria-label={t('win.starTip', { count: par })}>
+                <span className={styles.tipStars}>★★★</span>
+                <TapIcon size={18} />
+                <span dir="ltr">{par}</span>
+              </span>
+            )
           )}
         </p>
       )}

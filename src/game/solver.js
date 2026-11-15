@@ -87,11 +87,21 @@ export function nearestSolution(level, currentOrients) {
   return orientsFor(currentOrients, groups, best);
 }
 
-/** The fewest taps that can still solve the level from here (twins count once), or null if it can't be solved. */
-export function tapsLeft(level, currentOrients) {
-  const { isSolvable, solutionMasks } = analyzeLevel(level, currentOrients);
-  if (!isSolvable) return null;
-  return Math.min(...solutionMasks.map(popcount));
+/**
+ * The level's solutions worked out once, so the fewest taps left can be read on every move without searching
+ * again (the full search takes a moment on big boards and slow phones).
+ * @returns (currentOrients) => fewest taps still needed (twins count once), or null if it can't be solved
+ */
+export function tapsLeftFinder(level) {
+  const start = level.tiles.map((t) => t.orient ?? 0);
+  const { isSolvable, solutionMasks, groups } = analyzeLevel(level, start);
+  return (currentOrients) => {
+    if (!isSolvable) return null;
+    const current = groups.reduce((mask, group, bit) => (currentOrients[group[0]] !== start[group[0]] ? mask | (1 << bit) : mask), 0);
+    let fewest = Infinity;
+    for (const solution of solutionMasks) fewest = Math.min(fewest, popcount(solution ^ current));
+    return fewest;
+  };
 }
 
 /**

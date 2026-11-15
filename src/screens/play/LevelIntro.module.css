@@ -35,11 +35,17 @@
   color: var(--text-soft);
 }
 
-/* The mood medallion sits on the card's top edge, like a badge pinned to it */
-.medallion {
+/* The mood medallions sit on the card's top edge, like badges pinned to it (a Hard night level wears both) */
+.medallions {
   position: absolute;
   top: -30px;
   left: 50%;
+  display: flex;
+  gap: var(--space-2);
+  translate: -50% 0;
+}
+
+.medallion {
   display: grid;
   place-items: center;
   width: 60px;
@@ -48,20 +54,25 @@
   box-shadow:
     0 0 0 5px var(--surface-raised),
     var(--shadow-md);
-  translate: -50% 0;
   animation: stamp 500ms var(--ease-pop) 250ms both;
 }
 
-.medallion + .subtitle,
-.medallion + h1 {
+.medallion + .medallion {
+  animation-delay: 450ms;
+}
+
+.medallions + .subtitle,
+.medallions + h1 {
   margin-top: var(--space-3);
 }
 
-.hard {
+.hard,
+.extra {
   background: color-mix(in srgb, var(--color-peach) 16%, var(--surface-raised));
 }
 
-.hard .medallion {
+.medal-hard,
+.medal-extra {
   color: var(--warm-label);
   background: var(--warm-bottom);
 }
@@ -70,12 +81,12 @@
   background: color-mix(in srgb, var(--color-terracotta) 14%, var(--surface-raised));
 }
 
-.boss .medallion {
+.medal-boss {
   color: var(--alert-label);
   background: var(--alert-bottom);
 }
 
-.disco .medallion {
+.medal-disco {
   color: var(--reward-label);
   background: var(--reward-bottom);
 }
@@ -101,9 +112,12 @@
     radial-gradient(circle at 88% 64%, #fff4e8 0 1px, transparent 2px), radial-gradient(circle at 10% 74%, #fff4e8 0 1px, transparent 2px), #33251d;
 }
 
-.night .medallion {
+.medal-night {
   color: #fbe7b5;
   background: #4a372b;
+}
+
+.night .medallion {
   box-shadow:
     0 0 0 5px #33251d,
     var(--shadow-md);

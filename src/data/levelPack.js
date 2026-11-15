@@ -9,7 +9,10 @@ const fileFor = (worldId) => `./worlds/world-${String(worldId).padStart(3, '0')}
 export function loadBuiltInWorld(worldId) {
   if (!cache.has(worldId)) {
     const load = worldModules[fileFor(worldId)];
-    cache.set(worldId, load ? load().then((module) => module.default) : Promise.resolve([]));
+    const loading = load ? load().then((module) => module.default) : Promise.resolve([]);
+    // A failed download (offline for a moment) is forgotten, so the next try downloads it again.
+    loading.catch(() => cache.delete(worldId));
+    cache.set(worldId, loading);
   }
   return cache.get(worldId);
 }

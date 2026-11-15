@@ -131,6 +131,9 @@ export const en = {
   'ui.notFound.title': 'Nothing to see here',
   'ui.notFound.text': 'This level doesn’t exist, or it hasn’t been published yet.',
   'ui.notFound.back': 'Back to the map',
+  'ui.offline.title': 'No connection',
+  'ui.offline.text': 'This level needs the internet once to download. Check your connection and try again.',
+  'ui.offline.retry': 'Try again',
 
   'ui.chest.treasure': 'Treasure!',
   'ui.chest.lumi': 'Shiny loot! Spend it wisely… or don’t!',
@@ -326,6 +329,9 @@ export const es = {
   'ui.notFound.title': 'Aquí no hay nada',
   'ui.notFound.text': 'Este nivel no existe o todavía no se ha publicado.',
   'ui.notFound.back': 'Volver al mapa',
+  'ui.offline.title': 'Sin conexión',
+  'ui.offline.text': 'Este nivel necesita internet una vez para descargarse. Revisa tu conexión e inténtalo de nuevo.',
+  'ui.offline.retry': 'Reintentar',
 
   'ui.chest.treasure': '¡Tesoro!',
   'ui.chest.lumi': '¡Qué botín! Gástalo con cabeza… ¡o no!',
@@ -427,7 +433,7 @@ export const he = {
   'me.reset.text': 'הכוכבים, הניצוצות והרצף במכשיר הזה חוזרים לאפס. ההתקדמות בחשבון (אם התחברתם) לא נמחקת.',
   'me.reset.confirm': 'איפוס',
 
-  'me.guest': 'שחקן אורח',
+  'me.guest': 'כניסת אורח',
   'me.nickname.onBoard': 'בלוח המובילים בשם',
   'me.nickname.label': 'כינוי:',
   'me.nickname.choose': 'בחרו כינוי',
@@ -523,6 +529,9 @@ export const he = {
   'ui.notFound.title': 'אין כאן כלום',
   'ui.notFound.text': 'השלב הזה לא קיים, או שעוד לא פורסם.',
   'ui.notFound.back': 'חזרה למפה',
+  'ui.offline.title': 'אין חיבור',
+  'ui.offline.text': 'צריך אינטרנט פעם אחת כדי להוריד את השלב. בדקו את החיבור ונסו שוב.',
+  'ui.offline.retry': 'לנסות שוב',
 
   'ui.chest.treasure': 'אוצר!',
   'ui.chest.lumi': 'שלל נוצץ! בזבזו בחוכמה… או שלא!',

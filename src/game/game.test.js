@@ -1009,10 +1009,16 @@ test('worlds 1–3: every flavored level is built as its flavor, and no two in a
 });
 
 test('taps left: the fewest taps that still solve a level', async () => {
-  const { tapsLeft } = await import('./solver.js');
-  const level = JSON.parse(readFileSync(new URL('../data/worlds/world-001.json', import.meta.url), 'utf8'))[1];
+  const { tapsLeftFinder, nearestSolution } = await import('./solver.js');
+  const level = JSON.parse(readFileSync(new URL('../data/worlds/world-002.json', import.meta.url), 'utf8'))[4];
   const start = level.tiles.map((t) => t.orient ?? 0);
-  assert.equal(tapsLeft(level, start), level.par);
+  const tapsLeft = tapsLeftFinder(level);
+  assert.equal(tapsLeft(start), level.par);
+  // After one tap on a piece of the best solution, one tap fewer is left; a solved board needs none.
+  const solved = nearestSolution(level, start);
+  const oneTurned = start.map((orient, i) => (i === solved.findIndex((o, j) => o !== start[j]) ? solved[i] : orient));
+  assert.equal(tapsLeft(oneTurned), level.par - 1);
+  assert.equal(tapsLeft(solved), 0);
 });
 
 test('level names never repeat within a built-in world', async () => {

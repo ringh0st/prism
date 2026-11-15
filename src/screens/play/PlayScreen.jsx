@@ -43,7 +43,7 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 import { flavorText, levelTitle, pieceText, worldName } from '../../i18n/gameText.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
 import { firstTileOf, newPiecesIn, piecesMetIn } from '../../game/pieces.js';
-import { findHint, tapsLeft } from '../../game/solver.js';
+import { findHint, tapsLeftFinder } from '../../game/solver.js';
 import { isRotatable } from '../../game/beam.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import { EVENT_LEVELS, parseEventLevelId } from '../../game/events.js';
@@ -161,6 +161,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const isFirstSteps = isFirstStepsLevel(level, mode);
   const flavor = flavorText(lang, level);
   const moveLimit = (mode === 'rush' ? rushMoveLimit(rush.run, level.par) : moveLimitFor(level.par, level.difficulty)) + bonusMoves;
+  // The very first levels teach without a counter, so they can't run out of moves either.
+  const playLimit = isFirstSteps ? Infinity : moveLimit;
   const starCap = bonusMoves > 0 ? Math.min(1, puzzle.starCap) : puzzle.starCap;
   const canKeepGoing = mode === 'level' && level.world <= KEEP_GOING_WORLDS;
   const gems = level.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
@@ -301,7 +303,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       sfx.shade();
       say('worried', 'shade');
       react('shake');
-    } else if (!trace.isSolved && moves === moveLimit - 1) {
+    } else if (!trace.isSolved && moves === playLimit - 1) {
       // The last move shows on the moves counter itself (it beats like a heart); Lumi just looks worried.
       setLumi({ mood: 'worried', line: '' });
       react('shiver');
@@ -310,7 +312,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     }
     lastLitCount.current = litCount;
     lastShadeCount.current = shadeCount;
-  }, [trace, moves, gems.length, moveLimit, say, react]);
+  }, [trace, moves, gems.length, playLimit, say, react]);
 
   // First levels: Lumi explains what just happened after the first tap.
   useEffect(() => {
@@ -334,7 +336,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       // Hard levels get the big celebration too: beating one should feel like it.
       if (!isSkipped) celebrate({ stars, isBig: isBig || level.difficulty === DIFFICULTY.HARD, from: boardAreaRef.current });
       // The light finale: each move left over bursts along the winning light path before the result shows.
-      const movesLeft = isSkipped ? 0 : moveLimit - moves;
+      const movesLeft = isSkipped ? 0 : Math.max(0, moveLimit - moves);
       const finaleMs = playLightFinale({
         segments: trace.segments,
         width: level.width,
@@ -415,7 +417,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
   // Out of moves.
   useEffect(() => {
-    if (!trace.isSolved && moves >= moveLimit && !hasRecordedWin.current) {
+    if (!trace.isSolved && moves >= playLimit && !hasRecordedWin.current) {
       const timer = setTimeout(() => {
         sfx.outOfMoves();
         say('sad', null);
@@ -426,7 +428,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [moves, moveLimit, trace.isSolved, say, react, playStats]);
+  }, [moves, playLimit, trace.isSolved, say, react, playStats]);
 
   // Tapping a piece that can't turn says why (a little shake, a soft "nope" and a word from Lumi).
   const [nudgedCell, setNudgedCell] = useState(null);
@@ -444,7 +446,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
   const onActivate = useCallback(
     (_cell, tileIndex) => {
-      if (isOver || tileIndex < 0 || moves >= moveLimit) return;
+      if (isOver || tileIndex < 0 || moves >= playLimit) return;
       sfx.rotate();
       // A cracking mirror's last turn: crack! (it stays put from now on)
       if (puzzle.turnsLeft[tileIndex] === 1) {
@@ -453,7 +455,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       }
       puzzle.rotate(tileIndex);
     },
-    [isOver, moves, moveLimit, puzzle, say],
+    [isOver, moves, playLimit, puzzle, say],
   );
 
   const restart = useCallback(() => {
@@ -621,7 +623,17 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     return () => clearTimeout(timer);
   }, [isFirstSteps, showIntro, isCoachDue, moves]);
   // How many taps the best finish still needs, so the meter can drop a star the moment it's out of reach.
-  const minTapsLeft = useMemo(() => (trace.isSolved ? 0 : tapsLeft(level, puzzle.orients)), [level, puzzle.orients, trace.isSolved]);
+  // The solutions are worked out once per level, just after it shows, so a tap never waits for the search.
+  const [findTapsLeft, setFindTapsLeft] = useState(null);
+  useEffect(() => {
+    setFindTapsLeft(null);
+    const timer = setTimeout(() => setFindTapsLeft(() => tapsLeftFinder(level)), 50);
+    return () => clearTimeout(timer);
+  }, [level]);
+  const minTapsLeft = useMemo(
+    () => (trace.isSolved ? 0 : findTapsLeft ? findTapsLeft(puzzle.orients) : 0),
+    [findTapsLeft, puzzle.orients, trace.isSolved],
+  );
   const coachTile = useMemo(
     () => (isFirstSteps && isCoachDue && !showIntro && !isOver ? findHint(level, puzzle.orients) : null),
     [isFirstSteps, isCoachDue, showIntro, isOver, level, puzzle.orients],
@@ -824,6 +836,11 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           result={result}
           par={level.par}
           difficulty={level.difficulty}
+          cap={
+            starCap < 3
+              ? { stars: starCap, icon: bonusMoves > 0 && starCap === 1 ? 'plus' : (HELPERS[puzzle.usedHelpers.at(-1)]?.icon ?? 'hint') }
+              : null
+          }
           hotStreak={progress.hotStreak}
           hasNext={Boolean(nextLevel)}
           shareMessage={

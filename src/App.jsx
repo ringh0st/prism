@@ -31,7 +31,7 @@ import LoadingScreen from './screens/LoadingScreen.jsx';
 import SplashScreen from './components/splash/SplashScreen.jsx';
 import { SplashContext } from './state/SplashContext.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
-import { BEAM_THEMES } from './game/progress.js';
+import { BEAM_THEMES, starsFor } from './game/progress.js';
 import { sfx } from './audio/sfx.js';
 
 // The editor is only for admins, so players never download it.
@@ -57,7 +57,7 @@ function WeeklyRewardNotice() {
 const PAL_NOTICE_ROUTES = ['map', 'pals', 'settings', 'store', 'top'];
 
 function PalNotices() {
-  const { progress } = usePlayer();
+  const { progress, luckyGift } = usePlayer();
   const route = useHashRoute();
   const [isSkipped, setIsSkipped] = useState(false);
   if (!PAL_NOTICE_ROUTES.includes(route.name)) return null;
@@ -66,17 +66,28 @@ function PalNotices() {
   if (!progress.pal.id) return isFriendDue(progress) && !isSkipped ? <FriendFoundDialog onDone={() => setIsSkipped(true)} /> : null;
   return (
     <>
-      <PalUnlockNotice />
-      <LuckyPalDialog />
+      {/* One sheet at a time: a Lucky gift first, then the new Pals. */}
+      {luckyGift ? <LuckyPalDialog /> : <PalUnlockNotice />}
     </>
   );
 }
 
+/** Sends the player back to the map (for a link to a level that isn't open yet). */
+function BackToMap() {
+  useEffect(() => window.location.replace('#/'), []);
+  return null;
+}
+
 function LevelRoute({ levelId }) {
-  const { level, isLoading } = useLevel(levelId);
-  const { nextLevelIdAfter } = useLevels();
+  const { level, isLoading, isFailed, retry } = useLevel(levelId);
+  const { nextLevelIdAfter, previousLevelIdBefore } = useLevels();
+  const { progress } = usePlayer();
   if (isLoading) return <LoadingScreen />;
+  if (isFailed) return <NotFoundScreen onRetry={retry} />;
   if (!level) return <NotFoundScreen />;
+  // A level opens once the one before it is solved (a link can't skip ahead).
+  const previousId = previousLevelIdBefore(level.id);
+  if (previousId && starsFor(progress, previousId) === 0) return <BackToMap />;
   const nextId = nextLevelIdAfter(level.id);
   return <PlayScreen key={level.id} level={level} nextLevel={nextId ? `#/play/${nextId}` : null} />;
 }

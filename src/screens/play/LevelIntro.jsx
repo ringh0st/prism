@@ -24,6 +24,7 @@ const moon = (
 /** Each special level wears its mood: a medallion with a symbol and the card's own colors (the word is for screen readers). */
 const MOODS = {
   hard: { key: 'intro.sticker.hard', art: <Icon name="flame" size={30} /> },
+  extra: { key: 'intro.sticker.extra', art: <Icon name="flame" size={36} /> },
   boss: { key: 'intro.sticker.boss', art: <Icon name="crown" size={32} /> },
   disco: { key: 'intro.sticker.disco', art: <Icon name="spark" size={30} /> },
   night: { key: 'intro.sticker.night', art: moon },
@@ -52,7 +53,9 @@ export default function LevelIntro({
   glowbugId = null,
   onDone,
 }) {
-  const mood = MOODS[modifier] ? modifier : MOODS[level.difficulty] ? level.difficulty : null;
+  // A Hard or Extra Hard level always says so, even when it's also a night or disco level (difficulty first).
+  const moods = [level.difficulty, modifier].filter((id) => MOODS[id]);
+  const mood = MOODS[modifier] ? modifier : (moods[0] ?? null);
   useEffect(() => {
     if (waitsForTap) return undefined;
     const timer = setTimeout(onDone, mood ? INTRO_MS * 1.3 : INTRO_MS);
@@ -64,7 +67,7 @@ export default function LevelIntro({
   const limit = moveLimit ?? moveLimitFor(level.par, level.difficulty);
   const moves = showsStarTarget ? level.par : limit;
   const goalLabel = [
-    mood && t(MOODS[mood].key),
+    ...moods.map((id) => t(MOODS[id].key)),
     flavor?.name,
     t('intro.lightGems', { count: gems.length }),
     showsStarTarget ? t('intro.starTarget', { count: level.par }) : t('intro.inMoves', { count: limit }),
@@ -76,9 +79,13 @@ export default function LevelIntro({
     // Clicking anywhere also starts; the button is the keyboard and screen-reader path.
     <div className={styles.overlay} onClick={onDone} role="presentation">
       <div className={`${styles.card} ${mood ? styles[mood] : ''}`} onClick={(event) => event.stopPropagation()} role="presentation">
-        {mood && (
-          <span className={styles.medallion} aria-hidden="true">
-            {MOODS[mood].art}
+        {moods.length > 0 && (
+          <span className={styles.medallions} aria-hidden="true">
+            {moods.map((id) => (
+              <span key={id} className={`${styles.medallion} ${styles[`medal-${id}`]}`}>
+                {MOODS[id].art}
+              </span>
+            ))}
           </span>
         )}
         {subtitle && <p className={styles.subtitle}>{subtitle}</p>}

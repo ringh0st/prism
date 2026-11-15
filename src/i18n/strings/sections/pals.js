@@ -112,6 +112,8 @@ export const en = {
   'pals.unlocked.title': 'New Pal unlocked!',
   'pals.unlocked.wants': 'wants to join your team.',
   'pals.unlocked.meet': 'Meet {name}',
+  'pals.unlocked.many': '{count} new friends!',
+  'pals.unlocked.meetAll': 'Meet them',
 
   'pals.garden.title': 'Glowbug Garden',
   'pals.garden.found': '{n} of {total} found',
@@ -231,6 +233,8 @@ export const es = {
   'pals.unlocked.title': '¡Nuevo amigo desbloqueado!',
   'pals.unlocked.wants': 'quiere unirse a tu equipo.',
   'pals.unlocked.meet': 'Conocer a {name}',
+  'pals.unlocked.many': '¡{count} amigos nuevos!',
+  'pals.unlocked.meetAll': 'Conocerlos',
 
   'pals.garden.title': 'Jardín de bichitos de luz',
   'pals.garden.found': '{n} de {total} encontrados',
@@ -471,6 +475,8 @@ export const he = {
   'pals.unlocked.title': 'חבר חדש נפתח!',
   'pals.unlocked.wants': 'רוצה להצטרף לחבורה שלכם!',
   'pals.unlocked.meet': 'הכירו את {name}',
+  'pals.unlocked.many': '{count} חברים חדשים!',
+  'pals.unlocked.meetAll': 'בואו להכיר',
 
   'pals.garden.title': 'גינת חרקיקי האור',
   'pals.garden.found': 'נמצאו {n} מתוך {total}',

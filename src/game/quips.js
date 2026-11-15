@@ -18,7 +18,7 @@ const QUIPS = {
   win3: ['PERFECT! Three stars!', 'Flawless! The gems are applauding.', 'You’re basically a laser wizard.', 'Brilliant! I’m glowing with pride.'],
   win2: ['Great job! Try for three?', 'So close to perfect!', 'Nice! Two shiny stars.'],
   win1: ['Solved! Every star counts.', 'Done! Now, can you do it in fewer moves?', 'Phew! We made it.'],
-  idle: ['Psst… try tapping a mirror.', 'Stuck? A Hint could help!', 'I’m not bored. I’m just… glowing.', 'Hmm, think like a photon.'],
+  idle: ['Psst… try tapping a mirror.', 'I’m not bored. I’m just… glowing.', 'Hmm, think like a photon.'],
   streak: ['You’re on fire! 🔥', 'Unstoppable!', 'Streak power!', 'Hot hot hot!'],
 };
 

@@ -95,7 +95,17 @@ export function LevelsProvider({ children }) {
       return levelRefsInWorld(parsed.world + 1)[0]?.id ?? null;
     };
 
-    return { worlds, levelRefsInWorld, loadLevel, nextLevelIdAfter, reload, playtestLevel, setPlaytestLevel };
+    // The level just before (the previous world's last level for a world's first), or null for the very first.
+    const previousLevelIdBefore = (id) => {
+      const parsed = parseLevelId(id);
+      if (!parsed) return null;
+      const refs = levelRefsInWorld(parsed.world);
+      const position = refs.findIndex((ref) => ref.id === id);
+      if (position > 0) return refs[position - 1].id;
+      return parsed.world > 1 ? (levelRefsInWorld(parsed.world - 1).at(-1)?.id ?? null) : null;
+    };
+
+    return { worlds, levelRefsInWorld, loadLevel, nextLevelIdAfter, previousLevelIdBefore, reload, playtestLevel, setPlaytestLevel };
   }, [publishedLevels, reload, playtestLevel]);
 
   return <LevelsContext.Provider value={value}>{children}</LevelsContext.Provider>;

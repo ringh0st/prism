@@ -95,7 +95,7 @@ export default function SplashScreen({ onDone }) {
       <footer className={styles.footer}>
         <p className={styles.studio}>{t('splash.production', { studio: STUDIO_NAME })}</p>
         <p className={styles.meta}>
-          {t('splash.version', { version: APP_VERSION })} · © {COPYRIGHT_YEAR} {STUDIO_NAME}
+          <bdi>{t('splash.version', { version: APP_VERSION })}</bdi> · © {COPYRIGHT_YEAR} {STUDIO_NAME}
         </p>
       </footer>
 

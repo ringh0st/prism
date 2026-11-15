@@ -322,3 +322,9 @@
   font-size: 30px;
   line-height: 1;
 }
+
+/* The arrow points the way the line is read */
+:root[dir='rtl'] .capArrow {
+  display: inline-block;
+  transform: scaleX(-1);
+}

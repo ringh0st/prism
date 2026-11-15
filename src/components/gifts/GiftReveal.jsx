@@ -163,6 +163,8 @@ export default function GiftReveal({
       title={heading}
       hideTitle={isPile && phase !== 'done'}
       tone="celebrate"
+      // A tap beside a gift that isn't open yet shouldn't throw it away: only the close button can, until it's open.
+      closesOnBackdrop={phase === 'done' || phase === 'error'}
       onClose={phase === 'wrapped' || phase === 'done' || phase === 'error' ? onClose : undefined}
     >
       <div className={styles.stage} onClick={() => hurry.current?.()} role="presentation">
