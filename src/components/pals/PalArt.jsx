@@ -2,6 +2,7 @@ import { accessoryById, palStage } from '../../game/pals.js';
 import { PAL_GROWTH } from './palGrowth.jsx';
 import { ThemeOutfit } from './themeOutfitArt.jsx';
 import { PAL_PICTURES, picturePlacement } from './palPictures.js';
+import { formPlacement, formPortraitBox, hasFormPictures } from './palForms.js';
 import styles from './PalArt.module.css';
 
 const SLOT_ORDER = ['neck', 'head', 'hand'];
@@ -785,41 +786,63 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
   const art = ART[palId];
   if (!art) return null;
   const stageIndex = palStage(stage).index;
+  const outfitOrder = [...wearing].sort(bySlotOrder);
+  const sparkles = stageIndex === STAGE_SCALES.length - 1 && (
+    <g fill="#f0c14e">
+      <path d={RADIANT_SPARKLES} transform="translate(4 8) scale(.6)" />
+      <path d={RADIANT_SPARKLES} transform="translate(80 14) scale(.5)" />
+    </g>
+  );
+  const svgProps = {
+    className: `${alive ? styles.alive : ''} ${className}`,
+    style: alive ? { '--blink-delay': blinkDelay(palId) } : undefined,
+    width: size,
+    height: size,
+    role: label ? 'img' : undefined,
+    'aria-label': label,
+    'aria-hidden': label ? undefined : true,
+    focusable: 'false',
+    overflow: 'visible',
+  };
+
+  // Pals drawn as five pictures: each form is its own drawing at its own size, so no extra scaling or growth parts.
+  if (hasFormPictures(palId)) {
+    const form = formPlacement(palId, stageIndex);
+    return (
+      <svg {...svgProps} viewBox={portrait ? formPortraitBox(form) : '0 0 100 100'}>
+        <ellipse cx="50" cy="95" rx={Math.min(30, form.width * 0.38)} ry="4" fill="rgba(60,40,20,.14)" />
+        <g className={styles.body}>
+          <image href={form.src} x={form.x} y={form.y} width={form.width} height={form.height} />
+          {outfitOrder.map((id) => (
+            <g key={id} transform={form.outfit[slotOf(id)]}>
+              <Accessory id={id} hat={form.outfit.hat} neck={form.outfit.neckY} />
+            </g>
+          ))}
+        </g>
+        {sparkles}
+      </svg>
+    );
+  }
+
   const scale = STAGE_SCALES[stageIndex];
   // Pals with a finished illustration show it (their forms grow in size; the drawn growth parts are for the old shapes).
   const picture = PAL_PICTURES[palId] ? picturePlacement(PAL_PICTURES[palId]) : null;
   const growth = picture ? { back: [], front: [] } : growthLayers(palId, art, stageIndex);
   const { hat, neck } = art;
   return (
-    <svg
-      className={`${alive ? styles.alive : ''} ${className}`}
-      style={alive ? { '--blink-delay': blinkDelay(palId) } : undefined}
-      width={size}
-      height={size}
-      viewBox={viewBoxFor(scale, portrait)}
-      role={label ? 'img' : undefined}
-      aria-label={label}
-      aria-hidden={label ? undefined : true}
-      focusable="false"
-      overflow="visible"
-    >
+    <svg {...svgProps} viewBox={viewBoxFor(scale, portrait)}>
       <ellipse cx="50" cy="95" rx="24" ry="4" fill="rgba(60,40,20,.14)" />
       <g transform={`translate(50 94) scale(${scale}) translate(-50 -94)`}>
         <g className={styles.body}>
           {growth.back}
           {picture ? <image href={PAL_PICTURES[palId].src} x={picture.x} y={picture.y} width={picture.width} height={picture.height} /> : art.base}
           {growth.front}
-          {[...wearing]
-            .sort(bySlotOrder)
-            .map((id) => (picture ? <PictureAccessory key={id} id={id} picture={picture} /> : <Accessory key={id} id={id} hat={hat} neck={neck} />))}
+          {outfitOrder.map((id) =>
+            picture ? <PictureAccessory key={id} id={id} picture={picture} /> : <Accessory key={id} id={id} hat={hat} neck={neck} />,
+          )}
         </g>
       </g>
-      {stageIndex === STAGE_SCALES.length - 1 && (
-        <g fill="#f0c14e">
-          <path d={RADIANT_SPARKLES} transform="translate(4 8) scale(.6)" />
-          <path d={RADIANT_SPARKLES} transform="translate(80 14) scale(.5)" />
-        </g>
-      )}
+      {sparkles}
     </svg>
   );
 }
