@@ -9,6 +9,8 @@
 /** A darker shade of a pastel, for its outline. */
 export function shade(hex, amount = 0.32) {
   const n = parseInt(hex.slice(1), 16);
+  // near-white Pals get a soft warm line instead of a grey one
+  if (amount >= 0.3 && n >> 16 > 236 && ((n >> 8) & 255) > 236 && (n & 255) > 230) return '#d8c8bb';
   const ch = (v) =>
     Math.round(v * (1 - amount))
       .toString(16)
@@ -16,7 +18,7 @@ export function shade(hex, amount = 0.32) {
   return `#${ch(n >> 16)}${ch((n >> 8) & 255)}${ch(n & 255)}`;
 }
 
-const LINE = 1.8;
+const LINE = 2;
 const INK = '#3d2c26';
 
 /** A filled shape with a soft outline in a darker shade of its own color. */
@@ -36,8 +38,16 @@ export const HEAD = { cx: 50, cy: 48, rx: 28, ry: 24 };
 export function Body({ c }) {
   return (
     <g>
-      <path d="M29 89c-2-13 6-23 21-23s23 10 21 23c-1 4-4 5-8 5H37c-4 0-7-1-8-5z" {...fill(c.body ?? c.fill)} />
-      {c.belly && <ellipse cx="50" cy="82" rx="12.5" ry="10" fill={c.belly} />}
+      <path d="M27 88c-2-14 7-23 23-23s25 9 23 23c-1 5-5 6-9 6H36c-4 0-8-1-9-6z" {...fill(c.body ?? c.fill)} />
+      <path
+        d="M30 86c2 5 6 6 10 6h20c4 0 8-1 10-6"
+        fill="none"
+        stroke={shade(c.body ?? c.fill, 0.12)}
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity=".5"
+      />
+      {c.belly && <ellipse cx="50" cy="82" rx="13" ry="10.5" fill={c.belly} />}
       {c.bodyMarks}
     </g>
   );
@@ -47,18 +57,37 @@ export function Feet({ c }) {
   const color = c.feet ?? c.body ?? c.fill;
   return (
     <g>
-      <ellipse cx="40" cy="92" rx="7" ry="4.2" {...fill(color)} />
-      <ellipse cx="60" cy="92" rx="7" ry="4.2" {...fill(color)} />
+      <ellipse cx="39" cy="92" rx="7.4" ry="4.6" {...fill(color)} />
+      <ellipse cx="61" cy="92" rx="7.4" ry="4.6" {...fill(color)} />
+      {!c.noBeans && (
+        <g fill={c.beans ?? '#f5b3b3'} opacity=".85">
+          <ellipse cx="39" cy="92.6" rx="2.4" ry="1.7" />
+          <circle cx="35.6" cy="90.6" r="1" />
+          <circle cx="39" cy="89.6" r="1" />
+          <circle cx="42.4" cy="90.6" r="1" />
+          <ellipse cx="61" cy="92.6" rx="2.4" ry="1.7" />
+          <circle cx="57.6" cy="90.6" r="1" />
+          <circle cx="61" cy="89.6" r="1" />
+          <circle cx="64.4" cy="90.6" r="1" />
+        </g>
+      )}
     </g>
   );
 }
 
 export function Paws({ c }) {
   const color = c.paws ?? c.body ?? c.fill;
+  if (c.flippers)
+    return (
+      <g>
+        <path d="M34 74c-6 2-10 8-9 13 4 0 8-3 11-8z" {...fill(color)} />
+        <path d="M66 74c6 2 10 8 9 13-4 0-8-3-11-8z" {...fill(color)} />
+      </g>
+    );
   return (
     <g>
-      <ellipse cx="34" cy="79" rx="4.6" ry="6.4" transform="rotate(18 34 79)" {...fill(color)} />
-      <ellipse cx="66" cy="79" rx="4.6" ry="6.4" transform="rotate(-18 66 79)" {...fill(color)} />
+      <ellipse cx="37" cy="80" rx="5.4" ry="5" {...fill(color)} />
+      <ellipse cx="63" cy="80" rx="5.4" ry="5" {...fill(color)} />
     </g>
   );
 }
@@ -67,7 +96,9 @@ export function Head({ c }) {
   return (
     <g>
       <ellipse cx={HEAD.cx} cy={HEAD.cy} rx={HEAD.rx} ry={HEAD.ry} {...fill(c.head ?? c.fill)} />
-      <ellipse cx="41" cy="33" rx="9" ry="3.6" fill="#fff" opacity=".38" transform="rotate(-12 41 33)" />
+      <path d="M25 54c4 10 14 15 25 15s21-5 25-15c-4 5-13 9-25 9s-21-4-25-9z" fill={shade(c.head ?? c.fill, 0.5)} opacity=".1" />
+      <ellipse cx="40" cy="32.5" rx="9.5" ry="3.8" fill="#fff" opacity=".45" transform="rotate(-14 40 32.5)" />
+      <circle cx="53" cy="29" r="1.6" fill="#fff" opacity=".45" />
     </g>
   );
 }
@@ -83,16 +114,19 @@ export function Face({ c }) {
         </g>
       ) : (
         <g>
-          <ellipse cx="39" cy="50" rx="4.6" ry="5.4" fill={INK} />
-          <ellipse cx="61" cy="50" rx="4.6" ry="5.4" fill={INK} />
-          <circle cx="40.5" cy="48" r="1.8" fill="#fff" />
-          <circle cx="62.5" cy="48" r="1.8" fill="#fff" />
-          <circle cx="37.8" cy="52.4" r=".8" fill="#fff" opacity=".9" />
-          <circle cx="59.8" cy="52.4" r=".8" fill="#fff" opacity=".9" />
+          <ellipse cx="39" cy="50.5" rx="5.4" ry="6.4" fill={INK} />
+          <ellipse cx="61" cy="50.5" rx="5.4" ry="6.4" fill={INK} />
+          <ellipse cx="39" cy="53.6" rx="3.6" ry="2.4" fill={c.iris ?? '#7a5444'} opacity=".55" />
+          <ellipse cx="61" cy="53.6" rx="3.6" ry="2.4" fill={c.iris ?? '#7a5444'} opacity=".55" />
+          <circle cx="41" cy="47.8" r="2.3" fill="#fff" />
+          <circle cx="63" cy="47.8" r="2.3" fill="#fff" />
+          <circle cx="37.4" cy="53" r="1" fill="#fff" opacity=".9" />
+          <circle cx="59.4" cy="53" r="1" fill="#fff" opacity=".9" />
         </g>
       )}
-      <ellipse cx="30.5" cy="58" rx="4.6" ry="2.6" fill="#f59a9a" opacity=".5" />
-      <ellipse cx="69.5" cy="58" rx="4.6" ry="2.6" fill="#f59a9a" opacity=".5" />
+      <ellipse cx="30" cy="59" rx="5" ry="2.9" fill={c.blush ?? '#f59a9a'} opacity=".55" />
+      <ellipse cx="70" cy="59" rx="5" ry="2.9" fill={c.blush ?? '#f59a9a'} opacity=".55" />
+      <path d="M27.6 58.6l1.4-1M30.6 58.6l1.4-1M68 58.6l1.4-1M71 58.6l1.4-1" stroke="#fff" strokeWidth=".9" strokeLinecap="round" opacity=".7" />
       {c.nose === 'beak' ? (
         <path d="M46.6 55.4h6.8l-3.4 4.2z" {...fill(c.beak ?? '#f6b26b', { strokeWidth: 1.2 })} />
       ) : c.nose === 'snout' ? (
@@ -106,7 +140,8 @@ export function Face({ c }) {
       ) : c.nose === 'none' ? null : (
         <path d="M48.3 55.2h3.4c.6 0 .9.6.5 1.1L50.6 58c-.3.4-.9.4-1.2 0l-1.6-1.7c-.4-.5-.1-1.1.5-1.1z" fill={INK} />
       )}
-      {c.nose !== 'beak' && c.nose !== 'snout' && (
+      {c.mouth === 'wide' && <path d="M41 58.6q9 6.4 18 0" stroke={INK} strokeWidth="1.6" strokeLinecap="round" fill="none" />}
+      {c.mouth !== 'wide' && c.nose !== 'beak' && c.nose !== 'snout' && (
         <path
           d={c.nose === 'big' ? 'M46.2 62.2q1.9 2 3.8 0q1.9 2 3.8 0' : 'M46.6 59.6q1.7 1.9 3.4 0q1.7 1.9 3.4 0'}
           stroke={INK}
@@ -322,8 +357,14 @@ export function Wings({ color, big = false, bat = false }) {
     </g>
   ) : (
     <g>
-      <path d="M32 73c-6-8-17-9-22-3-4 5-1 12 5 13 7 1 13-3 17-10z" {...fill(color)} />
-      <path d="M14 77c4 1 8 0 11-3M17 82c4 0 8-2 10-5" fill="none" stroke={shade(color, 0.2)} strokeWidth="1.3" strokeLinecap="round" />
+      <path d="M32 72c-4-7-12-11-20-8-5 2-6 7-3 9-3 2-2 6 1 7-1 3 2 5 5 4 5 2 12-1 17-12z" {...fill(color)} />
+      <path
+        d="M12 72c5 1 10 0 14-3M13 78c5 0 10-2 14-5M18 82c4-1 7-3 10-6"
+        fill="none"
+        stroke={shade(color, 0.18)}
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
     </g>
   );
   return (

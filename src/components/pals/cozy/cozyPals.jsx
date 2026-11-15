@@ -291,7 +291,20 @@ export const COZY_PALS = {
     feature: 'flower',
     top: <path d="M50 27a4 4 0 1 0 3 6 3 3 0 1 1-3-6z" fill="#f0c14e" />,
   },
-  hoot: { fill: '#c9a07c', belly: '#f4e2c6', muzzle: '#f4e2c6', ears: 'tufts', nose: 'beak', feature: 'wings', wing: '#b48b68', paws: '#b48b68' },
+  hoot: {
+    fill: '#c9a07c',
+    belly: '#f4e2c6',
+    ears: 'tufts',
+    nose: 'beak',
+    faceMask: '#f4e2c6',
+    heartFace: true,
+    bodyMarks: <path d="M44 78l3 2 3-2 3 2 3-2M46 84l2 1.6 2-1.6 2 1.6 2-1.6" fill="none" stroke="#d9bf9c" strokeWidth="1.4" strokeLinecap="round" />,
+    feature: 'wings',
+    wing: '#b48b68',
+    paws: '#b48b68',
+    feet: '#f6b26b',
+    noBeans: true,
+  },
   waffles: { fill: '#f2cf9c', belly: CREAM, muzzle: CREAM, ears: 'floppy', ear: '#d9ae7a', tail: 'fluffy', feature: 'bigTail' },
   peep: { fill: '#fde58a', belly: '#fff3c2', ears: 'none', nose: 'beak', feet: '#f6b26b', top: crest('#f8cf5a'), feature: 'wings', wing: '#f8d76e' },
   bruno: { fill: '#c99a74', belly: '#f1dcc4', muzzle: '#f1dcc4', ears: 'bear', inner: '#f1dcc4', feature: 'flower', flowerColor: '#fff2a8' },
@@ -307,7 +320,33 @@ export const COZY_PALS = {
     top: <path d="M30 40l8-12M70 40l-8-12" stroke="#ffffff" strokeWidth="2.4" strokeLinecap="round" opacity=".8" />,
     feature: 'crystals',
   },
-  ribbit: { fill: '#b8e09c', belly: '#e9f7d6', ears: 'none', nose: 'none', back: frogBumps('#b8e09c'), feature: 'leaves' },
+  ribbit: {
+    fill: '#b8e09c',
+    belly: '#ecf8dc',
+    ears: 'none',
+    nose: 'none',
+    mouth: 'wide',
+    back: frogBumps('#b8e09c'),
+    bodyMarks: (
+      <Spots
+        color="#9fd083"
+        dots={[
+          [34, 78, 1.6],
+          [66, 80, 1.8],
+        ]}
+      />
+    ),
+    top: (
+      <Spots
+        color="#9fd083"
+        dots={[
+          [30, 42, 1.6],
+          [70, 41, 2],
+        ]}
+      />
+    ),
+    feature: 'leaves',
+  },
   cotton: { fill: '#f6e2cf', belly: '#fffaf2', ears: 'side', inner: '#f6c9c4', back: wool('#fffaf2'), feature: 'flower' },
   squeak: { fill: '#d9cfc6', belly: '#f4ece4', ears: 'mouse', tail: 'thin', whiskers: true, feature: 'bigTail' },
   maple: {
@@ -338,18 +377,23 @@ export const COZY_PALS = {
   splash: {
     fill: '#dcd5cf',
     belly: '#f3efea',
+    muzzle: '#f6f2ee',
     ears: 'none',
     whiskers: true,
+    flippers: true,
+    noBeans: true,
     top: (
       <Spots
         color="#c3b9b1"
         dots={[
-          [36, 34, 2.2],
+          [36, 34, 2.4],
           [62, 31, 1.8],
           [68, 38, 1.4],
         ]}
       />
     ),
+    tail: 'fish',
+    fin: '#cfc7c0',
     feature: 'bubbles',
     bubble: '#9ccfd6',
   },
@@ -398,7 +442,23 @@ export const COZY_PALS = {
   },
   shelly: { fill: '#cfe7a8', belly: '#eaf6d6', ears: 'none', nose: 'none', top: antennae('#9cc77a'), back: snailShell('#f6b88f'), feature: 'flower' },
   inky: { fill: '#f7adb8', ears: 'none', nose: 'none', octo: true, feature: 'bubbles', bubble: '#f492a5' },
-  puff: { fill: '#ffffff', belly: '#f2fbf8', ears: 'none', nose: 'none', back: cloudBack('#ffffff'), feature: 'clouds' },
+  puff: {
+    fill: '#fbfefd',
+    body: '#fbfefd',
+    belly: '#eefaf6',
+    ears: 'none',
+    nose: 'none',
+    mouth: 'wide',
+    blush: '#9fdccc',
+    noBeans: true,
+    back: cloudBack('#fbfefd'),
+    top: (
+      <g fill="none" stroke="#9fdccc" strokeWidth="1.6" strokeLinecap="round">
+        <path d="M24 46c2-3 6-3 6 0s-4 3-4 1M70 46c2-3 6-3 6 0s-4 3-4 1" />
+      </g>
+    ),
+    feature: 'clouds',
+  },
   twinkle: { fill: '#fde58a', belly: '#fff2bd', ears: 'none', nose: 'none', back: starPoints('#fde58a'), feature: 'wings', wing: '#ffffff' },
   starla: {
     fill: '#fff6f3',
@@ -426,27 +486,31 @@ export const COZY_PALS = {
     feature: 'mane',
   },
   koi: {
-    fill: '#fff4ee',
+    fill: '#fff6f0',
     belly: '#ffffff',
     ears: 'fins',
     fin: '#f7b087',
     tail: 'fish',
     nose: 'none',
+    mouth: 'wide',
     top: (
-      <Spots
-        color="#f7a77c"
-        dots={[
-          [58, 32, 5],
-          [40, 36, 3],
-        ]}
-      />
+      <g>
+        <path d="M42 26c2-8 10-12 16-10-2 4-4 8-4 11z" {...fill('#f7b087')} />
+        <Spots
+          color="#f7a77c"
+          dots={[
+            [60, 34, 6],
+            [36, 38, 3.6],
+          ]}
+        />
+      </g>
     ),
     bodyMarks: (
       <Spots
         color="#f7a77c"
         dots={[
-          [42, 76, 4],
-          [60, 84, 3.4],
+          [40, 76, 4.6],
+          [61, 84, 3.6],
         ]}
       />
     ),
@@ -548,7 +612,30 @@ export const COZY_PALS = {
     feature: 'wings',
     wing: '#e8b066',
   },
-  nessa: { fill: '#a8ddc2', belly: '#e9f6dd', ears: 'fins', fin: '#8ccfae', nose: 'none', back: humps('#a8ddc2'), feature: 'bubbles' },
+  nessa: {
+    fill: '#a8ddc2',
+    belly: '#eef8de',
+    ears: 'none',
+    nose: 'none',
+    mouth: 'wide',
+    back: humps('#a8ddc2'),
+    top: (
+      <g>
+        <path d="M38 27l3-9 5 7M47 25l3-10 4 9M56 25l4-8 3 9" {...fill('#7fc7a6')} />
+        <Spots
+          color="#8fd0b2"
+          dots={[
+            [34, 38, 2.4],
+            [66, 36, 2],
+            [70, 44, 1.4],
+          ]}
+        />
+      </g>
+    ),
+    bodyMarks: <path d="M40 76h20M41 82h18M43 88h14" stroke="#d6ecc8" strokeWidth="1.6" strokeLinecap="round" />,
+    tail: 'dragon',
+    feature: 'bubbles',
+  },
   dozy: {
     fill: '#c2b8b4',
     belly: '#ece6e2',
@@ -608,7 +695,8 @@ function FaceMarks({ c }) {
         </g>
       )}
       {c.mask && <path d="M24 50c4-8 14-8 26-4 12-4 22-4 26 4-4 6-14 8-26 4-12 4-22 2-26-4z" fill={c.mask} />}
-      {c.faceMask && <path d="M50 38c8-6 20-2 22 10s-8 20-22 20-24-8-22-20 14-16 22-10z" fill={c.faceMask} />}
+      {c.faceMask && !c.heartFace && <path d="M50 38c8-6 20-2 22 10s-8 20-22 20-24-8-22-20 14-16 22-10z" fill={c.faceMask} />}
+      {c.heartFace && <path d="M50 40c6-8 22-8 23 6 1 12-11 20-23 22-12-2-24-10-23-22 1-14 17-14 23-6z" fill={c.faceMask} />}
       {c.stripes && (
         <g stroke={c.stripes} strokeWidth="2.4" strokeLinecap="round">
           <path d="M50 26v6M44 28l1 5M56 28l-1 5M23 46h6M23 52h5M77 46h-6M77 52h-5" />
