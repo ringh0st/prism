@@ -26,9 +26,9 @@
   flex: none;
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
-  padding: 0;
+  gap: 2px;
+  width: 62px;
+  padding: 4px 0 5px;
   border: 0;
   border-radius: 18px;
   background: var(--surface-tonal);
@@ -54,4 +54,10 @@
   height: 8px;
   border-radius: 50%;
   background: var(--color-sage);
+}
+
+/* The Pal's form as small pips under it (sprout → crown), so babies and grown-ups read at a glance */
+.teamPal > span:last-child svg {
+  width: 10px;
+  height: 10px;
 }

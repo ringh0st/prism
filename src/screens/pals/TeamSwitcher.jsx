@@ -1,17 +1,22 @@
 import PalArt from '../../components/pals/PalArt.jsx';
+import GrowthPips from '../../components/pals/GrowthPips.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { PALS, stageOf } from '../../game/pals.js';
+import { PALS, PAL_STAGES, growthOf, stageOf } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './TeamSwitcher.module.css';
-import { palWithSpecies } from '../../i18n/palText.js';
+import { palWithSpecies, stageName } from '../../i18n/palText.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 
-/** Your Pals in a row: tap one to make it your partner. */
+/**
+ * Your Pals in a row, youngest first (babies lead, so it's easy to pick one that still has growing to do), each
+ * with its growth pips: tap one to make it your partner.
+ */
 export default function TeamSwitcher() {
   const { progress, choosePal } = usePlayer();
   const { t, lang } = useI18n();
   const partner = progress.pal.id;
-  const team = PALS.filter((pal) => progress.pal.owned[pal.id]);
+  const owned = (pal) => progress.pal.owned[pal.id];
+  const team = PALS.filter(owned).sort((a, b) => stageOf(owned(a)) - stageOf(owned(b)) || growthOf(owned(a)) - growthOf(owned(b)));
   if (team.length < 2) return null;
 
   const switchTo = async (palId) => {
@@ -32,11 +37,12 @@ export default function TeamSwitcher() {
             type="button"
             role="radio"
             aria-checked={pal.id === partner}
-            aria-label={palWithSpecies(lang, pal)}
+            aria-label={`${palWithSpecies(lang, pal)}, ${stageName(lang, PAL_STAGES[stageOf(owned(pal))])}`}
             className={`${styles.teamPal} ${pal.id === partner ? styles.teamPalActive : ''}`}
             onClick={() => switchTo(pal.id)}
           >
-            <PalArt palId={pal.id} stage={stageOf(progress.pal.owned[pal.id])} size={48} portrait />
+            <PalArt palId={pal.id} stage={stageOf(owned(pal))} size={48} portrait />
+            <GrowthPips stageIndex={stageOf(owned(pal))} />
           </button>
         ))}
       </div>
