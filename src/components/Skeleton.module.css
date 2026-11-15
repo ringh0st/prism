@@ -1,0 +1,54 @@
+/*
+ * Loading placeholder: a warm neutral block with a slow, soft light passing over it (about 1.6 s).
+ * The light is a moving background, so nothing reflows. Still for reduced motion.
+ */
+.skeleton {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 16px;
+  vertical-align: middle;
+  background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--surface-raised) 60%, transparent) 50%, transparent 70%)
+    var(--surface-tonal);
+  background-size: 220% 100%;
+  /* appear softly so a fast load doesn't flash */
+  opacity: 0;
+  animation:
+    appear 0.2s ease-out 0.1s forwards,
+    shimmer 1.6s ease-in-out infinite;
+}
+
+.line {
+  border-radius: 6px;
+}
+
+.pill {
+  border-radius: var(--radius-pill);
+}
+
+.circle {
+  border-radius: 50%;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    opacity: 1;
+    animation: none;
+  }
+}

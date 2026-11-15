@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ScreenHeader from '../../components/game/ScreenHeader.jsx';
 import BottomNav from '../../components/game/BottomNav.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
 import Icon from '../../components/Icon.jsx';
 import Button from '../../components/Button.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
+import { useAuth } from '../../state/AuthContext.jsx';
+import { useWeeklyBoard } from '../../hooks/useWeeklyBoard.js';
 import Podium from './Podium.jsx';
 import { stageOf } from '../../game/pals.js';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { palById } from '../../game/pals.js';
 import RankRow from './RankRow.jsx';
+import BoardSkeleton from './BoardSkeleton.jsx';
 import PlayerCardDialog from './PlayerCardDialog.jsx';
 import WeekRules from './WeekRules.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
@@ -39,20 +41,11 @@ function Bunting() {
 export default function LeaderboardScreen() {
   const { isSignedIn, progress } = usePlayer();
   const { t } = useI18n();
-  const [board, setBoard] = useState(null);
-  const [error, setError] = useState('');
-
-  // Reload when the player's progress changes, so their own score is fresh.
+  const { user } = useAuth();
+  // Reload when the player's progress changes, so their own score is fresh; the last board shows meanwhile.
   const solvedCount = Object.keys(progress.levels).length;
-  useEffect(() => {
-    let isCurrent = true;
-    fetchWeeklyLeaderboard()
-      .then((data) => isCurrent && setBoard(data))
-      .catch((loadError) => isCurrent && setError(errorText(t, loadError.message)));
-    return () => {
-      isCurrent = false;
-    };
-  }, [isSignedIn, solvedCount, progress.pal.id]);
+  const { board, error: loadError } = useWeeklyBoard({ owner: user?.id ?? 'guest', refreshKey: `${isSignedIn}:${solvedCount}:${progress.pal.id}` });
+  const error = loadError ? errorText(t, loadError.message) : '';
 
   // Your own rows always show the Pal you're playing with right now, even before the board reloads.
   const withMyPal = (row) =>
@@ -111,7 +104,7 @@ export default function LeaderboardScreen() {
           )}
         </div>
         {error && <p className={styles.empty}>{error}</p>}
-        {!board && !error && <p className={styles.empty}>{t('top.loading')}</p>}
+        {!board && !error && <BoardSkeleton label={t('top.loading')} />}
         {board && <Podium top={top} onOpen={setOpenRow} />}
 
         <div className={styles.below}>

@@ -4,6 +4,7 @@ import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import TitleBadge from '../../components/game/TitleBadge.jsx';
+import Skeleton from '../../components/Skeleton.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { fetchPlayerCard } from '../../lib/economyApi.js';
 import { palById, palStage } from '../../game/pals.js';
@@ -58,11 +59,21 @@ export default function PlayerCardDialog({ row, myScore = null, onClose }) {
             {t(`stage.${stage.id}`, {}, stage.name)}
           </p>
         )}
-        {card && <TitleBadge stars={card.stars} size="lg" />}
+        {card ? <TitleBadge stars={card.stars} size="lg" /> : !error && <Skeleton shape="pill" width={150} height={34} />}
       </div>
 
       {error && <p className={styles.error}>{error}</p>}
-      {!card && !error && <p className={styles.loading}>{t('top.card.loading')}</p>}
+      {!card && !error && (
+        <ul className={styles.stats} role="status" aria-busy="true" aria-label={t('top.card.loading')}>
+          {STATS.map(({ key }) => (
+            <li key={key} className={styles.stat}>
+              <Skeleton shape="circle" width={18} height={18} />
+              <Skeleton width={36} height={22} />
+              <Skeleton width="60%" height={12} />
+            </li>
+          ))}
+        </ul>
+      )}
       {card && (
         <ul className={styles.stats}>
           {STATS.map(({ key, icon, label }) => {

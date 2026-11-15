@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Lumi from '../../components/game/Lumi.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
 import { PALS, palById, stageOf } from '../../game/pals.js';
@@ -8,7 +8,8 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { currentStreak, totalStars } from '../../game/progress.js';
 import { finishedWorldCount, playerLevelFor } from '../../game/titles.js';
 import { todayKey } from '../../game/daily.js';
-import { fetchWeeklyLeaderboard } from '../../lib/economyApi.js';
+import { useWeeklyBoard } from '../../hooks/useWeeklyBoard.js';
+import Skeleton from '../../components/Skeleton.jsx';
 import NicknameDialog from './NicknameDialog.jsx';
 import TitleBadge from '../../components/game/TitleBadge.jsx';
 import TitleRoad from './TitleRoad.jsx';
@@ -36,9 +37,11 @@ export default function PlayerCard() {
   const { user, displayName, avatarUrl } = useAuth();
   const { progress } = usePlayer();
   const { t } = useI18n();
-  const [nickname, setNickname] = useState(null);
   const [isEditingNickname, setIsEditingNickname] = useState(false);
-  const shownNickname = progress.nickname ?? nickname;
+  // The public nickname shown on the Top board (signed-in players only); the last one loaded shows at once.
+  const { board, error: boardError } = useWeeklyBoard({ owner: user?.id ?? 'guest', isEnabled: Boolean(user) && !progress.nickname });
+  const shownNickname = progress.nickname ?? board?.myNickname ?? null;
+  const isNicknameLoading = Boolean(user) && !shownNickname && !board && !boardError;
   const stars = totalStars(progress);
   const playerLevel = playerLevelFor(stars);
   const solved = Object.values(progress.levels).filter((entry) => entry.stars > 0).length;
@@ -46,18 +49,6 @@ export default function PlayerCard() {
   const shields = progress.daily.shields ?? 0;
   const partner = palById(progress.pal.id);
   const partnerStage = partner ? stageOf(progress.pal.owned[partner.id]) : 0;
-
-  // The public nickname shown on the Top board (signed-in players only).
-  useEffect(() => {
-    if (!user) return undefined;
-    let isCurrent = true;
-    fetchWeeklyLeaderboard()
-      .then((board) => isCurrent && setNickname(board.myNickname))
-      .catch(() => {});
-    return () => {
-      isCurrent = false;
-    };
-  }, [user]);
 
   return (
     <section className={styles.card} aria-labelledby="player-name">
@@ -74,16 +65,22 @@ export default function PlayerCard() {
       <h2 id="player-name" className={`game-title ${styles.name}`}>
         {user ? displayName : t('me.guest')}
       </h2>
-      <button
-        type="button"
-        className={styles.nicknameButton}
-        onClick={() => setIsEditingNickname(true)}
-        aria-label={shownNickname ? `${t(user ? 'me.nickname.onBoard' : 'me.nickname.label')} ${shownNickname}` : t('me.nickname.choose')}
-      >
-        <Icon name="trophy" size={16} />
-        {shownNickname ? <strong>{shownNickname}</strong> : t('me.nickname.choose')}
-        <Icon name="edit" size={14} />
-      </button>
+      {isNicknameLoading ? (
+        <span className={styles.nicknameButton} role="status" aria-busy="true" aria-label={t('ui.loading')}>
+          <Skeleton shape="pill" width={120} height={14} />
+        </span>
+      ) : (
+        <button
+          type="button"
+          className={styles.nicknameButton}
+          onClick={() => setIsEditingNickname(true)}
+          aria-label={shownNickname ? `${t(user ? 'me.nickname.onBoard' : 'me.nickname.label')} ${shownNickname}` : t('me.nickname.choose')}
+        >
+          <Icon name="trophy" size={16} />
+          {shownNickname ? <strong>{shownNickname}</strong> : t('me.nickname.choose')}
+          <Icon name="edit" size={14} />
+        </button>
+      )}
       {isEditingNickname && (
         <NicknameDialog current={shownNickname} onSaved={() => setIsEditingNickname(false)} onClose={() => setIsEditingNickname(false)} />
       )}

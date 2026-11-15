@@ -82,7 +82,6 @@
   background: color-mix(in srgb, var(--color-sage) 30%, var(--surface-raised));
 }
 
-.loading,
 .error {
   margin: 0 0 var(--space-3);
   font-weight: 700;

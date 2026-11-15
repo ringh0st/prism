@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
+import Skeleton from '../../components/Skeleton.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { fetchRushBoard } from '../../lib/economyApi.js';
 import { RUSH_LENGTH } from '../../game/rush.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './Rush.module.css';
+
+const LOADING_ROWS = 3;
 
 /** This week's best Light Rush runs, under public nicknames. Signed-in players take part. */
 export default function RushBoard() {
@@ -31,6 +34,19 @@ export default function RushBoard() {
         <Icon name="trophy" size={20} /> {t('rush.board.title')}
       </h3>
       {error && <p className={styles.muted}>{t(error)}</p>}
+      {!board && !error && (
+        <ol className={styles.board} role="status" aria-busy="true" aria-label={t('ui.loading')}>
+          {Array.from({ length: LOADING_ROWS }, (_, index) => (
+            <li key={index}>
+              <Skeleton width={28} height={18} />
+              <span className={styles.nickname}>
+                <Skeleton width={`${70 - index * 15}%`} height={14} />
+              </span>
+              <Skeleton width={40} height={18} />
+            </li>
+          ))}
+        </ol>
+      )}
       {board && board.top.length === 0 && <p className={styles.muted}>{t('rush.board.empty')}</p>}
       {board && board.top.length > 0 && (
         <ol className={styles.board}>
