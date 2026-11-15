@@ -46,11 +46,11 @@ export default function GlowbugRowPrize({ kind, found, total, onMessage }) {
   const tag = (
     <>
       <span className={styles.tag}>
-        <Icon name="diamond" size={12} />
+        <Icon name="diamond" size={10} />
       </span>
       {isReady && !isSignedIn && (
         <span className={styles.lock}>
-          <Icon name="lock" size={10} />
+          <Icon name="lock" size={9} />
         </span>
       )}
     </>
