@@ -38,6 +38,9 @@ export default function PresentOdds() {
                 <GiftBoxArt tone={look.tone} phase="still" size={rarity.id === 'legendary' ? 58 : 50} />
                 {look.symbol && <span className={styles.symbol}>{look.symbol}</span>}
               </span>
+              <span className={`game-title ${styles.name}`} aria-hidden="true">
+                {t(`present.rarity.${rarity.id}`).replace('!', '')}
+              </span>
               <span className={`game-title ${styles.chance}`} aria-hidden="true">
                 {rarity.chance}%
               </span>

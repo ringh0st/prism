@@ -5,6 +5,7 @@ import Icon from '../Icon.jsx';
 import RewardShower from '../RewardShower.jsx';
 import GiftBoxArt from './GiftBoxArt.jsx';
 import GiftItemArt from './GiftItemArt.jsx';
+import RarityBadge from './RarityBadge.jsx';
 import { giftItems } from '../../i18n/giftText.js';
 import { PRESENT_RARITIES, mergeGifts } from '../../game/gifts.js';
 import { gemBurst } from '../../lib/effects.js';
@@ -34,6 +35,21 @@ const rarityStep = (gift) =>
     0,
     PRESENT_RARITIES.findIndex((rarity) => rarity.id === gift.rarity),
   );
+
+/** The rarities of the opened presents: one badge for a single present, a chip per rarity for several. */
+function RaritySummary({ rarities }) {
+  if (rarities.length === 1) return <RarityBadge rarity={rarities[0]} />;
+  const counts = [...PRESENT_RARITIES].reverse().map((rarity) => [rarity.id, rarities.filter((id) => id === rarity.id).length]);
+  return (
+    <span className={styles.raritySummary}>
+      {counts
+        .filter(([, count]) => count > 0)
+        .map(([id, count]) => (
+          <RarityBadge key={id} rarity={id} count={count} />
+        ))}
+    </span>
+  );
+}
 
 /**
  * The gift moment, the same for every gift: a wrapped box (or chest) waits for a tap, wobbles and pops open, and
@@ -67,6 +83,8 @@ export default function GiftReveal({
   const [shown, setShown] = useState(0);
   const [error, setError] = useState('');
   const [isFast, setIsFast] = useState(false);
+  // What each opened present turned out to be (said plainly once it's open, and summed up at the end).
+  const [rarities, setRarities] = useState([]);
   const fast = useRef(false);
   const boxRef = useRef(null);
   const hurry = useRef(null);
@@ -134,6 +152,7 @@ export default function GiftReveal({
         // Quick mode: a plain present goes straight to the pile (its things show in the summary).
         if (fast.current && steps === 0) {
           opened.push(gift);
+          setRarities((list) => [...list, gift.rarity]);
           setOpenedCount(i + 1);
           sfx.giftItem(0);
           await pause(FAST_NEXT_GIFT_MS);
@@ -151,6 +170,7 @@ export default function GiftReveal({
       }
       if (!isMounted.current) return;
       setPhase('open');
+      if (charges) setRarities((list) => [...list, gift.rarity]);
       sfx.giftOpen({ isBig: isBig || rarityStep(gift) >= 2 });
       setOpenedCount(i + 1);
       // Quick mode: a special present still glows up and pops, and its things wait for the summary.
@@ -220,7 +240,7 @@ export default function GiftReveal({
             </span>
           )}
         </button>
-        {glow > 0 && phase !== 'done' && (
+        {glow > 0 && phase === 'charging' && (
           // Rarity reads from color, light and a big symbol; the word is only for screen readers.
           <span key={glow} className={`${styles.glowMark} ${styles[`glow${glow}`]}`} role="status">
             <span aria-hidden="true">{look.symbol}</span>
@@ -242,6 +262,8 @@ export default function GiftReveal({
             {t('gift.tapToOpen')}
           </p>
         )}
+        {charges && phase === 'open' && rarities.length > 0 && <RarityBadge key={rarities.length} rarity={rarities.at(-1)} />}
+        {charges && phase === 'done' && <RaritySummary rarities={rarities} />}
         {(phase === 'open' || phase === 'done') && (
           <ul className={styles.items} aria-live="polite">
             {items.slice(0, shown).map((item) => (

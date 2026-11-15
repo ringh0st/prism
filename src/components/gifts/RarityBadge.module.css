@@ -1,0 +1,56 @@
+.badge,
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+}
+
+.badge {
+  padding: 6px 16px;
+  font-size: 22px;
+  animation: stamp 480ms var(--ease-pop) both;
+}
+
+.chip {
+  padding: 4px 12px;
+  font-size: 17px;
+}
+
+/* Plain, Rare, Epic, Legendary: the same colors as the glow while the present charges */
+.step0 {
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+}
+
+.step1 {
+  color: var(--warm-label);
+  background: var(--warm-bottom);
+}
+
+.step2 {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.step3 {
+  color: var(--reward-label);
+  background: #ffd54a;
+  box-shadow:
+    0 0 0 3px var(--surface-raised),
+    0 0 22px 4px rgba(255, 213, 74, 0.85);
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge {
+    animation: none;
+  }
+}
