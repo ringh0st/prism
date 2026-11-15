@@ -719,6 +719,33 @@ function Accessory({ id, hat, neck }) {
   }
 }
 
+// Items that hug the head from both sides, fitted to the head's width.
+const EAR_ITEMS = new Set(['headphones', 'earmuffs']);
+
+/**
+ * An outfit piece on a Pal drawn as a picture: hats on the measured top of its head, ear items stretched to its
+ * head's width, and neck pieces moved onto the center of its chest (they're drawn around x=50).
+ */
+function PictureAccessory({ id, picture }) {
+  const { hat, ears, neck, chest } = picture;
+  if (EAR_ITEMS.has(id)) {
+    const [x] = ears.at;
+    return (
+      <g transform={`translate(${x} 0) scale(${ears.stretch} 1) translate(${-x} 0)`}>
+        <Accessory id={id} hat={ears.at} neck={neck} />
+      </g>
+    );
+  }
+  if (slotOf(id) === 'neck') {
+    return (
+      <g transform={`translate(${chest - 50} 0)`}>
+        <Accessory id={id} hat={hat} neck={neck} />
+      </g>
+    );
+  }
+  return <Accessory id={id} hat={hat} neck={neck} />;
+}
+
 /** Each form is a little bigger; Legends also sparkle. */
 const STAGE_SCALES = [0.72, 0.84, 0.94, 1, 1.04];
 
@@ -758,8 +785,7 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
   // Pals with a finished illustration show it (their forms grow in size; the drawn growth parts are for the old shapes).
   const picture = PAL_PICTURES[palId] ? picturePlacement(PAL_PICTURES[palId]) : null;
   const growth = picture ? { back: [], front: [] } : growthLayers(palId, art, stageIndex);
-  const hat = picture ? picture.hat : art.hat;
-  const neck = picture ? picture.neck : art.neck;
+  const { hat, neck } = art;
   return (
     <svg
       className={`${alive ? styles.alive : ''} ${className}`}
@@ -779,9 +805,9 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
           {growth.back}
           {picture ? <image href={PAL_PICTURES[palId].src} x={picture.x} y={picture.y} width={picture.width} height={picture.height} /> : art.base}
           {growth.front}
-          {[...wearing].sort(bySlotOrder).map((id) => (
-            <Accessory key={id} id={id} hat={hat} neck={neck} />
-          ))}
+          {[...wearing]
+            .sort(bySlotOrder)
+            .map((id) => (picture ? <PictureAccessory key={id} id={id} picture={picture} /> : <Accessory key={id} id={id} hat={hat} neck={neck} />))}
         </g>
       </g>
       {stageIndex === STAGE_SCALES.length - 1 && (
