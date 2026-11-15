@@ -203,6 +203,7 @@ export const es = {
   'win.shieldsUsed.other': '{count} escudos salvaron tu racha',
   'win.shieldEarned': '+1 escudo de racha',
   'win.next': 'Siguiente nivel',
+  'win.again': 'Otra vez',
   'win.playAgain': 'Jugar otra vez',
   'win.grew': '¡{name} creció: ahora es {stage}!',
   'win.treat': '¡{name} encontró {treat}! Dáselo en Amigos.',

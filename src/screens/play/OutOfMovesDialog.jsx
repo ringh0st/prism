@@ -48,7 +48,9 @@ export default function OutOfMovesDialog({ gems, extraMoves = 0, backName = 'map
               {t('helpers.short.hint')}
             </Button>
           )}
-          <Button variant="ghost" icon="map" label={t('play.backTo', { place: backName })} onClick={onMap} />
+          <Button variant="secondary" icon="map" onClick={onMap} aria-label={t('play.backTo', { place: backName })}>
+            {backName === t('place.map') ? t('nav.map') : backName}
+          </Button>
         </div>
       </div>
     </Dialog>

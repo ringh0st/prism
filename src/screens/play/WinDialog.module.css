@@ -121,38 +121,24 @@
   }
 }
 
+/* The buttons: one wide Next, then two equal buttons under it, all to the same edges */
 .actions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto var(--space-4);
 }
 
-.actions .next {
-  flex: 1;
-  max-width: 260px;
+.actionRow {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: var(--space-2);
 }
 
-.actions .round {
-  flex: none;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-}
-
-.actions .mapTile {
-  flex: none;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 64px;
-  height: 60px;
-  padding: 6px 10px;
-  border-radius: 18px;
-  font-size: 13px;
-  color: var(--text-strong);
-  background: color-mix(in srgb, var(--color-sage) 28%, var(--surface-raised));
-  box-shadow: 0 3px 0 color-mix(in srgb, var(--color-sage) 55%, var(--surface-raised));
+.actions .toMap {
+  background: color-mix(in srgb, var(--color-sage) 26%, var(--surface-raised));
 }
 
 .diamond {

@@ -207,24 +207,28 @@ export default function WinDialog({
           </span>
         )}
       </div>
-      {/* One big Next right under the result; Play again is a round icon beside it, and the map a green tile with its
-          name (like the map tab below), so going back to the path is as easy to see as going on. */}
+      {/* One big Next right under the result, then Play again and the map as two equal buttons under it (the map
+          softly tinted, so going back to the path is easy to see). Every button lines up to the same edges. */}
       <div className={styles.actions}>
-        <Button variant="secondary" icon="restart" label={t('win.playAgain')} onClick={onReplay} className={styles.round} />
         {hasNext ? (
-          <Button size="lg" icon="play" onClick={onNext} data-autofocus className={styles.next}>
+          <Button size="lg" icon="play" onClick={onNext} data-autofocus>
             {t('win.next')}
           </Button>
         ) : (
-          <Button size="lg" icon="map" onClick={onMap} data-autofocus className={styles.next}>
+          <Button size="lg" icon="map" onClick={onMap} data-autofocus>
             {t('play.backTo', { place: backName })}
           </Button>
         )}
-        {hasNext && (
-          <Button variant="secondary" icon="map" onClick={onMap} className={styles.mapTile} aria-label={t('play.backTo', { place: backName })}>
-            {backName === t('place.map') ? t('nav.map') : backName}
+        <div className={styles.actionRow}>
+          <Button variant="secondary" icon="restart" onClick={onReplay}>
+            {t('win.again')}
           </Button>
-        )}
+          {hasNext && (
+            <Button variant="secondary" icon="map" onClick={onMap} className={styles.toMap} aria-label={t('play.backTo', { place: backName })}>
+              {backName === t('place.map') ? t('nav.map') : backName}
+            </Button>
+          )}
+        </div>
       </div>
       {/* The extras pop in one by one once the stars and sparks have landed, so the result reads first. */}
       <div className={styles.extras} style={{ '--extras-at': `${rewardsAt + 700}ms` }}>
