@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="480" height="480"><defs>
+<linearGradient id="waffles-f1-fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbe3b8"/><stop offset="1" stop-color="#e5b574"/></linearGradient>
+<linearGradient id="waffles-f1-ear" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dba466"/><stop offset="1" stop-color="#b4763e"/></linearGradient>
+<linearGradient id="waffles-f1-cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf1"/><stop offset="1" stop-color="#f8e6cc"/></linearGradient>
+<linearGradient id="waffles-f1-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#e5a93a"/></linearGradient>
+<filter id="waffles-f1-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<g filter="url(#waffles-f1-st)">
+<path d="M64 88.6C69 87.6 72.6 85 74 81.6 75 79.6 77 79.2 78 80.6 79 82.2 77.6 85.6 75 87.8 71.6 90.6 67.6 91.4 65 91.4Z" fill="url(#waffles-f1-fur)" stroke="#a86f3c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M30 89C29 83.5 32 80 37 80 42 80 44.5 84 43.5 89 43 92.5 40 94 36.5 94 33 94 30.6 92.5 30 89Z" fill="url(#waffles-f1-fur)" stroke="#a86f3c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M70.0 89.0 C71.0 83.5 68.0 80.0 63.0 80.0 58.0 80.0 55.5 84.0 56.5 89.0 57.0 92.5 60.0 94.0 63.5 94.0 67.0 94.0 69.4 92.5 70.0 89.0Z" fill="url(#waffles-f1-fur)" stroke="#a86f3c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M34.5 90C33.5 82 40 72 50 72 60 72 66.5 82 65.5 90 65 93.5 62 94 58 94H42C38 94 35 93.5 34.5 90Z" fill="url(#waffles-f1-fur)" stroke="#a86f3c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M50.0 74.9 C54.6 74.9 57.3 78.5 57.3 82.8 57.3 87.1 54.0 90.0 50.0 90.0 S42.7 87.1 42.7 82.8 C42.7 78.5 45.4 74.9 50.0 74.9Z" fill="url(#waffles-f1-cream)" stroke="#dcb787" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M38.5 92C38.5 88.6 40.8 87 43.8 87S49.2 88.6 49.2 92C49.2 94 47.6 94.8 43.8 94.8S38.5 94 38.5 92Z" fill="url(#waffles-f1-cream)" stroke="#a86f3c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M61.5 92.0 C61.5 88.6 59.2 87.0 56.2 87.0 S50.8 88.6 50.8 92.0 C50.8 94.0 52.4 94.8 56.2 94.8 S61.5 94.0 61.5 92.0Z" fill="url(#waffles-f1-cream)" stroke="#a86f3c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M41.6 93v-1.8M44 93.4v-1.9M46.4 93v-1.8M53.6 93v-1.8M56 93.4v-1.9M58.4 93v-1.8" stroke="#dcb787" stroke-width="1" stroke-linecap="round"/>
+<path d="M50 25C68 25 80.6 36 80.6 50.6 80.6 63.6 68 71 50 71S19.4 63.6 19.4 50.6C19.4 36 32 25 50 25Z" fill="url(#waffles-f1-fur)" stroke="#a86f3c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M48 25.6C47.6 23 48.8 21.2 51 20.6 50.2 22.4 50.8 24 52.4 25.4" fill="url(#waffles-f1-fur)" stroke="#a86f3c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M32.4 30.2 C24.1 28.0 15.9 31.7 13.8 39.0 12.1 45.1 12.9 51.3 16.0 53.7 17.8 55.0 19.8 54.3 21.0 53.2 22.4 54.1 24.6 53.5 25.3 51.8 26.2 48.5 27.0 44.0 28.9 39.5 30.7 36.2 32.4 34.1 34.4 32.6Z" fill="url(#waffles-f1-ear)" stroke="#8e5a2e" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M67.6 30.2 C75.9 28.0 84.1 31.7 86.2 39.0 87.9 45.1 87.1 51.3 84.0 53.7 82.2 55.0 80.2 54.3 79.0 53.2 77.6 54.1 75.4 53.5 74.7 51.8 73.8 48.5 73.0 44.0 71.1 39.5 69.3 36.2 67.6 34.1 65.6 32.6Z" fill="url(#waffles-f1-ear)" stroke="#8e5a2e" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M18.4 35.6 C16.9 38.4 16.4 41.8 17.1 45.1M81.6 35.6 C83.1 38.4 83.6 41.8 82.9 45.1" stroke="#f0c48c" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.8"/>
+<path d="M50 55.4C56.6 55.4 61 58.6 61 62.6 61 66.6 56.4 69.6 50 69.6S39 66.6 39 62.6C39 58.6 43.4 55.4 50 55.4Z" fill="url(#waffles-f1-cream)" stroke="#dcb787" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="39" cy="51" r="6.2" fill="#3a1e12"/>
+<path d="M34.8 53.4A4.6 4.6 0 0 0 43.2 53.4 5.6 2.8 0 0 1 34.8 53.4Z" fill="#8a5a44" opacity=".6"/>
+<circle cx="41.1" cy="48.4" r="2.9" fill="#fff"/><circle cx="36.6" cy="53.4" r="1.2" fill="#fff"/><circle cx="42.4" cy="53" r=".7" fill="#fff"/>
+<circle cx="61" cy="51" r="6.2" fill="#3a1e12"/>
+<path d="M56.8 53.4A4.6 4.6 0 0 0 65.2 53.4 5.6 2.8 0 0 1 56.8 53.4Z" fill="#8a5a44" opacity=".6"/>
+<circle cx="63.1" cy="48.4" r="2.9" fill="#fff"/><circle cx="58.6" cy="53.4" r="1.2" fill="#fff"/><circle cx="64.4" cy="53" r=".7" fill="#fff"/>
+<ellipse cx="31.6" cy="60" rx="4.4" ry="2.8" fill="#f79a86" opacity=".6"/><ellipse cx="68.4" cy="60" rx="4.4" ry="2.8" fill="#f79a86" opacity=".6"/>
+<path d="M46.4 57.6C46.4 56.2 48 55.4 50 55.4S53.6 56.2 53.6 57.6C53.6 59.4 51.6 60.8 50 60.8S46.4 59.4 46.4 57.6Z" fill="#3a1e12"/><ellipse cx="48.8" cy="56.8" rx="1.2" ry=".6" fill="#fff" opacity=".8"/>
+<path d="M50 60.8v1.8M45.6 62.6c1.4 2 3.4 2 4.4 0 1 2 3 2 4.4 0" fill="none" stroke="#3a1e12" stroke-width="1.3" stroke-linecap="round"/>
+<path d="M33 31.6c4-3.6 9-5.6 14-5.8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.55"/>
+</g>
+</svg>

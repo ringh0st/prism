@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="480" height="480"><defs>
+<linearGradient id="fen-f4-fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6e2dd"/><stop offset="1" stop-color="#b3aca5"/></linearGradient>
+<linearGradient id="fen-f4-dark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bdb5ad"/><stop offset="1" stop-color="#8f8780"/></linearGradient>
+<linearGradient id="fen-f4-cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#f3e3cf"/></linearGradient>
+<linearGradient id="fen-f4-ear" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbc3b3"/><stop offset="1" stop-color="#f0a092"/></linearGradient>
+<linearGradient id="fen-f4-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbe39a"/><stop offset="1" stop-color="#e9b54c"/></linearGradient>
+<filter id="fen-f4-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+<filter id="fen-f4-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<g opacity=".75" filter="url(#fen-f4-glow)"><ellipse cx="86.6" cy="40" rx="9" ry="9" fill="#f8d56f"/></g>
+<g filter="url(#fen-f4-st)">
+ <g transform="translate(65 89) scale(1.1 1.2) translate(-65 -89)"><path d="M64.0 90.0Q64.1 88.8 67.1 87.9Q67.0 90.0 69.9 90.3Q69.5 88.8 72.1 86.6Q72.7 89.4 75.7 89.0Q74.8 87.3 76.7 84.1Q78.1 87.2 80.9 86.1Q80.0 85.2 81.4 82.1Q82.9 83.9 85.2 82.0Q83.8 81.0 84.2 77.4Q86.6 79.3 88.5 77.0Q87.4 76.6 87.6 73.3Q89.4 74.2 90.7 71.5Q89.2 71.2 88.5 67.7Q91.0 68.5 91.8 65.6Q89.9 65.6 88.4 62.2Q91.6 62.6 92.0 59.7Q90.6 59.9 89.1 56.9Q91.3 56.8 91.1 53.8Q89.4 54.3 87.2 51.5Q89.9 51.0 89.3 48.1Q88.3 48.6 86.1 46.2Q87.7 45.5 86.6 42.8Q85.8 44.1 82.8 43.5Q84.1 41.7 81.9 40.0Q83.3 41.4 82.4 44.2Q80.1 42.4 77.8 44.3Q79.2 44.6 79.5 47.5Q77.4 47.2 76.4 50.1Q78.1 50.2 79.3 52.9Q76.5 53.0 76.0 56.0Q77.1 55.9 78.3 58.6Q76.4 59.0 76.4 62.0Q77.9 62.2 78.6 65.1Q76.2 64.9 75.4 67.8Q77.1 68.7 77.0 71.7Q74.3 70.6 72.5 73.0Q73.4 74.0 72.1 76.6Q70.6 75.2 68.3 77.1Q68.9 78.8 66.5 80.8Q65.6 78.4 62.7 79.1Q63.8 79.4 64.2 82.2Q62.3 82.0 61.6 84.8Q62.9 84.1 65.3 85.9Q63.0 87.3 64.0 90.0Z" fill="url(#fen-f4-fur)" stroke="#7a716a" stroke-width="1.31" stroke-linejoin="round"/>
+ <path d="M84.0 40.0Q84.6 39.3 87.0 40.2Q85.9 41.6 87.7 43.5Q88.8 43.0 90.8 44.5Q89.0 45.7 89.9 48.2Q91.3 47.8 93.2 49.5Q90.8 50.7 91.1 53.2Q91.8 54.1 90.6 55.6Q89.6 54.6 87.9 55.6Q87.6 57.0 84.8 57.0Q85.3 55.3 82.8 54.5Q82.4 55.3 79.8 54.5Q80.4 53.5 78.2 52.2Q77.0 52.4 75.6 49.6Q77.5 49.8 77.3 47.2Q76.0 46.5 76.1 43.1Q78.3 44.8 79.7 42.7Q79.1 41.8 80.8 39.3Q81.7 41.2 84.0 40.0Z" fill="url(#fen-f4-cream)" stroke="#7a716a" stroke-width="1.13" stroke-linejoin="round"/>
+ <path d="M82 76c3-4 5-9 5-14" stroke="#fff" stroke-width="1.22" fill="none" stroke-linecap="round" opacity=".8"/></g>
+ <!-- ears -->
+ <path d="M24 44C22 32 22 18 25 6 32 10 40 20 45 29Z" fill="url(#fen-f4-dark)" stroke="#7a716a" stroke-width="1.5" stroke-linejoin="round"/>
+ <path d="M76 44C78 32 78 18 75 6 68 10 60 20 55 29Z" fill="url(#fen-f4-dark)" stroke="#7a716a" stroke-width="1.5" stroke-linejoin="round"/>
+ <path d="M29 36C28 28 28 20 29 13 33 17 37 22 40 28Z" fill="url(#fen-f4-ear)" stroke="#d98a7a" stroke-width="1.3" stroke-linejoin="round"/>
+ <path d="M71 36C72 28 72 20 71 13 67 17 63 22 60 28Z" fill="url(#fen-f4-ear)" stroke="#d98a7a" stroke-width="1.3" stroke-linejoin="round"/>
+ <path d="M30 31c1-3 3-5 5-6M31 26c1-2 2-3 4-4M70 31c-1-3-3-5-5-6M69 26c-1-2-2-3-4-4" stroke="#fff" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".9"/>
+ <!-- body -->
+ <path d="M35 66C29 73 26 83 27 89 28 93 31 94 36 94H64C69 94 72 93 73 89 74 83 71 73 65 66Z" fill="url(#fen-f4-fur)" stroke="#7a716a" stroke-width="1.5" stroke-linejoin="round"/>
+ <!-- hind paws -->
+ <path d="M22 91C22 87.5 25 86 29 86 33 86 35 88 35 91 35 93.5 33 94.5 28.5 94.5 24 94.5 22 93.5 22 91Z" fill="url(#fen-f4-fur)" stroke="#7a716a" stroke-width="1.5" stroke-linejoin="round"/>
+ <path d="M78 91C78 87.5 75 86 71 86 67 86 65 88 65 91 65 93.5 67 94.5 71.5 94.5 76 94.5 78 93.5 78 91Z" fill="url(#fen-f4-fur)" stroke="#7a716a" stroke-width="1.5" stroke-linejoin="round"/>
+ <!-- left front leg -->
+ <path d="M38 76C37 82 36 87 36 90 36 93 38 94.5 42.5 94.5 47 94.5 49 93 49 90 49 86 48 81 47 76Z" fill="url(#fen-f4-fur)" stroke="#7a716a" stroke-width="1.5" stroke-linejoin="round"/>
+ <path d="M37 90.5C37 88 39 87 42.5 87S48 88 48 90.5C48 93 46.5 94.5 42.5 94.5S37 93 37 90.5Z" fill="url(#fen-f4-cream)" stroke="#7a716a" stroke-width="1.3" stroke-linejoin="round"/>
+ <path d="M40 92.4v-2M42.5 93v-2.2M45 92.4v-2M26 92v-2M29 92.6v-2.2M74 92v-2M71 92.6v-2.2" stroke="#cdbfae" stroke-width="1" stroke-linecap="round"/>
+ <!-- chest ruff -->
+ <g transform="translate(50 62) scale(1.3 1.08) translate(-50 -62)"><path d="M50.0 63.0Q50.0 62.0 52.5 62.2Q52.4 62.9 54.8 63.2Q55.0 61.8 57.5 62.3Q57.2 63.3 59.5 63.9Q60.2 62.3 62.9 63.5Q61.9 64.5 64.0 65.7Q65.0 65.1 66.9 67.7Q65.2 67.6 66.2 69.6Q67.6 70.0 68.1 74.0Q65.8 72.0 64.9 74.2Q65.7 74.8 65.1 78.1Q63.8 76.4 62.4 78.3Q63.2 79.3 62.2 82.9Q60.7 80.1 58.8 81.5Q59.6 82.9 58.2 86.8Q56.9 82.9 54.6 83.8Q54.9 85.0 52.8 87.5Q52.4 84.6 50.0 85.0Q49.6 86.4 47.0 88.4Q47.6 84.7 45.4 83.8Q44.9 84.7 42.4 85.1Q43.2 82.8 41.2 81.5Q40.3 82.5 37.8 82.9Q39.3 80.1 37.6 78.3Q36.3 79.2 33.8 79.3Q36.1 76.4 35.1 74.2Q34.0 74.5 32.5 73.5Q34.3 72.0 33.8 69.6Q32.5 68.9 32.6 67.7Q34.7 67.5 36.0 65.7Q35.7 64.8 37.6 64.0Q38.2 64.6 40.5 63.9Q40.3 62.6 42.5 62.3Q42.8 63.3 45.2 63.2Q45.2 61.5 47.5 61.6Q47.6 62.8 50.0 63.0Z" fill="url(#fen-f4-cream)" stroke="#bfae98" stroke-width="1.1" stroke-linejoin="round"/>
+ <path d="M45 72l2 3M55 72l-2 3M50 75v3M47 79l1.5 2M53 79l-1.5 2" stroke="#e3cfb6" stroke-width="0.844" stroke-linecap="round"/></g><path d="M50.64 75.40A3.2 3.2 0 1 0 50.64 81.80A2.30 2.56 0 1 1 50.64 75.40Z" fill="url(#fen-f4-gold)" stroke="#c9922c" stroke-width="1" stroke-linejoin="round"/>
+ <!-- raised right paw -->
+ <path d="M57 79C60 78 63 78 66 79" fill="none" stroke="#7a716a" stroke-width="8.6" stroke-linecap="round"/>
+ <path d="M57 79C60 78 63 78 66 79" fill="none" stroke="#c9c3bd" stroke-width="5.6" stroke-linecap="round"/>
+ <path d="M62 80C61 76 64 73 68 73 72 73 74 76 73 80 72 83 70 85 67 85 64 85 62.5 83 62 80Z" fill="url(#fen-f4-cream)" stroke="#7a716a" stroke-width="1.5" stroke-linejoin="round"/>
+ <ellipse cx="67.5" cy="80.5" rx="2.4" ry="2" fill="#f2a4a0"/>
+ <circle cx="64.6" cy="77" r="1" fill="#f2a4a0"/><circle cx="67.6" cy="76" r="1" fill="#f2a4a0"/><circle cx="70.6" cy="77" r="1" fill="#f2a4a0"/>
+ <!-- head -->
+ <path d="M50 25C65 25 76 34 78 46L86 53 79 56 85 62 76 63C71 68 62 71 50 71S29 68 24 63L15 62 21 56 14 53 22 46C24 34 35 25 50 25Z" fill="url(#fen-f4-fur)" stroke="#7a716a" stroke-width="1.5" stroke-linejoin="round"/>
+ <!-- husky mask -->
+ <path d="M50 44C47 48 46 52 45 55 42 52 39 48 33 47 28 47 25 50 24 54L19 58 25 59 22 63 28 63C34 68 41 70 50 70S66 68 72 63L78 63 75 59 81 58 76 54C75 50 72 47 67 47 61 48 58 52 55 55 54 52 53 48 50 44Z" fill="url(#fen-f4-cream)" stroke="#bfae98" stroke-width="1.2" stroke-linejoin="round"/>
+ <path d="M30 39c4-8 11-12 18-12" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".5"/>
+ <!-- rune mark -->
+ <g transform="translate(50 35) scale(1.15 1.15) translate(-50 -35)"><path d="M50 31l2.6 3.8L50 38.6 47.4 34.8Z" fill="url(#fen-f4-gold)" stroke="#d9a12e" stroke-width="0.87" stroke-linejoin="round"/>
+ <path d="M50 33.2v3.2" stroke="#fff6d6" stroke-width="0.696" stroke-linecap="round"/></g>
+ <!-- brows -->
+ <ellipse cx="37" cy="41.5" rx="2.4" ry="1.4" fill="#f5efe6" transform="rotate(-12 37 41.5)"/><ellipse cx="63" cy="41.5" rx="2.4" ry="1.4" fill="#f5efe6" transform="rotate(12 63 41.5)"/>
+ <!-- muzzle -->
+ <path d="M50 55C44 55 41 58 41 61.5 41 65.5 45 67.5 50 67.5S59 65.5 59 61.5C59 58 56 55 50 55Z" fill="#fffaf3" stroke="#d6c4ac" stroke-width="1.1"/>
+ <!-- eyes -->
+ <circle cx="39" cy="51" r="5.9" fill="#3a1e12"/><ellipse cx="39" cy="54.4" rx="3.6" ry="2" fill="#8a5a44" opacity=".6"/>
+ <circle cx="41.1" cy="48.6" r="2.3" fill="#fff"/><circle cx="37" cy="53.8" r=".9" fill="#fff"/>
+ <circle cx="61" cy="51" r="5.9" fill="#3a1e12"/><ellipse cx="61" cy="54.4" rx="3.6" ry="2" fill="#8a5a44" opacity=".6"/>
+ <circle cx="63.1" cy="48.6" r="2.3" fill="#fff"/><circle cx="59" cy="53.8" r=".9" fill="#fff"/>
+ <ellipse cx="29.5" cy="59.5" rx="4.6" ry="2.8" fill="#f79a86" opacity=".6"/><ellipse cx="70.5" cy="59.5" rx="4.6" ry="2.8" fill="#f79a86" opacity=".6"/>
+ <!-- nose + mouth -->
+ <path d="M46.6 57.4c0-1.2 1.4-1.8 3.4-1.8s3.4.6 3.4 1.8c0 1.4-1.8 2.8-3.4 2.8s-3.4-1.4-3.4-2.8z" fill="#4a3530"/>
+ <ellipse cx="48.8" cy="57" rx="1" ry=".55" fill="#fff" opacity=".8"/>
+ <path d="M50 60.2v1.6M46.4 62c1.2 1.6 2.8 1.6 3.6 0 .8 1.6 2.4 1.6 3.6 0" fill="none" stroke="#3a1e12" stroke-width="1.3" stroke-linecap="round"/>
+ <path d="M48.4 63.4c.4 1.6 2.8 1.6 3.2 0" fill="#f08a92"/>
+</g>
+ <g fill="#fbe39a" stroke="#d9a12e" stroke-width=".5" stroke-linejoin="round">
+ <path d="M93 33l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9z"/>
+ <path d="M78 30l.6 1.5 1.5.6-1.5.6-.6 1.5-.6-1.5-1.5-.6 1.5-.6z"/>
+ <path d="M12 30l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>
+ </g>
+</svg>
