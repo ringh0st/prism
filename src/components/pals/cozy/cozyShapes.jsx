@@ -12,12 +12,46 @@ export function shade(hex, amount = 0.36) {
 }
 
 export const INK = '#2b2118';
-export const LINE = 2.4;
+export const LINE = 1.6;
 export const DETAIL = 1.4;
 
-/** Fill and outline for one part: the outline is a darker shade of the part's own color. */
+// Every color used gets a soft sticker gradient (lighter top left, deeper bottom right); see StickerDefs.
+export const USED_COLORS = new Set();
+export const gradientId = (color) => `czg${color.slice(1)}`;
+export const paint = (color) => {
+  if (!/^#[0-9a-f]{6}$/i.test(color)) return color;
+  USED_COLORS.add(color.toLowerCase());
+  return `url(#${gradientId(color.toLowerCase())}) ${color}`;
+};
+
+/** The gradients and the white sticker edge every cozy Pal uses (identical everywhere, so repeats are harmless). */
+export function StickerDefs({ extra = [] }) {
+  extra.forEach((c) => /^#[0-9a-f]{6}$/i.test(c) && USED_COLORS.add(c.toLowerCase()));
+  return (
+    <defs>
+      {[...USED_COLORS].map((c) => (
+        <linearGradient key={c} id={gradientId(c)} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor={shade(c, -0.32)} />
+          <stop offset=".55" stopColor={c} />
+          <stop offset="1" stopColor={shade(c, 0.08)} />
+        </linearGradient>
+      ))}
+      <filter id="czSticker" x="-12%" y="-12%" width="124%" height="124%">
+        <feMorphology in="SourceAlpha" operator="dilate" radius="2.2" result="d" />
+        <feFlood floodColor="#ffffff" />
+        <feComposite in2="d" operator="in" result="w" />
+        <feMerge>
+          <feMergeNode in="w" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+  );
+}
+
+/** Fill and outline for one part: a soft gradient, and an outline in a darker shade of the part's own color. */
 export const F = (color, line = null, width = LINE) => ({
-  fill: color,
+  fill: paint(color),
   stroke: line ?? shade(color),
   strokeWidth: width,
   strokeLinejoin: 'round',
@@ -36,9 +70,9 @@ export function Scallops({ cx, cy, rx, ry, n, r, color, line, inner = true }) {
         <circle key={`s${i}`} cx={x} cy={y} r={r} {...F(color, line)} />
       ))}
       {dots.map(([x, y], i) => (
-        <circle key={`f${i}`} cx={x} cy={y} r={r - LINE / 2} fill={color} />
+        <circle key={`f${i}`} cx={x} cy={y} r={r - LINE / 2} fill={paint(color)} />
       ))}
-      {inner && <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={color} />}
+      {inner && <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={paint(color)} />}
     </g>
   );
 }
@@ -59,8 +93,8 @@ export const HEADS = {
   star: 'M50 13L60 36 85 38 66 54 72 79 50 66 28 79 34 54 15 38 40 36Z',
 };
 
-/** The head shape a Pal uses, with a soft cel shadow at the lower right and a highlight at the top left. */
-export function Head({ shape, color, line, id }) {
+/** The head shape a Pal uses, with a soft highlight at the top left (the sticker gradient does the shading). */
+export function Head({ shape, color, line }) {
   if (shape === 'cloud') {
     return (
       <g>
@@ -70,16 +104,9 @@ export function Head({ shape, color, line, id }) {
     );
   }
   const d = HEADS[shape] ?? HEADS.round;
-  const clip = `cz-${id}-${shape}`;
   return (
     <g>
-      <clipPath id={clip}>
-        <path d={d} />
-      </clipPath>
       <path d={d} {...F(color, line)} />
-      <g clipPath={`url(#${clip})`}>
-        <ellipse cx="66" cy="68" rx="34" ry="16" fill={shade(color, 0.08)} />
-      </g>
       <path d="M33 37c3-6 9-9 15-9-6 3-10 6-12 10z" fill="#fff" opacity=".55" />
       {shape === 'gem' && <path d="M32 28l18 8 18-8M50 36v34M22 42l28-6 28 6" fill="none" stroke="#fff" strokeWidth="1.2" opacity=".6" />}
     </g>
@@ -198,5 +225,16 @@ export function Paw({ x, y, kind, color, line }) {
       />
     );
   if (kind === 'small') return <path d={`M${x - 5} ${y}h10l-2-3h-6z`} {...F(color, line, 1.6)} />;
-  return <ellipse cx={x} cy={y} rx="5.4" ry="5" {...F(color, line)} />;
+  return (
+    <g>
+      <ellipse cx={x} cy={y} rx="5.6" ry="5" {...F(color, line)} />
+      <path
+        d={`M${x - 2.2} ${y + 4.2}v-2M${x} ${y + 4.6}v-2.2M${x + 2.2} ${y + 4.2}v-2`}
+        stroke={line}
+        strokeWidth="1"
+        strokeLinecap="round"
+        opacity=".7"
+      />
+    </g>
+  );
 }

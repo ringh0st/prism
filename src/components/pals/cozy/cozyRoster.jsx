@@ -1,4 +1,4 @@
-import { BODIES, DETAIL, F, Head, INK, Paw, Scallops, shade } from './cozyShapes.jsx';
+import { BODIES, DETAIL, F, Head, INK, Paw, Scallops, StickerDefs, paint, shade } from './cozyShapes.jsx';
 
 /* ---------- small building blocks ---------- */
 
@@ -170,15 +170,29 @@ export const ROSTER = {
     ]),
   },
   mochi: {
-    head: 'mochi',
-    body: 'loaf',
-    c: ['#fde0cb', '#fff6ec', '#f6b8a4'],
+    head: 'ruff',
+    body: 'sit',
+    c: ['#fbd6bc', '#fff4ea', '#f6b0a2'],
+    muzzle: true,
     mouth: 'w',
     whiskers: true,
-    back: () => ears.corner('#fde0cb', '#f6b8a4'),
-    front: (s) => grow(s, [84, 88], <path d="M86 84C90 96 62 99 36 96 30 95 30 90 35 90 56 92 74 90 82 82Z" {...F('#fde0cb')} />),
-    top: <path d="M50 29a4 4 0 1 0 3 6 3 3 0 1 1-3-6z" fill={GOLD} />,
-    master: <path d="M30 76l3 2M36 74l2 2M64 74l-2 2M70 76l-3 2" {...stroke('#f2b896', 2)} />,
+    nose: 'pink',
+    back: (s) => (
+      <g>
+        {ears.cat('#fbd6bc', '#f6b0a2')}
+        {grow(
+          s,
+          [66, 88],
+          <g>
+            <path d="M66 88C78 92 88 84 88 72 88 63 81 59 76 63 72 66 74 71 79 69" {...stroke('#c27a52', 10)} />
+            <path d="M66 88C78 92 88 84 88 72 88 63 81 59 76 63 72 66 74 71 79 69" {...stroke('#f8cbab', 7)} />
+          </g>,
+        )}
+      </g>
+    ),
+    top: <path d="M50 28A5.6 5.6 0 1 0 55.4 36 4.4 4.4 0 1 1 50 28Z" {...F('#f3c552', '#d9a12e')} />,
+    champ: <path d="M58 79l6 3-2 6z" {...F('#f3c552', '#d9a12e')} />,
+    master: <path d="M44 34l6-8 6 8" {...stroke('#f3c552', 1.6)} />,
   },
   hoot: {
     head: 'heart',
@@ -1043,18 +1057,18 @@ BODIES.frosty = {
 function Eyes({ kind }) {
   if (kind === 'sleepy') return <path d="M33.6 51q5.4 4.6 10.8 0M55.6 51q5.4 4.6 10.8 0" {...stroke(INK, 2.4)} />;
   if (kind === 'happy') return <path d="M34 52q5-7 10 0M56 52q5-7 10 0" {...stroke(INK, 2.6)} />;
-  const r = kind === 'big' ? [6.2, 7.2] : [5.4, 6.4];
+  const r = kind === 'big' ? 6.8 : 6;
   return (
     <g>
       {[39, 61].map((x) => (
         <g key={x}>
-          <ellipse cx={x} cy="50.5" rx={r[0]} ry={r[1]} fill={INK} />
-          <ellipse cx={x} cy="53.8" rx="3.6" ry="2.4" fill="#7a5444" opacity=".55" />
-          <circle cx={x + 2} cy="47.8" r="2.3" fill="#fff" />
+          <circle cx={x} cy="51" r={r} fill={INK} />
+          <ellipse cx={x} cy="54.6" rx={r * 0.62} ry={r * 0.36} fill="#8a5a44" opacity=".6" />
+          <circle cx={x + 2.2} cy="48.6" r="2.4" fill="#fff" />
           {kind === 'sparkle' ? (
-            <path d={`M${x - 2.4} 50.6l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z`} fill="#fff" />
+            <path d={`M${x - 2.4} 52l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z`} fill="#fff" />
           ) : (
-            <circle cx={x - 1.6} cy="53" r="1" fill="#fff" opacity=".9" />
+            <circle cx={x - 2} cy="54" r="1" fill="#fff" opacity=".95" />
           )}
         </g>
       ))}
@@ -1076,6 +1090,8 @@ function Mouth({ kind, nose, base }) {
       <ellipse cx="50" cy="57" rx="3.6" ry="2.8" fill={INK} />
     ) : nose === 'bigBean' ? (
       <ellipse cx="50" cy="57" rx="4.6" ry="6" fill="#5a4a46" />
+    ) : nose === 'pink' ? (
+      <path d="M48 57.6h4c.7 0 1 .7.6 1.2L50.6 61c-.3.4-.9.4-1.2 0l-2-2.2c-.4-.5-.1-1.2.6-1.2z" fill="#e77f8a" />
     ) : nose === 'none' ? null : (
       <path d="M48.3 55.4h3.4c.6 0 .9.6.5 1.1L50.6 58c-.3.4-.9.4-1.2 0l-1.6-1.5c-.4-.5-.1-1.1.5-1.1z" fill={INK} />
     );
@@ -1119,75 +1135,101 @@ export function CozyPal2({ palId, stageIndex = 0 }) {
   const paws = body.paws.map(([x, y, kind], i) => (i === 0 && p.leftPaw ? [...p.leftPaw, 'round'] : [x, y, kind]));
   const pawKind = (kind) => (p.flippers || p.flipperWings ? 'wing' : kind);
 
+  const stickerColors = [base, patch, accent, bodyColor, limbs];
   return (
     <g>
-      {p.rarity === 'mythic' && stageIndex >= 3 && (
-        <g fill={p.element} opacity=".9">
-          {[
-            [12, 30, 3],
-            [88, 22, 2.4],
-            [90, 60, 2],
-            [8, 64, 2.2],
-          ].map(([x, y, r]) => (
-            <path
-              key={x}
-              d={`M${x} ${y - r * 2}l${r * 0.6} ${r * 1.4} ${r * 1.4} ${r * 0.6}-${r * 1.4} ${r * 0.6}-${r * 0.6} ${r * 1.4}-${r * 0.6}-${r * 1.4}-${r * 1.4}-${r * 0.6} ${r * 1.4}-${r * 0.6}z`}
-            />
-          ))}
-        </g>
-      )}
-      {p.under}
-      {run(p.back, s)}
-      {stageIndex >= 3 && p.champ}
-      {body.d && (
-        <g transform={bodyT}>
-          {body.water && <path d="M10 88c8-4 16 4 24 0s16 4 24 0 16 4 24 0 12 3 12 3" {...stroke('#9fd6e0', 2.4)} />}
-          {body.haunch && <ellipse cx="80" cy="84" rx="12" ry="10" {...F(bodyColor, line)} />}
-          {body.legs &&
-            (p.fourLegs ? [36, 44, 56, 64] : [44, 56]).map((x, i) => (
-              <path key={x} d={`M${x} 82V${p.raisedHoof && i === 0 ? 86 : 92}`} {...stroke(line, 7.4)} />
+      <g filter="url(#czSticker)">
+        {p.rarity === 'mythic' && stageIndex >= 3 && (
+          <g fill={p.element} opacity=".9">
+            {[
+              [12, 30, 3],
+              [88, 22, 2.4],
+              [90, 60, 2],
+              [8, 64, 2.2],
+            ].map(([x, y, r]) => (
+              <path
+                key={x}
+                d={`M${x} ${y - r * 2}l${r * 0.6} ${r * 1.4} ${r * 1.4} ${r * 0.6}-${r * 1.4} ${r * 0.6}-${r * 0.6} ${r * 1.4}-${r * 0.6}-${r * 1.4}-${r * 1.4}-${r * 0.6} ${r * 1.4}-${r * 0.6}z`}
+              />
             ))}
-          {body.legs &&
-            (p.fourLegs ? [36, 44, 56, 64] : [44, 56]).map((x, i) => (
-              <path key={`f${x}`} d={`M${x} 82V${p.raisedHoof && i === 0 ? 86 : 92}`} {...stroke(limbs, 4.6)} />
-            ))}
-          <path d={body.d} {...F(bodyColor, line)} />
-          {p.bodyFluff && <Scallops cx={50} cy={78} rx={22} ry={11} n={10} r={6} color={base} line={line} />}
-          {body.belly && <ellipse cx={body.belly[0]} cy={body.belly[1]} rx={body.belly[2]} ry={body.belly[3]} fill={patch} />}
-          {p.bodyMarks}
-          {body.feet.map(([x, y, kind]) =>
-            kind === 'small' || p.feetColor ? (
-              <ellipse key={x} cx={x} cy={y} rx={p.bigFeet ? 9 : 6} ry={p.bigFeet ? 3.8 : 3} {...F(p.feetColor ?? '#f6b26b')} />
-            ) : (
-              <ellipse key={x} cx={x} cy={y} rx={p.bigFeet ? 9.6 : 7} ry="4.4" {...F(limbs, shade(limbs))} />
-            ),
-          )}
-        </g>
-      )}
-      {body.merge && <ellipse cx="50" cy="68" rx="24" ry="7" fill={bodyColor} />}
-      {p.head === 'cloud' ? <Head shape="cloud" color={base} line={line} id={palId} /> : <Head shape={p.head} color={base} line={line} id={palId} />}
-      {p.muzzleBun && <ellipse cx="50" cy="62" rx="15" ry="9.6" {...F(patch, line)} />}
-      {p.muzzle && !p.muzzleBun && <ellipse cx="50" cy="60" rx="12" ry="8.4" fill={patch} />}
-      {p.snout && <ellipse cx="50" cy="61" rx="13" ry="8" fill={patch} />}
-      {p.face}
-      {stageIndex >= 4 && p.master}
-      {run(p.top, s)}
-      <Eyes kind={p.eyes} />
-      <ellipse cx="29.6" cy="59" rx="5" ry="2.9" fill={p.blush ?? '#f59a9a'} opacity=".5" />
-      <ellipse cx="70.4" cy="59" rx="5" ry="2.9" fill={p.blush ?? '#f59a9a'} opacity=".5" />
-      <Mouth kind={p.mouth} nose={p.nose} />
-      {p.whiskers && <path d="M26 57l-7-1M26 61l-7 1M74 57l7-1M74 61l7 1" {...stroke(shade(base, 0.45), 1)} />}
-      {paws.map(([x, y, kind]) => (
-        <Paw key={`${x}${y}`} x={x} y={y} kind={p.bigPaws ? 'round' : pawKind(kind)} color={limbs} line={shade(limbs)} />
-      ))}
-      {p.frontFill ? (
-        <g>
-          {run(p.front, s)}
-          {run(p.frontFill, s)}
-        </g>
-      ) : (
-        run(p.front, s)
-      )}
+          </g>
+        )}
+        {p.under}
+        {run(p.back, s)}
+        {stageIndex >= 3 && p.champ}
+        {body.d && (
+          <g transform={bodyT}>
+            {body.water && <path d="M10 88c8-4 16 4 24 0s16 4 24 0 16 4 24 0 12 3 12 3" {...stroke('#9fd6e0', 2.4)} />}
+            {body.haunch && <ellipse cx="80" cy="84" rx="12" ry="10" {...F(bodyColor, line)} />}
+            {body.legs &&
+              (p.fourLegs ? [36, 44, 56, 64] : [44, 56]).map((x, i) => (
+                <path key={x} d={`M${x} 82V${p.raisedHoof && i === 0 ? 86 : 92}`} {...stroke(line, 7.4)} />
+              ))}
+            {body.legs &&
+              (p.fourLegs ? [36, 44, 56, 64] : [44, 56]).map((x, i) => (
+                <path key={`f${x}`} d={`M${x} 82V${p.raisedHoof && i === 0 ? 86 : 92}`} {...stroke(limbs, 4.6)} />
+              ))}
+            {(p.body === 'sit' || p.body === 'pear') && (
+              <g>
+                <path d="M24 88C22 80 26 74 33 74 40 74 43 81 41 88 40 92 36 94 31 94 27 94 25 92 24 88Z" {...F(bodyColor, line)} />
+                <path d="M76 88C78 80 74 74 67 74 60 74 57 81 59 88 60 92 64 94 69 94 73 94 75 92 76 88Z" {...F(bodyColor, line)} />
+              </g>
+            )}
+            <path d={body.d} {...F(bodyColor, line)} />
+            {p.bodyFluff && <Scallops cx={50} cy={78} rx={22} ry={11} n={10} r={6} color={base} line={line} />}
+            {['sit', 'pear', 'stand'].includes(p.body) && !p.noBib && (
+              <path
+                d="M38 68C41 71 43 70 45 68 46 71 49 72 50 69 52 72 54 71 55 68 57 70 59 71 62 68 62 76 58 82 50 84 42 82 38 76 38 68Z"
+                {...F(patch, line, 1.2)}
+              />
+            )}
+            {['sit', 'pear', 'stand'].includes(p.body) && !p.noBib
+              ? null
+              : body.belly && <ellipse cx={body.belly[0]} cy={body.belly[1]} rx={body.belly[2]} ry={body.belly[3]} fill={paint(patch)} />}
+            {p.bodyMarks}
+            {body.feet.map(([x, y, kind]) =>
+              kind === 'small' || p.feetColor ? (
+                <ellipse key={x} cx={x} cy={y} rx={p.bigFeet ? 9 : 6} ry={p.bigFeet ? 3.8 : 3} {...F(p.feetColor ?? '#f6b26b')} />
+              ) : (
+                <ellipse key={x} cx={x} cy={y} rx={p.bigFeet ? 9.6 : 7} ry="4.4" {...F(limbs, shade(limbs))} />
+              ),
+            )}
+          </g>
+        )}
+        {body.merge && <ellipse cx="50" cy="68" rx="24" ry="7" fill={bodyColor} />}
+        {p.head === 'cloud' ? <Head shape="cloud" color={base} line={line} /> : <Head shape={p.head} color={base} line={line} />}
+        {p.muzzleBun && <ellipse cx="50" cy="62" rx="15" ry="9.6" {...F(patch, line)} />}
+        {p.muzzle && !p.muzzleBun && (
+          <path
+            d="M50 55C44 55 40 58 38 61 34 61 31 62 29 63 33 68 41 70 50 70S67 68 71 63C69 62 66 61 62 61 60 58 56 55 50 55Z"
+            fill={paint(patch)}
+            stroke={line}
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
+        )}
+        {p.snout && <ellipse cx="50" cy="61" rx="13" ry="8" fill={paint(patch)} />}
+        {p.face}
+        {stageIndex >= 4 && p.master}
+        {run(p.top, s)}
+        <Eyes kind={p.eyes} />
+        <ellipse cx="29.6" cy="59" rx="5" ry="2.9" fill={p.blush ?? '#f59a9a'} opacity=".5" />
+        <ellipse cx="70.4" cy="59" rx="5" ry="2.9" fill={p.blush ?? '#f59a9a'} opacity=".5" />
+        <Mouth kind={p.mouth} nose={p.nose} />
+        {p.whiskers && <path d="M26 57l-7-1M26 61l-7 1M74 57l7-1M74 61l7 1" {...stroke(shade(base, 0.45), 1)} />}
+        {paws.map(([x, y, kind]) => (
+          <Paw key={`${x}${y}`} x={x} y={y} kind={p.bigPaws ? 'round' : pawKind(kind)} color={limbs} line={shade(limbs)} />
+        ))}
+        {p.frontFill ? (
+          <g>
+            {run(p.front, s)}
+            {run(p.frontFill, s)}
+          </g>
+        ) : (
+          run(p.front, s)
+        )}
+      </g>
+      <StickerDefs extra={stickerColors} />
     </g>
   );
 }
