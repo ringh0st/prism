@@ -13,9 +13,9 @@ const TABS = [
 ];
 
 /**
- * Big chunky game tab bar along the bottom of the screen. The map is the main game, so its tab is a big round
- * raised button in the middle, always in the main color, easy to find from anywhere. (The daily puzzle lives on
- * the map's top bar.)
+ * Big chunky game tab bar along the bottom of the screen. The map is the main game, so its tab sits in the middle
+ * as a slightly bigger green tile, always in the main color, easy to find from anywhere without shouting. (The daily
+ * puzzle lives on the map's top bar.)
  */
 export default function BottomNav({ active }) {
   const { t } = useI18n();
@@ -30,7 +30,7 @@ export default function BottomNav({ active }) {
           onClick={() => active !== tab.route && sfx.tab()}
         >
           <span className={styles.icon}>
-            <Icon name={tab.icon} size={tab.isMain ? 30 : 24} strokeWidth={2.6} />
+            <Icon name={tab.icon} size={tab.isMain ? 27 : 24} strokeWidth={2.6} />
           </span>
           <span className={styles.label}>{t(tab.label)}</span>
         </a>
