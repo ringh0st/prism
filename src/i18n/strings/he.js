@@ -167,12 +167,6 @@ export const he = {
   'buy.withDiamondsSignIn.one': 'לקנות {name} ביהלום אחד (צריך להתחבר)',
   'buy.withDiamondsSignIn.other': 'לקנות {name} ב-{count} יהלומים (צריך להתחבר)',
 
-  'play.heartsLeft.one': 'נשאר לב אחד מתוך {total}',
-  'play.heartsLeft.other': 'נשארו {count} לבבות מתוך {total}',
-  'tip.hearts.title': 'סיבוב לא נכון שובר ❤',
-  'lumi.lastHeart': 'זהירות, נשאר לב אחד!',
-  'out.heartsTitle': 'נגמרו הלבבות',
-  'out.keepGoingHeart': 'להמשיך: עוד לב אחד, עד ★ אחד',
   'out.title': 'נגמרו המהלכים',
   'out.close': 'כמעט!',
   'out.noneLit': 'אף אבן חן עוד לא נדלקה. נסו דרך אחרת!',

@@ -11,29 +11,14 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
  * missing (lit ones ticked, dark ones waiting with a "?"), retrying is one big tap, a hint is offered as a gentle
  * way forward. In the early worlds `onKeepGoing` adds `extraMoves` instead (for 1 star), so new players never hit a wall.
  * @param gems [{ color, isLit }] for every gem on the board
- * @param reason 'moves', or 'hearts' when wrong turns broke every heart (Keep going then gives one heart back)
  */
-export default function OutOfMovesDialog({
-  gems,
-  extraMoves = 0,
-  reason = 'moves',
-  backName = 'map',
-  onRetry,
-  onKeepGoing = null,
-  onRetryWithHint = null,
-  onMap,
-}) {
+export default function OutOfMovesDialog({ gems, extraMoves = 0, backName = 'map', onRetry, onKeepGoing = null, onRetryWithHint = null, onMap }) {
   const { t } = useI18n();
   const gemsLit = gems.filter((gem) => gem.isLit).length;
   const gemsLeft = gems.length - gemsLit;
   const isClose = gemsLit > 0 && gemsLeft === 1;
   return (
-    <Dialog
-      title={t(reason === 'hearts' ? 'out.heartsTitle' : isClose ? 'out.close' : 'out.title')}
-      tone="gentle"
-      onClose={onMap}
-      closesOnBackdrop={false}
-    >
+    <Dialog title={t(isClose ? 'out.close' : 'out.title')} tone="gentle" onClose={onMap} closesOnBackdrop={false}>
       <ul className={styles.gems} aria-label={gemsLit === 0 ? t('out.noneLit') : t('out.gemsToGo', { count: gemsLeft })}>
         {gems.map((gem, i) => (
           <li key={i} className={gem.isLit ? styles.lit : styles.missing} style={{ '--i': i }}>
@@ -46,16 +31,10 @@ export default function OutOfMovesDialog({
       </ul>
       <div className={styles.actions}>
         {onKeepGoing && (
-          <Button
-            size="lg"
-            onClick={onKeepGoing}
-            data-autofocus
-            silent
-            aria-label={reason === 'hearts' ? t('out.keepGoingHeart') : t('out.keepGoing', { count: extraMoves })}
-          >
+          <Button size="lg" onClick={onKeepGoing} data-autofocus aria-label={t('out.keepGoing', { count: extraMoves })}>
             <span className={styles.keepGoing} aria-hidden="true">
-              <span dir="ltr">+{reason === 'hearts' ? 1 : extraMoves}</span>
-              {reason === 'hearts' ? <Icon name="heart" size={22} /> : <TapIcon size={24} />}
+              <span dir="ltr">+{extraMoves}</span>
+              <TapIcon size={24} />
               <span className={styles.cap}>★☆☆</span>
             </span>
           </Button>

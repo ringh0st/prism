@@ -55,11 +55,6 @@
   box-shadow: var(--highlight), var(--shadow-md);
 }
 
-.sideStatus {
-  display: grid;
-  justify-items: end;
-}
-
 .gems {
   display: flex;
   flex-wrap: wrap;

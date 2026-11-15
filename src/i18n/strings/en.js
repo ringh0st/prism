@@ -165,12 +165,6 @@ export const en = {
   'buy.withDiamondsSignIn.one': 'Buy {name} for {count} diamond (sign in required)',
   'buy.withDiamondsSignIn.other': 'Buy {name} for {count} diamonds (sign in required)',
 
-  'play.heartsLeft.one': '{count} of {total} hearts left',
-  'play.heartsLeft.other': '{count} of {total} hearts left',
-  'tip.hearts.title': 'A wrong turn breaks a ❤',
-  'lumi.lastHeart': 'Careful, one heart left!',
-  'out.heartsTitle': 'Out of hearts',
-  'out.keepGoingHeart': 'Keep going: one more heart, 1 ★ at most',
   'out.title': 'Out of moves',
   'out.close': 'So close!',
   'out.noneLit': 'No gems lit yet. Try another way!',
