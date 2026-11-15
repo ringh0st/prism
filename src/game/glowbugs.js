@@ -145,6 +145,15 @@ export function glowbugCellOf(level) {
   return lamp ? lamp.y * level.width + lamp.x : null;
 }
 
+/** A Glowbug row is one kind in all 5 colors; rescuing the whole row pays this many diamonds (accounts), once. */
+export const GLOWBUG_ROW_DIAMONDS = 1;
+
+/** Kinds whose 5 colors are all rescued. */
+export function completedGlowbugRows(levels) {
+  const rescued = rescuedGlowbugs(levels);
+  return GLOWBUG_KINDS.filter((kind) => GLOWBUGS.filter((bug) => bug.kind === kind.id).every((bug) => rescued.has(bug.id))).map((kind) => kind.id);
+}
+
 /** Rescued Glowbugs: every Glowbug level solved with three stars. @returns Map(speciesId -> times rescued) */
 export function rescuedGlowbugs(levels) {
   const rescued = new Map();

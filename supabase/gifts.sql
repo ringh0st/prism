@@ -7,7 +7,12 @@ alter table public.profiles
   add column if not exists gift_days integer not null default 0,
   add column if not exists presents_opened integer not null default 0,
   add column if not exists win_gift_date date,
-  add column if not exists win_gifts_opened integer not null default 0;
+  add column if not exists win_gifts_opened integer not null default 0,
+  -- Glowbug rows whose diamond was collected (see glowbugs.sql).
+  add column if not exists glowbug_rows_claimed text[] not null default '{}',
+  -- Pal adoption limits (see adopt_pal in pals.sql), here too so _economy_state works on any run order.
+  add column if not exists rare_adopt_week integer,
+  add column if not exists rare_adopts integer not null default 0;
 
 -- Balances also report the gift calendar, presents and win gifts (same as grove.sql, plus the gift fields).
 create or replace function public._economy_state(p_user uuid)
@@ -34,6 +39,7 @@ as $$
     'pal', jsonb_build_object('id', p.pal_id, 'owned', p.pals, 'accessories', to_jsonb(p.pal_accessories), 'wearing', to_jsonb(p.pal_wearing)),
     'grove', jsonb_build_object('items', to_jsonb(p.grove_items), 'placed', to_jsonb(p.grove_placed)),
     'luckyPalsClaimed', p.lucky_pals_claimed,
+    'glowbugRowsClaimed', to_jsonb(p.glowbug_rows_claimed),
     'rareAdopts', case when p.rare_adopt_week = public._adopt_week((now() at time zone 'utc')::date) then p.rare_adopts else 0 end
   )
   from public.profiles p

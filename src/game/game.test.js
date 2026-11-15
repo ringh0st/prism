@@ -1127,3 +1127,28 @@ test('win streak and level milestones', async () => {
   assert.equal(levelNumber(8, 8), 148);
   assert.equal(levelNumber(50, 20), 1000);
 });
+
+test('glowbug rows: the database knows every Glowbug level, and a full row is all 5 colors', async () => {
+  const { GLOWBUG_KINDS, completedGlowbugRows, glowbugForLevel, GLOWBUGS } = await import('./glowbugs.js');
+  const sql = readFileSync(new URL('../../supabase/glowbugs.sql', import.meta.url), 'utf8');
+  const inSql = new Map(
+    [...sql.matchAll(/\('(w\d+-\d{2})', '([a-z]+-[a-z]+)', '([a-z]+)'\)/g)].map(([, level, bug, kind]) => [level, `${bug}|${kind}`]),
+  );
+  let count = 0;
+  for (let world = 1; world <= 50; world++) {
+    for (let index = 1; index <= 20; index++) {
+      const levelId = `w${world}-${String(index).padStart(2, '0')}`;
+      const bug = glowbugForLevel(levelId);
+      if (!bug) continue;
+      count++;
+      assert.equal(inSql.get(levelId), `${bug.id}|${bug.kind}`, levelId);
+    }
+  }
+  assert.equal(inSql.size, count, 'no extra rows');
+  // Every color of every kind naps somewhere, so every row can be finished.
+  assert.equal(new Set([...inSql.values()].map((value) => value.split('|')[0])).size, GLOWBUGS.length);
+  const firefly = GLOWBUGS.filter((bug) => bug.kind === GLOWBUG_KINDS[0].id).map((bug) => bug.id);
+  const levels = {};
+  for (const [level, value] of inSql) if (firefly.includes(value.split('|')[0])) levels[level] = { stars: 3 };
+  assert.deepEqual(completedGlowbugRows(levels), [GLOWBUG_KINDS[0].id]);
+});

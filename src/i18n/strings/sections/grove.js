@@ -33,6 +33,10 @@ export const en = {
   'grove.scene.visiting': '{name} is visiting.',
   'grove.scene.party': 'It’s a party for finishing World {world}!',
 
+  'garden.row.progress': '{found} of {total} rescued in this row: rescue all for {count} diamond',
+  'garden.row.collect': 'Row complete! Collect {count} diamond',
+  'garden.row.collected': '+{count} 💎 for a full row!',
+  'garden.row.done': 'Row complete, diamond collected',
   'garden.title': 'Glowbug Garden',
   'garden.found': '{found} of {total} Glowbugs found',
   'garden.meter': 'Glowbugs found',
@@ -85,6 +89,10 @@ export const es = {
   'grove.scene.visiting': '{name} está de visita.',
   'grove.scene.party': '¡Hay fiesta por terminar el Mundo {world}!',
 
+  'garden.row.progress': '{found} de {total} rescatados en esta fila: rescata todos por {count} diamante',
+  'garden.row.collect': '¡Fila completa! Recoge {count} diamante',
+  'garden.row.collected': '¡+{count} 💎 por una fila completa!',
+  'garden.row.done': 'Fila completa, diamante recogido',
   'garden.title': 'Jardín de bichitos de luz',
   'garden.found': '{found} de {total} bichitos de luz encontrados',
   'garden.meter': 'Bichitos de luz encontrados',
@@ -217,6 +225,10 @@ export const he = {
   'grove.scene.visiting': '{name} בא לבקר.',
   'grove.scene.party': 'יש מסיבה לכבוד סיום עולם {world}!',
 
+  'garden.row.progress': '{found} מתוך {total} נאספו בשורה הזאת: אספו את כולם וקבלו יהלום',
+  'garden.row.collect': 'השורה מלאה! אספו יהלום',
+  'garden.row.collected': '\u2066+{count}\u2069 💎 על שורה מלאה!',
+  'garden.row.done': 'השורה מלאה, היהלום נאסף',
   'garden.title': 'גן הזוהרונים',
   'garden.found': 'נמצאו {found} מתוך {total} זוהרונים',
   'garden.meter': 'זוהרונים שנמצאו',

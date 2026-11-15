@@ -13,6 +13,7 @@ import {
   recordEventLevelOnServer,
   claimDailyGiftOnServer,
   claimPresentOnServer,
+  claimGlowbugRowOnServer,
   claimWinGiftOnServer,
   choosePalOnServer,
   setNicknameOnServer,
@@ -491,6 +492,12 @@ export function PlayerProvider({ children }) {
         const state = await claimPresentOnServer();
         applyServerState(state);
         return state.gift;
+      },
+
+      /** Collects a finished Glowbug row's diamond (accounts only: diamonds need one). @throws when not ready */
+      async claimGlowbugRow(kind) {
+        if (!userId) throw new EconomyError('Sign in to use diamonds.');
+        applyServerState(await claimGlowbugRowOnServer(kind));
       },
 
       /** @throws EconomyError when none are left */

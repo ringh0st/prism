@@ -34,6 +34,8 @@ export function createEmptyProgress() {
     winStreak: 0,
     // Legendary/Mythic Pals adopted this week (from the server; see pals.js).
     rareAdopts: 0,
+    // Glowbug rows whose diamond was collected (accounts; see glowbugs.js).
+    glowbugRowsClaimed: [],
     giftDate: null,
     // Calendar gifts opened (the day in the 7-day gift calendar; see gifts.js).
     giftDays: 0,
@@ -243,6 +245,7 @@ export function withServerState(progress, state, today) {
     sparkPurchases: { date: today, count: state.sparkPurchasesToday },
     claimedChests: state.claimedChests ?? progress.claimedChests,
     rareAdopts: state.rareAdopts ?? 0,
+    glowbugRowsClaimed: state.glowbugRowsClaimed ?? progress.glowbugRowsClaimed,
     giftDate: state.lastGiftDate ?? progress.giftDate,
     giftDays: state.giftDays ?? progress.giftDays,
     presents: { opened: state.presentsOpened ?? progress.presents.opened },

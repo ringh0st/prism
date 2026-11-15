@@ -6,7 +6,8 @@ import Button from '../../components/Button.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import HelpTip from '../../components/game/HelpTip.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { GLOWBUGS, rescuedGlowbugs } from '../../game/glowbugs.js';
+import { GLOWBUGS, GLOWBUG_KINDS, rescuedGlowbugs } from '../../game/glowbugs.js';
+import GlowbugRowPrize from './GlowbugRowPrize.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { glowbugBio, glowbugName, glowbugTitle } from '../../i18n/groveText.js';
 import styles from './GlowbugGarden.module.css';
@@ -14,11 +15,13 @@ import styles from './GlowbugGarden.module.css';
 /**
  * The Glowbug Garden: every Glowbug you've rescued (by three-starring the level it napped on), with the
  * ones still out there as gentle silhouettes (★ for rare ones). Tap a rescued one to meet it; "?" says how.
+ * One row per kind (its 5 colors): a full row earns a diamond, collected at the row's end.
  */
 export default function GlowbugGarden() {
   const { progress } = usePlayer();
   const { t, lang } = useI18n();
   const [meeting, setMeeting] = useState(null);
+  const [message, setMessage] = useState('');
   const rescued = rescuedGlowbugs(progress.levels);
   const found = GLOWBUGS.filter((bug) => rescued.has(bug.id)).length;
   const meetingName = meeting && glowbugName(lang, meeting);
@@ -46,36 +49,51 @@ export default function GlowbugGarden() {
             <p>{t('garden.how')}</p>
           </HelpTip>
         </section>
-        <ul className={styles.grid}>
-          {GLOWBUGS.map((bug) => {
-            const times = rescued.get(bug.id) ?? 0;
-            const name = glowbugName(lang, bug);
-            const title = glowbugTitle(lang, bug);
+        {message && (
+          <p className={styles.message} role="status">
+            {message}
+          </p>
+        )}
+        <ul className={styles.rows}>
+          {GLOWBUG_KINDS.map((kind) => {
+            const bugs = GLOWBUGS.filter((bug) => bug.kind === kind.id);
             return (
-              <li key={bug.id}>
-                {times ? (
-                  <button
-                    type="button"
-                    className={styles.bug}
-                    onClick={() => setMeeting(bug)}
-                    aria-label={t(times > 1 ? 'garden.bugLabelTimes' : 'garden.bugLabel', { name, title, times })}
-                  >
-                    <GlowbugArt id={bug.id} size={64} />
-                    <span className={styles.name}>{name}</span>
-                    {times > 1 && <span className={styles.times}>×{times}</span>}
-                  </button>
-                ) : (
-                  <span
-                    className={`${styles.bug} ${styles.missing}`}
-                    role="img"
-                    aria-label={bug.rare ? t('garden.missingRare') : t('garden.missing')}
-                  >
-                    <GlowbugArt id={bug.id} size={64} isSilhouette />
-                    <span className={styles.name} aria-hidden="true">
-                      {bug.rare ? '★' : '?'}
-                    </span>
-                  </span>
-                )}
+              <li key={kind.id} className={styles.row}>
+                <ul className={styles.grid}>
+                  {bugs.map((bug) => {
+                    const times = rescued.get(bug.id) ?? 0;
+                    const name = glowbugName(lang, bug);
+                    const title = glowbugTitle(lang, bug);
+                    return (
+                      <li key={bug.id}>
+                        {times ? (
+                          <button
+                            type="button"
+                            className={styles.bug}
+                            onClick={() => setMeeting(bug)}
+                            aria-label={t(times > 1 ? 'garden.bugLabelTimes' : 'garden.bugLabel', { name, title, times })}
+                          >
+                            <GlowbugArt id={bug.id} size={46} />
+                            <span className={styles.name}>{name}</span>
+                            {times > 1 && <span className={styles.times}>×{times}</span>}
+                          </button>
+                        ) : (
+                          <span
+                            className={`${styles.bug} ${styles.missing}`}
+                            role="img"
+                            aria-label={bug.rare ? t('garden.missingRare') : t('garden.missing')}
+                          >
+                            <GlowbugArt id={bug.id} size={46} isSilhouette />
+                            <span className={styles.name} aria-hidden="true">
+                              {bug.rare ? '★' : '?'}
+                            </span>
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+                <GlowbugRowPrize kind={kind.id} found={bugs.filter((bug) => rescued.has(bug.id)).length} total={bugs.length} onMessage={setMessage} />
               </li>
             );
           })}
