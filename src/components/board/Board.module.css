@@ -77,6 +77,22 @@
   border-radius: 26%;
   background: var(--surface-cell);
   box-shadow: var(--shadow-sm);
+  transition:
+    background 350ms ease,
+    box-shadow 350ms ease;
+}
+
+/* Every other tile a shade deeper in the world's color, like a candy-box checkerboard */
+.plateAlt {
+  background: var(--surface-cell-alt, var(--surface-cell));
+}
+
+/* Where the light passes, the tile catches its warm glow */
+.plateLit {
+  background: color-mix(in srgb, var(--color-honey) 26%, var(--surface-cell));
+  box-shadow:
+    var(--shadow-sm),
+    0 0 10px rgba(255, 213, 74, 0.45);
 }
 
 .beams {
@@ -217,7 +233,7 @@
 .gem {
   transform-origin: 50px 50px;
   opacity: var(--gem-unlit-opacity);
-  filter: saturate(0.6);
+  filter: saturate(0.85);
   transition:
     opacity var(--duration-base) ease,
     filter var(--duration-base) ease;
@@ -225,7 +241,8 @@
 
 .gemLit {
   opacity: 1;
-  filter: none;
+  /* A lit gem shines (only light glows in this game) */
+  filter: drop-shadow(0 0 7px rgba(255, 236, 170, 0.95));
   animation:
     gemPop 600ms var(--ease-pop),
     gemPulse 1.8s ease-in-out 600ms infinite;

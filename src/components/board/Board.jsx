@@ -6,7 +6,7 @@ import GlowbugArt from '../glowbugs/GlowbugArt.jsx';
 import { glowbugById } from '../../game/glowbugs.js';
 import { glowbugName } from '../../i18n/groveText.js';
 import { describeTile } from '../../game/describe.js';
-import { isRotatable as tileIsRotatable } from '../../game/beam.js';
+import { cellsOnBeams, isRotatable as tileIsRotatable } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
 import { flyToCounter, gemBurst } from '../../lib/effects.js';
 import CoachHand from './CoachHand.jsx';
@@ -113,6 +113,7 @@ export default function Board({
   }, [trace.litGems, tiles, width, isEditing]);
 
   const hasLitShade = trace.litShades.size > 0;
+  const litPlates = useMemo(() => (isEditing ? new Set() : cellsOnBeams(trace.segments, width, height)), [trace.segments, width, height, isEditing]);
 
   return (
     <div
@@ -122,8 +123,12 @@ export default function Board({
     >
       <TileDefs />
       <div className={styles.floor} aria-hidden="true">
+        {/* A checkerboard in the world's colors; the cells the light passes through glow in its color. */}
         {Array.from({ length: width * height }, (_, cell) => (
-          <span key={cell} className={styles.plate} />
+          <span
+            key={cell}
+            className={`${styles.plate} ${(Math.floor(cell / width) + (cell % width)) % 2 ? styles.plateAlt : ''} ${litPlates.has(cell) ? styles.plateLit : ''}`}
+          />
         ))}
       </div>
       <BeamLayer width={width} height={height} segments={trace.segments} />

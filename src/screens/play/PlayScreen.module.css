@@ -141,39 +141,52 @@
 
 /* ---------- Each world's own look: board and cells take on the world's colors ---------- */
 .themed {
-  --surface-board: color-mix(in srgb, var(--world-tint) 30%, var(--board-base));
-  --surface-cell: color-mix(in srgb, var(--world-tint) 7%, var(--cell-base));
+  --surface-board: color-mix(in srgb, var(--world-tint) 45%, var(--board-base));
+  --surface-cell: color-mix(in srgb, var(--world-tint) 12%, var(--cell-base));
+  --surface-cell-alt: color-mix(in srgb, var(--world-tint) 32%, var(--cell-base));
+  /* Mirrors in a deep, rich color of the world (they stand out from the light tiles), with a bright face */
+  --mirror-top: color-mix(in srgb, var(--world-piece) 55%, #fff4dc);
+  --mirror-bottom: var(--world-piece);
+  --pivot-fill: color-mix(in srgb, var(--world-tint) 35%, transparent);
 }
 
 .sunshine {
+  --world-piece: #3f8a64;
   --world-tint: #9fcf9a;
 }
 
 .tangerine {
+  --world-piece: #cf6a3a;
   --world-tint: #f2a67e;
 }
 
 .coral {
+  --world-piece: #c2513c;
   --world-tint: #df9078;
 }
 
 .mint {
+  --world-piece: #2a8a7a;
   --world-tint: #7cc8b5;
 }
 
 .ember {
+  --world-piece: #b45f2c;
   --world-tint: #d8946a;
 }
 
 .lime {
+  --world-piece: #5c9530;
   --world-tint: #a9cf7c;
 }
 
 .peach {
+  --world-piece: #cc7148;
   --world-tint: #e9b393;
 }
 
 .gold {
+  --world-piece: #b08a22;
   --world-tint: #d9bb63;
 }
 
@@ -182,4 +195,10 @@
 .calm [data-scenery] * {
   animation: none !important;
   transition: none !important;
+}
+
+/* Night boards stay dark: light mirrors keep the pieces easy to see there */
+.themed.night {
+  --mirror-top: #f6efe4;
+  --mirror-bottom: #cbbca9;
 }

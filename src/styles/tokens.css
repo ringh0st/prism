@@ -66,7 +66,7 @@
   /* Mirrors: dark graphite on light cells, pale silver on dark cells */
   --mirror-top: #7d6e63;
   --mirror-bottom: #4a3e36;
-  --gem-unlit-opacity: 0.75;
+  --gem-unlit-opacity: 0.9;
   --scene-hill-near: #dcebd9;
   --scene-hill-far: #e9f1e3;
   --scene-sun: #fbedc9;
