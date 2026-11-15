@@ -1,7 +1,6 @@
 import { accessoryById, palStage } from '../../game/pals.js';
 import { PAL_GROWTH } from './palGrowth.jsx';
 import { ThemeOutfit } from './themeOutfitArt.jsx';
-import { PAL_PICTURES, picturePlacement } from './palPictures.js';
 import { formPlacement, formPortraitBox, hasFormPictures } from './palForms.js';
 import styles from './PalArt.module.css';
 
@@ -720,36 +719,9 @@ function Accessory({ id, hat, neck }) {
   }
 }
 
-// Items that hug the head from both sides, fitted to the head's width.
-const EAR_ITEMS = new Set(['headphones', 'earmuffs']);
 // Circlets draw their band lower than hats do; on the pictures they sit up on the crown of the head.
 const CIRCLETS = new Set(['leafCrown', 'flowerCrown', 'moonCirclet']);
 const CIRCLET_LIFT = 5;
-
-/**
- * An outfit piece on a Pal drawn as a picture: hats on the measured top of its head, ear items stretched to its
- * head's width, and neck pieces moved onto the center of its chest (they're drawn around x=50).
- */
-function PictureAccessory({ id, picture }) {
-  const { hat, ears, neck, chest } = picture;
-  if (EAR_ITEMS.has(id)) {
-    const [x] = ears.at;
-    return (
-      <g transform={`translate(${x} 0) scale(${ears.stretch} 1) translate(${-x} 0)`}>
-        <Accessory id={id} hat={ears.at} neck={neck} />
-      </g>
-    );
-  }
-  if (CIRCLETS.has(id)) return <Accessory id={id} hat={[hat[0], hat[1] - CIRCLET_LIFT]} neck={neck} />;
-  if (slotOf(id) === 'neck') {
-    return (
-      <g transform={`translate(${chest - 50} 0)`}>
-        <Accessory id={id} hat={hat} neck={neck} />
-      </g>
-    );
-  }
-  return <Accessory id={id} hat={hat} neck={neck} />;
-}
 
 /** Each form is a little bigger; Legends also sparkle. */
 const STAGE_SCALES = [0.72, 0.84, 0.94, 1, 1.04];
@@ -815,7 +787,11 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
           <image href={form.src} x={form.x} y={form.y} width={form.width} height={form.height} />
           {outfitOrder.map((id) => (
             <g key={id} transform={form.outfit[slotOf(id)]}>
-              <Accessory id={id} hat={form.outfit.hat} neck={form.outfit.neckY} />
+              <Accessory
+                id={id}
+                hat={CIRCLETS.has(id) ? [form.outfit.hat[0], form.outfit.hat[1] - CIRCLET_LIFT] : form.outfit.hat}
+                neck={form.outfit.neckY}
+              />
             </g>
           ))}
         </g>
@@ -825,9 +801,7 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
   }
 
   const scale = STAGE_SCALES[stageIndex];
-  // Pals with a finished illustration show it (their forms grow in size; the drawn growth parts are for the old shapes).
-  const picture = PAL_PICTURES[palId] ? picturePlacement(PAL_PICTURES[palId]) : null;
-  const growth = picture ? { back: [], front: [] } : growthLayers(palId, art, stageIndex);
+  const growth = growthLayers(palId, art, stageIndex);
   const { hat, neck } = art;
   return (
     <svg {...svgProps} viewBox={viewBoxFor(scale, portrait)}>
@@ -835,11 +809,11 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
       <g transform={`translate(50 94) scale(${scale}) translate(-50 -94)`}>
         <g className={styles.body}>
           {growth.back}
-          {picture ? <image href={PAL_PICTURES[palId].src} x={picture.x} y={picture.y} width={picture.width} height={picture.height} /> : art.base}
+          {art.base}
           {growth.front}
-          {outfitOrder.map((id) =>
-            picture ? <PictureAccessory key={id} id={id} picture={picture} /> : <Accessory key={id} id={id} hat={hat} neck={neck} />,
-          )}
+          {outfitOrder.map((id) => (
+            <Accessory key={id} id={id} hat={hat} neck={neck} />
+          ))}
         </g>
       </g>
       {sparkles}
