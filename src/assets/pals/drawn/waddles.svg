@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="480" height="480"><defs>
+<linearGradient id="waddles-back" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6e63"/><stop offset="1" stop-color="#55483f"/></linearGradient>
+<linearGradient id="waddles-cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbf4"/><stop offset="1" stop-color="#f3e6d3"/></linearGradient>
+<linearGradient id="waddles-peach" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f9be98"/><stop offset="1" stop-color="#eb9a6e"/></linearGradient>
+<filter id="waddles-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#waddles-st)" stroke-linejoin="round" stroke-linecap="round">
+<path d="M34 89C30 90 26 93 28 95 32 96 38 95 44 93 44 90 40 88 34 89Z" fill="url(#waddles-peach)" stroke="#c4724a" stroke-width="1.5"/>
+<path d="M66 89C70 90 74 93 72 95 68 96 62 95 56 93 56 90 60 88 66 89Z" fill="url(#waddles-peach)" stroke="#c4724a" stroke-width="1.5"/>
+<path d="M22 58C14 62 9 70 10 79 13 80 18 76 22 70Z" fill="url(#waddles-back)" stroke="#3f342d" stroke-width="1.5"/>
+<path d="M50 23C68 23 80 38 81 56 82 76 72 92 50 92S18 76 19 56C20 38 32 23 50 23Z" fill="url(#waddles-back)" stroke="#3f342d" stroke-width="1.5"/>
+<path d="M48 23.4C46 19 48 16 52 15 51 17.4 52 19 54 19.6 53 21 52.6 22.4 53 24" fill="url(#waddles-back)" stroke="#3f342d" stroke-width="1.4"/>
+<path d="M50 39C45 34 32 34 29 45 27 54 31 62 37 66 32 72 31 81 35 87 40 91 60 91 65 87 69 81 68 72 63 66 69 62 73 54 71 45 68 34 55 34 50 39Z" fill="url(#waddles-cream)" stroke="#c9b49c" stroke-width="1.2"/>
+<path d="M42 75l1.6 2.4M50 77v2.6M58 75l-1.6 2.4M46 82l1 2M54 82l-1 2" stroke="#e5d3bd" stroke-width="1"/>
+<path d="M78 58C84 66 82 76 73 84 69 86 67 82 69 78 73 72 75 66 74 60Z" fill="url(#waddles-back)" stroke="#3f342d" stroke-width="1.5"/>
+<path d="M76 66c0 4-1 7-3 10" stroke="#a69588" stroke-width="1.2" fill="none" opacity=".7"/>
+<path d="M27 41c3-8 10-13 17-14" stroke="#fff" stroke-width="2" fill="none" opacity=".4"/>
+<path d="M14 66c1-2 3-4 5-5" stroke="#a69588" stroke-width="1.2" fill="none" opacity=".7"/>
+<circle cx="39" cy="51" r="5.9" fill="#3a1e12"/><ellipse cx="39" cy="54.6" rx="3.6" ry="1.9" fill="#8a5a44" opacity=".6"/><circle cx="41.2" cy="48.6" r="2.3" fill="#fff"/><circle cx="36.9" cy="53.8" r=".9" fill="#fff"/>
+<circle cx="61" cy="51" r="5.9" fill="#3a1e12"/><ellipse cx="61" cy="54.6" rx="3.6" ry="1.9" fill="#8a5a44" opacity=".6"/><circle cx="63.2" cy="48.6" r="2.3" fill="#fff"/><circle cx="58.9" cy="53.8" r=".9" fill="#fff"/>
+<ellipse cx="32" cy="59" rx="4.2" ry="2.6" fill="#f79a86" opacity=".6"/><ellipse cx="68" cy="59" rx="4.2" ry="2.6" fill="#f79a86" opacity=".6"/>
+<path d="M45.4 56.4C47 55 53 55 54.6 56.4 54.6 58.6 52 61.4 50 61.6 48 61.4 45.4 58.6 45.4 56.4Z" fill="url(#waddles-peach)" stroke="#c4724a" stroke-width="1.2"/>
+<path d="M46.4 57.8c2 .9 5.2.9 7.2 0" stroke="#c4724a" stroke-width=".9" fill="none"/>
+<path d="M47.6 56.4c1-.4 2-.5 3-.4" stroke="#fff" stroke-width=".8" opacity=".8"/>
+<path d="M32 92.4l1.2 1.6M36.6 92.6l.6 1.6M68 92.4l-1.2 1.6M63.4 92.6l-.6 1.6" stroke="#d9845a" stroke-width=".9" opacity=".8"/>
+</g></svg>

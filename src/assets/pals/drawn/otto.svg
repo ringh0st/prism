@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="480" height="480"><defs><linearGradient id="otto-fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d6a17a"/><stop offset="1" stop-color="#a8704b"/></linearGradient><linearGradient id="otto-cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6ea"/><stop offset="1" stop-color="#f1dcc2"/></linearGradient><linearGradient id="otto-stone" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d7d0c6"/><stop offset="1" stop-color="#a99f93"/></linearGradient><linearGradient id="otto-dk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9a6342"/><stop offset="1" stop-color="#7a4a2f"/></linearGradient><filter id="otto-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#otto-st)">
+<path d="M60 86C70 90 80 92 88 88 93 85 95 79 93 74 92 72 90 73 90 75 89 80 84 82 78 81 72 80 66 76 62 74Z" fill="url(#otto-fur)" stroke="#7c4b2f" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M70 86c6 1.4 12 1 16-1.6" stroke="#e8c09e" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.7"/>
+<path d="M50 62C61 62 67 70 68 80 69 89 64 94 56 94H44C36 94 31 89 32 80 33 70 39 62 50 62Z" fill="url(#otto-fur)" stroke="#7c4b2f" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M50 66c7 0 11 5.6 11.6 13 .6 8-3.6 12.4-11.6 12.4S37.8 87 38.4 79C39 71.6 43 66 50 66Z" fill="url(#otto-cream)" stroke="#c99a76" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M34 92.6c0-3 2.4-5 6-5 3.4 0 5.6 2 5.6 5 0 1.6-1.6 2.4-5.8 2.4S34 94.2 34 92.6Z" fill="url(#otto-dk)" stroke="#7c4b2f" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M54.4 92.6c0-3 2.2-5 5.6-5 3.6 0 6 2 6 5 0 1.6-1.6 2.4-5.8 2.4s-5.8-.8-5.8-2.4Z" fill="url(#otto-dk)" stroke="#7c4b2f" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M38 93.4v-2M41 93.6v-2.2M58.4 93.4v-2M61.4 93.6v-2.2" stroke="#c08a66" stroke-width="0.9" fill="none" stroke-linecap="round" opacity="1"/>
+<ellipse cx="62" cy="79" rx="7.4" ry="5.6" transform="rotate(-12 62 79)" fill="url(#otto-stone)" stroke="#857a6e" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M58 76.4c1.6-1 3.6-1.4 5.4-1.2" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.8"/>
+<path d="M66 76c2.6-.6 5 .4 5.8 2.6.8 2.4-.4 4.8-2.8 5.6-2 .6-4-.4-4.6-2.2" fill="url(#otto-fur)" stroke="#7c4b2f" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M50 80.4c1.8-2.4 5-3 7-1.4 1.6 1.4 1.4 3.8-.4 5-1.8 1.2-4.4 1-6-.6" fill="url(#otto-fur)" stroke="#7c4b2f" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M68.4 83.4l.4-1.4M70.6 82.4l.2-1.4" stroke="#7c4b2f" stroke-width="0.8" fill="none" stroke-linecap="round" opacity="0.8"/>
+<path d="M24 38c-4-1-6.6 2-5.6 5.4.8 2.6 3.6 3.4 5.6 2.4" fill="url(#otto-fur)" stroke="#7c4b2f" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M76 38c4-1 6.6 2 5.6 5.4-.8 2.6-3.6 3.4-5.6 2.4" fill="url(#otto-fur)" stroke="#7c4b2f" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M22.6 40.6c-1.6 0-2.4 1.4-1.8 2.8" fill="none" stroke="#f0c4b0" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M77.4 40.6c1.6 0 2.4 1.4 1.8 2.8" fill="none" stroke="#f0c4b0" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M50 25C65 25 78 30 79 43 80 53 77 61 70 65 64 69 57 70 50 70S36 69 30 65C23 61 20 53 21 43 22 30 35 25 50 25Z" fill="url(#otto-fur)" stroke="#7c4b2f" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M28 33c6-5 14-6.4 22-6.4S66 28 72 33c-6-1.6-13-2.4-22-2.4S34 31.4 28 33Z" fill="#9a6342" opacity=".35"/>
+<path d="M50 54.4c-3 0-5 1.6-6 3.2-3-1-7-.6-9 2-1.6 2.4-.4 5.4 2.4 6.6 4 2 8 3.4 12.6 3.4s8.6-1.4 12.6-3.4c2.8-1.2 4-4.2 2.4-6.6-2-2.6-6-3-9-2-1-1.6-3-3.2-6-3.2Z" fill="url(#otto-cream)" stroke="#c99a76" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="41" cy="62" r=".7" fill="#a8704b"/><circle cx="43.6" cy="63.6" r=".7" fill="#a8704b"/><circle cx="59" cy="62" r=".7" fill="#a8704b"/><circle cx="56.4" cy="63.6" r=".7" fill="#a8704b"/>
+<path d="M28 38c4-6 11-9 18-9.6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".5"/>
+<circle cx="39" cy="51" r="5.9" fill="#3a1e12"/><ellipse cx="39" cy="54.6" rx="3.6" ry="1.9" fill="#8a5a44" opacity=".6"/><circle cx="41" cy="48.6" r="2.3" fill="#fff"/><circle cx="37" cy="53.8" r=".9" fill="#fff"/><circle cx="61" cy="51" r="5.9" fill="#3a1e12"/><ellipse cx="61" cy="54.6" rx="3.6" ry="1.9" fill="#8a5a44" opacity=".6"/><circle cx="63" cy="48.6" r="2.3" fill="#fff"/><circle cx="59" cy="53.8" r=".9" fill="#fff"/>
+<ellipse cx="32" cy="58.6" rx="4.8" ry="2.8" fill="#f79a86" opacity=".6"/><ellipse cx="68" cy="58.6" rx="4.8" ry="2.8" fill="#f79a86" opacity=".6"/>
+<path d="M46.6 56.4h6.8c.9 0 1.3 1 .7 1.6l-3 2.6c-.6.5-1.4.5-2 0l-3-2.6c-.6-.6-.2-1.6.5-1.6z" fill="#4a2a1c"/><ellipse cx="48.8" cy="57.3" rx="1.2" ry=".5" fill="#fff" opacity=".6"/>
+<path d="M50 60.4v1.6M46.8 62.6c1.2 1.6 2.4 1.6 3.2 0 .8 1.6 2 1.6 3.2 0" stroke="#3a1e12" stroke-width="1.3" fill="none" stroke-linecap="round" opacity="1"/>
+<path d="M36 60l-12-2M36 63l-11.6 1.6M64 60l12-2M64 63l11.6 1.6" stroke="#7c4b2f" stroke-width="0.9" fill="none" stroke-linecap="round" opacity="0.8"/>
+</g></svg>
