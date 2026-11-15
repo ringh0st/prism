@@ -1,6 +1,7 @@
 import { accessoryById, palStage } from '../../game/pals.js';
 import { PAL_GROWTH } from './palGrowth.jsx';
 import { ThemeOutfit } from './themeOutfitArt.jsx';
+import { PAL_PICTURES, picturePlacement } from './palPictures.js';
 import styles from './PalArt.module.css';
 
 const SLOT_ORDER = ['neck', 'head', 'hand'];
@@ -754,7 +755,11 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
   if (!art) return null;
   const stageIndex = palStage(stage).index;
   const scale = STAGE_SCALES[stageIndex];
-  const growth = growthLayers(palId, art, stageIndex);
+  // Pals with a finished illustration show it (their forms grow in size; the drawn growth parts are for the old shapes).
+  const picture = PAL_PICTURES[palId] ? picturePlacement(PAL_PICTURES[palId]) : null;
+  const growth = picture ? { back: [], front: [] } : growthLayers(palId, art, stageIndex);
+  const hat = picture ? picture.hat : art.hat;
+  const neck = picture ? picture.neck : art.neck;
   return (
     <svg
       className={`${alive ? styles.alive : ''} ${className}`}
@@ -772,10 +777,10 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
       <g transform={`translate(50 94) scale(${scale}) translate(-50 -94)`}>
         <g className={styles.body}>
           {growth.back}
-          {art.base}
+          {picture ? <image href={PAL_PICTURES[palId].src} x={picture.x} y={picture.y} width={picture.width} height={picture.height} /> : art.base}
           {growth.front}
           {[...wearing].sort(bySlotOrder).map((id) => (
-            <Accessory key={id} id={id} hat={art.hat} neck={art.neck} />
+            <Accessory key={id} id={id} hat={hat} neck={neck} />
           ))}
         </g>
       </g>
