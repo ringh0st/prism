@@ -328,3 +328,33 @@
   display: inline-block;
   transform: scaleX(-1);
 }
+
+/* 50, 100, 250… levels: a big golden trophy with the number */
+.milestone {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 auto;
+  padding: 8px 22px;
+  width: fit-content;
+  border-radius: var(--radius-pill);
+  font-size: 34px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: var(--shadow-md);
+  animation: milestonePop 700ms var(--ease-pop) both;
+}
+
+@keyframes milestonePop {
+  from {
+    opacity: 0;
+    transform: scale(0.3) rotate(-12deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .milestone {
+    animation: none;
+  }
+}

@@ -1098,3 +1098,21 @@ test('translations: every key the screens ask for exists in English', async () =
     }
   }
 });
+
+test('win streak and level milestones', async () => {
+  const { nextWinStreak, streakBoosters, winsToNextBonus } = await import('./winStreak.js');
+  const { milestoneReached, solvedLevelCount } = await import('./milestones.js');
+  const { levelNumber } = await import('./worlds.js');
+  let streak = 0;
+  for (let i = 0; i < 3; i++) streak = nextWinStreak(streak, { isWin: true });
+  assert.deepEqual(streakBoosters(streak), ['spareMoves']);
+  assert.equal(winsToNextBonus(streak), 3);
+  assert.deepEqual(streakBoosters(6), ['spareMoves', 'steadyHand']);
+  assert.equal(nextWinStreak(7, { isWin: false }), 0, 'running out of moves ends it');
+  assert.equal(milestoneReached(49, 50), 50);
+  assert.equal(milestoneReached(50, 51), null);
+  assert.equal(solvedLevelCount({ levels: { 'w1-01': { stars: 2 }, 'w1-02': { stars: 0 }, 'event-2026-01-03-1': { stars: 3 } } }), 1);
+  assert.equal(levelNumber(1, 1), 1);
+  assert.equal(levelNumber(8, 8), 148);
+  assert.equal(levelNumber(50, 20), 1000);
+});

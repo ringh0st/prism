@@ -129,6 +129,8 @@ export default function LevelIntro({
           <BoosterPicker
             owned={boosters.owned}
             chosen={boosters.chosen}
+            free={boosters.free}
+            streak={boosters.streak}
             onToggle={(id) => {
               setIsPicking(true);
               boosters.onToggle(id);

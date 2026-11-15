@@ -52,6 +52,8 @@ import { starsForMoves } from '../game/scoring.js';
 import { claimQuestLocally, questWeekOf, questsForWeek, recordQuestProgress } from '../game/quests.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
 import { recordPalFeats } from '../game/palRecords.js';
+import { nextWinStreak } from '../game/winStreak.js';
+import { milestoneReached, solvedLevelCount } from '../game/milestones.js';
 import { claimCalendarGiftLocally, claimWinGiftLocally, openPresentLocally, recordDailyWin } from '../game/gifts.js';
 import { nicknameProblem } from '../game/nicknames.js';
 import {
@@ -203,9 +205,17 @@ export function PlayerProvider({ children }) {
       /** This player's number for their daily Shop picks. */
       shopSeed: userId ? seedFor(userId) : progress.shopSeed,
 
+      /** Running out of moves on the main road ends the win streak. */
+      endWinStreak() {
+        if (progressRef.current.winStreak > 0)
+          setProgress({ ...progressRef.current, winStreak: nextWinStreak(progressRef.current.winStreak, { isWin: false }) });
+      },
+
       /** @returns Promise<{ stars, previousStars, sparksEarned, diamondsEarned, isNewBest }> */
       async finishLevel(level, result) {
         const local = recordLevelResult(progressRef.current, level, result);
+        // 50, 100, 250… levels solved: a party on the win screen.
+        local.milestone = milestoneReached(solvedLevelCount(progressRef.current), solvedLevelCount(local.progress));
         const hotStreak = nextHotStreak(progressRef.current, {
           stars: local.stars,
           usedHelpers: result.usedHelpers,
@@ -218,6 +228,7 @@ export function PlayerProvider({ children }) {
         // The partner Pal grows with every solved level (a Skip doesn't count). The server does the same.
         if (Number.isFinite(result.moves)) {
           local.progress = recordDailyWin(local.progress, level.id, todayKey());
+          local.progress = { ...local.progress, winStreak: nextWinStreak(local.progress.winStreak, { isWin: true }) };
           const grown = growPartnerLocally(local.progress);
           local.progress = grown.progress;
           local.palGrewTo = grown.grewTo;

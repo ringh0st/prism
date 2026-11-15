@@ -214,6 +214,15 @@ a.node:active {
   line-height: 1;
 }
 
+/* Level numbers run to 1000: longer numbers get a little smaller to fit the node */
+.nodeNumber[data-digits='3'] {
+  font-size: 20px;
+}
+
+.nodeNumber[data-digits='4'] {
+  font-size: 16px;
+}
+
 .doneNode {
   --fill-bottom: var(--reward-bottom);
   --ledge: var(--reward-ledge);
@@ -262,6 +271,14 @@ a.node:active {
 
 .extra .nodeNumber {
   font-size: 32px;
+}
+
+.extra .nodeNumber[data-digits='3'] {
+  font-size: 25px;
+}
+
+.extra .nodeNumber[data-digits='4'] {
+  font-size: 20px;
 }
 
 .nodeStars {

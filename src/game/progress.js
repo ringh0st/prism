@@ -30,6 +30,8 @@ export function createEmptyProgress() {
     beamTheme: 'sunbeam',
     claimedChests: [],
     hotStreak: 0,
+    // Main-road levels won in a row (see winStreak.js).
+    winStreak: 0,
     giftDate: null,
     // Calendar gifts opened (the day in the 7-day gift calendar; see gifts.js).
     giftDays: 0,

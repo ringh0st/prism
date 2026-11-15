@@ -1,3 +1,4 @@
+import { levelNumber } from '../../game/worlds.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import CurrencyHud from '../../components/game/CurrencyHud.jsx';
 import BottomNav from '../../components/game/BottomNav.jsx';
@@ -172,7 +173,7 @@ export default function MapScreen() {
             className={styles.playButton}
             aria-label={[
               t('map.play'),
-              t('level.title', { label: `${currentRef.world}-${currentRef.index}` }),
+              t('level.title', { label: levelNumber(currentRef.world, currentRef.index) }),
               progress.hotStreak >= 2 && t('map.hotStreak', { count: progress.hotStreak }),
             ]
               .filter(Boolean)
@@ -186,7 +187,7 @@ export default function MapScreen() {
               </span>
             )}
             <span className={styles.playLevel} dir="ltr" aria-hidden="true">
-              {currentRef.world}-{currentRef.index}
+              {levelNumber(currentRef.world, currentRef.index)}
             </span>
           </a>
         )}

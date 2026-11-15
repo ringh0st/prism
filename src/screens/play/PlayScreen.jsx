@@ -22,7 +22,7 @@ import Spotlight from '../../components/tour/Spotlight.jsx';
 import TileArt from '../../components/board/TileArt.jsx';
 import { unseenTips } from '../../game/levelTips.js';
 import WorldBackdrop from './WorldBackdrop.jsx';
-import { WORLDS } from '../../game/worlds.js';
+import { WORLDS, levelNumber } from '../../game/worlds.js';
 import OutOfMovesDialog from './OutOfMovesDialog.jsx';
 import WinDialog from './WinDialog.jsx';
 import { usePuzzle } from '../../hooks/usePuzzle.js';
@@ -35,6 +35,7 @@ import { playLightFinale } from '../../lib/lightFinale.js';
 import { moveLimitFor, starsForMoves } from '../../game/scoring.js';
 import { BOOSTERS_FROM_WORLD, HELPERS, HELPER_IDS, LENS_DURATION_MS, helpersAllowedFor, toolFor } from '../../game/catalog.js';
 import { useBoosters } from '../../hooks/useBoosters.js';
+import { streakBoosters } from '../../game/winStreak.js';
 import { isWorldComplete } from '../../game/progress.js';
 import { dailyShareText } from '../../game/share.js';
 import { PUBLIC_GAME_URL } from '../../lib/config.js';
@@ -107,7 +108,7 @@ function piecesToIntroduce(level, mode, progress) {
  * | 'rush' (Light Rush: no helpers, the run's spare moves set the limit; `rush` is from RushRoute)
  */
 export default function PlayScreen({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey, challenge = null, rush = null }) {
-  const { progress, settings, finishLevel, finishDaily, finishEventLevel, consumeHelper } = usePlayer();
+  const { progress, settings, finishLevel, finishDaily, finishEventLevel, consumeHelper, endWinStreak } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
   // Worlds 1–2: the first Hint in each level is free (beginners shouldn't run out of help).
@@ -163,8 +164,13 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const modifier = useMemo(() => levelModifierFor(level), [level]);
   const isFirstSteps = isFirstStepsLevel(level, mode);
   // Boosters: picked on the level card in the main road from World 2 (not in the daily, events, Rush or challenges).
+  const canBoost = mode === 'level' && level.world >= BOOSTERS_FROM_WORLD;
+  // A win streak (3+ in a row) gives free boosters for as long as it lasts, fixed when the level opens.
+  const [streak] = useState(() => (canBoost ? progress.winStreak : 0));
   const boosters = useBoosters({
-    enabled: mode === 'level' && level.world >= BOOSTERS_FROM_WORLD,
+    enabled: canBoost,
+    free: streakBoosters(streak),
+    streak,
     owned: progress.helpers,
     consumeHelper,
     puzzle,
@@ -196,7 +202,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           ? HELPER_IDS.filter((id) => id !== 'skip')
           : HELPER_IDS;
   const levelName = mode === 'daily' ? t('play.daily') : mode === 'playtest' ? title : title || levelTitle(lang, level);
-  const levelLabel = `${level.world}-${level.index}`;
+  // Built-in levels go by their number on the whole road (1 to 1000).
+  const levelLabel = Number.isInteger(level.world) ? String(levelNumber(level.world, level.index)) : level.id;
   // Built-in worlds have their own look (board colors and landscape) and show their name.
   const world = ['level', 'challenge', 'rush'].includes(mode) ? WORLDS[level.world - 1] : null;
   const backName = t(mode === 'event' ? 'place.event' : mode === 'rush' ? 'place.rush' : 'place.map');
@@ -214,8 +221,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           : mode === 'rush'
             ? t('play.rushSpot', { n: rush.number, total: RUSH_LENGTH })
             : world && lang !== 'en'
-              ? '' // the title already says "שלב 5-16"
-              : `${world ? `${worldName(lang, world)} · ` : ''}${level.world}-${level.index}`;
+              ? worldName(lang, world) // the title already says "שלב 148"
+              : `${world ? `${worldName(lang, world)} · ` : ''}${t('level.title', { label: levelLabel })}`;
   // The intro speaks only when the picture can't say it: a friend's score to beat, or the Rush's spare moves.
   const introLine = useMemo(
     () => (challenge ? t('intro.challenge', { count: challenge.moves }) : rush ? t('intro.rush', { count: rush.run.spare }) : ''),
@@ -442,11 +449,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         react('droop');
         setIsOutOfMoves(true);
         playStats.end('out_of_moves');
+        if (mode === 'level') endWinStreak();
       }, 450);
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [moves, playLimit, trace.isSolved, say, react, playStats]);
+  }, [moves, playLimit, trace.isSolved, say, react, playStats]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Tapping a piece that can't turn says why (a little shake, a soft "nope" and a word from Lumi).
   const [nudgedCell, setNudgedCell] = useState(null);
@@ -634,7 +642,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     boosters.start().then((used) => {
       if (!used.length) return;
       sfx.helper();
-      setLumi({ mood: 'excited', line: t(used.includes('headStart') ? 'lumi.headStart' : 'lumi.boosters') });
+      const line = used.includes('headStart') ? t('lumi.headStart') : streak >= 3 ? t('lumi.streak', { count: streak }) : t('lumi.boosters');
+      setLumi({ mood: 'excited', line });
     });
   }, [playStats, isFirstSteps, flavor, progress, newPieces, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 

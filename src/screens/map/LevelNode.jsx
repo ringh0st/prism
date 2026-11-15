@@ -1,3 +1,4 @@
+import { levelNumber } from '../../game/worlds.js';
 import Icon from '../../components/Icon.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
 import { DIFFICULTY } from '../../game/constants.js';
@@ -18,7 +19,7 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef 
   const { ref, x, y } = stop;
   const kindLabel = DIFFICULTY_LABEL[ref.difficulty];
   const label = [
-    t('level.title', { label: `${ref.world}-${ref.index}` }),
+    t('level.title', { label: levelNumber(ref.world, ref.index) }),
     kindLabel && t(kindLabel),
     isUnlocked ? t('map.node.stars', { count: stars, max: MAX_STARS }) : t('map.node.locked'),
     glowbug && t('map.node.glowbug'),
@@ -38,7 +39,13 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef 
         </span>
       )}
       <span className={styles.nodeFace}>
-        {isUnlocked ? <span className={`game-title ${styles.nodeNumber}`}>{ref.index}</span> : <Icon name="lock" size={22} strokeWidth={2.8} />}
+        {isUnlocked ? (
+          <span className={`game-title ${styles.nodeNumber}`} data-digits={String(levelNumber(ref.world, ref.index)).length}>
+            {levelNumber(ref.world, ref.index)}
+          </span>
+        ) : (
+          <Icon name="lock" size={22} strokeWidth={2.8} />
+        )}
       </span>
       {ref.difficulty === DIFFICULTY.HARD && (
         <span className={styles.flame} aria-hidden="true">

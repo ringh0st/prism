@@ -28,9 +28,10 @@ import { palName } from '../../i18n/palText.js';
 import { useCountUp } from '../../hooks/useCountUp.js';
 
 /** The headline's translation key. */
-function headlineFor({ stars, isSkipped, completesWorld, isFirstToday }, difficulty) {
+function headlineFor({ stars, isSkipped, completesWorld, isFirstToday, milestone }, difficulty) {
   if (isSkipped) return 'win.skipped';
   if (isFirstToday) return 'win.dailyDone';
+  if (milestone) return 'win.milestone';
   if (completesWorld) return 'win.worldComplete';
   if (stars === 3 && difficulty === DIFFICULTY.EXTRA) return 'win.legendary';
   if (difficulty === DIFFICULTY.EXTRA) return 'win.bossBeaten';
@@ -94,6 +95,7 @@ export default function WinDialog({
     shieldEarned = false,
     isSkipped,
     completesWorld,
+    milestone = null,
     palGrewTo = null,
     isFirstToday = false,
   } = result;
@@ -107,14 +109,21 @@ export default function WinDialog({
     const afterStars = 350 + stars * 260 + 150;
     if (sparksEarned > 0 || diamondsEarned > 0) timers.push(setTimeout(() => sfx.coin(), afterStars));
     // The big moments get their own sounds once the stars have landed.
-    const finale = completesWorld ? sfx.worldComplete : palGrewTo ? sfx.palGrow : isFirstToday ? sfx.reward : null;
+    const finale = completesWorld || milestone ? sfx.worldComplete : palGrewTo ? sfx.palGrow : isFirstToday ? sfx.reward : null;
     if (finale) timers.push(setTimeout(finale, afterStars + 450));
-    if (completesWorld || palGrewTo) timers.push(setTimeout(() => celebrate({ stars: 3, isBig: true }), afterStars + 450));
+    if (completesWorld || milestone || palGrewTo) timers.push(setTimeout(() => celebrate({ stars: 3, isBig: true }), afterStars + 450));
     return () => timers.forEach(clearTimeout);
-  }, [stars, sparksEarned, diamondsEarned, completesWorld, palGrewTo, isFirstToday]);
+  }, [stars, sparksEarned, diamondsEarned, completesWorld, milestone, palGrewTo, isFirstToday]);
 
   return (
-    <Dialog title={t(headlineFor(result, difficulty))} tone="celebrate" onClose={onMap} closesOnBackdrop={false}>
+    <Dialog title={t(headlineFor(result, difficulty), { count: milestone })} tone="celebrate" onClose={onMap} closesOnBackdrop={false}>
+      {milestone && (
+        // A milestone on the whole road: a trophy with the number of levels solved.
+        <p className={`game-title ${styles.milestone}`} aria-hidden="true">
+          <Icon name="trophy" size={36} />
+          <span dir="ltr">{milestone}</span>
+        </p>
+      )}
       <Stars count={stars} size={46} animate className={styles.stars} />
       {/* Moves used, and (short of ★★★) the moves that would earn it: numbers and pictures, words for screen readers. */}
       {isSkipped ? (

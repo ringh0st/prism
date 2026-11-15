@@ -77,6 +77,9 @@ export function difficultyFor(index) {
   return DIFFICULTY.NORMAL;
 }
 
+/** A built-in level's place on the whole road, 1 to 1000 ("Level 148"), so players see how far they've come. */
+export const levelNumber = (world, index) => (world - 1) * LEVELS_PER_WORLD + index;
+
 export const levelId = (world, index) => `w${world}-${String(index).padStart(2, '0')}`;
 
 export function parseLevelId(id) {
