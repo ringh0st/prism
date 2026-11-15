@@ -1,6 +1,8 @@
+import { useId, useMemo } from 'react';
 import { accessoryById, palStage } from '../../game/pals.js';
 import { PAL_GROWTH } from './palGrowth.jsx';
 import { ThemeOutfit } from './themeOutfitArt.jsx';
+import { ClayGradients, withClayShading } from './clayShading.jsx';
 import styles from './PalArt.module.css';
 
 const SLOT_ORDER = ['neck', 'head', 'hand'];
@@ -26,6 +28,9 @@ function Face({ y, gap = 10, eyeSize = 1, cx = 50 }) {
         <ellipse cx={cx + gap} cy={y} rx={rx} ry={ry} fill={INK} />
         <circle cx={cx - gap + 2} cy={y - 3} r={2.2 * eyeSize} fill="#fff" />
         <circle cx={cx + gap + 2} cy={y - 3} r={2.2 * eyeSize} fill="#fff" />
+        {/* A second, smaller sparkle low in each eye: the eyes look round and wet, not flat */}
+        <circle cx={cx - gap - 2} cy={y + 3} r={1 * eyeSize} fill="#fff" opacity=".8" />
+        <circle cx={cx + gap - 2} cy={y + 3} r={1 * eyeSize} fill="#fff" opacity=".8" />
       </g>
       <ellipse cx={cx - gap - 9} cy={y + 9} rx="5" ry="3" fill="#ff8f7f" opacity=".55" />
       <ellipse cx={cx + gap + 9} cy={y + 9} rx="5" ry="3" fill="#ff8f7f" opacity=".55" />
@@ -718,6 +723,9 @@ function Accessory({ id, hat, neck }) {
   }
 }
 
+/** Pals drawn at least this big get the soft clay edge. */
+const CLAY_EDGE_MIN_SIZE = 56;
+
 /** Each form is a little bigger; Legends also sparkle. */
 const STAGE_SCALES = [0.72, 0.84, 0.94, 1, 1.04];
 
@@ -750,11 +758,33 @@ const blinkDelay = (palId) => `${-([...palId].reduce((sum, char) => sum + char.c
  * `portrait` zooms in on the Pal, for round avatars. `alive` makes it breathe and blink (for big, featured Pals).
  */
 export default function PalArt({ palId, stage = 0, wearing = [], size = 64, portrait = false, alive = false, label, className = '' }) {
+  const uid = useId().replace(/:/g, '');
+  // The clay edge (an SVG filter) is for Pals shown big enough to see it; tiny ones skip it to stay light.
+  const hasClayEdge = typeof size !== 'number' || size >= CLAY_EDGE_MIN_SIZE;
   const art = ART[palId];
-  if (!art) return null;
   const stageIndex = palStage(stage).index;
   const scale = STAGE_SCALES[stageIndex];
-  const growth = growthLayers(palId, art, stageIndex);
+  const wornKey = [...wearing].sort(bySlotOrder).join(',');
+  // Every shape gets its own soft clay light (see clayShading.jsx); worked out once per Pal, form and outfit.
+  const clay = useMemo(() => {
+    if (!art) return null;
+    const growth = growthLayers(palId, art, stageIndex);
+    const drawing = (
+      <>
+        {growth.back}
+        {art.base}
+        {growth.front}
+        {wornKey
+          .split(',')
+          .filter(Boolean)
+          .map((id) => (
+            <Accessory key={id} id={id} hat={art.hat} neck={art.neck} />
+          ))}
+      </>
+    );
+    return withClayShading(drawing, uid);
+  }, [art, palId, stageIndex, wornKey, uid]);
+  if (!clay) return null;
   return (
     <svg
       className={`${alive ? styles.alive : ''} ${className}`}
@@ -768,16 +798,45 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
       focusable="false"
       overflow="visible"
     >
-      <ellipse cx="50" cy="95" rx="24" ry="4" fill="rgba(60,40,20,.14)" />
-      <g transform={`translate(50 94) scale(${scale}) translate(-50 -94)`}>
-        <g className={styles.body}>
-          {growth.back}
-          {art.base}
-          {growth.front}
-          {[...wearing].sort(bySlotOrder).map((id) => (
-            <Accessory key={id} id={id} hat={art.hat} neck={art.neck} />
-          ))}
+      <defs>
+        <ClayGradients uid={uid} colors={clay.colors} />
+        {/* Soft clay light: bright from the top left, a gentle shade toward the bottom right (matte, not shiny) */}
+        <radialGradient id={`${uid}-light`} gradientUnits="userSpaceOnUse" cx="36" cy="30" r="66">
+          <stop offset="0" stopColor="#fff" stopOpacity=".2" />
+          <stop offset=".34" stopColor="#fff" stopOpacity="0" />
+          <stop offset=".6" stopColor={INK} stopOpacity="0" />
+          <stop offset="1" stopColor={INK} stopOpacity=".16" />
+        </radialGradient>
+        {/* A puffy clay edge: a soft shade along the bottom right of the outline, a soft light along the top left */}
+        <filter id={`${uid}-clay`} x="-10%" y="-10%" width="120%" height="120%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2.4" result="blur" />
+          <feOffset in="blur" dx="-2" dy="-2.4" result="up" />
+          <feComposite in="SourceAlpha" in2="up" operator="out" result="lowEdge" />
+          <feFlood floodColor={INK} floodOpacity=".26" />
+          <feComposite in2="lowEdge" operator="in" result="shade" />
+          <feOffset in="blur" dx="1.6" dy="2" result="down" />
+          <feComposite in="SourceAlpha" in2="down" operator="out" result="highEdge" />
+          <feFlood floodColor="#fff" floodOpacity=".5" />
+          <feComposite in2="highEdge" operator="in" result="shine" />
+          <feMerge>
+            <feMergeNode in="SourceGraphic" />
+            <feMergeNode in="shade" />
+            <feMergeNode in="shine" />
+          </feMerge>
+        </filter>
+        {/* The light falls only on the Pal itself (its outfit too), shaped by its own outline */}
+        <mask id={`${uid}-shape`} maskUnits="userSpaceOnUse" x="-20" y="-20" width="140" height="140" style={{ maskType: 'alpha' }}>
+          <use href={`#${uid}-body`} />
+        </mask>
+      </defs>
+      {/* A soft contact shadow under the feet, darker in the middle */}
+      <ellipse cx="50" cy="95" rx="24" ry="4" fill="rgba(60,40,20,.12)" />
+      <ellipse cx="50" cy="94.6" rx="14" ry="2.6" fill="rgba(60,40,20,.14)" />
+      <g transform={`translate(50 94) scale(${scale}) translate(-50 -94)`} filter={hasClayEdge ? `url(#${uid}-clay)` : undefined}>
+        <g className={styles.body} id={`${uid}-body`}>
+          {clay.content}
         </g>
+        <rect x="-20" y="-20" width="140" height="140" fill={`url(#${uid}-light)`} mask={`url(#${uid}-shape)`} pointerEvents="none" />
       </g>
       {stageIndex === STAGE_SCALES.length - 1 && (
         <g fill="#f0c14e">
