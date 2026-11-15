@@ -1,4 +1,5 @@
 import Icon from '../../components/Icon.jsx';
+import { sfx } from '../../audio/sfx.js';
 import ShopItemArt from '../store/ShopItemArt.jsx';
 import { BOOSTER_IDS, storeItem } from '../../game/catalog.js';
 import { helperText } from '../../i18n/gameText.js';
@@ -34,6 +35,9 @@ export default function BoosterPicker({ owned, chosen, free = [], streak = 0, on
               }
               onClick={(event) => {
                 event.stopPropagation();
+                if (isFree) return;
+                if (count > 0) sfx.boosterPick(!isChosen);
+                else sfx.tap();
                 onToggle(id);
               }}
             >

@@ -1,4 +1,5 @@
 import { levelNumber } from '../../game/worlds.js';
+import { sfx } from '../../audio/sfx.js';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import CurrencyHud from '../../components/game/CurrencyHud.jsx';
 import BottomNav from '../../components/game/BottomNav.jsx';
@@ -171,6 +172,7 @@ export default function MapScreen() {
           <a
             href={`#/play/${currentRef.id}`}
             className={styles.playButton}
+            onPointerDown={() => sfx.press()}
             aria-label={[
               t('map.play'),
               t('level.title', { label: levelNumber(currentRef.world, currentRef.index) }),

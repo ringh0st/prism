@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { BOOSTERS } from '../game/catalog.js';
+import { sfx } from '../audio/sfx.js';
 
 /**
  * The boosters for one visit to a level: which ones the player picks on the level card, then what they give
@@ -47,6 +48,7 @@ export function useBoosters({ enabled, free = [], streak = 0, owned, consumeHelp
     extraMoves: active.includes('spareMoves') ? BOOSTERS.spareMoves.moves : 0,
     undosLeft: undos - undosUsed,
     spendUndo: () => {
+      sfx.undo();
       puzzle.undo();
       setUndosUsed((n) => n + 1);
     },

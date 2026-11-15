@@ -109,7 +109,7 @@ export default function WinDialog({
     const afterStars = 350 + stars * 260 + 150;
     if (sparksEarned > 0 || diamondsEarned > 0) timers.push(setTimeout(() => sfx.coin(), afterStars));
     // The big moments get their own sounds once the stars have landed.
-    const finale = completesWorld || milestone ? sfx.worldComplete : palGrewTo ? sfx.palGrow : isFirstToday ? sfx.reward : null;
+    const finale = milestone ? sfx.milestone : completesWorld ? sfx.worldComplete : palGrewTo ? sfx.palGrow : isFirstToday ? sfx.reward : null;
     if (finale) timers.push(setTimeout(finale, afterStars + 450));
     if (completesWorld || milestone || palGrewTo) timers.push(setTimeout(() => celebrate({ stars: 3, isBig: true }), afterStars + 450));
     return () => timers.forEach(clearTimeout);

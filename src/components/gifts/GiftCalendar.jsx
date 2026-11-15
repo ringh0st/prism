@@ -1,6 +1,6 @@
 import Icon from '../Icon.jsx';
 import { GIFT_CALENDAR, calendarDay } from '../../game/gifts.js';
-import { HELPERS } from '../../game/catalog.js';
+import { toolFor } from '../../game/catalog.js';
 import { helperText } from '../../i18n/gameText.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './GiftCalendar.module.css';
@@ -41,7 +41,7 @@ export default function GiftCalendar({ giftDays, isOpenedToday, isSignedIn }) {
                 ) : day.isBig ? (
                   <Icon name="gift" size={20} />
                 ) : (
-                  <Icon name={helper ? HELPERS[helper].icon : 'spark'} size={18} />
+                  <Icon name={helper ? toolFor(helper).icon : 'spark'} size={18} />
                 )}
               </span>
             </li>

@@ -11,6 +11,12 @@ const PATTERNS = {
   double: { android: [10, 60, 10], ticks: 2 },
   success: { android: [12, 40, 12, 40, 24], ticks: 3 },
   celebrate: { android: [15, 30, 15, 30, 15, 30, 60], ticks: 5 },
+  // A firm thump (a lid popping, a booster switching on).
+  heavy: { android: 45, ticks: 2 },
+  // Something charging up: taps that get stronger.
+  rise: { android: [6, 50, 12, 50, 24], ticks: 3 },
+  // Not this time: two slow, soft pulses (clearly different from the quick, happy success taps).
+  fail: { android: [70, 140, 110], ticks: 2 },
 };
 
 const TICK_GAP_MS = 80;
@@ -55,9 +61,19 @@ const NATIVE = {
     setTimeout(() => Haptics.impact({ style: ImpactStyle.Heavy }), 260);
     setTimeout(() => Haptics.impact({ style: ImpactStyle.Light }), 420);
   },
+  heavy: () => Haptics.impact({ style: ImpactStyle.Heavy }),
+  rise: () => {
+    Haptics.impact({ style: ImpactStyle.Light });
+    setTimeout(() => Haptics.impact({ style: ImpactStyle.Medium }), 110);
+    setTimeout(() => Haptics.impact({ style: ImpactStyle.Heavy }), 220);
+  },
+  fail: () => {
+    Haptics.notification({ type: NotificationType.Warning });
+    setTimeout(() => Haptics.impact({ style: ImpactStyle.Medium }), 320);
+  },
 };
 
-/** strength: light | medium | soft | double | success | celebrate */
+/** strength: light | medium | soft | double | success | celebrate | heavy | rise | fail */
 export function haptic(strength) {
   if (isNativeApp) {
     Promise.resolve(NATIVE[strength]?.()).catch(() => {});

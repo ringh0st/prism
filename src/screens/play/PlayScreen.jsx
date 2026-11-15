@@ -641,7 +641,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     }
     boosters.start().then((used) => {
       if (!used.length) return;
-      sfx.helper();
+      if (streak >= 3) sfx.streak();
+      else sfx.helper();
       const line = used.includes('headStart') ? t('lumi.headStart') : streak >= 3 ? t('lumi.streak', { count: streak }) : t('lumi.boosters');
       setLumi({ mood: 'excited', line });
     });
@@ -699,6 +700,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
               className={styles.undo}
               label={t('play.undo', { count: boosters.undosLeft })}
               onClick={boosters.spendUndo}
+              silent
               disabled={isOver || puzzle.taps.length === 0}
               data-count={boosters.undosLeft}
             />
@@ -758,7 +760,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         <div className={styles.side}>
           <SpeechBox line={lumi.line} tail="left" />
           <div className={styles.controls}>
-            <Button variant="secondary" icon="restart" label={t('play.restart')} onClick={restart} />
+            <Button variant="secondary" icon="restart" label={t('play.restart')} onClick={restart} silent />
             {!isFirstSteps && (
               <div data-tour="helpers">
                 <HelperBar
@@ -855,6 +857,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           onKeepGoing={
             canKeepGoing
               ? () => {
+                  sfx.keepGoing();
                   setBonusMoves((extra) => extra + keepGoingMoves);
                   setIsOutOfMoves(false);
                   setLumi({ mood: 'happy', line: t('lumi.keepGoing') });

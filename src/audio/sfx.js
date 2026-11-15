@@ -133,6 +133,7 @@ export const sfx = {
   /** A star can no longer be reached: it drops off the meter with a soft falling "whoop". */
   starLost() {
     tone(660, 330, 0.28, { type: 'triangle', volume: 0.05 });
+    feel('soft');
   },
   /** One tap lit several gems: a rising run of chimes that grows with the combo. */
   combo(size) {
@@ -169,7 +170,7 @@ export const sfx = {
     bell(note(4), { volume: 0.08 });
     bell(note(2), { delay: 0.18, volume: 0.07 });
     tone(note(1), note(0) * 0.94, 0.55, { volume: 0.06, delay: 0.36, attack: 0.04 });
-    feel('soft');
+    feel('fail');
   },
   /** A helper does its magic. */
   helper() {
@@ -188,7 +189,7 @@ export const sfx = {
   star(index) {
     bell(note(5 + index * 2), { volume: 0.1, duration: 0.45 });
     tone(note(5 + index * 2), note(5 + index * 2) * 1.5, 0.18, { volume: 0.03 });
-    feel('light');
+    feel(index === 2 ? 'heavy' : 'medium');
   },
   /** A whole world finished: the biggest fanfare. */
   worldComplete() {
@@ -263,14 +264,16 @@ export const sfx = {
   giftShake() {
     tone(300, 260, 0.08, { type: 'triangle', volume: 0.05 });
     tone(320, 280, 0.08, { type: 'triangle', volume: 0.05, delay: 0.14 });
-    feel('light');
+    tone(340, 300, 0.08, { type: 'triangle', volume: 0.05, delay: 0.3 });
+    feel('rise');
   },
   /** The lid pops off: a bright pop and a sparkle run (fuller for the big gifts). */
   giftOpen({ isBig = false } = {}) {
     tone(520, 900, 0.09, { volume: 0.08 });
     const steps = isBig ? [5, 7, 8, 10, 12, 14] : [5, 7, 10];
     steps.forEach((step, i) => bell(note(step), { delay: 0.1 + i * 0.06, volume: 0.07, duration: 0.5 }));
-    feel('success');
+    tone(130, 70, 0.14, { volume: 0.1 });
+    feel(isBig ? 'celebrate' : 'heavy');
   },
   /** A present glows up to a more special kind: a bright shimmer that climbs higher at each step. */
   glowUp(step) {
@@ -281,6 +284,46 @@ export const sfx = {
   /** Each thing that comes out of a gift: one chime, a step higher every time. */
   giftItem(index) {
     bell(note(7 + index * 2), { volume: 0.08, duration: 0.45 });
+    feel('light');
+  },
+
+  /** A booster picked on the level card (a bright "pop" up) or put back (a soft step down). */
+  boosterPick(isOn) {
+    if (isOn) {
+      tone(500, 950, 0.1, { volume: 0.07 });
+      bell(note(8), { delay: 0.06, volume: 0.07, duration: 0.4 });
+      feel('heavy');
+    } else {
+      tone(700, 420, 0.1, { type: 'triangle', volume: 0.05 });
+      feel('light');
+    }
+  },
+  /** Undo: a quick backwards swish, like a tape rewinding. */
+  undo() {
+    tone(1200, 500, 0.16, { type: 'triangle', volume: 0.05 });
+    [6, 4].forEach((step, i) => bell(note(step), { delay: 0.12 + i * 0.07, volume: 0.05, duration: 0.3 }));
+    feel('double');
+  },
+  /** A win streak's free boosters switch on: a crackling flame whoosh and a bright run. */
+  streak() {
+    tone(200, 800, 0.35, { type: 'sawtooth', volume: 0.015, attack: 0.1 });
+    [5, 7, 9, 10].forEach((step, i) => bell(note(step), { delay: 0.2 + i * 0.07, volume: 0.07, duration: 0.45 }));
+    feel('success');
+  },
+  /** Keep going: more moves pour in, a hopeful little lift. */
+  keepGoing() {
+    [2, 4, 7].forEach((step, i) => bell(note(step), { delay: i * 0.08, volume: 0.08, duration: 0.45 }));
+    feel('success');
+  },
+  /** 50, 100, 250… levels: the world fanfare plus a final high sparkle cascade. */
+  milestone() {
+    sfx.worldComplete();
+    [10, 9, 10, 12, 14].forEach((step, i) => bell(note(step), { delay: 1.3 + i * 0.07, volume: 0.06, duration: 0.6 }));
+    setTimeout(() => feel('celebrate'), 1300);
+  },
+  /** Any button pressed: a soft, chunky "thock" and a light tap. */
+  press() {
+    tone(520, 380, 0.05, { type: 'triangle', volume: 0.05 });
     feel('light');
   },
 
