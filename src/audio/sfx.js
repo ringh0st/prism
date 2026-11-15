@@ -135,6 +135,12 @@ export const sfx = {
     tone(660, 330, 0.28, { type: 'triangle', volume: 0.05 });
     feel('soft');
   },
+  /** A wrong turn breaks a heart: a soft glassy "tink" falling down (kind, not a buzzer). */
+  heartLost() {
+    tone(1200, 700, 0.12, { type: 'triangle', volume: 0.05 });
+    bell(note(3), { delay: 0.1, volume: 0.05, duration: 0.35 });
+    feel('double');
+  },
   /** One tap lit several gems: a rising run of chimes that grows with the combo. */
   combo(size) {
     const run = [3, 5, 7, 8, 10].slice(0, Math.min(5, size + 1));

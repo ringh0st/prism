@@ -36,6 +36,8 @@ import { moveLimitFor, starsForMoves } from '../../game/scoring.js';
 import { BOOSTERS_FROM_WORLD, HELPERS, HELPER_IDS, LENS_DURATION_MS, helpersAllowedFor, toolFor } from '../../game/catalog.js';
 import { useBoosters } from '../../hooks/useBoosters.js';
 import { streakBoosters } from '../../game/winStreak.js';
+import { heartsFor, heartsMoveRoom, isWrongTurn } from '../../game/hearts.js';
+import HeartsMeter from './HeartsMeter.jsx';
 import { isWorldComplete } from '../../game/progress.js';
 import { dailyShareText } from '../../game/share.js';
 import { PUBLIC_GAME_URL } from '../../lib/config.js';
@@ -138,6 +140,11 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const [isOutOfMoves, setIsOutOfMoves] = useState(false);
   // Early worlds forgive running out: "Keep going" adds moves, for 1 star at most.
   const [bonusMoves, setBonusMoves] = useState(0);
+  // Hearts broken this try by wrong turns, and hearts given back by Keep going (1★ at most then).
+  const [heartsLost, setHeartsLost] = useState(0);
+  const [heartsRestored, setHeartsRestored] = useState(0);
+  // Why the try ended: 'moves' or 'hearts'.
+  const [outReason, setOutReason] = useState('moves');
   const [isMeetingFriend, setIsMeetingFriend] = useState(false);
   const [rushOver, setRushOver] = useState(null);
   const [showIntro, setShowIntro] = useState(true);
@@ -177,15 +184,19 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     onNeedBuy: setBuyingHelper,
   });
   const flavor = flavorText(lang, level);
+  // Hearts (main road from World 2): wrong turns break them; none left ends the try. The move limit loosens to match.
+  const maxHearts = mode === 'level' && !isFirstSteps ? heartsFor(level) : 0;
   // Spare Moves and every Undo add to the limit (never to the stars); Keep going adds too, with 1★ at most.
   const moveLimit =
     (mode === 'rush' ? rushMoveLimit(rush.run, level.par) : moveLimitFor(level.par, level.difficulty)) +
     bonusMoves +
     boosters.extraMoves +
-    puzzle.undos;
+    puzzle.undos +
+    heartsMoveRoom(maxHearts);
   // The very first levels teach without a counter, so they can't run out of moves either.
   const playLimit = isFirstSteps ? Infinity : moveLimit;
-  const starCap = bonusMoves > 0 ? Math.min(1, puzzle.starCap) : puzzle.starCap;
+  const starCap = bonusMoves > 0 || heartsRestored > 0 ? Math.min(1, puzzle.starCap) : puzzle.starCap;
+  const heartsLeft = maxHearts - heartsLost;
   const isEarlyWorld = level.world <= KEEP_GOING_WORLDS;
   const keepGoingMoves = isEarlyWorld ? KEEP_GOING_MOVES : KEEP_GOING_MOVES_LATER;
   const canKeepGoing = mode === 'level' && (isEarlyWorld || bonusMoves === 0);
@@ -251,6 +262,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     setResult(null);
     setIsOutOfMoves(false);
     setBonusMoves(0);
+    setHeartsLost(0);
+    setHeartsRestored(0);
+    wrongTaps.current = [];
     setShowIntro(true);
     setNewPieces(piecesToIntroduce(level, mode, progress));
     setSpotlightTile(-1);
@@ -440,10 +454,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     if (trace.isSolved) completeLevel();
   }, [trace.isSolved]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Out of moves.
+  // Out of moves, or out of hearts.
+  const isOutOfHearts = maxHearts > 0 && heartsLeft <= 0;
   useEffect(() => {
-    if (!trace.isSolved && moves >= playLimit && !hasRecordedWin.current) {
+    if (!trace.isSolved && (moves >= playLimit || isOutOfHearts) && !hasRecordedWin.current) {
       const timer = setTimeout(() => {
+        setOutReason(isOutOfHearts ? 'hearts' : 'moves');
         sfx.outOfMoves();
         say('sad', null);
         react('droop');
@@ -454,7 +470,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [moves, playLimit, trace.isSolved, say, react, playStats]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [moves, playLimit, isOutOfHearts, trace.isSolved, say, react, playStats]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Tapping a piece that can't turn says why (a little shake, a soft "nope" and a word from Lumi).
   const [nudgedCell, setNudgedCell] = useState(null);
@@ -479,6 +495,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         sfx.crack();
         say('worried', 'crack');
       }
+      isPlayerTap.current = true;
       puzzle.rotate(tileIndex);
     },
     [isOver, moves, playLimit, puzzle, say],
@@ -488,6 +505,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     sfx.restart();
     if (mode === 'rush' && moves > 0) rush.onRestart(moves);
     puzzle.restart();
+    setHeartsLost(0);
+    setHeartsRestored(0);
+    wrongTaps.current = [];
+    lastCheck.current = { moves: 0, tapsLeft: null };
     setFinaleSpent(0);
     bestCombo.current = 0;
     playStats.start();
@@ -579,7 +600,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       };
     });
     const showsTips = ['level', 'daily', 'event'].includes(mode) && !isFirstSteps && pieceSteps.length === 0;
-    const tipSteps = showsTips ? unseenTips(readJson(SEEN_TIPS_KEY, [])).map((tip) => ({ ...tip, title: t(`tip.${tip.id}.title`) })) : [];
+    const tipSteps = showsTips
+      ? unseenTips(readJson(SEEN_TIPS_KEY, []), maxHearts > 0 ? ['hearts'] : []).map((tip) => ({ ...tip, title: t(`tip.${tip.id}.title`) }))
+      : [];
     return [...pieceSteps, ...tipSteps];
   };
 
@@ -672,6 +695,29 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     () => (trace.isSolved ? 0 : findTapsLeft ? findTapsLeft(puzzle.orients) : 0),
     [findTapsLeft, puzzle.orients, trace.isSolved],
   );
+  // A player's tap that sends the light further from the solution breaks a heart. Each tap is noted (wrong or
+  // not) so an Undo can mend the heart it broke; a helper's turn is never wrong.
+  const wrongTaps = useRef([]);
+  const isPlayerTap = useRef(false);
+  const lastCheck = useRef({ moves: 0, tapsLeft: null });
+  useEffect(() => {
+    const before = lastCheck.current;
+    lastCheck.current = { moves, tapsLeft: findTapsLeft ? minTapsLeft : null };
+    if (moves !== before.moves + 1) return;
+    const isWrong = isPlayerTap.current && maxHearts > 0 && !trace.isSolved && isWrongTurn(before.tapsLeft, lastCheck.current.tapsLeft);
+    isPlayerTap.current = false;
+    wrongTaps.current.push(isWrong);
+    if (!isWrong) return;
+    sfx.heartLost();
+    react('shake');
+    setHeartsLost((lost) => lost + 1);
+    if (heartsLeft - 1 === 1) setLumi({ mood: 'worried', line: t('lumi.lastHeart') });
+  }, [moves, minTapsLeft]); // eslint-disable-line react-hooks/exhaustive-deps
+  const undo = () => {
+    if (wrongTaps.current.pop()) setHeartsLost((lost) => Math.max(0, lost - 1));
+    boosters.spendUndo();
+  };
+
   const coachTile = useMemo(
     () => (isFirstSteps && isCoachDue && !showIntro && !isOver ? findHint(level, puzzle.orients) : null),
     [isFirstSteps, isCoachDue, showIntro, isOver, level, puzzle.orients],
@@ -699,7 +745,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
               icon="undo"
               className={styles.undo}
               label={t('play.undo', { count: boosters.undosLeft })}
-              onClick={boosters.spendUndo}
+              onClick={undo}
               silent
               disabled={isOver || puzzle.taps.length === 0}
               data-count={boosters.undosLeft}
@@ -711,13 +757,16 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
       <section className={styles.status} aria-label={t('play.status')} data-tour="meter">
         {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} spent={finaleSpent} />}
-        <ul className={styles.gems} aria-label={t('play.gemsLit', { n: trace.litGems.size, total: gems.length })}>
-          {gems.map(({ tile, i }) => (
-            <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff} data-gem-slot={i}>
-              <GemShape color={tile.color} size={24} />
-            </li>
-          ))}
-        </ul>
+        <div className={styles.sideStatus}>
+          {maxHearts > 0 && <HeartsMeter total={maxHearts} left={heartsLeft} />}
+          <ul className={styles.gems} aria-label={t('play.gemsLit', { n: trace.litGems.size, total: gems.length })}>
+            {gems.map(({ tile, i }) => (
+              <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff} data-gem-slot={i}>
+                <GemShape color={tile.color} size={24} />
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <div
@@ -853,16 +902,28 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           backName={backName}
           gems={gems.map(({ tile, i }) => ({ color: tile.color, isLit: trace.litGems.has(i) }))}
           extraMoves={keepGoingMoves}
+          reason={outReason}
           onRetry={restart}
           onKeepGoing={
-            canKeepGoing
-              ? () => {
-                  sfx.keepGoing();
-                  setBonusMoves((extra) => extra + keepGoingMoves);
-                  setIsOutOfMoves(false);
-                  setLumi({ mood: 'happy', line: t('lumi.keepGoing') });
-                }
-              : null
+            outReason === 'hearts'
+              ? heartsRestored === 0
+                ? () => {
+                    // Out of hearts: one heart back, once per try (1★ at most).
+                    sfx.keepGoing();
+                    setHeartsRestored(1);
+                    setHeartsLost((lost) => lost - 1);
+                    setIsOutOfMoves(false);
+                    setLumi({ mood: 'happy', line: t('lumi.keepGoing') });
+                  }
+                : null
+              : canKeepGoing
+                ? () => {
+                    sfx.keepGoing();
+                    setBonusMoves((extra) => extra + keepGoingMoves);
+                    setIsOutOfMoves(false);
+                    setLumi({ mood: 'happy', line: t('lumi.keepGoing') });
+                  }
+                : null
           }
           onRetryWithHint={
             offeredHelpers.includes('hint') && helpersAllowed > 0

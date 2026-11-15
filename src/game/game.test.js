@@ -1127,3 +1127,24 @@ test('win streak and level milestones', async () => {
   assert.equal(levelNumber(8, 8), 148);
   assert.equal(levelNumber(50, 20), 1000);
 });
+
+test('hearts: a few per try from World 2, a wrong turn breaks one', async () => {
+  const { heartsFor, heartsMoveRoom, isWrongTurn } = await import('./hearts.js');
+  const { moveLimitFor } = await import('./scoring.js');
+  assert.equal(heartsFor({ world: 1, difficulty: 'normal' }), 0);
+  assert.equal(heartsFor({ world: 2, difficulty: 'normal' }), 3, 'one more while learning');
+  assert.equal(heartsFor({ world: 9, difficulty: 'normal' }), 2);
+  assert.equal(heartsFor({ world: 9, difficulty: 'hard' }), 2);
+  assert.equal(heartsFor({ world: 9, difficulty: 'extra' }), 1);
+  // Hearts end a try before moves do: every wrong turn costs two moves, and the limit leaves room for all of them.
+  for (const par of [2, 5, 9]) {
+    for (const difficulty of ['normal', 'hard', 'extra']) {
+      const hearts = heartsFor({ world: 9, difficulty });
+      assert.ok(moveLimitFor(par, difficulty) + heartsMoveRoom(hearts) >= par + 2 * hearts, `${difficulty} par ${par}`);
+    }
+  }
+  assert.equal(heartsFor({ world: 'event', difficulty: 'normal' }), 0);
+  assert.equal(isWrongTurn(3, 4), true);
+  assert.equal(isWrongTurn(3, 2), false);
+  assert.equal(isWrongTurn(null, 4), false);
+});

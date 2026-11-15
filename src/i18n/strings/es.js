@@ -166,6 +166,12 @@ export const es = {
   'buy.withDiamondsSignIn.one': 'Comprar {name} por {count} diamante (hay que iniciar sesión)',
   'buy.withDiamondsSignIn.other': 'Comprar {name} por {count} diamantes (hay que iniciar sesión)',
 
+  'play.heartsLeft.one': 'Te queda {count} de {total} corazones',
+  'play.heartsLeft.other': 'Te quedan {count} de {total} corazones',
+  'tip.hearts.title': 'Un giro equivocado rompe un ❤',
+  'lumi.lastHeart': '¡Cuidado, queda un corazón!',
+  'out.heartsTitle': 'Sin corazones',
+  'out.keepGoingHeart': 'Seguir: un corazón más, 1 ★ como mucho',
   'out.title': 'Sin movimientos',
   'out.close': '¡Casi!',
   'out.noneLit': 'Aún no hay gemas encendidas. ¡Prueba otro camino!',
