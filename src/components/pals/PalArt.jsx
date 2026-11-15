@@ -7,9 +7,10 @@ const slotOf = (id) => accessoryById(id)?.slot;
 const bySlotOrder = (a, b) => SLOT_ORDER.indexOf(slotOf(a)) - SLOT_ORDER.indexOf(slotOf(b));
 
 /*
- * Pals are hand-drawn kawaii stickers, one SVG each (assets/pals/drawn/<id>.svg) on a shared 100×100 stage:
- * every Pal sits on y≈94 with the top of its head at y≈25, its eyes at (39,51)/(61,51) and its neck at y≈70,
- * so each outfit piece fits every Pal. The five forms grow in size; Champ gets a soft glow, Master a golden one.
+ * Pals are hand-drawn kawaii stickers, one SVG per form (assets/pals/drawn/<id>-<1…5>.svg, Baby to Master) on a
+ * shared 100×100 stage: every Pal sits on y≈94 with the top of its head at y≈25, its eyes at (39,51)/(61,51) and
+ * its neck at y≈70, so each outfit piece fits every Pal and form. Each form is drawn older and grander (the Master
+ * brings its own golden glow) and is shown a little bigger.
  */
 const PICTURES = Object.fromEntries(
   Object.entries(import.meta.glob('../../assets/pals/drawn/*.svg', { eager: true, query: '?url', import: 'default' })).map(([path, url]) => [
@@ -22,7 +23,6 @@ const NECK = 70;
 // Capes and cloaks hang behind the Pal; only their clasp shows in front.
 const WORN_BEHIND = new Set(['cape', 'elvenCloak']);
 
-const RADIANT_SPARKLES = 'M12 1.5l2.6 7.9 7.9 2.6-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z';
 
 export function Accessory({ id, hat, neck }) {
   const [hx, hy] = hat;
@@ -178,9 +178,9 @@ const blinkDelay = (palId) => `${-([...palId].reduce((sum, char) => sum + char.c
  * `portrait` zooms in on the Pal, for round avatars. `alive` makes it breathe (for big, featured Pals).
  */
 export default function PalArt({ palId, stage = 0, wearing = [], size = 64, portrait = false, alive = false, label, className = '' }) {
-  const picture = PICTURES[palId];
-  if (!picture) return null;
   const stageIndex = palStage(stage).index;
+  const picture = PICTURES[`${palId}-${stageIndex + 1}`];
+  if (!picture) return null;
   const scale = STAGE_SCALES[stageIndex];
   return (
     <svg
@@ -198,7 +198,6 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
       <ellipse cx="50" cy="95" rx="24" ry="4" fill="rgba(60,40,20,.14)" />
       <g transform={`translate(50 94) scale(${scale}) translate(-50 -94)`}>
         <g className={styles.body}>
-          {stageIndex >= 3 && <circle cx="50" cy="56" r="40" fill={stageIndex === 4 ? '#ffe39a' : '#fff1d6'} opacity=".55" />}
           {wearing
             .filter((id) => WORN_BEHIND.has(id))
             .map((id) => (
@@ -216,12 +215,6 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
             ))}
         </g>
       </g>
-      {stageIndex === STAGE_SCALES.length - 1 && (
-        <g fill="#f0c14e">
-          <path d={RADIANT_SPARKLES} transform="translate(4 8) scale(.6)" />
-          <path d={RADIANT_SPARKLES} transform="translate(80 14) scale(.5)" />
-        </g>
-      )}
     </svg>
   );
 }
