@@ -35,7 +35,7 @@ export default function OutOfMovesDialog({ gems, extraMoves = 0, backName = 'map
             <span className={styles.keepGoing} aria-hidden="true">
               <span dir="ltr">+{extraMoves}</span>
               <TapIcon size={24} />
-              <span className={styles.cap}>1★</span>
+              <span className={styles.cap}>★☆☆</span>
             </span>
           </Button>
         )}

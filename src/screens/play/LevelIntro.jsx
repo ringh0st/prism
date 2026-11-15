@@ -62,7 +62,8 @@ export default function LevelIntro({
   // Picking boosters takes a moment: once one is touched, the card waits for Let's go.
   const [isPicking, setIsPicking] = useState(false);
   useEffect(() => {
-    if (waitsForTap || isPicking) return undefined;
+    // With boosters to pick, the card waits for Let's go (no rush to choose).
+    if (waitsForTap || isPicking || boosters) return undefined;
     const timer = setTimeout(onDone, mood ? INTRO_MS * 1.3 : INTRO_MS);
     return () => clearTimeout(timer);
   }, [onDone, isPicking]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -72,7 +73,6 @@ export default function LevelIntro({
   const limit = moveLimit ?? moveLimitFor(level.par, level.difficulty);
   const moves = showsStarTarget ? level.par : limit;
   const goalLabel = [
-    ...moods.map((id) => t(MOODS[id].key)),
     flavor?.name,
     t('intro.lightGems', { count: gems.length }),
     showsStarTarget ? t('intro.starTarget', { count: level.par }) : t('intro.inMoves', { count: limit }),
@@ -93,6 +93,7 @@ export default function LevelIntro({
             ))}
           </span>
         )}
+        {moods.length > 0 && <p className={`game-title ${styles.moodWords}`}>{moods.map((id) => t(MOODS[id].key)).join(' · ')}</p>}
         {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         <ScreenTitle as="h1" size="lg" tone={modifier === 'boss' ? 'boss' : 'calm'}>
           {title}

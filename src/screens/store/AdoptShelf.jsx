@@ -6,7 +6,7 @@ import PalArt from '../../components/pals/PalArt.jsx';
 import PalFormsStrip from '../../components/pals/PalFormsStrip.jsx';
 import RarityBadge from '../../components/pals/RarityBadge.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { PALS, adoptPriceOf, dailyPalPick, rarityOf, stageOf } from '../../game/pals.js';
+import { RARE_ADOPTS_PER_WEEK, adoptPriceOf, dailyPalPick, rareAdoptsLeft, stageOf, weeklyAdoptShelf } from '../../game/pals.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { palName, palSpecies } from '../../i18n/palText.js';
 import { errorText } from '../../i18n/meText.js';
@@ -23,10 +23,17 @@ function DailyPicks({ onChoose }) {
   const { progress, shopSeed } = usePlayer();
   const { t, lang } = useI18n();
   const picks = ['legendary', 'mythic'].map((rarity) => ({ rarity, pal: dailyPalPick(progress, rarity, shopSeed) }));
+  // At most 2 rare Pals a week: shown as tickets left (filled) and used (empty).
+  const left = rareAdoptsLeft(progress);
   return (
     <>
       <div className={styles.titleRow}>
         <h2 className="game-title">{t('shop.picks.title')}</h2>
+        <span className={`game-title ${styles.rareLeft}`} aria-label={t('shop.picks.left', { count: left, total: RARE_ADOPTS_PER_WEEK })}>
+          {Array.from({ length: RARE_ADOPTS_PER_WEEK }, (_, i) => (
+            <Icon key={i} name="paw" size={16} className={i < left ? styles.ticketOn : styles.ticketOff} />
+          ))}
+        </span>
         <HelpTip title={t('shop.picks.title')}>
           <p>{t('shop.picks.help')}</p>
         </HelpTip>
@@ -34,7 +41,16 @@ function DailyPicks({ onChoose }) {
       <ul className={styles.dailyPicks}>
         {picks.map(({ rarity, pal }) => (
           <li key={rarity}>
-            {pal ? (
+            {pal && left === 0 ? (
+              // Both rare adoptions used this week: the pick waits behind a lock until Monday.
+              <div className={`${styles.dailyPick} ${styles[rarity]} ${styles.adoptOwned}`} aria-label={t('shop.picks.nextWeek')}>
+                <RarityBadge pal={pal} />
+                <PalArt palId={pal.id} size={96} />
+                <span className={styles.ownedChip}>
+                  <Icon name="lock" size={13} /> {t('shop.picks.nextWeekShort')}
+                </span>
+              </div>
+            ) : pal ? (
               <button
                 type="button"
                 className={`${styles.dailyPick} ${styles[rarity]}`}
@@ -60,15 +76,15 @@ function DailyPicks({ onChoose }) {
   );
 }
 
-/** Adopt Pals for diamonds: any Basic Pal you choose, plus today's Legendary and Mythic picks. Never a surprise. */
+/** Adopt Pals for diamonds: this week's 6 Basic Pals, plus today's Legendary and Mythic picks (2 a week). Never a surprise. */
 export default function AdoptShelf({ onAdopted, onError }) {
-  const { progress, isSignedIn, adoptPal } = usePlayer();
+  const { progress, isSignedIn, adoptPal, shopSeed } = usePlayer();
   const { t, lang } = useI18n();
   const [choice, setChoice] = useState(null);
   const [isBusy, setIsBusy] = useState(false);
-  const regulars = PALS.filter((pal) => rarityOf(pal) === 'common');
-  // Pals you don't have come first; yours stay visible, marked Owned, and can't be bought again.
-  const shelf = [...regulars.filter((pal) => !progress.pal.owned[pal.id]), ...regulars.filter((pal) => progress.pal.owned[pal.id])];
+  // This week's 6 Basic Pals (new ones every Monday). Ones you have stay on the shelf, marked Owned.
+  const weekly = weeklyAdoptShelf(shopSeed);
+  const shelf = [...weekly.filter((pal) => !progress.pal.owned[pal.id]), ...weekly.filter((pal) => progress.pal.owned[pal.id])];
   const price = choice ? adoptPriceOf(choice) : 0;
 
   const confirm = async () => {
@@ -90,7 +106,7 @@ export default function AdoptShelf({ onAdopted, onError }) {
       <div className={styles.titleRow}>
         <h2 className="game-title">{t('shop.adopt.title')}</h2>
         <HelpTip title={t('shop.adopt.title')}>
-          <p>{t('shop.adopt.help', { count: adoptPriceOf(regulars[0]) })}</p>
+          <p>{t('shop.adopt.help', { count: adoptPriceOf(weekly[0]) })}</p>
         </HelpTip>
       </div>
       {!isSignedIn && <SignInNote />}

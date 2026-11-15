@@ -669,3 +669,15 @@ button.goods:active .goodsArt {
 .shortBy svg {
   color: var(--color-mint-deep);
 }
+
+/* Rare adoptions left this week: filled paws, used ones faded */
+.rareLeft {
+  display: inline-flex;
+  gap: 2px;
+  margin-inline-start: auto;
+  color: var(--reward-ledge);
+}
+
+.ticketOff {
+  opacity: 0.25;
+}

@@ -53,10 +53,17 @@ export default function BoosterPicker({ owned, chosen, free = [], streak = 0, on
                 ) : count > 0 ? (
                   count
                 ) : (
-                  <Icon name="plus" size={12} strokeWidth={3.4} />
+                  // None held: its price in sparks (a tap offers to buy one).
+                  <>
+                    {storeItem(id).price.sparks}
+                    <Icon name="spark" size={11} />
+                  </>
                 )}
               </span>
             </button>
+            <span className={styles.caption} aria-hidden="true">
+              {name}
+            </span>
           </li>
         );
       })}

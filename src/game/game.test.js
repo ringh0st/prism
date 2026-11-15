@@ -580,7 +580,18 @@ test('pals: daily Shop picks and Lucky Pal gifts', async () => {
   assert.equal(pals.canAdopt(base, pick, 42, day), true);
   const other = pals.PALS.find((pal) => pals.rarityOf(pal) === 'mythic' && pal.id !== pick.id);
   assert.equal(pals.canAdopt(base, other, 42, day), false);
-  assert.equal(pals.canAdopt(base, pals.palById('mossy'), 42, day), true);
+  // Basic Pals: only this week's 6 (different ones each week); rare ones: at most 2 a week.
+  const shelf = pals.weeklyAdoptShelf(42, day);
+  assert.equal(new Set(shelf.map((pal) => pal.id)).size, pals.ADOPT_SHELF_SIZE);
+  assert.ok(shelf.every((pal) => pals.rarityOf(pal) === 'common'));
+  assert.equal(pals.canAdopt(base, shelf[0], 42, day), true);
+  const offShelf = pals.PALS.find((pal) => pals.rarityOf(pal) === 'common' && !shelf.includes(pal));
+  assert.equal(pals.canAdopt(base, offShelf, 42, day), false);
+  assert.notDeepEqual(pals.weeklyAdoptShelf(42, new Date(day.getTime() + 7 * 86_400_000)), shelf, 'a new shelf next week');
+  assert.equal(pals.canAdopt({ ...base, rareAdopts: 2 }, pick, 42, day), false, 'two rare adoptions a week');
+  const sql = readFileSync(new URL('../../supabase/pals.sql', import.meta.url), 'utf8');
+  assert.match(sql, /\(seed\.value \+ public\._adopt_week\(p_day\) \* 6 \+ i \* 7\) % pool\.size from generate_series\(0, 5\)/);
+  assert.match(sql, new RegExp(`rare_adopts >= ${pals.RARE_ADOPTS_PER_WEEK} then`));
   // Lucky gifts: one per 200 solved levels, odds 10/20/70, always a Pal you don't have.
   assert.equal(pals.luckyRarityFor(0.05), 'mythic');
   assert.equal(pals.luckyRarityFor(0.2), 'legendary');

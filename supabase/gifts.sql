@@ -33,7 +33,8 @@ as $$
     'claimedChests', to_jsonb(p.claimed_chests),
     'pal', jsonb_build_object('id', p.pal_id, 'owned', p.pals, 'accessories', to_jsonb(p.pal_accessories), 'wearing', to_jsonb(p.pal_wearing)),
     'grove', jsonb_build_object('items', to_jsonb(p.grove_items), 'placed', to_jsonb(p.grove_placed)),
-    'luckyPalsClaimed', p.lucky_pals_claimed
+    'luckyPalsClaimed', p.lucky_pals_claimed,
+    'rareAdopts', case when p.rare_adopt_week = public._adopt_week((now() at time zone 'utc')::date) then p.rare_adopts else 0 end
   )
   from public.profiles p
   where p.id = p_user;

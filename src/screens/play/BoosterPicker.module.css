@@ -7,6 +7,21 @@
   list-style: none;
 }
 
+.picker > li {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 76px;
+}
+
+.caption {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  color: var(--text-soft);
+}
+
 .booster {
   position: relative;
   display: grid;
@@ -43,6 +58,7 @@
 
 .badge {
   position: absolute;
+  gap: 1px;
   top: -6px;
   inset-inline-end: -6px;
   display: grid;
@@ -80,6 +96,8 @@
 }
 
 .empty .badge {
+  display: inline-flex;
+  align-items: center;
   color: var(--warm-label);
   background: var(--warm-bottom);
 }

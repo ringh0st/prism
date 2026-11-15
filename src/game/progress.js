@@ -32,6 +32,8 @@ export function createEmptyProgress() {
     hotStreak: 0,
     // Main-road levels won in a row (see winStreak.js).
     winStreak: 0,
+    // Legendary/Mythic Pals adopted this week (from the server; see pals.js).
+    rareAdopts: 0,
     giftDate: null,
     // Calendar gifts opened (the day in the 7-day gift calendar; see gifts.js).
     giftDays: 0,
@@ -240,6 +242,7 @@ export function withServerState(progress, state, today) {
     daily: { streak: state.dailyStreak, lastDate: state.lastDailyDate, shields: state.streakShields ?? 0 },
     sparkPurchases: { date: today, count: state.sparkPurchasesToday },
     claimedChests: state.claimedChests ?? progress.claimedChests,
+    rareAdopts: state.rareAdopts ?? 0,
     giftDate: state.lastGiftDate ?? progress.giftDate,
     giftDays: state.giftDays ?? progress.giftDays,
     presents: { opened: state.presentsOpened ?? progress.presents.opened },

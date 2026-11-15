@@ -161,6 +161,24 @@ export function dailyPalPick(progress, rarity, seed, now = new Date()) {
   return pool.length ? pool[(utcDayNumber(now) + seed) % pool.length] : null;
 }
 
+/** The Shop shows 6 Basic Pals a week (some may already be on your team), so adopting stays a choice, not a sweep. */
+export const ADOPT_SHELF_SIZE = 6;
+/** Legendary and Mythic Pals adopted per week, at most (each one stays a treat). Must match adopt_pal in supabase/pals.sql. */
+export const RARE_ADOPTS_PER_WEEK = 2;
+
+/** The Shop's week number (weeks start on Monday, UTC). Must match _adopt_week in supabase/pals.sql. */
+export const adoptWeekOf = (now = new Date()) => Math.floor((utcDayNumber(now) + 3) / 7);
+
+/** This week's 6 Basic Pals in this player's Shop. Must match _weekly_basics in supabase/pals.sql. */
+export function weeklyAdoptShelf(seed, now = new Date()) {
+  const pool = PALS.filter((pal) => rarityOf(pal) === 'common');
+  const week = adoptWeekOf(now);
+  return Array.from({ length: ADOPT_SHELF_SIZE }, (_, i) => pool[(seed + week * ADOPT_SHELF_SIZE + i * 7) % pool.length]);
+}
+
+/** Legendary/Mythic adoptions left this week. */
+export const rareAdoptsLeft = (progress) => Math.max(0, RARE_ADOPTS_PER_WEEK - (progress.rareAdopts ?? 0));
+
 /**
  * Lucky Pal gifts: every 200 solved levels, a free Pal you don't have yet, picked at random with these
  * odds (shown in the game). Free and earned, never bought. Must match claim_lucky_pal in supabase/pals.sql.
@@ -255,9 +273,13 @@ export function wearAccessoryLocally(progress, accessoryId, isWearing) {
   return { ...progress, pal: { ...progress.pal, wearing: isWearing ? [...others, accessoryId] : others } };
 }
 
-/** Can this Pal be adopted now? Any regular Pal you don't have; Legendary and Mythic ones only as today's pick. */
+/**
+ * Can this Pal be adopted now? A Basic Pal on this week's shelf that you don't have; a Legendary or Mythic one
+ * only as today's pick, and at most 2 of those a week.
+ */
 export function canAdopt(progress, pal, seed, now = new Date()) {
   if (!pal || progress.pal.owned[pal.id]) return false;
   const rarity = rarityOf(pal);
-  return rarity === 'common' || dailyPalPick(progress, rarity, seed, now)?.id === pal.id;
+  if (rarity === 'common') return weeklyAdoptShelf(seed, now).some((shelfPal) => shelfPal.id === pal.id);
+  return rareAdoptsLeft(progress) > 0 && dailyPalPick(progress, rarity, seed, now)?.id === pal.id;
 }

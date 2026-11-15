@@ -151,7 +151,7 @@ export const en = {
   'skip.text': 'You’ll get 1 star. You can come back for more stars any time.',
   'skip.keepTrying': 'Keep trying',
 
-  'buy.outOf': 'Out of {name}',
+  'buy.title': 'Get {name}?',
   'buy.cap.one': 'Using it limits this level to {count} ★.',
   'buy.cap.other': 'Using it limits this level to {count} ★.',
   'buy.sparksLeftToday.one': '{count} spark purchase left today.',

@@ -63,10 +63,14 @@ export const en = {
   'shop.pal.ownedCount': '{have} of {total} owned',
 
   'shop.picks.title': 'Today’s picks',
+  'shop.picks.left': '{count} of {total} rare Pals left to adopt this week',
+  'shop.picks.nextWeek': 'You adopted 2 rare Pals this week. New picks next week!',
+  'shop.picks.nextWeekShort': 'Monday',
   'shop.picks.aria.other': "Today's pick: {name} the {species}, {count} diamonds",
   'shop.picks.allLegendary': 'You have every Legendary Pal!',
   'shop.picks.allMythic': 'You have every Mythic Pal!',
-  'shop.picks.help': 'Every day you get one Legendary and one Mythic Pal, picked just for you. You always see who you get before buying.',
+  'shop.picks.help':
+    'Every day you get one Legendary and one Mythic Pal, picked just for you. You can adopt 2 of them a week. You always see who you get before buying.',
 
   'shop.adopt.title': 'Adopt a Pal',
   'shop.adopt.ownedAria': '{name} the {species}: owned',
@@ -78,7 +82,8 @@ export const en = {
   'shop.adopt.youHave.one': 'You have {count} diamond.',
   'shop.adopt.youHave.other': 'You have {count} diamonds.',
   'shop.adopt.notNow': 'Not now',
-  'shop.adopt.help.other': 'Pick any Pal you don’t have for {count} diamonds, or keep playing to unlock them for free.',
+  'shop.adopt.help.other':
+    'Six Pals a week, new ones every Monday: adopt one you don’t have for {count} diamonds, or keep playing to unlock them for free.',
 
   'shop.clothes.link': 'Wardrobe',
   'shop.grove.link': 'My Grove',
@@ -235,10 +240,14 @@ export const es = {
   'shop.pal.ownedCount': 'Tienes {have} de {total}',
 
   'shop.picks.title': 'Selección de hoy',
+  'shop.picks.left': 'Te quedan {count} de {total} amigos raros esta semana',
+  'shop.picks.nextWeek': 'Adoptaste 2 amigos raros esta semana. ¡Más la próxima semana!',
+  'shop.picks.nextWeekShort': 'El lunes',
   'shop.picks.aria.other': 'Selección de hoy: {name} ({species}), {count} diamantes',
   'shop.picks.allLegendary': '¡Tienes todos los amigos legendarios!',
   'shop.picks.allMythic': '¡Tienes todos los amigos míticos!',
-  'shop.picks.help': 'Cada día tienes un Pal Legendario y uno Mítico elegidos para ti. Siempre ves a quién recibes antes de comprar.',
+  'shop.picks.help':
+    'Cada día tienes un Pal Legendario y uno Mítico elegidos para ti. Puedes adoptar 2 por semana. Siempre ves a quién recibes antes de comprar.',
 
   'shop.adopt.title': 'Adopta un amigo',
   'shop.adopt.ownedAria': '{name} ({species}): ya es tuyo',
@@ -250,7 +259,8 @@ export const es = {
   'shop.adopt.youHave.one': 'Tienes {count} diamante.',
   'shop.adopt.youHave.other': 'Tienes {count} diamantes.',
   'shop.adopt.notNow': 'Ahora no',
-  'shop.adopt.help.other': 'Elige cualquier Pal que no tengas por {count} diamantes, o sigue jugando para desbloquearlos gratis.',
+  'shop.adopt.help.other':
+    'Seis amigos por semana, nuevos cada lunes: adopta uno que no tengas por {count} diamantes, o sigue jugando para desbloquearlos gratis.',
 
   'shop.clothes.link': 'Armario',
   'shop.grove.link': 'Mi Arboleda',
@@ -346,10 +356,13 @@ export const he = {
   'shop.pal.ownedCount': 'יש לכם {have} מתוך {total}',
 
   'shop.picks.title': 'הבחירות של היום',
+  'shop.picks.left': 'נשארו {count} מתוך {total} חברים נדירים לאמץ השבוע',
+  'shop.picks.nextWeek': 'אימצתם 2 חברים נדירים השבוע. עוד בשבוע הבא!',
+  'shop.picks.nextWeekShort': 'ביום שני',
   'shop.picks.aria.other': 'הבחירה של היום: {name} ({species}), {count} יהלומים',
   'shop.picks.allLegendary': 'יש לכם את כל החברים האגדיים!',
-  'shop.picks.allMythic': 'יש לכם את כל החברים המיתיים!',
-  'shop.picks.help': 'בכל יום מחכים לכם חבר אגדי אחד וחבר מיתי אחד שנבחרו רק בשבילכם. תמיד רואים מראש את מי מקבלים.',
+  'shop.picks.allMythic': 'יש לכם את כל החברים המיתולוגיים!',
+  'shop.picks.help': 'בכל יום מחכים לכם חבר אגדי אחד וחבר מיתולוגי אחד שנבחרו רק בשבילכם. אפשר לאמץ 2 מהם בשבוע. תמיד רואים מראש את מי מקבלים.',
 
   'shop.adopt.title': 'אמצו חבר',
   'shop.adopt.ownedAria': '{name} ({species}): כבר שלכם',
@@ -361,7 +374,7 @@ export const he = {
   'shop.adopt.youHave.one': 'יש לכם יהלום אחד.',
   'shop.adopt.youHave.other': 'יש לכם {count} יהלומים.',
   'shop.adopt.notNow': 'לא עכשיו',
-  'shop.adopt.help.other': 'בחרו כל חבר שעוד אין לכם תמורת {count} יהלומים, או המשיכו לשחק כדי לפתוח אותם בחינם.',
+  'shop.adopt.help.other': 'שישה חברים בשבוע, חדשים בכל יום שני: אמצו חבר שעוד אין לכם תמורת {count} יהלומים, או המשיכו לשחק כדי לפתוח אותם בחינם.',
 
   'shop.clothes.link': 'ארון בגדים',
   'shop.grove.link': 'החורשה שלי',

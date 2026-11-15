@@ -391,7 +391,7 @@ export const he = {
 
   'pals.rarity.common': 'רגיל',
   'pals.rarity.legendary': 'אגדי',
-  'pals.rarity.mythic': 'מיתי',
+  'pals.rarity.mythic': 'מיתולוגי',
 
   'pals.unlock.stars': 'אספו {stars} ★',
   'pals.unlock.worlds.one': 'סיימו עולם אחד',
@@ -461,7 +461,7 @@ export const he = {
   'pals.lucky.title': 'חבר המזל',
   'pals.lucky.line': 'חבר חדש בחינם כל {every} שלבים: עוד {left}!',
   'pals.lucky.progressLabel': 'ההתקדמות לחבר המזל הבא',
-  'pals.lucky.odds': 'סיכויים: רגיל {common} · ★ אגדי {legendary} · ✦ מיתי {mythic}. תמיד אחד שעוד אין לכם.',
+  'pals.lucky.odds': 'סיכויים: רגיל {common} · ★ אגדי {legendary} · ✦ מיתולוגי {mythic}. תמיד אחד שעוד אין לכם.',
   'pals.lucky.giftTitle': 'מתנת חבר המזל!',
   'pals.lucky.joined': '{name} הצטרף אליכם!',
   'pals.lucky.sparksTitle': 'ניצוצות המזל!',

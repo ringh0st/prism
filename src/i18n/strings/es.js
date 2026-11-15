@@ -153,7 +153,7 @@ export const es = {
   'skip.text': 'Ganarás 1 estrella. Puedes volver por más cuando quieras.',
   'skip.keepTrying': 'Seguir intentando',
 
-  'buy.outOf': 'Sin {name}',
+  'buy.title': '¿Conseguir {name}?',
   'buy.cap.other': 'Usarla limita este nivel a {count} ★.',
   'buy.sparksLeftToday.one': 'Te queda {count} compra con chispas hoy.',
   'buy.sparksLeftToday.other': 'Te quedan {count} compras con chispas hoy.',

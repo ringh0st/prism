@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Dialog from './Dialog.jsx';
 import Button from './Button.jsx';
-import Icon from './Icon.jsx';
+import ShopItemArt from '../screens/store/ShopItemArt.jsx';
 import BuyButtons from './BuyButtons.jsx';
 import Stars from './Stars.jsx';
 import { storeItem, toolFor } from '../game/catalog.js';
@@ -37,9 +37,9 @@ export default function QuickBuyDialog({ helperId, onBought, onClose }) {
   };
 
   return (
-    <Dialog title={t('buy.outOf', { name: text.name })} onClose={onClose}>
+    <Dialog title={t('buy.title', { name: text.name })} onClose={onClose}>
       <div className={styles.helper} aria-hidden="true">
-        <Icon name={helper.icon} size={34} />
+        <ShopItemArt art={helperId} size={84} />
       </div>
       <p className={styles.description}>{text.description}</p>
       {/* Using a helper caps the stars: shown as the stars still possible (the sentence is for screen readers). */}
@@ -62,7 +62,7 @@ export default function QuickBuyDialog({ helperId, onBought, onClose }) {
       )}
       <div className={styles.footer}>
         <Button variant="ghost" onClick={onClose} data-autofocus>
-          {t('skip.keepTrying')}
+          {t('pals.later')}
         </Button>
         <Button variant="secondary" icon="bag" as="a" href="#/store">
           {t('nav.shop')}

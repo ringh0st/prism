@@ -8,7 +8,10 @@ alter table public.profiles
   add column if not exists pal_accessories text[] not null default '{}',
   add column if not exists pal_accessory text,
   add column if not exists pal_wearing text[] not null default '{}',
-  add column if not exists lucky_pals_claimed integer not null default 0;
+  add column if not exists lucky_pals_claimed integer not null default 0,
+  -- Legendary/Mythic Pals adopted this week (at most 2 a week; see _adopt_week).
+  add column if not exists rare_adopt_week integer,
+  add column if not exists rare_adopts integer not null default 0;
 
 -- Saves from before slots wore one item in pal_accessory.
 update public.profiles set pal_wearing = array[pal_accessory] where pal_accessory is not null and pal_wearing = '{}';
@@ -212,6 +215,37 @@ as $$
   where position = ((p_day - date '2026-01-01') + seed.value) % size;
 $$;
 
+-- The Shop's week (Monday to Sunday, UTC), counted from the week of 2026-01-01. Must match adoptWeekOf in pals.js.
+create or replace function public._adopt_week(p_day date)
+returns integer
+language sql
+immutable
+as $$
+  select floor(((p_day - date '2026-01-01') + 3) / 7.0)::integer;
+$$;
+
+-- This week's 6 Basic Pals in a player's Shop (some may already be on their team): among the Basic Pals in
+-- catalog order, positions (seed + week * 6 + i * 7) mod how many there are. Must match weeklyAdoptShelf in pals.js.
+create or replace function public._weekly_basics(p_user uuid, p_day date)
+returns text[]
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  with pool as (
+    select pal, row_number() over (order by ord) - 1 as position, count(*) over () as size
+    from unnest(public._all_pals()) with ordinality as t(pal, ord)
+    where public._pal_rarity(pal) = 'common'
+  ), seed as (
+    select coalesce(sum(ascii(c)), 0) as value from regexp_split_to_table(p_user::text, '') as c
+  )
+  select coalesce(array_agg(pal), '{}') from pool, seed
+  where position in (
+    select (seed.value + public._adopt_week(p_day) * 6 + i * 7) % pool.size from generate_series(0, 5) as i
+  );
+$$;
+
 -- Built-in worlds where all 20 levels have at least one star.
 create or replace function public._finished_world_count(p_user uuid)
 returns integer
@@ -398,14 +432,23 @@ declare
   v_rarity text := public._pal_rarity(p_pal);
   v_price integer := case public._pal_rarity(p_pal) when 'mythic' then 60 when 'legendary' then 40 else 20 end;
   v_profile public.profiles;
+  v_today date := (now() at time zone 'utc')::date;
+  v_week integer := public._adopt_week((now() at time zone 'utc')::date);
 begin
   if public._pal_unlock(p_pal) is null then
     raise exception using message = 'That Pal doesn’t exist.';
   end if;
-  if v_rarity <> 'common' and p_pal is distinct from public._daily_pick(v_user, v_rarity, (now() at time zone 'utc')::date) then
+  if v_rarity <> 'common' and p_pal is distinct from public._daily_pick(v_user, v_rarity, v_today) then
     raise exception using message = 'That Pal isn’t in your Shop today. There’s a new pick tomorrow!';
   end if;
+  if v_rarity = 'common' and not (p_pal = any (public._weekly_basics(v_user, v_today))) then
+    raise exception using message = 'That Pal isn’t in your Shop this week. New friends come on Monday!';
+  end if;
   select * into v_profile from public.profiles where id = v_user for update;
+  -- At most 2 Legendary or Mythic Pals a week, so each one stays a treat.
+  if v_rarity <> 'common' and v_profile.rare_adopt_week = v_week and v_profile.rare_adopts >= 2 then
+    raise exception using message = 'You adopted 2 rare Pals this week. More next week!';
+  end if;
   if v_profile.pals ? p_pal then
     raise exception using message = 'This Pal is already on your team.';
   end if;
@@ -415,7 +458,9 @@ begin
   update public.profiles set
     diamonds = diamonds - v_price,
     pals = pals || jsonb_build_object(p_pal, jsonb_build_object('stage', 0)),
-    pal_id = coalesce(pal_id, p_pal)
+    pal_id = coalesce(pal_id, p_pal),
+    rare_adopts = case when v_rarity = 'common' then rare_adopts when rare_adopt_week = v_week then rare_adopts + 1 else 1 end,
+    rare_adopt_week = case when v_rarity = 'common' then rare_adopt_week else v_week end
   where id = v_user;
   return public._economy_state(v_user);
 end;

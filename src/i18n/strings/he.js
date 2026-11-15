@@ -153,7 +153,7 @@ export const he = {
   'skip.text': 'תקבלו כוכב אחד. אפשר לחזור ולהשיג עוד כוכבים מתי שרוצים.',
   'skip.keepTrying': 'להמשיך לנסות',
 
-  'buy.outOf': 'אזל המלאי: {name}',
+  'buy.title': 'לקבל {name}?',
   'buy.cap.one': 'השימוש בו מגביל את השלב הזה לכוכב אחד.',
   'buy.cap.other': 'השימוש בו מגביל את השלב הזה ל-{count} ★.',
   'buy.sparksLeftToday.one': 'נשארה קנייה אחת בניצוצות היום.',

@@ -132,7 +132,7 @@ export const he = {
   'winGift.giftTitle.other': '{count} ניצחונות היום!',
   'present.rarity.plain': 'רגילה',
   'present.rarity.rare': 'נדירה!',
-  'present.rarity.epic': 'מיוחדת!',
+  'present.rarity.epic': 'נדירה מאוד!',
   'present.rarity.legendary': 'אגדית!',
   'present.rarity.bonus': '\u2066+{n}\u2069 ניצוצות',
   'present.rarity.item': 'בגד או קישוט בטוח',
