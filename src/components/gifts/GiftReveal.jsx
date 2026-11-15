@@ -17,6 +17,10 @@ const SHAKE_MS = 700;
 const CHARGE_STEP_MS = 650;
 const ITEM_GAP_MS = 380;
 const NEXT_GIFT_MS = 1100;
+/** After "Open all": plain presents go straight to the pile, special ones still glow up, just quicker. */
+const FAST_SHAKE_MS = 150;
+const FAST_CHARGE_STEP_MS = 300;
+const FAST_NEXT_GIFT_MS = 250;
 /** Each step a present glows up to, plain → rare → epic → legendary: its color, its light and a symbol (never color alone). */
 const GLOW_LOOKS = [
   { tone: 'mint', symbol: '', light: '#4FBFAD' },
@@ -62,6 +66,8 @@ export default function GiftReveal({
   const [items, setItems] = useState([]);
   const [shown, setShown] = useState(0);
   const [error, setError] = useState('');
+  const [isFast, setIsFast] = useState(false);
+  const fast = useRef(false);
   const boxRef = useRef(null);
   const hurry = useRef(null);
   const isMounted = useRef(true);
@@ -113,7 +119,7 @@ export default function GiftReveal({
       sfx.giftShake();
       let gift;
       try {
-        [gift] = await Promise.all([open(), pause(SHAKE_MS)]);
+        [gift] = await Promise.all([open(), pause(fast.current ? FAST_SHAKE_MS : SHAKE_MS)]);
       } catch (failure) {
         if (!isMounted.current) return;
         if (opened.length) break;
@@ -125,9 +131,18 @@ export default function GiftReveal({
       if (charges) {
         // Charging: the bar fills notch by notch; each notch the present reaches makes it glow up.
         const steps = rarityStep(gift);
+        // Quick mode: a plain present goes straight to the pile (its things show in the summary).
+        if (fast.current && steps === 0) {
+          opened.push(gift);
+          setOpenedCount(i + 1);
+          sfx.giftItem(0);
+          await pause(FAST_NEXT_GIFT_MS);
+          if (!isMounted.current) return;
+          continue;
+        }
         for (let step = 1; step < GLOW_LOOKS.length; step++) {
           setCharge(step / GLOW_LOOKS.length);
-          await pause(CHARGE_STEP_MS);
+          await pause(fast.current ? FAST_CHARGE_STEP_MS : CHARGE_STEP_MS);
           if (step > steps) break;
           glowUp(step);
         }
@@ -138,9 +153,11 @@ export default function GiftReveal({
       setPhase('open');
       sfx.giftOpen({ isBig: isBig || rarityStep(gift) >= 2 });
       setOpenedCount(i + 1);
-      await showItems(giftItems(lang, gift, partner));
+      // Quick mode: a special present still glows up and pops, and its things wait for the summary.
+      if (fast.current) setItems([]);
+      else await showItems(giftItems(lang, gift, partner));
       opened.push(gift);
-      if (i < count - 1) await pause(NEXT_GIFT_MS);
+      if (i < count - 1) await pause(fast.current ? FAST_NEXT_GIFT_MS : NEXT_GIFT_MS);
       if (!isMounted.current) return;
     }
     // Everything together at the end (for several gifts, a summary).
@@ -238,6 +255,19 @@ export default function GiftReveal({
           </ul>
         )}
       </div>
+      {isPile && !isFast && openedCount >= 1 && left > 1 && phase !== 'done' && phase !== 'error' && (
+        // Many presents: after the first one's show, the rest can open quickly (the special ones still glow up).
+        <Button
+          variant="secondary"
+          onClick={() => {
+            fast.current = true;
+            setIsFast(true);
+            hurry.current?.();
+          }}
+        >
+          {t('gift.openAll', { count: left })}
+        </Button>
+      )}
       {phase === 'error' && (
         <>
           <p className={styles.error}>{error}</p>

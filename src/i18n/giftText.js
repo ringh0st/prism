@@ -22,11 +22,14 @@ export function giftItems(lang, gift, partner = null) {
   }
   if (gift.diamonds)
     entries.push({ key: 'diamonds', text: translate(lang, 'gift.diamonds', { count: gift.diamonds }), art: { kind: 'shop', id: 'diamonds0' } });
+  // The same helper twice (several gifts summed up) is one line: "+2 Lens".
   const helpers = gift.helpers ?? (gift.helper ? [gift.helper] : []);
-  helpers.forEach((helper, i) => {
+  const helperCounts = helpers.reduce((counts, helper) => counts.set(helper, (counts.get(helper) ?? 0) + 1), new Map());
+  helperCounts.forEach((count, helper) => {
+    const name = helperText(lang, helper).name;
     entries.push({
-      key: `helper-${i}`,
-      text: translate(lang, 'gift.helper', { name: helperText(lang, helper).name }),
+      key: `helper-${helper}`,
+      text: count > 1 ? translate(lang, 'gift.helperMany', { count, name }) : translate(lang, 'gift.helper', { name }),
       art: { kind: 'shop', id: helper },
     });
   });

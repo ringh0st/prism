@@ -70,7 +70,9 @@ const STUCK_AFTER_MOVES = 6;
 const COACH_AFTER_MS = 3500;
 /** Worlds where running out of moves offers "Keep going" (for 1 star) instead of a fail. */
 const KEEP_GOING_WORLDS = 2;
+/** Out of moves: Keep going adds moves (1★ at most). Worlds 1–2: +5 as often as needed; later: +3, once per try. */
 const KEEP_GOING_MOVES = 5;
+const KEEP_GOING_MOVES_LATER = 3;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const SEEN_PIECES_KEY = 'prism.seenPieces.v1';
@@ -164,7 +166,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   // The very first levels teach without a counter, so they can't run out of moves either.
   const playLimit = isFirstSteps ? Infinity : moveLimit;
   const starCap = bonusMoves > 0 ? Math.min(1, puzzle.starCap) : puzzle.starCap;
-  const canKeepGoing = mode === 'level' && level.world <= KEEP_GOING_WORLDS;
+  const isEarlyWorld = level.world <= KEEP_GOING_WORLDS;
+  const keepGoingMoves = isEarlyWorld ? KEEP_GOING_MOVES : KEEP_GOING_MOVES_LATER;
+  const canKeepGoing = mode === 'level' && (isEarlyWorld || bonusMoves === 0);
   const gems = level.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
   const helpersAllowed = helpersAllowedFor(level.difficulty);
   // Daily and event puzzles can't be skipped.
@@ -794,12 +798,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         <OutOfMovesDialog
           backName={backName}
           gems={gems.map(({ tile, i }) => ({ color: tile.color, isLit: trace.litGems.has(i) }))}
-          extraMoves={KEEP_GOING_MOVES}
+          extraMoves={keepGoingMoves}
           onRetry={restart}
           onKeepGoing={
             canKeepGoing
               ? () => {
-                  setBonusMoves((extra) => extra + KEEP_GOING_MOVES);
+                  setBonusMoves((extra) => extra + keepGoingMoves);
                   setIsOutOfMoves(false);
                   setLumi({ mood: 'happy', line: t('lumi.keepGoing') });
                 }
