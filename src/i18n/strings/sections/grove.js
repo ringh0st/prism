@@ -217,14 +217,14 @@ export const he = {
   'grove.scene.visiting': '{name} בא לבקר.',
   'grove.scene.party': 'יש מסיבה לכבוד סיום עולם {world}!',
 
-  'garden.title': 'גינת חרקיקי האור',
-  'garden.found': 'נמצאו {found} מתוך {total} חרקיקי אור',
-  'garden.meter': 'חרקיקי אור שנמצאו',
-  'garden.how': 'חרקיקי אור מנמנמים בחלק מהשלבים (חפשו אותם במפה). השיגו שם ★★★ כדי להציל אותם. הנדירים מתחבאים בשלבים קשים ובשלבי בוס.',
+  'garden.title': 'גן הזוהרונים',
+  'garden.found': 'נמצאו {found} מתוך {total} זוהרונים',
+  'garden.meter': 'זוהרונים שנמצאו',
+  'garden.how': 'זוהרונים מנמנמים בחלק מהשלבים (חפשו אותם במפה). השיגו שם ★★★ כדי להציל אותם. הנדירים מתחבאים בשלבים קשים ובשלבי בוס.',
   'garden.bugLabel': '{name}, {title}',
   'garden.bugLabelTimes': '{name}, {title}, הצלתם אותו {times} פעמים',
   'garden.missing': 'עוד לא נמצא',
-  'garden.missingRare': 'עוד לא נמצא, חרקיק נדיר',
+  'garden.missingRare': 'עוד לא נמצא, זוהרון נדיר',
   'garden.rare': '★ נדיר',
   'garden.hi': 'היי, {name}!',
 
@@ -238,7 +238,7 @@ export const he = {
   'sticker.starry.how': '★★★ ב-10 שלבים',
   'sticker.hardHero.how': '★★★ בכל השלבים הקשים',
   'sticker.bossBeater.how': '★★★ בשלב הבוס',
-  'sticker.bugBuddy.how': 'הצילו את כל חרקיקי האור',
+  'sticker.bugBuddy.how': 'הצילו את כל הזוהרונים',
   'sticker.perfect.how': '★★★ בכל 20 השלבים',
 
   'decor.spot.home': 'בתים',

@@ -478,7 +478,7 @@ export const he = {
   'pals.unlocked.many': '{count} חברים חדשים!',
   'pals.unlocked.meetAll': 'בואו להכיר',
 
-  'pals.garden.title': 'גינת חרקיקי האור',
+  'pals.garden.title': 'גן הזוהרונים',
   'pals.garden.found': 'נמצאו {n} מתוך {total}',
 
   // Pal names (cute local names where the English is a pun) and species (palBio.*).

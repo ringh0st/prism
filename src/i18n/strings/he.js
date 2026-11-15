@@ -50,7 +50,7 @@ export const he = {
   'map.node.stars.one': 'כוכב אחד מתוך {max}',
   'map.node.stars.other': '{count} כוכבים מתוך {max}',
   'map.node.locked': 'נעול',
-  'map.node.glowbug': 'חרקיק אור מחכה שיצילו אותו',
+  'map.node.glowbug': 'זוהרון מחכה שיצילו אותו',
   'map.chest.locked.one': 'תיבת פרס. סיימו שלב אחד כדי לפתוח אותה.',
   'map.chest.locked.other': 'תיבת פרס. סיימו {count} שלבים כדי לפתוח אותה.',
   'map.chest.ready': 'תיבת הפרס מוכנה! הקישו כדי לפתוח.',
@@ -230,7 +230,7 @@ export const he = {
 
   'glowbug.shy': '{name} עדיין קצת ביישן… השיגו ★★★ כדי להציל אותו!',
   'glowbug.rescued': 'הצלתם את {name}!',
-  'glowbug.visit': 'לבקר בגינת חרקיקי האור',
+  'glowbug.visit': 'לבקר בגן הזוהרונים',
 
   'combo.double': 'כפול!',
   'combo.triple': 'משולש!',
@@ -344,7 +344,7 @@ export const he = {
   'sticker.starry': 'מלא כוכבים',
   'sticker.hardHero': 'גיבור הקשים',
   'sticker.bossBeater': 'מנצח הבוסים',
-  'sticker.bugBuddy': 'חבר של חרקיקים',
+  'sticker.bugBuddy': 'חבר של זוהרונים',
   'sticker.perfect': 'מושלם!',
 
   'quips.start': ['בואו נדליק את האור!', 'אני מאמינה בכם. וגם במראות.', 'אבני החן מחכות לכם.', 'מסובבים מראות, מכופפים קרניים!', 'זה יהיה מבריק!'],

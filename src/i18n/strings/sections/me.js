@@ -398,8 +398,8 @@ export const es = {
 };
 
 export const he = {
-  'ui.cell.glowbugAwake': 'חרקיק האור {name} ער כאן',
-  'ui.cell.glowbugAsleep': 'חרקיק האור {name} ישן כאן',
+  'ui.cell.glowbugAwake': 'הזוהרון {name} ער כאן',
+  'ui.cell.glowbugAsleep': 'הזוהרון {name} ישן כאן',
   'ui.cell.position': 'שורה {row}, עמודה {col}',
   'me.sync.local': 'נשמר במכשיר הזה',
   'me.sync.syncing': 'מסנכרנים…',
@@ -450,7 +450,7 @@ export const he = {
   'me.stat.shields.one': 'מגן אחד',
   'me.stat.shields.other': '{count} מגנים',
   'me.stickers': 'אלבום המדבקות',
-  'me.glowbugs': 'חרקיקי אור',
+  'me.glowbugs': 'זוהרונים',
 
   'me.road.title': 'דרך התארים',
   'me.road.earned': 'הושג',
