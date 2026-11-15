@@ -1,7 +1,7 @@
 import { translate } from './translate.js';
 import { recipeOf } from '../game/recipes.js';
 import { levelNameFor } from '../game/levelNames.js';
-import { HELPERS } from '../game/catalog.js';
+import { toolFor } from '../game/catalog.js';
 import { eventThemeFor, parseEventLevelId } from '../game/events.js';
 
 /*
@@ -26,10 +26,10 @@ export const pieceText = (lang, piece) => ({
   text: translate(lang, `piece.${piece.id}.text`, {}, piece.text),
 });
 
-/** A helper's name and description. */
+/** A helper's (or booster's) name and description. */
 export const helperText = (lang, id) => ({
-  name: translate(lang, `helper.${id}.name`, {}, HELPERS[id].name),
-  description: translate(lang, `helper.${id}.description`, {}, HELPERS[id].description),
+  name: translate(lang, `helper.${id}.name`, {}, toolFor(id).name),
+  description: translate(lang, `helper.${id}.description`, {}, toolFor(id).description),
 });
 
 /** "Sunrise Sandbox" in English; "Mundo 1" / "עולם 1" elsewhere (the world names are English wordplay). */

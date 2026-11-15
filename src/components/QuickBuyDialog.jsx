@@ -4,7 +4,7 @@ import Button from './Button.jsx';
 import Icon from './Icon.jsx';
 import BuyButtons from './BuyButtons.jsx';
 import Stars from './Stars.jsx';
-import { HELPERS, storeItem } from '../game/catalog.js';
+import { storeItem, toolFor } from '../game/catalog.js';
 import { sparkPurchasesLeft } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
 import { usePlayer } from '../state/PlayerContext.jsx';
@@ -20,7 +20,7 @@ export default function QuickBuyDialog({ helperId, onBought, onClose }) {
   const { progress, isSignedIn, buyItem } = usePlayer();
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState('');
-  const helper = HELPERS[helperId];
+  const helper = toolFor(helperId);
   const item = storeItem(helperId);
   const sparksLeftToday = sparkPurchasesLeft(progress, todayKey());
 

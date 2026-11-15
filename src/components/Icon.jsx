@@ -74,6 +74,12 @@ const PATHS = {
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
+  undo: (
+    <>
+      <path d="M9 14 4 9l5-5" />
+      <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+    </>
+  ),
   map: (
     <>
       <path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z" />

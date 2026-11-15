@@ -33,7 +33,8 @@ import { music } from '../../audio/music.js';
 import { sfx } from '../../audio/sfx.js';
 import { playLightFinale } from '../../lib/lightFinale.js';
 import { moveLimitFor, starsForMoves } from '../../game/scoring.js';
-import { HELPERS, HELPER_IDS, LENS_DURATION_MS, helpersAllowedFor } from '../../game/catalog.js';
+import { BOOSTERS_FROM_WORLD, HELPERS, HELPER_IDS, LENS_DURATION_MS, helpersAllowedFor, toolFor } from '../../game/catalog.js';
+import { useBoosters } from '../../hooks/useBoosters.js';
 import { isWorldComplete } from '../../game/progress.js';
 import { dailyShareText } from '../../game/share.js';
 import { PUBLIC_GAME_URL } from '../../lib/config.js';
@@ -161,8 +162,21 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
   const modifier = useMemo(() => levelModifierFor(level), [level]);
   const isFirstSteps = isFirstStepsLevel(level, mode);
+  // Boosters: picked on the level card in the main road from World 2 (not in the daily, events, Rush or challenges).
+  const boosters = useBoosters({
+    enabled: mode === 'level' && level.world >= BOOSTERS_FROM_WORLD,
+    owned: progress.helpers,
+    consumeHelper,
+    puzzle,
+    onNeedBuy: setBuyingHelper,
+  });
   const flavor = flavorText(lang, level);
-  const moveLimit = (mode === 'rush' ? rushMoveLimit(rush.run, level.par) : moveLimitFor(level.par, level.difficulty)) + bonusMoves;
+  // Spare Moves and every Undo add to the limit (never to the stars); Keep going adds too, with 1★ at most.
+  const moveLimit =
+    (mode === 'rush' ? rushMoveLimit(rush.run, level.par) : moveLimitFor(level.par, level.difficulty)) +
+    bonusMoves +
+    boosters.extraMoves +
+    puzzle.undos;
   // The very first levels teach without a counter, so they can't run out of moves either.
   const playLimit = isFirstSteps ? Infinity : moveLimit;
   const starCap = bonusMoves > 0 ? Math.min(1, puzzle.starCap) : puzzle.starCap;
@@ -617,6 +631,11 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       setLumi({ mood: 'happy', line: flavor.goal });
       sfx.lumiTalk();
     }
+    boosters.start().then((used) => {
+      if (!used.length) return;
+      sfx.helper();
+      setLumi({ mood: 'excited', line: t(used.includes('headStart') ? 'lumi.headStart' : 'lumi.boosters') });
+    });
   }, [playStats, isFirstSteps, flavor, progress, newPieces, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // First levels: a hand points at the next mirror to turn.
@@ -626,6 +645,11 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     const timer = setTimeout(() => setIsCoachDue(true), COACH_AFTER_MS);
     return () => clearTimeout(timer);
   }, [isFirstSteps, showIntro, isCoachDue, moves]);
+  // The replay starts from the board as the player found it (with Lumi's Head Start mirror already turned).
+  const replayLevel = useMemo(
+    () => (puzzle.startOrients ? { ...level, tiles: level.tiles.map((tile, i) => ({ ...tile, orient: puzzle.startOrients[i] })) } : level),
+    [level, puzzle.startOrients],
+  );
   // How many taps the best finish still needs, so the meter can drop a star the moment it's out of reach.
   // The solutions are worked out once per level, just after it shows, so a tap never waits for the search.
   const [findTapsLeft, setFindTapsLeft] = useState(null);
@@ -657,7 +681,21 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           </ScreenTitle>
         </div>
         {/* The partner Pal watches from the header, so the board can use all the room below. */}
-        <span className={styles.headerSpacer}>{mode !== 'playtest' && <PalBuddy reaction={palReaction} />}</span>
+        <span className={styles.headerEnd}>
+          {/* Undo (a booster) sits up here, so the helper buttons below keep their room. */}
+          {boosters.undosLeft > 0 && (
+            <Button
+              variant="secondary"
+              icon="undo"
+              className={styles.undo}
+              label={t('play.undo', { count: boosters.undosLeft })}
+              onClick={boosters.spendUndo}
+              disabled={isOver || puzzle.taps.length === 0}
+              data-count={boosters.undosLeft}
+            />
+          )}
+          <span className={styles.headerSpacer}>{mode !== 'playtest' && <PalBuddy reaction={palReaction} />}</span>
+        </span>
       </header>
 
       <section className={styles.status} aria-label={t('play.status')} data-tour="meter">
@@ -745,6 +783,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           flavor={flavor}
           waitsForTap={isFirstSteps}
           glowbugId={glowbug?.id}
+          boosters={boosters.picker}
           onDone={dismissIntro}
         />
       )}
@@ -755,7 +794,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           onBought={() => {
             const helperId = buyingHelper;
             setBuyingHelper(null);
-            if (helperId === 'skip') setIsConfirmingSkip(true);
+            if (showIntro) boosters.choose(helperId);
+            else if (helperId === 'skip') setIsConfirmingSkip(true);
             else spendHelper(helperId);
           }}
         />
@@ -839,13 +879,13 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           showWinGifts={mode === 'level' && !isFirstSteps}
           challenge={mode === 'level' && !result.isSkipped && !isFirstSteps ? { levelId: level.id, levelLabel, moves: result.moves } : null}
           backName={backName}
-          replay={mode === 'playtest' || isFirstSteps ? null : { level, history: puzzle.history, title: levelName, subtitle }}
+          replay={mode === 'playtest' || isFirstSteps ? null : { level: replayLevel, history: puzzle.history, title: levelName, subtitle }}
           result={result}
           par={level.par}
           difficulty={level.difficulty}
           cap={
             starCap < 3
-              ? { stars: starCap, icon: bonusMoves > 0 && starCap === 1 ? 'plus' : (HELPERS[puzzle.usedHelpers.at(-1)]?.icon ?? 'hint') }
+              ? { stars: starCap, icon: bonusMoves > 0 && starCap === 1 ? 'plus' : (toolFor(puzzle.usedHelpers.at(-1))?.icon ?? 'hint') }
               : null
           }
           hotStreak={progress.hotStreak}

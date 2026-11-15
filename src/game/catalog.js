@@ -42,6 +42,44 @@ export const HELPERS = {
 
 export const HELPER_IDS = Object.keys(HELPERS);
 
+/**
+ * Boosters: picked on the level card before a level starts (from World 2, in the main road only) and used up
+ * at the start. They're held and bought like helpers (the same inventory, cap and 3-a-day sparks limit), but
+ * never for diamonds. Spare Moves and Undo never touch the stars; Head Start counts like a Hint (★★ at most).
+ */
+export const BOOSTERS = {
+  spareMoves: {
+    id: 'spareMoves',
+    name: 'Spare Moves',
+    icon: 'plus',
+    description: '3 more moves for this level. Stars still count your taps.',
+    starCap: 3,
+    moves: 3,
+  },
+  steadyHand: {
+    id: 'steadyHand',
+    name: 'Undo',
+    icon: 'undo',
+    description: 'Take back up to 2 taps. They don’t use up your moves.',
+    starCap: 3,
+    undos: 2,
+  },
+  headStart: {
+    id: 'headStart',
+    name: 'Head Start',
+    icon: 'spark',
+    description: 'Lumi turns one mirror into place before you start.',
+    starCap: 2,
+  },
+};
+
+export const BOOSTER_IDS = Object.keys(BOOSTERS);
+/** Boosters open from this world on. */
+export const BOOSTERS_FROM_WORLD = 2;
+
+/** A helper or a booster by id. */
+export const toolFor = (id) => HELPERS[id] ?? BOOSTERS[id] ?? null;
+
 /** You can hold at most this many of each helper. */
 export const INVENTORY_CAP = 5;
 
@@ -66,6 +104,9 @@ export const STORE_ITEMS = [
   { id: 'lens', kind: 'helper', price: { sparks: 40, diamonds: 1 }, grants: { helper: 'lens', quantity: 1 } },
   { id: 'autoturn', kind: 'helper', price: { diamonds: 2 }, grants: { helper: 'autoturn', quantity: 1 } },
   { id: 'skip', kind: 'helper', price: { diamonds: 5 }, grants: { helper: 'skip', quantity: 1 } },
+  { id: 'spareMoves', kind: 'helper', price: { sparks: 60 }, grants: { helper: 'spareMoves', quantity: 1 } },
+  { id: 'steadyHand', kind: 'helper', price: { sparks: 60 }, grants: { helper: 'steadyHand', quantity: 1 } },
+  { id: 'headStart', kind: 'helper', price: { sparks: 60 }, grants: { helper: 'headStart', quantity: 1 } },
   { id: 'sparks-small', kind: 'sparks', price: { diamonds: 2 }, grants: { sparks: 150 } },
   { id: 'sparks-medium', kind: 'sparks', price: { diamonds: 5 }, grants: { sparks: 400 } },
   { id: 'sparks-large', kind: 'sparks', price: { diamonds: 10 }, grants: { sparks: 1000 } },
@@ -101,9 +142,9 @@ export const weeklyRewardFor = (rank) => WEEKLY_REWARDS.find((reward) => reward.
 
 export const storeItem = (id) => STORE_ITEMS.find((item) => item.id === id) ?? null;
 
-/** The strictest star cap among the helpers used this attempt (3 if none). */
+/** The strictest star cap among the helpers (and boosters) used this attempt (3 if none). */
 export function starCapForHelpers(usedHelperIds) {
-  return usedHelperIds.reduce((cap, id) => Math.min(cap, HELPERS[id]?.starCap ?? 3), 3);
+  return usedHelperIds.reduce((cap, id) => Math.min(cap, toolFor(id)?.starCap ?? 3), 3);
 }
 
 export function helpersAllowedFor(difficulty) {

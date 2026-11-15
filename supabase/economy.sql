@@ -42,6 +42,9 @@ insert into public.store_items (id, kind, price_sparks, price_diamonds, grant_he
   ('lens', 'helper', 40, 1, 'lens', 1, 0),
   ('autoturn', 'helper', null, 2, 'autoturn', 1, 0),
   ('skip', 'helper', null, 5, 'skip', 1, 0),
+  ('spareMoves', 'helper', 60, null, 'spareMoves', 1, 0),
+  ('steadyHand', 'helper', 60, null, 'steadyHand', 1, 0),
+  ('headStart', 'helper', 60, null, 'headStart', 1, 0),
   ('sparks-small', 'sparks', null, 2, null, 0, 150),
   ('sparks-medium', 'sparks', null, 5, null, 0, 400),
   ('sparks-large', 'sparks', null, 10, null, 0, 1000)

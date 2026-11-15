@@ -71,9 +71,9 @@ as $$
   select case p_day
     when 0 then '{"sparks": 15}'::jsonb
     when 1 then '{"sparks": 20, "helper": "hint"}'::jsonb
-    when 2 then '{"sparks": 25}'::jsonb
+    when 2 then '{"sparks": 25, "helper": "spareMoves"}'::jsonb
     when 3 then '{"sparks": 25, "helper": "lens"}'::jsonb
-    when 4 then '{"sparks": 30}'::jsonb
+    when 4 then '{"sparks": 30, "helper": "steadyHand"}'::jsonb
     when 5 then '{"sparks": 30, "helper": "autoturn"}'::jsonb
     when 6 then '{"sparks": 60, "diamonds": 1, "isBig": true}'::jsonb
   end;
@@ -181,7 +181,7 @@ begin
         and not (split_part(i, ':', 1) = 'decor' and split_part(i, ':', 2) = any (v_profile.grove_items))
       order by random() limit 1;
   elsif v_roll < 45 then
-    select h into v_helper from unnest(array['hint', 'lens', 'autoturn']) as h
+    select h into v_helper from unnest(array['hint', 'lens', 'autoturn', 'spareMoves', 'steadyHand', 'headStart']) as h
       where coalesce((v_profile.helpers ->> h)::integer, 0) < 5
       order by random() limit 1;
   end if;

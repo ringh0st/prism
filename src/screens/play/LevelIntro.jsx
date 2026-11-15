@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import ScreenTitle from '../../components/game/ScreenTitle.jsx';
 import Button from '../../components/Button.jsx';
@@ -8,6 +8,7 @@ import LumiSays from '../../components/game/LumiSays.jsx';
 import GemShape from '../../components/GemShape.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import TapIcon from './TapIcon.jsx';
+import BoosterPicker from './BoosterPicker.jsx';
 import { glowbugById } from '../../game/glowbugs.js';
 import { glowbugName } from '../../i18n/groveText.js';
 import { moveLimitFor } from '../../game/scoring.js';
@@ -39,6 +40,7 @@ const INTRO_MS = 3500;
  * `lumiLine` is only for what the picture can't say (a friend's challenge, the Rush's spare moves).
  * `flavor` ({ name, goal }, see recipes.js) is read out to screen readers; Lumi says its goal once the level starts.
  * `waitsForTap` keeps it up until the player taps (the very first levels, for new players).
+ * `boosters` ({ owned, chosen, onToggle }) shows the booster picks; touching one keeps the card up until Let's go.
  */
 export default function LevelIntro({
   level,
@@ -51,16 +53,19 @@ export default function LevelIntro({
   flavor = null,
   waitsForTap = false,
   glowbugId = null,
+  boosters = null,
   onDone,
 }) {
   // A Hard or Extra Hard level always says so, even when it's also a night or disco level (difficulty first).
   const moods = [level.difficulty, modifier].filter((id) => MOODS[id]);
   const mood = MOODS[modifier] ? modifier : (moods[0] ?? null);
+  // Picking boosters takes a moment: once one is touched, the card waits for Let's go.
+  const [isPicking, setIsPicking] = useState(false);
   useEffect(() => {
-    if (waitsForTap) return undefined;
+    if (waitsForTap || isPicking) return undefined;
     const timer = setTimeout(onDone, mood ? INTRO_MS * 1.3 : INTRO_MS);
     return () => clearTimeout(timer);
-  }, [onDone]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [onDone, isPicking]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { t, lang } = useI18n();
   const gems = level.tiles.filter((tile) => tile.type === TILE.GEM);
@@ -120,6 +125,16 @@ export default function LevelIntro({
             <LumiSays mood="excited" size={72} line={lumiLine} />
           </div>
         ) : null}
+        {boosters && (
+          <BoosterPicker
+            owned={boosters.owned}
+            chosen={boosters.chosen}
+            onToggle={(id) => {
+              setIsPicking(true);
+              boosters.onToggle(id);
+            }}
+          />
+        )}
         <div className={styles.footer}>
           {!lumiLine && (
             <span className={styles.lumi} aria-hidden="true">

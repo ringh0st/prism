@@ -13,9 +13,9 @@ import { INVENTORY_CAP } from './catalog.js';
 export const GIFT_CALENDAR = [
   { sparks: 15 },
   { sparks: 20, helper: 'hint' },
-  { sparks: 25 },
+  { sparks: 25, helper: 'spareMoves' },
   { sparks: 25, helper: 'lens' },
-  { sparks: 30 },
+  { sparks: 30, helper: 'steadyHand' },
   { sparks: 30, helper: 'autoturn' },
   { sparks: 60, diamonds: 1, guestHelper: 'skip', isBig: true },
 ];
@@ -82,8 +82,8 @@ export const PRESENT_ITEMS = [
   { id: 'glowShrooms', type: 'decor' },
   { id: 'kites', type: 'decor' },
 ];
-/** Helpers a present can hold. */
-export const PRESENT_HELPERS = ['hint', 'lens', 'autoturn'];
+/** Helpers (and boosters) a present can hold. Must match claim_present() in supabase/gifts.sql. */
+export const PRESENT_HELPERS = ['hint', 'lens', 'autoturn', 'spareMoves', 'steadyHand', 'headStart'];
 
 const starsFromLevels = (levels) => Object.entries(levels).reduce((sum, [id, entry]) => sum + (/^w\d+-\d{2}$/.test(id) ? entry.stars : 0), 0);
 

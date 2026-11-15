@@ -301,6 +301,7 @@ test('gift calendar: one a day, grows through the week, pauses when a day is mis
 test('pal presents: one per 10 stars, odds shown, glow up by rarity, never something you own, matches the database', async () => {
   const {
     PRESENT_BASE_SPARKS,
+    PRESENT_HELPERS,
     PRESENT_EVERY_STARS,
     PRESENT_ITEMS,
     PRESENT_ODDS,
@@ -326,6 +327,7 @@ test('pal presents: one per 10 stars, odds shown, glow up by rarity, never somet
   );
   assert.match(sql, new RegExp(`v_stars / ${PRESENT_EVERY_STARS} <= v_profile.presents_opened`));
   assert.match(sql, new RegExp(`v_sparks integer := ${PRESENT_BASE_SPARKS};`));
+  assert.ok(sql.includes(`unnest(array[${PRESENT_HELPERS.map((id) => `'${id}'`).join(', ')}]) as h`), 'present helpers match');
   assert.match(sql, new RegExp(`v_sparks := v_sparks \\+ ${PRESENT_ODDS[1].sparks};`));
   assert.match(sql, new RegExp(`v_roll >= ${PRESENT_ODDS[0].chance + PRESENT_ODDS[1].chance}\\b`));
   assert.match(sql, new RegExp(`v_roll < ${PRESENT_ODDS[0].chance}\\b`));
@@ -382,7 +384,7 @@ test('pal presents: one per 10 stars, odds shown, glow up by rarity, never somet
   assert.deepEqual(presentProgress(progress), { have: 7, need: 10 });
   assert.throws(() => openPresentLocally(progress));
   // Every helper full: the helper surprise becomes the sparks bag.
-  const full = { ...progress, helpers: { hint: 5, lens: 5, autoturn: 5, skip: 0 } };
+  const full = { ...progress, helpers: { skip: 0, ...Object.fromEntries(PRESENT_HELPERS.map((id) => [id, 5])) } };
   assert.equal(drawPresent(full, { rarityRoll: 0, roll: 0.1 }).sparks, PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks);
 });
 

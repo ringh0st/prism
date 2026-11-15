@@ -16,6 +16,12 @@
   gap: var(--space-2);
 }
 
+.headerEnd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .headerSpacer {
   position: relative;
   width: 52px;
@@ -104,10 +110,36 @@
 }
 
 .controls {
-  display: grid;
-  grid-template-columns: auto 1fr;
+  display: flex;
   align-items: start;
   gap: var(--space-2);
+}
+
+.controls > [data-tour] {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Undo (a booster) shows how many are left as a small number on its corner */
+.undo {
+  position: relative;
+}
+
+.undo::after {
+  content: attr(data-count);
+  position: absolute;
+  top: -6px;
+  inset-inline-end: -6px;
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: 0 0 0 2px var(--surface-page);
 }
 
 .dialogText {

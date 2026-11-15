@@ -1,6 +1,6 @@
 import { sparksForDaily, sparksForNewStars, starsForMoves, STARTING_SPARKS } from './scoring.js';
 import { daysBetween } from './daily.js';
-import { DAILY_SPARK_PURCHASE_LIMIT, HELPER_IDS, INVENTORY_CAP, storeItem } from './catalog.js';
+import { DAILY_SPARK_PURCHASE_LIMIT, INVENTORY_CAP, storeItem, toolFor } from './catalog.js';
 
 export const BEAM_THEMES = [
   { id: 'sunbeam', name: 'Sunbeam', color: '#FFD23F', starsToUnlock: 0 },
@@ -170,7 +170,8 @@ export function buyStoreItemLocally(progress, itemId, currency, today) {
   const price = item.price.sparks;
   if (!price) throw new EconomyError('This item needs diamonds. Sign in to get diamonds.');
   const helperId = item.grants.helper;
-  if (helperId && progress.helpers[helperId] + item.grants.quantity > INVENTORY_CAP) {
+  const held = progress.helpers[helperId] ?? 0;
+  if (helperId && held + item.grants.quantity > INVENTORY_CAP) {
     throw new EconomyError(`You already have the maximum of ${INVENTORY_CAP}.`);
   }
   if (item.kind === 'helper' && sparkPurchasesLeft(progress, today) === 0) {
@@ -182,14 +183,14 @@ export function buyStoreItemLocally(progress, itemId, currency, today) {
   return {
     ...progress,
     sparks: progress.sparks - price + (item.grants.sparks ?? 0),
-    helpers: helperId ? { ...progress.helpers, [helperId]: progress.helpers[helperId] + item.grants.quantity } : progress.helpers,
+    helpers: helperId ? { ...progress.helpers, [helperId]: held + item.grants.quantity } : progress.helpers,
     sparkPurchases: { date: today, count: usedToday + (item.kind === 'helper' ? 1 : 0) },
   };
 }
 
 /** @throws EconomyError when the player has none left */
 export function consumeHelperLocally(progress, helperId) {
-  if (!HELPER_IDS.includes(helperId) || (progress.helpers[helperId] ?? 0) < 1) {
+  if (!toolFor(helperId) || (progress.helpers[helperId] ?? 0) < 1) {
     throw new EconomyError('You don’t have that helper.');
   }
   return { ...progress, helpers: { ...progress.helpers, [helperId]: progress.helpers[helperId] - 1 } };

@@ -13,7 +13,7 @@ import HelpTip from '../components/game/HelpTip.jsx';
 import SignInNote from './store/SignInNote.jsx';
 import BuysLeft from './store/BuysLeft.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
-import { DAILY_SPARK_PURCHASE_LIMIT, DIAMOND_PACKS, DIAMOND_REWARDS, HELPERS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS } from '../game/catalog.js';
+import { DAILY_SPARK_PURCHASE_LIMIT, DIAMOND_PACKS, DIAMOND_REWARDS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS, toolFor } from '../game/catalog.js';
 import { sparkPurchasesLeft } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
 import { startDiamondCheckout } from '../lib/economyApi.js';
@@ -51,7 +51,7 @@ function HelpersShelf({ buyProps, onInfo }) {
       </div>
       <ul className={styles.shelf}>
         {helperItems.map((item) => {
-          const helper = HELPERS[item.grants.helper];
+          const helper = toolFor(item.grants.helper);
           const { name, description } = helperText(lang, helper.id);
           const owned = progress.helpers[helper.id] ?? 0;
           return (

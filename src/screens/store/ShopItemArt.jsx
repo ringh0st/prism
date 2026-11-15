@@ -63,6 +63,53 @@ const ART = {
       <ellipse cx="36" cy="26" rx="10" ry="5" fill="#fff" opacity="0.35" transform="rotate(-30 36 26)" />
     </>
   ),
+  // Boosters: a "+3" move token, an undo coin and a mirror Lumi turns for you
+  spareMoves: (
+    <>
+      <GroundShadow width={54} />
+      <rect x="16" y="16" width="68" height="68" rx="20" fill="#f2a67e" />
+      <rect x="16" y="16" width="68" height="60" rx="20" fill="#f6bd9b" />
+      <text
+        x="50"
+        y="60"
+        direction="ltr"
+        unicodeBidi="isolate"
+        textAnchor="middle"
+        fontSize="34"
+        fontWeight="800"
+        fill="#5a2a14"
+        fontFamily="var(--font-display)"
+      >
+        +3
+      </text>
+      <Spark x={82} y={18} size={16} />
+    </>
+  ),
+  steadyHand: (
+    <>
+      <GroundShadow width={54} />
+      <circle cx="50" cy="50" r="36" fill="#d9a531" />
+      <circle cx="50" cy="47" r="36" fill="#f0c14e" />
+      <path
+        d="M42 56 30 44l12-12M30 44h25a13 13 0 0 1 0 26h-7"
+        fill="none"
+        stroke="#5c4310"
+        strokeWidth="7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </>
+  ),
+  headStart: (
+    <>
+      <GroundShadow width={54} />
+      <rect x="18" y="20" width="64" height="64" rx="16" fill="#4fbfad" />
+      <rect x="18" y="20" width="64" height="58" rx="16" fill="#7fd6c8" />
+      <rect x="46" y="22" width="8" height="54" rx="4" fill="#fffdf8" transform="rotate(45 50 49)" />
+      <path d="M50 4v10M30 10l5 8M70 10l-5 8" stroke="#f0c14e" strokeWidth="4" strokeLinecap="round" />
+      <Spark x={80} y={24} size={18} />
+    </>
+  ),
   sparks0: (
     <>
       <GroundShadow width={50} />

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cellsOnBeams, rotationGroup, traceBeams } from '../game/beam.js';
 import { findHint, nearestSolution } from '../game/solver.js';
 import { starCapForHelpers } from '../game/catalog.js';
@@ -6,18 +6,51 @@ import { FRAGILE_TURNS } from '../game/constants.js';
 
 const initialState = (level) => {
   const orients = level.tiles.map((tile) => tile.orient ?? 0);
-  return { orients, turns: orients.slice(), moves: 0, history: [], usedHelpers: [], hintTile: null, ghostSegments: null };
+  return {
+    orients,
+    turns: orients.slice(),
+    moves: 0,
+    history: [],
+    taps: [],
+    undos: 0,
+    usedHelpers: [],
+    hintTile: null,
+    ghostSegments: null,
+    headStartTile: null,
+    startOrients: null,
+  };
 };
 
-/** One tap: the tile turns, along with its twins. `history` keeps every tap (for the solve replay). */
-const rotated = (s, tiles, tileIndex) => {
+/** Turns a tile and its twins (`by` 1 forward, -1 back for an undo). */
+const turned = (s, tiles, tileIndex, by = 1) => {
   const orients = s.orients.slice();
   const turns = s.turns.slice();
   for (const i of rotationGroup(tiles, tileIndex)) {
     orients[i] ^= 1;
-    turns[i] += 1;
+    turns[i] += by;
   }
-  return { ...s, orients, turns, moves: s.moves + 1, history: [...s.history, tileIndex], hintTile: s.hintTile === tileIndex ? null : s.hintTile };
+  return { orients, turns };
+};
+
+/**
+ * One tap: the tile turns, along with its twins. `history` keeps every tap as shown (for the solve replay);
+ * `taps` are the ones an Undo can take back.
+ */
+const rotated = (s, tiles, tileIndex) => ({
+  ...s,
+  ...turned(s, tiles, tileIndex),
+  moves: s.moves + 1,
+  history: [...s.history, tileIndex],
+  taps: [...s.taps, tileIndex],
+  hintTile: s.hintTile === tileIndex ? null : s.hintTile,
+});
+
+/** Head Start: Lumi turns one mirror of the best solution before the first tap (not a move; ★★ at most, like a Hint). */
+const withHeadStart = (s, level) => {
+  const tileIndex = findHint(level, s.orients);
+  if (tileIndex === null) return s;
+  const start = turned(s, level.tiles, tileIndex);
+  return { ...s, ...start, startOrients: start.orients, headStartTile: tileIndex, usedHelpers: [...s.usedHelpers, 'headStart'] };
 };
 
 /** Turns a cracking mirror has left (Infinity for every other tile). */
@@ -66,7 +99,28 @@ export function usePuzzle(level) {
     [level.tiles],
   );
 
-  const restart = useCallback(() => setState({ levelId: level.id, ...initialState(level) }), [level]);
+  // A Head Start stays for the whole visit: a restart begins from the turned mirror again.
+  const hasHeadStart = useRef(false);
+  const fresh = useCallback(() => {
+    const start = { levelId: level.id, ...initialState(level) };
+    return hasHeadStart.current ? withHeadStart(start, level) : start;
+  }, [level]);
+  const restart = useCallback(() => setState(fresh()), [fresh]);
+  const startWithHeadStart = useCallback(() => {
+    hasHeadStart.current = true;
+    setState((s) => (s.headStartTile === null && s.moves === 0 ? withHeadStart(s, level) : s));
+  }, [level]);
+
+  /** Undo: takes back the last tap. It still counts toward the stars, but gives the move back (`undos`). */
+  const undo = useCallback(
+    () =>
+      setState((s) => {
+        const tileIndex = s.taps.at(-1);
+        if (tileIndex === undefined) return s;
+        return { ...s, ...turned(s, level.tiles, tileIndex, -1), taps: s.taps.slice(0, -1), history: [...s.history, tileIndex], undos: s.undos + 1 };
+      }),
+    [level.tiles],
+  );
 
   /**
    * Apply a helper's effect to the board. Skip is handled by the screen.
@@ -104,6 +158,8 @@ export function usePuzzle(level) {
     starCap: starCapForHelpers(current.usedHelpers),
     rotate,
     restart,
+    undo,
+    startWithHeadStart,
     applyHelper,
     clearGhost,
   };
