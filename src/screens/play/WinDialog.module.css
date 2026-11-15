@@ -141,6 +141,20 @@
   border-radius: 50%;
 }
 
+.actions .mapTile {
+  flex: none;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 64px;
+  height: 60px;
+  padding: 6px 10px;
+  border-radius: 18px;
+  font-size: 13px;
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--color-sage) 28%, var(--surface-raised));
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--color-sage) 55%, var(--surface-raised));
+}
+
 .diamond {
   color: var(--calm-label);
   background: var(--calm-bottom);

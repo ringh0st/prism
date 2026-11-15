@@ -207,7 +207,8 @@ export default function WinDialog({
           </span>
         )}
       </div>
-      {/* One big Next right under the result; Play again and the map are round icon buttons beside it. */}
+      {/* One big Next right under the result; Play again is a round icon beside it, and the map a green tile with its
+          name (like the map tab below), so going back to the path is as easy to see as going on. */}
       <div className={styles.actions}>
         <Button variant="secondary" icon="restart" label={t('win.playAgain')} onClick={onReplay} className={styles.round} />
         {hasNext ? (
@@ -219,7 +220,11 @@ export default function WinDialog({
             {t('play.backTo', { place: backName })}
           </Button>
         )}
-        {hasNext && <Button variant="secondary" icon="map" label={t('play.backTo', { place: backName })} onClick={onMap} className={styles.round} />}
+        {hasNext && (
+          <Button variant="secondary" icon="map" onClick={onMap} className={styles.mapTile} aria-label={t('play.backTo', { place: backName })}>
+            {backName === t('place.map') ? t('nav.map') : backName}
+          </Button>
+        )}
       </div>
       {/* The extras pop in one by one once the stars and sparks have landed, so the result reads first. */}
       <div className={styles.extras} style={{ '--extras-at': `${rewardsAt + 700}ms` }}>
