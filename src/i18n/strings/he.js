@@ -113,8 +113,6 @@ export const he = {
   'lumi.helper.hint': 'סובבו את המראה הזוהרת! עכשיו אפשר עד {stars}',
   'lumi.helper.lens': 'עקבו אחרי השביל המנוקד! עכשיו אפשר עד {stars}',
   'lumi.helper.autoturn': 'הופ! סובבתי לכם מראה אחת. עכשיו אפשר עד {stars}',
-  'lumi.helperLimit.one': 'כאן מותר רק כלי עזר אחד בכל ניסיון!',
-  'lumi.helperLimit.other': 'כאן מותרים רק {count} כלי עזר בכל ניסיון!',
   'lumi.keepGoing': 'אתם יכולים!',
 
   'helpers.label': 'עזרים',
@@ -144,8 +142,6 @@ export const he = {
   'helpers.left.one': 'במלאי: 1.',
   'helpers.left.other': 'במלאי: {count}.',
   'helpers.none': 'אין במלאי. הקישו כדי להשיג עוד.',
-  'helpers.used.one': 'השתמשתם ב-{used} מתוך כלי עזר אחד',
-  'helpers.used.other': 'השתמשתם ב-{used} מתוך {count} כלי עזר',
 
   'tip.stars.title': 'פחות הקשות, יותר ★',
 

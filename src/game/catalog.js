@@ -1,5 +1,3 @@
-import { DIFFICULTY } from './constants.js';
-
 /**
  * The game economy in one place. The database (supabase/economy.sql) enforces the same
  * prices for signed-in players; game.test.js checks the two stay in sync.
@@ -86,13 +84,6 @@ export const INVENTORY_CAP = 5;
 /** Helpers bought with sparks per day (diamond purchases aren't limited). */
 export const DAILY_SPARK_PURCHASE_LIMIT = 3;
 
-/** How many helpers can be used in one attempt at a level. */
-export const HELPERS_PER_ATTEMPT = {
-  [DIFFICULTY.NORMAL]: 3,
-  [DIFFICULTY.HARD]: 2,
-  [DIFFICULTY.EXTRA]: 1,
-};
-
 export const LENS_DURATION_MS = 6000;
 
 /**
@@ -145,8 +136,4 @@ export const storeItem = (id) => STORE_ITEMS.find((item) => item.id === id) ?? n
 /** The strictest star cap among the helpers (and boosters) used this attempt (3 if none). */
 export function starCapForHelpers(usedHelperIds) {
   return usedHelperIds.reduce((cap, id) => Math.min(cap, toolFor(id)?.starCap ?? 3), 3);
-}
-
-export function helpersAllowedFor(difficulty) {
-  return HELPERS_PER_ATTEMPT[difficulty] ?? HELPERS_PER_ATTEMPT[DIFFICULTY.NORMAL];
 }

@@ -113,8 +113,6 @@ export const es = {
   'lumi.helper.hint': '¡Gira el que brilla! Ahora como máximo: {stars}',
   'lumi.helper.lens': '¡Sigue el camino de puntos! Ahora como máximo: {stars}',
   'lumi.helper.autoturn': '¡Zas! Giré uno por ti. Ahora como máximo: {stars}',
-  'lumi.helperLimit.one': '¡Solo {count} ayuda por intento aquí!',
-  'lumi.helperLimit.other': '¡Solo {count} ayudas por intento aquí!',
   'lumi.keepGoing': '¡Tú puedes!',
 
   'helpers.label': 'Ayudas',
@@ -144,8 +142,6 @@ export const es = {
   'helpers.left.one': 'Queda {count}.',
   'helpers.left.other': 'Quedan {count}.',
   'helpers.none': 'No te quedan. Toca para conseguir más.',
-  'helpers.used.one': '{used} de {count} ayuda usada',
-  'helpers.used.other': '{used} de {count} ayudas usadas',
 
   'tip.stars.title': 'Menos toques, más ★',
 

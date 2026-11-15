@@ -90,24 +90,6 @@
 }
 
 /* Helpers used in this try: one dot each, filled once used */
-.limit {
-  display: flex;
-  gap: 5px;
-}
-
-.pip,
-.pipUsed {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: rgba(var(--shadow-color), 0.14);
-  box-shadow: var(--shadow-inset);
-}
-
-.pipUsed {
-  background: var(--reward-bottom);
-  box-shadow: none;
-}
 
 /* "Stuck? Try me": a friendly wiggle when the player has been still for a while. */
 .nudge {

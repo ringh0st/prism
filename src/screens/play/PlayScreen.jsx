@@ -33,7 +33,7 @@ import { music } from '../../audio/music.js';
 import { sfx } from '../../audio/sfx.js';
 import { playLightFinale } from '../../lib/lightFinale.js';
 import { moveLimitFor, starsForMoves } from '../../game/scoring.js';
-import { BOOSTERS_FROM_WORLD, HELPERS, HELPER_IDS, LENS_DURATION_MS, helpersAllowedFor, toolFor } from '../../game/catalog.js';
+import { BOOSTERS_FROM_WORLD, HELPERS, HELPER_IDS, LENS_DURATION_MS, toolFor } from '../../game/catalog.js';
 import { useBoosters } from '../../hooks/useBoosters.js';
 import { streakBoosters } from '../../game/winStreak.js';
 import { isWorldComplete } from '../../game/progress.js';
@@ -190,7 +190,6 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const keepGoingMoves = isEarlyWorld ? KEEP_GOING_MOVES : KEEP_GOING_MOVES_LATER;
   const canKeepGoing = mode === 'level' && (isEarlyWorld || bonusMoves === 0);
   const gems = level.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
-  const helpersAllowed = helpersAllowedFor(level.difficulty);
   // Daily and event puzzles can't be skipped.
   // World 1 offers just Hint (fewer buttons to take in); the others join from World 2.
   const offeredHelpers =
@@ -268,7 +267,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   // Nothing happening for a while: Lumi suggests a Hint and the Hint button wiggles (where helpers are on).
   const [isNudgingHint, setIsNudgingHint] = useState(false);
   const isTouring = tour.steps.length > 0;
-  const canSuggestHint = !isFirstSteps && offeredHelpers.includes('hint') && puzzle.usedHelpers.length < helpersAllowed;
+  const canSuggestHint = !isFirstSteps && offeredHelpers.includes('hint');
   // The hint ladder's free first step: a soft glow on the area to look at (Hint then marks the mirror,
   // Auto-turn turns it), so the "aha" is still the player's.
   const [lookHere, setLookHere] = useState(null);
@@ -524,10 +523,6 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const requestHelper = useCallback(
     (helperId) => {
       if (isOver) return;
-      if (puzzle.usedHelpers.length >= helpersAllowed) {
-        setLumi({ mood: 'worried', line: t('lumi.helperLimit', { count: helpersAllowed }) });
-        return;
-      }
       if (helperId === 'autoturn' && moves >= moveLimit) return;
       const owned = progress.helpers[helperId] ?? 0;
       if (mode !== 'playtest' && owned < 1 && !(helperId === 'hint' && hasFreeHint)) {
@@ -537,7 +532,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       if (helperId === 'skip') setIsConfirmingSkip(true);
       else spendHelper(helperId);
     },
-    [isOver, puzzle.usedHelpers.length, helpersAllowed, moves, moveLimit, progress.helpers, mode, spendHelper],
+    [isOver, moves, moveLimit, progress.helpers, mode, spendHelper],
   );
 
   // "Try again with a hint": once the board has reset, spend the hint.
@@ -766,8 +761,6 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
                 <HelperBar
                   helperIds={offeredHelpers}
                   inventory={progress.helpers}
-                  usedCount={puzzle.usedHelpers.length}
-                  allowed={helpersAllowed}
                   disabled={isOver}
                   onUse={requestHelper}
                   nudgeId={isNudgingHint ? 'hint' : null}
@@ -865,7 +858,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
               : null
           }
           onRetryWithHint={
-            offeredHelpers.includes('hint') && helpersAllowed > 0
+            offeredHelpers.includes('hint')
               ? () => {
                   restart();
                   setIsHintAfterRetry(true);

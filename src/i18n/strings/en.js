@@ -117,8 +117,6 @@ export const en = {
   'lumi.helper.hint': 'Turn the glowing one! Best now: {stars}',
   'lumi.helper.lens': 'Follow the dotted path! Best now: {stars}',
   'lumi.helper.autoturn': 'Zap! I turned one for you. Best now: {stars}',
-  'lumi.helperLimit.one': 'Only {count} helper per try here!',
-  'lumi.helperLimit.other': 'Only {count} helpers per try here!',
   'lumi.keepGoing': 'You’ve got this!',
 
   'helpers.label': 'Helpers',
@@ -142,8 +140,6 @@ export const en = {
   'helpers.left.one': '{count} left.',
   'helpers.left.other': '{count} left.',
   'helpers.none': 'None left, tap to get more.',
-  'helpers.used.one': '{used} of {count} helper used',
-  'helpers.used.other': '{used} of {count} helpers used',
 
   'tip.stars.title': 'Fewer taps, more ★',
 

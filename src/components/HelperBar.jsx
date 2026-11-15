@@ -6,13 +6,12 @@ import styles from './HelperBar.module.css';
 
 /**
  * In-level helper buttons: an icon, a one-word name and a badge with how many the player owns (none left: no
- * badge and a faded icon; tapping offers more). Dots below show how many helpers this try still allows.
+ * badge and a faded icon; tapping offers more). Any number can be used in a try; each one caps the stars.
  * @param helperIds which helpers to offer (Skip is hidden on daily puzzles)
  * @param freeIds   helpers free right now (the first Hint in each early level): shown as "Free"
  */
-export default function HelperBar({ helperIds, inventory, usedCount, allowed, disabled, onUse, nudgeId = null, freeIds = [] }) {
+export default function HelperBar({ helperIds, inventory, disabled, onUse, nudgeId = null, freeIds = [] }) {
   const { t, lang } = useI18n();
-  const isAtLimit = usedCount >= allowed;
   return (
     <div className={styles.bar}>
       <div className={styles.buttons} role="group" aria-label={t('helpers.label')} style={{ '--helper-count': helperIds.length }}>
@@ -25,7 +24,7 @@ export default function HelperBar({ helperIds, inventory, usedCount, allowed, di
               key={id}
               type="button"
               className={`${styles.helper} ${owned === 0 && !isFree ? styles.empty : ''} ${nudgeId === id ? styles.nudge : ''}`}
-              disabled={disabled || isAtLimit}
+              disabled={disabled}
               onClick={() => onUse(id)}
               aria-label={`${helper.name}: ${helper.description} ${isFree ? t('helpers.freeHere') : owned > 0 ? t('helpers.left', { count: owned }) : t('helpers.none')}`}
             >
@@ -44,13 +43,6 @@ export default function HelperBar({ helperIds, inventory, usedCount, allowed, di
           );
         })}
       </div>
-      {usedCount > 0 && (
-        <span className={styles.limit} role="img" aria-label={t('helpers.used', { used: usedCount, count: allowed })}>
-          {Array.from({ length: allowed }, (_, i) => (
-            <span key={i} className={i < usedCount ? styles.pipUsed : styles.pip} />
-          ))}
-        </span>
-      )}
     </div>
   );
 }
