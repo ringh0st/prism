@@ -84,8 +84,11 @@
   min-height: 240px;
 }
 
-.speech {
-  margin-bottom: -6px;
+.side {
+  display: grid;
+  align-content: end;
+  gap: 6px;
+  min-width: 0;
 }
 
 .bottom {
@@ -201,4 +204,15 @@
 .themed.night {
   --mirror-top: #f6efe4;
   --mirror-bottom: #cbbca9;
+}
+
+/* Short phone screens: a slimmer meter and tighter gaps, so the board gets the room */
+@media (max-height: 760px) {
+  .screen {
+    gap: var(--space-2);
+  }
+
+  .status {
+    padding-block: 4px 6px;
+  }
 }

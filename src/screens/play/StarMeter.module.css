@@ -141,3 +141,9 @@
     animation: none;
   }
 }
+
+@media (max-height: 760px) {
+  .count {
+    font-size: 32px;
+  }
+}

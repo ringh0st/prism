@@ -703,27 +703,30 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         />
       </div>
 
-      <SpeechBox line={lumi.line} tail="down" className={styles.speech} />
       <div className={styles.bottom}>
         <div className={styles.lumi}>
           <Lumi mood={lumi.mood} size={96} />
         </div>
-        <div className={styles.controls}>
-          <Button variant="secondary" icon="restart" label={t('play.restart')} onClick={restart} />
-          {!isFirstSteps && (
-            <div data-tour="helpers">
-              <HelperBar
-                helperIds={offeredHelpers}
-                inventory={progress.helpers}
-                usedCount={puzzle.usedHelpers.length}
-                allowed={helpersAllowed}
-                disabled={isOver}
-                onUse={requestHelper}
-                nudgeId={isNudgingHint ? 'hint' : null}
-                freeIds={hasFreeHint ? ['hint'] : []}
-              />
-            </div>
-          )}
+        {/* Lumi's line sits beside her, above the buttons, so the board keeps all the height above. */}
+        <div className={styles.side}>
+          <SpeechBox line={lumi.line} tail="left" />
+          <div className={styles.controls}>
+            <Button variant="secondary" icon="restart" label={t('play.restart')} onClick={restart} />
+            {!isFirstSteps && (
+              <div data-tour="helpers">
+                <HelperBar
+                  helperIds={offeredHelpers}
+                  inventory={progress.helpers}
+                  usedCount={puzzle.usedHelpers.length}
+                  allowed={helpersAllowed}
+                  disabled={isOver}
+                  onUse={requestHelper}
+                  nudgeId={isNudgingHint ? 'hint' : null}
+                  freeIds={hasFreeHint ? ['hint'] : []}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
