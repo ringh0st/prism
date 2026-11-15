@@ -1,0 +1,122 @@
+/*
+ * The gift at a row's end: a wrapped box with a tag showing what's inside, and a dot per color under it.
+ * Waiting rows show the box calm; a full row's box wiggles in a soft ring of light; an opened one sits open, faded.
+ */
+.prize {
+  flex: none;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 56px;
+  padding: 4px 0 8px;
+  border: 0;
+  border-radius: var(--radius-md);
+  font: inherit;
+  color: inherit;
+  background: var(--surface-sunken);
+}
+
+.box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+}
+
+.box svg {
+  position: relative;
+}
+
+/* What's inside: a diamond (or a lock for guests, a tick once opened) on a round tag at the box's corner */
+.tag {
+  position: absolute;
+  inset-inline-end: -4px;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+  box-shadow: 0 0 0 2px var(--surface-raised);
+}
+
+.lock {
+  position: absolute;
+  inset-inline-start: -2px;
+  bottom: 2px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: var(--text-strong);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.tick {
+  top: auto;
+  bottom: 2px;
+}
+
+/* One dot per color in the row: filled ones are rescued */
+.dots {
+  display: flex;
+  gap: 3px;
+}
+
+.dot,
+.dotOn {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--text-soft) 30%, transparent);
+}
+
+.dotOn {
+  background: var(--calm-bottom);
+}
+
+/* A full row: lifted, glowing and wiggling, asking to be opened */
+.ready {
+  cursor: pointer;
+  background: color-mix(in srgb, var(--color-honey) 30%, var(--surface-raised));
+  box-shadow: var(--shadow-md);
+  transition: transform 160ms var(--ease-pop);
+}
+
+.ready:active {
+  transform: scale(0.94);
+}
+
+.ready .dotOn {
+  background: var(--reward-bottom);
+}
+
+.halo {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 233, 168, 0.95) 0%, rgba(255, 233, 168, 0) 70%);
+  animation: halo 1.6s ease-in-out infinite;
+}
+
+.done {
+  opacity: 0.75;
+}
+
+@keyframes halo {
+  50% {
+    transform: scale(1.18);
+    opacity: 0.7;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .halo {
+    animation: none;
+  }
+}

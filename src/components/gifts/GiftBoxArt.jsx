@@ -8,7 +8,7 @@ const TONES = {
 };
 
 /**
- * A wrapped present (inline SVG). `phase` wrapped | shaking | open: it wobbles, then the lid pops off.
+ * A wrapped present (inline SVG). `phase` wrapped | shaking | open: it wobbles, then the lid pops off; `still` just shows it.
  * Decorative: the dialog around it says what it is.
  */
 export default function GiftBoxArt({ tone = 'honey', phase = 'wrapped', size = 120, isBig = false }) {

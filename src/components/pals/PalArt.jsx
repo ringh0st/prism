@@ -721,6 +721,9 @@ function Accessory({ id, hat, neck }) {
 
 // Items that hug the head from both sides, fitted to the head's width.
 const EAR_ITEMS = new Set(['headphones', 'earmuffs']);
+// Circlets draw their band lower than hats do; on the pictures they sit up on the crown of the head.
+const CIRCLETS = new Set(['leafCrown', 'flowerCrown', 'moonCirclet']);
+const CIRCLET_LIFT = 5;
 
 /**
  * An outfit piece on a Pal drawn as a picture: hats on the measured top of its head, ear items stretched to its
@@ -736,6 +739,7 @@ function PictureAccessory({ id, picture }) {
       </g>
     );
   }
+  if (CIRCLETS.has(id)) return <Accessory id={id} hat={[hat[0], hat[1] - CIRCLET_LIFT]} neck={neck} />;
   if (slotOf(id) === 'neck') {
     return (
       <g transform={`translate(${chest - 50} 0)`}>

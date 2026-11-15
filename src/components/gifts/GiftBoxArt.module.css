@@ -25,6 +25,11 @@
   animation: bob 2.4s ease-in-out infinite;
 }
 
+/* Shown as a picture only (a reward further off): no motion */
+.still {
+  animation: none;
+}
+
 .shaking {
   animation: shake 0.45s ease-in-out infinite;
 }
