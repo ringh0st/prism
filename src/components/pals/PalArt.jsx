@@ -583,7 +583,7 @@ for (const [id, parts] of Object.entries(PARTS_PALS)) ART[id] = partsPal(parts);
 
 const RADIANT_SPARKLES = 'M12 1.5l2.6 7.9 7.9 2.6-7.9 2.6L12 22.5l-2.6-7.9L1.5 12l7.9-2.6z';
 
-function Accessory({ id, hat, neck }) {
+export function Accessory({ id, hat, neck }) {
   const [hx, hy] = hat;
   switch (id) {
     case 'scarf':
