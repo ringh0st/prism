@@ -1,4 +1,4 @@
-/* Floating matte dock. The active tab sits in a solid coral pill. */
+/* Floating matte dock. The map is a big raised round button in the middle; the open tab gets a soft pill. */
 .nav {
   position: fixed;
   left: 50%;
@@ -53,12 +53,47 @@
 }
 
 .active {
-  color: var(--action-label);
-  background: var(--action-bottom);
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--color-sage) 24%, var(--surface-raised));
 }
 
-.active:hover {
+/* The map: the main game, always in the main color, lifted above the dock */
+.main {
+  align-self: end;
+  gap: 13px;
+  margin-top: -34px;
+  padding: 0 0 6px;
+  color: var(--text-strong);
+  background: none;
+}
+
+.main .icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
   color: var(--action-label);
+  background: var(--action-bottom);
+  box-shadow:
+    0 0 0 5px var(--surface-raised),
+    0 5px 0 5px var(--action-ledge),
+    var(--shadow-md);
+}
+
+.main .label {
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.main.active {
+  background: none;
+}
+
+.main.active .icon {
+  box-shadow:
+    0 0 0 5px var(--surface-raised),
+    0 5px 0 5px var(--action-ledge),
+    0 0 0 9px color-mix(in srgb, var(--color-sage) 30%, transparent),
+    var(--shadow-md);
 }
 
 .active .icon {
