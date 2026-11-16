@@ -157,20 +157,14 @@ export function Accessory({ id, hat, neck }) {
  * it scales around the floor together with the outfit, which is drawn for the shared stage.
  */
 /**
- * Worn items get one warm dark outline, like the line around the Pals themselves, so a peach beanie still stands out on
- * an orange tiger and a white scarf on a snowy yeti.
+ * Worn items cast a soft shadow on the Pal, as if really worn, so a peach beanie still stands out on an orange tiger
+ * and a white scarf on a snowy yeti (no outline: an outline made them look like stickers).
  */
 function ItemOutline({ id }) {
   return (
     <defs>
       <filter id={id} x="-25%" y="-25%" width="150%" height="150%">
-        <feMorphology in="SourceAlpha" operator="dilate" radius="1.7" result="wide" />
-        <feFlood floodColor="#5a4636" floodOpacity="0.9" />
-        <feComposite in2="wide" operator="in" result="edge" />
-        <feMerge>
-          <feMergeNode in="edge" />
-          <feMergeNode in="SourceGraphic" />
-        </feMerge>
+        <feDropShadow dx="0" dy="1.4" stdDeviation="1.1" floodColor="#3b2a1e" floodOpacity="0.45" />
       </filter>
     </defs>
   );
