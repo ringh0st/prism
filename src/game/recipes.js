@@ -45,29 +45,29 @@ const SEQUENCES = {
     'twoLamps',
     'tiny',
     null,
-    'oneTap',
+    'tiny',
     'lightShow',
     'longRoad',
     'twoLamps',
     'wallMaze',
     'tiny',
-    'oneTap',
+    'wallMaze',
     'longRoad',
     'lightShow',
     null,
   ],
   2: [
     null,
-    'oneTap',
+    'longRoad',
     'gemShower',
     'twoLamps',
     'longRoad',
     'tiny',
-    'oneTap',
+    'longRoad',
     'gemShower',
     'wallMaze',
     'lightShow',
-    'oneTap',
+    'tiny',
     'longRoad',
     'twoLamps',
     'gemShower',
@@ -80,16 +80,16 @@ const SEQUENCES = {
   ],
   3: [
     null,
-    'oneTap',
+    'longRoad',
     'rainbow',
     'twoLamps',
     'longRoad',
     'tiny',
     'rainbow',
-    'oneTap',
+    'longRoad',
     'wallMaze',
     'gemShower',
-    'oneTap',
+    'tiny',
     'longRoad',
     'rainbow',
     'twoLamps',
@@ -122,15 +122,18 @@ export function recipeOf(level) {
 export function recipePreset(recipe, base, { world, index, spike }) {
   const preset = flavorPreset(recipe, base, { world, spike });
   if (REST_RECIPES.includes(recipe)) return preset;
-  // Playtesters found the early worlds far too easy: every regular flavor needs two more moves and has an
-  // extra turn and decoy, and the second half of each world one move more again.
+  // Playtesters found the early worlds far too easy: every regular flavor needs at least as many moves as the
+  // level's place on the difficulty curve (base.minPar), and two more than its own base, with the light path
+  // and decoys to match; the second half of each world one move more again.
   const later = index > 10 ? 1 : 0;
+  const minPar = Math.max(preset.minPar + 2, base.minPar) + later;
+  const emitters = preset.emitters ?? 1;
   return {
     ...preset,
-    turns: [preset.turns[0] + 1, preset.turns[1] + 1],
-    decoys: preset.decoys + 1,
-    minPar: preset.minPar + 2 + later,
-    maxPar: preset.maxPar + 2 + later,
+    turns: [preset.turns[0] + 1, Math.max(preset.turns[1] + 1, Math.ceil(minPar / emitters) + 1)],
+    decoys: preset.decoys + 1 + Math.floor(minPar / 4),
+    minPar,
+    maxPar: Math.max(preset.maxPar + 2, minPar + 3) + later,
   };
 }
 
@@ -189,8 +192,8 @@ function flavorPreset(recipe, base, { world, spike }) {
         walls: 0,
         splits: Math.min(1, base.splits ?? 0),
         filters: Math.min(1, base.filters ?? 0),
-        minPar: 3,
-        maxPar: 5,
+        minPar: 4,
+        maxPar: 6,
       };
     case 'wallMaze':
       return {

@@ -235,6 +235,9 @@ export const en = {
   'friend.text': '{name} wants to join you. It cheers you on while you play!',
   'friend.welcome': 'Welcome, {name}!',
   'friend.note': 'You’ll meet more friends as you play. Visit them in Pals.',
+  'friend.does.gifts': 'A present for every 10\u00a0★',
+  'friend.does.grows': 'Grows up as you solve levels',
+  'friend.does.home': 'Lives in your Grove, dress it up',
 
   'hello.label': '{name} says: {line} Visit your Pals.',
   'hello.morning': 'Good morning!',

@@ -136,9 +136,9 @@ export function generatorPresetFor(world, index) {
   const progress = (number - 1) / (WORLD_COUNT * LEVELS_PER_WORLD - 1); // 0 at level 1, 1 at level 1000
   const spike = difficulty === DIFFICULTY.EXTRA ? 2 : difficulty === DIFFICULTY.HARD ? 1 : 0;
   const size = clamp(Math.round(5 + progress * 4.6) + (spike > 0 ? 1 : 0), 4, 10);
-  // Moves needed rise steadily with the level number: about 4 at the start, 6 by level 150, 13 by level 500
-  // and 20 at the end (the light-following solver handles boards with up to 30 turning pieces).
-  const basePar = Math.min(20, 4 + Math.floor((number - 1) / 55));
+  // Moves needed rise steadily with the level number: 5 at the start, 8 by level 150, 16 by level 500 and 20
+  // from about level 700 (the light-following solver handles boards with up to 30 turning pieces).
+  const basePar = Math.min(20, 5 + Math.floor((number - 1) / 45));
   const minPar = Math.min(22, basePar + spike * (world <= 2 ? 1 : 2));
   const steps = Math.min(3, Math.floor(progress * 4));
 

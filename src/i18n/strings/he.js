@@ -241,6 +241,9 @@ export const he = {
   'friend.text': '{name} רוצה להצטרף אליכם. הוא יעודד אתכם בזמן המשחק!',
   'friend.welcome': 'ברוך הבא, {name}!',
   'friend.note': 'תפגשו עוד חברים תוך כדי משחק. אפשר לבקר אותם במסך החברים.',
+  'friend.does.gifts': 'מביא לכם מתנה על כל 10\u00a0★',
+  'friend.does.grows': 'גדל ככל שאתם פותרים שלבים',
+  'friend.does.home': 'גר בחורשה שלכם, ואפשר להלביש אותו',
 
   'hello.label': '{name} אומר: {line} הקישו כדי לבקר את החברים.',
   'hello.morning': 'בוקר טוב!',
