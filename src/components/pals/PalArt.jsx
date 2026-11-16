@@ -1,5 +1,6 @@
 import { accessoryById, palStage } from '../../game/pals.js';
 import { ThemeOutfit } from './themeOutfitArt.jsx';
+import Cloak, { isCloak } from './Cloak.jsx';
 import styles from './PalArt.module.css';
 
 const SLOT_ORDER = ['neck', 'head', 'hand'];
@@ -20,10 +21,6 @@ const PICTURES = Object.fromEntries(
 );
 const HAT = [50, 23];
 const NECK = 70;
-// Capes and cloaks hang behind the Pal; only their clasp shows in front.
-const WORN_BEHIND = new Set(['cape', 'elvenCloak']);
-
-
 export function Accessory({ id, hat, neck }) {
   const [hx, hy] = hat;
   switch (id) {
@@ -82,14 +79,6 @@ export function Accessory({ id, hat, neck }) {
           <path d={`M42 ${neck - 6}l8 14 8-14`} stroke="#58ac82" strokeWidth="4" fill="none" />
           <circle cx="50" cy={neck + 11} r="6.5" fill="#f0c14e" />
           <path d={`M50 ${neck + 7}l1.4 3 3 .4-2.2 2 .6 3-2.8-1.5-2.8 1.5.6-3-2.2-2 3-.4z`} fill="#c99a2e" />
-        </g>
-      );
-    case 'cape':
-      return (
-        <g>
-          <path d={`M30 ${neck - 3}q20 8 40 0l8 26q-28 8-56 0z`} fill="#df7458" opacity=".9" />
-          <path d={`M30 ${neck - 3}q20 8 40 0`} stroke="#b05a40" strokeWidth="4" fill="none" />
-          <circle cx="50" cy={neck + 1} r="3.5" fill="#f0c14e" />
         </g>
       );
     case 'balloon':
@@ -198,21 +187,13 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
       <ellipse cx="50" cy="95" rx="24" ry="4" fill="rgba(60,40,20,.14)" />
       <g transform={`translate(50 94) scale(${scale}) translate(-50 -94)`}>
         <g className={styles.body}>
-          {wearing
-            .filter((id) => WORN_BEHIND.has(id))
-            .map((id) => (
-              <g key={id} transform={`translate(50 ${NECK}) scale(1.25 1.05) translate(-50 ${-NECK})`}>
-                <Accessory id={id} hat={HAT} neck={NECK} />
-              </g>
-            ))}
+          {wearing.filter(isCloak).map((id) => (
+            <Cloak key={id} id={id} part="back" neck={NECK} />
+          ))}
           <image href={picture} x="0" y="0" width="100" height="100" />
-          {wearing.some((id) => WORN_BEHIND.has(id)) && <circle cx="50" cy={NECK + 1} r="3.2" fill="#f0c14e" stroke="#c99a2e" strokeWidth="1" />}
           {[...wearing]
-            .filter((id) => !WORN_BEHIND.has(id))
             .sort(bySlotOrder)
-            .map((id) => (
-              <Accessory key={id} id={id} hat={HAT} neck={NECK} />
-            ))}
+            .map((id) => (isCloak(id) ? <Cloak key={id} id={id} part="front" neck={NECK} /> : <Accessory key={id} id={id} hat={HAT} neck={NECK} />))}
         </g>
       </g>
     </svg>
