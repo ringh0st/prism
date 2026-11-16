@@ -10,6 +10,8 @@ export const TILE = Object.freeze({
   SHADE: 'shade',
   PORTAL: 'portal',
   PRISM: 'prism',
+  GATE: 'gate',
+  SWITCH: 'switch',
 });
 
 /** A cracking mirror (`fragile`) can be turned this many times, then it cracks and stays put. */
@@ -17,6 +19,9 @@ export const FRAGILE_TURNS = 3;
 
 /** Portal and twin-mirror pairs are named by these letters (each pair has its own look). */
 export const PAIR_NAMES = Object.freeze(['a', 'b']);
+
+/** A turning lamp (`turnable`) points `dir` in state 0 and a quarter turn clockwise from it in state 1. */
+export const CLOCKWISE = Object.freeze({ up: 'right', right: 'down', down: 'left', left: 'up' });
 
 /** Grid directions. y grows downwards. */
 export const DIRECTIONS = Object.freeze({

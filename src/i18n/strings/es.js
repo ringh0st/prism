@@ -288,6 +288,12 @@ export const es = {
   'piece.fog.text': 'Algo se esconde aquí. ¡Ilumínalo!',
   'piece.prism.name': 'Cristales prisma',
   'piece.prism.text': 'Divide la luz hacia los dos lados. No gira.',
+  'piece.gate.name': 'Puertas de luz',
+  'piece.gate.text': 'Ilumina el interruptor para abrir la puerta.',
+  'piece.lamp.name': 'Lámparas giratorias',
+  'piece.lamp.text': 'Toca la lámpara para girarla.',
+  'piece.oneSided.name': 'Espejos de una cara',
+  'piece.oneSided.text': 'La cara brillante refleja. La espalda bloquea.',
 
   'recipe.twoLamps.name': 'Dos lámparas',
   'recipe.twoLamps.goals': ['Dos lámparas, dos gemas. ¡Enciende las dos!', '¡Doble lío: dos rayos que guiar!', 'Cada lámpara necesita su camino.'],

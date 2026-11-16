@@ -71,6 +71,24 @@ export const PIECES = [
     text: 'Splits the light both ways. Can’t turn.',
     sample: { type: TILE.PRISM },
   },
+  {
+    id: 'gate',
+    name: 'Light gates',
+    text: 'Light the switch to open the gate.',
+    sample: { type: TILE.GATE, pair: 'a' },
+  },
+  {
+    id: 'lamp',
+    name: 'Turning lamps',
+    text: 'Tap the lamp to turn it.',
+    sample: { type: TILE.EMITTER, dir: 'right', color: 'sun', turnable: true },
+  },
+  {
+    id: 'oneSided',
+    name: 'One-sided mirrors',
+    text: 'Shiny side bounces. The back blocks.',
+    sample: { type: TILE.MIRROR, orient: 0, oneSided: 0 },
+  },
 ];
 
 const HAS = {
@@ -85,6 +103,9 @@ const HAS = {
   fragile: (tile) => Boolean(tile.fragile),
   fog: (tile) => Boolean(tile.fog),
   prism: (tile) => tile.type === TILE.PRISM,
+  gate: (tile) => tile.type === TILE.GATE,
+  lamp: (tile) => tile.type === TILE.EMITTER && Boolean(tile.turnable),
+  oneSided: (tile) => tile.oneSided !== undefined,
 };
 
 /** Where each piece is first taught (levels are built so each one brings at most one new piece). */
@@ -95,11 +116,14 @@ export const PIECE_FIRST_LEVEL = {
   splitter: 'w2-01',
   color: 'w3-01',
   shade: 'w4-01',
-  twins: 'w6-01',
-  portal: 'w8-01',
-  fragile: 'w10-01',
-  fog: 'w12-01',
-  prism: 'w14-01',
+  twins: 'w5-01',
+  portal: 'w6-01',
+  fragile: 'w7-01',
+  fog: 'w8-01',
+  prism: 'w9-01',
+  gate: 'w10-01',
+  lamp: 'w11-01',
+  oneSided: 'w12-01',
 };
 
 /**

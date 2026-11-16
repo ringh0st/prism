@@ -1,5 +1,5 @@
 import { DIRECTIONS, PAIR_NAMES, TILE } from './constants.js';
-import { isRotatable, reflect, rotationGroup, traceBeams } from './beam.js';
+import { faceHitBy, isRotatable, reflect, rotationGroup, traceBeams } from './beam.js';
 import { analyzeLevel } from './solver.js';
 
 const TINTS = ['coral', 'lime', 'sky'];
@@ -22,6 +22,9 @@ const TINTS = ['coral', 'lime', 'sky'];
  * @property {number} [fragile=0]    path mirrors that crack after a few turns
  * @property {number} [fog=0]        gems, walls or shades hidden under fog
  * @property {number} [prisms=0]     prism crystals that split the light to both sides
+ * @property {number} [gates=0]      light gates on the solution path, opened by a switch the first lamp must light
+ * @property {number} [turningLamps=0] lamps the player can turn a quarter turn
+ * @property {number} [oneSided=0]   path mirrors that only reflect from their silvered face
  * @property {number} [flips]        scramble exactly this many pieces ("one tap wonder" boards)
  * @property {number} [minPar=1]     minimum taps needed to solve
  * @property {number} [maxPar=99]
@@ -43,7 +46,7 @@ function directionName([dx, dy]) {
 
 /** Build one solved board, or return null if the random walk got stuck. */
 function buildSolvedBoard(options, random) {
-  const { width, height, emitters = 1, splits = 0, turns = [1, 2], segment = [1, 3], filters = 0, portals = 0, prisms = 0 } = options;
+  const { width, height, emitters = 1, splits = 0, turns = [1, 2], segment = [1, 3], filters = 0, portals = 0, prisms = 0, gates = 0 } = options;
   const tiles = [];
   const occupied = new Map();
   const beamCells = new Set();
@@ -60,6 +63,8 @@ function buildSolvedBoard(options, random) {
   let filtersLeft = filters;
   let portalsMade = 0;
   let prismsLeft = prisms;
+  // Light gates: the first lamp's light ends on the switch; the gates sit on the other beams' paths.
+  let gatesLeft = gates;
 
   /** Step into a portal here and come out of a new partner portal somewhere free, facing the same way. */
   const jumpThroughPortal = (x, y, dir) => {
@@ -99,6 +104,12 @@ function buildSolvedBoard(options, random) {
             continue;
           }
         }
+        // A light gate on a straight stretch of a beam that doesn't feed the switch.
+        if (gatesLeft > 0 && !start.feedsSwitch && moved < length && random.chance(0.4) && isFree(x + dir[0], y + dir[1])) {
+          place({ x, y, type: TILE.GATE, pair: PAIR_NAMES[0] });
+          gatesLeft--;
+          continue;
+        }
         // Drop a color filter on a straight stretch, never on the final cell.
         if (filtersLeft > 0 && moved < length && random.chance(0.35) && isFree(x + dir[0], y + dir[1])) {
           color = random.pick(TINTS);
@@ -109,7 +120,7 @@ function buildSolvedBoard(options, random) {
       if (moved === 0) return false;
 
       if (isLast) {
-        place({ x, y, type: TILE.GEM, color });
+        place(start.feedsSwitch ? { x, y, type: TILE.SWITCH, pair: PAIR_NAMES[0] } : { x, y, type: TILE.GEM, color });
         return true;
       }
 
@@ -118,7 +129,7 @@ function buildSolvedBoard(options, random) {
       if (prismsLeft > 0 && turnChoices.every(([dx, dy]) => isFree(x + dx, y + dy)) && random.chance(0.5)) {
         place({ x, y, type: TILE.PRISM });
         prismsLeft--;
-        pendingBranches.push({ x, y, dir: turnChoices[1], color });
+        pendingBranches.push({ x, y, dir: turnChoices[1], color, feedsSwitch: start.feedsSwitch });
         dir = turnChoices[0];
         continue;
       }
@@ -131,7 +142,7 @@ function buildSolvedBoard(options, random) {
       pathMirrors.push({ tile, incoming: dir });
       if (useSplitter) {
         splitsLeft--;
-        pendingBranches.push({ x, y, dir, color });
+        pendingBranches.push({ x, y, dir, color, feedsSwitch: start.feedsSwitch });
       }
       dir = newDir;
     }
@@ -147,14 +158,14 @@ function buildSolvedBoard(options, random) {
     }
     if (!start) return null;
     place({ x: start.x, y: start.y, type: TILE.EMITTER, dir: start.dir, color: 'sun' });
-    pendingBranches.push({ x: start.x, y: start.y, dir: DIRECTIONS[start.dir], color: 'sun' });
+    pendingBranches.push({ x: start.x, y: start.y, dir: DIRECTIONS[start.dir], color: 'sun', feedsSwitch: gates > 0 && e === 0 });
   }
 
   while (pendingBranches.length) {
     if (!walkBranch(pendingBranches.shift())) return null;
   }
-  if (splitsLeft > 0 || portalsMade < portals || prismsLeft > 0) return null;
-  return { tiles, occupied, beamCells, pathMirrors, isFree };
+  if (splitsLeft > 0 || portalsMade < portals || prismsLeft > 0 || gatesLeft > 0) return null;
+  return { tiles, occupied, beamCells, pathMirrors, pathTiles: new Set(pathMirrors.map(({ tile }) => tile)), isFree };
 }
 
 function decorate(board, options, random) {
@@ -204,7 +215,9 @@ function decorate(board, options, random) {
   });
 
   // Twins: pairs of mirrors that turn together. At least one of each pair is on the light's path.
-  const pathPool = random.shuffle(pathMirrors.map(({ tile }) => tile).filter((tile) => tile.type === TILE.MIRROR && !tile.locked && !tile.fragile));
+  // (Cracking mirrors only if nothing else is left, so worlds that use both still get their twins.)
+  const turnable = pathMirrors.map(({ tile }) => tile).filter((tile) => tile.type === TILE.MIRROR && !tile.locked);
+  const pathPool = random.shuffle(turnable.some((tile) => !tile.fragile) ? turnable.filter((tile) => !tile.fragile) : turnable);
   const anyPool = random.shuffle(tiles.filter((tile) => tile.type === TILE.MIRROR && !tile.locked && !tile.fragile));
   for (let pair = 0; pair < (options.twins ?? 0); pair++) {
     const first = pathPool.find((tile) => !tile.link);
@@ -214,6 +227,28 @@ function decorate(board, options, random) {
     second.link = PAIR_NAMES[pair];
   }
 
+  // One-sided mirrors: path mirrors silvered on the face the light needs; turned wrong, their back blocks it.
+  const sideable = random.shuffle(pathMirrors.filter(({ tile }) => tile.type === TILE.MIRROR && !tile.locked));
+  sideable.slice(0, options.oneSided ?? 0).forEach(({ tile, incoming }) => {
+    tile.oneSided = faceHitBy(incoming, tile.orient);
+  });
+  // Decoy mirrors near them get a random silvered face too, so the backs aren't a giveaway.
+  if ((options.oneSided ?? 0) > 0) {
+    tiles
+      .filter((tile) => tile.type === TILE.MIRROR && !board.pathTiles.has(tile) && random.chance(0.5))
+      .forEach((tile) => {
+        tile.oneSided = random.int(0, 1);
+      });
+  }
+  // Turning lamps: the player can turn these lamps a quarter turn (they start turned the wrong way).
+  tiles
+    .filter((tile) => tile.type === TILE.EMITTER)
+    .slice(0, options.turningLamps ?? 0)
+    .forEach((tile) => {
+      tile.turnable = true;
+      tile.orient = 0;
+    });
+
   // Fog: hide some gems, walls and shadow crystals until the light reaches them.
   const foggable = random.shuffle(tiles.filter((tile) => [TILE.GEM, TILE.WALL, TILE.SHADE].includes(tile.type)));
   foggable.slice(0, options.fog ?? 0).forEach((tile) => {
@@ -222,8 +257,10 @@ function decorate(board, options, random) {
 }
 
 function toLevelTiles(tiles) {
-  return tiles.map(({ x, y, type, dir, color, orient, locked, pair, link, fragile, fog }) => {
+  return tiles.map(({ x, y, type, dir, color, orient, locked, pair, link, fragile, fog, turnable, oneSided }) => {
     const tile = { x, y, type };
+    if (turnable) tile.turnable = true;
+    if (oneSided !== undefined) tile.oneSided = oneSided;
     if (dir !== undefined) tile.dir = typeof dir === 'string' ? dir : directionName(dir);
     if (color !== undefined) tile.color = color;
     if (orient !== undefined) tile.orient = orient;

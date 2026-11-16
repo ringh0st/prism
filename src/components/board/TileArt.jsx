@@ -76,7 +76,7 @@ function Portal({ pair }) {
   );
 }
 
-function Mirror({ turns, isSplitter, isLocked, link }) {
+function Mirror({ turns, isSplitter, isLocked, link, oneSided }) {
   const angle = -45 + turns * 90;
   return (
     <>
@@ -99,6 +99,18 @@ function Mirror({ turns, isSplitter, isLocked, link }) {
           stroke={isSplitter ? '#17988c' : 'none'}
           strokeWidth="2.5"
         />
+        {oneSided !== undefined && (
+          // The dark back of a one-sided mirror (the silvered face is the other side of the bar), with little ribs.
+          <g>
+            <rect x="9" y={oneSided === 0 ? 50 : 42} width="82" height="8" rx="4" fill="#5e4a3f" />
+            <path
+              d={oneSided === 0 ? 'M24 52v4M38 52v4M52 52v4M66 52v4M80 52v4' : 'M24 44v4M38 44v4M52 44v4M66 44v4M80 44v4'}
+              stroke="#8a7264"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </g>
+        )}
         {isSplitter ? (
           <line x1="16" y1="50" x2="84" y2="50" stroke="#fff" strokeWidth="3" strokeDasharray="6 6" strokeLinecap="round" />
         ) : (
@@ -174,14 +186,64 @@ function Prism() {
   );
 }
 
-function Emitter({ dir, color }) {
+function Emitter({ dir, color, turnable, turns }) {
+  // A turning lamp swings a quarter turn clockwise and back on each tap (it has two positions), on a round turntable.
+  const angle = DIRECTION_ANGLE[dir] + (turnable ? (turns % 2) * 90 : 0);
   return (
-    <g style={{ transform: `rotate(${DIRECTION_ANGLE[dir]}deg)`, transformOrigin: '50px 50px' }}>
+    <g>
+      {turnable && <circle className={styles.pivotBase} cx="50" cy="50" r="44" />}
+      <g className={turnable ? styles.rotor : undefined} style={{ transform: `rotate(${angle}deg)`, transformOrigin: '50px 50px' }}>
+        <EmitterBody color={color} />
+      </g>
+      {turnable && <path d="M50 4a46 46 0 0 1 40 24" fill="none" stroke="var(--color-sage)" strokeWidth="5" strokeLinecap="round" />}
+    </g>
+  );
+}
+
+function EmitterBody({ color }) {
+  return (
+    <g>
       <rect x="14" y="14" width="72" height="72" rx="20" fill="url(#tile-emitter)" />
       <rect x="14" y="14" width="72" height="36" rx="18" fill="#fff" opacity="0.18" />
       <path d="M70 34 L90 50 L70 66 Z" fill="#fff" opacity="0.9" />
       <circle cx="48" cy="50" r="17" fill={beamColorVar(color)} stroke="#fff" strokeWidth="5" />
       <circle cx="43" cy="44" r="5" fill="#fff" opacity="0.8" />
+    </g>
+  );
+}
+
+/** A light gate: a barred door while its switch is dark, open bars that let light through while it's lit. */
+function Gate({ pair, isOpen }) {
+  const look = PAIR_LOOKS[pair] ?? PAIR_LOOKS.a;
+  return (
+    <g className={isOpen ? styles.gateOpen : ''}>
+      <rect
+        x="10"
+        y="10"
+        width="80"
+        height="80"
+        rx="14"
+        fill={isOpen ? 'none' : 'url(#tile-wall)'}
+        stroke={look.color}
+        strokeWidth="6"
+        strokeDasharray={isOpen ? '10 8' : 'none'}
+      />
+      {!isOpen && <path d="M30 14v72M50 14v72M70 14v72" stroke="#7d5a3d" strokeWidth="5" opacity="0.45" />}
+      <circle cx="50" cy="50" r="13" fill="#fffaf2" stroke={look.color} strokeWidth="3" />
+      <path d={look.symbol} transform="translate(50 49) scale(.9)" fill={look.ink} />
+    </g>
+  );
+}
+
+/** A light switch: a round button that glows when light hits it (and opens its gate). */
+function Switch({ pair, isLit }) {
+  const look = PAIR_LOOKS[pair] ?? PAIR_LOOKS.a;
+  return (
+    <g>
+      {isLit && <circle cx="50" cy="50" r="34" fill={look.color} filter="url(#tile-glow)" />}
+      <circle cx="50" cy="50" r="32" fill="#fffaf2" stroke={look.color} strokeWidth="7" />
+      <circle cx="50" cy="50" r="20" fill={isLit ? look.color : '#e9e1d4'} />
+      <path d={look.symbol} transform="translate(50 49) scale(1.05)" fill={isLit ? '#fff' : look.ink} />
     </g>
   );
 }
@@ -238,7 +300,7 @@ function Wall() {
  * Visual for one tile. Pure presentation: no interaction here.
  * turnsLeft: a cracking mirror's remaining turns. isFogged: hidden under fog until light reaches it.
  */
-function TileArt({ tile, turns = 0, isLit = false, isRotatable = false, turnsLeft = FRAGILE_TURNS, isFogged = false }) {
+function TileArt({ tile, turns = 0, isLit = false, isOpen = false, isRotatable = false, turnsLeft = FRAGILE_TURNS, isFogged = false }) {
   let art = null;
   switch (isFogged ? 'fog' : tile.type) {
     case 'fog':
@@ -248,7 +310,7 @@ function TileArt({ tile, turns = 0, isLit = false, isRotatable = false, turnsLef
     case TILE.SPLITTER:
       art = (
         <>
-          <Mirror turns={turns} isSplitter={tile.type === TILE.SPLITTER} isLocked={!isRotatable} link={tile.link} />
+          <Mirror turns={turns} isSplitter={tile.type === TILE.SPLITTER} isLocked={!isRotatable} link={tile.link} oneSided={tile.oneSided} />
           {tile.fragile && <CrackMarks turnsLeft={turnsLeft} />}
         </>
       );
@@ -257,7 +319,7 @@ function TileArt({ tile, turns = 0, isLit = false, isRotatable = false, turnsLef
       art = <Prism />;
       break;
     case TILE.EMITTER:
-      art = <Emitter dir={tile.dir} color={tile.color} />;
+      art = <Emitter dir={tile.dir} color={tile.color} turnable={tile.turnable} turns={turns} />;
       break;
     case TILE.GEM:
       art = <Gem color={tile.color} isLit={isLit} />;
@@ -273,6 +335,12 @@ function TileArt({ tile, turns = 0, isLit = false, isRotatable = false, turnsLef
       break;
     case TILE.PORTAL:
       art = <Portal pair={tile.pair} />;
+      break;
+    case TILE.GATE:
+      art = <Gate pair={tile.pair} isOpen={isOpen} />;
+      break;
+    case TILE.SWITCH:
+      art = <Switch pair={tile.pair} isLit={isLit} />;
       break;
     default:
       return null;

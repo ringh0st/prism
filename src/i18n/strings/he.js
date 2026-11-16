@@ -289,6 +289,12 @@ export const he = {
   'piece.fog.text': 'משהו מסתתר כאן. האירו עליו!',
   'piece.prism.name': 'גבישי פריזמה',
   'piece.prism.text': 'מפצלים את האור לשני הצדדים ולא מסתובבים.',
+  'piece.gate.name': 'שערי אור',
+  'piece.gate.text': 'הדליקו את המתג כדי לפתוח את השער.',
+  'piece.lamp.name': 'פנסים מסתובבים',
+  'piece.lamp.text': 'לחצו על הפנס כדי לסובב אותו.',
+  'piece.oneSided.name': 'מראות חד־צדדיות',
+  'piece.oneSided.text': 'הצד המבריק מחזיר אור. הגב חוסם.',
 
   'recipe.twoLamps.name': 'שתי מנורות',
   'recipe.twoLamps.goals': ['שתי מנורות, שתי אבני חן. הדליקו את שתיהן!', 'כיף כפול: שתי קרניים לכוון!', 'לכל מנורה יש שביל משלה.'],

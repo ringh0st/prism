@@ -142,9 +142,15 @@ export default function Board({
               const left = turnsLeft?.[tileIndex] ?? Infinity;
               const canRotate = tile ? tileIsRotatable(tile) && left > 0 : false;
               const isFogged = Boolean(tile?.fog) && revealedCells !== null && !revealedCells.has(cell);
-              const isLit = tileIndex >= 0 && (trace.litGems.has(tileIndex) || trace.litShades.has(tileIndex));
+              const isLit =
+                tileIndex >= 0 && (trace.litGems.has(tileIndex) || trace.litShades.has(tileIndex) || Boolean(trace.litSwitches?.has(tileIndex)));
+              const isOpen = tile?.type === TILE.GATE && Boolean(trace.openGates?.has(tile.pair));
               const isActionable = !isLocked && (isEditing || canRotate);
-              const description = describeTile(tile, { orient: orients[tileIndex], isLit, isRotatable: canRotate, isFogged, turnsLeft: left }, t);
+              const description = describeTile(
+                tile,
+                { orient: orients[tileIndex], isLit, isOpen, isRotatable: canRotate, isFogged, turnsLeft: left },
+                t,
+              );
               return (
                 <div role="gridcell" key={col} className={styles.cellWrap}>
                   <button
@@ -181,6 +187,7 @@ export default function Board({
                         tile={tile}
                         turns={turns[tileIndex] ?? orients[tileIndex] ?? 0}
                         isLit={isLit}
+                        isOpen={isOpen}
                         isRotatable={canRotate}
                         turnsLeft={left}
                         isFogged={isFogged}

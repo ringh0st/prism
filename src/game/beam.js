@@ -1,4 +1,4 @@
-import { DIRECTIONS, TILE } from './constants.js';
+import { CLOCKWISE, DIRECTIONS, TILE } from './constants.js';
 
 /** Reflect a direction off a mirror with the given orientation (0 = "/", 1 = "\"). */
 export function reflect([dx, dy], orient) {
@@ -6,8 +6,35 @@ export function reflect([dx, dy], orient) {
 }
 
 export function isRotatable(tile) {
+  if (tile.type === TILE.EMITTER) return Boolean(tile.turnable);
   return (tile.type === TILE.MIRROR || tile.type === TILE.SPLITTER) && !tile.locked;
 }
+
+/** Where a lamp shines: its direction, or a quarter turn clockwise from it when a turning lamp is in state 1. */
+export const lampDirection = (tile, orient = tile.orient ?? 0) => (tile.turnable && orient === 1 ? CLOCKWISE[tile.dir] : tile.dir);
+
+/*
+ * One-sided mirrors (`oneSided: 0 | 1`) reflect only from their silvered face and block light from behind.
+ * Face 0 is the face whose normal points up-left for "/" and up-right for "" (the top of the drawn bar);
+ * face 1 is the other side. Turning the mirror turns its faces with it.
+ */
+const FACE_NORMALS = [
+  [
+    [-1, -1],
+    [1, 1],
+  ],
+  [
+    [1, -1],
+    [-1, 1],
+  ],
+];
+/** Does light travelling `dir` hit the silvered face of this one-sided mirror? */
+export function hitsSilveredFace(dir, orient, face) {
+  const [nx, ny] = FACE_NORMALS[orient][face];
+  return nx * -dir[0] + ny * -dir[1] > 0;
+}
+/** Which face light travelling `dir` hits on a mirror in `orient` (to build one-sided mirrors that work). */
+export const faceHitBy = (dir, orient) => (hitsSilveredFace(dir, orient, 0) ? 0 : 1);
 
 /** The tiles that turn together when this one is tapped: itself, plus its twins (same `link`). */
 export function rotationGroup(tiles, tileIndex) {
@@ -42,11 +69,27 @@ export function buildCellIndex({ width, height, tiles }) {
  * @param level  { width, height, tiles }
  * @param orients optional array (by tile index) overriding each tile's `orient`
  * @param cells  optional prebuilt cell index (for the solver's hot loop)
- * @returns {{ segments, hits, litGems, litShades, isSolved }}
+ * @returns {{ segments, hits, litGems, litShades, litSwitches, openGates, isSolved }}
  *   segments: [{ x1, y1, x2, y2, color }] in cell units, measured from cell centers
- *   hits: Map(tileIndex -> Set(color)) for gems and shades the light reached
+ *   hits: Map(tileIndex -> Set(color)) for gems, shades and switches the light reached
+ *   openGates: the `pair` names of light gates whose switch is lit
  */
 export function traceBeams(level, orients = null, cells = buildCellIndex(level)) {
+  // Light gates open while their switch is lit, which can change where the light goes: trace again until
+  // the open gates stop changing (a few rounds at most).
+  const hasGates = level.tiles.some((tile) => tile.type === TILE.GATE);
+  let openPairs = new Set();
+  let result = traceOnce(level, orients, cells, openPairs);
+  for (let round = 0; hasGates && round < 4; round++) {
+    const lit = new Set([...result.litSwitches].map((i) => level.tiles[i].pair));
+    if (lit.size === openPairs.size && [...lit].every((pair) => openPairs.has(pair))) break;
+    openPairs = lit;
+    result = traceOnce(level, orients, cells, openPairs);
+  }
+  return { ...result, openGates: openPairs };
+}
+
+function traceOnce(level, orients, cells, openPairs) {
   const { width, height, tiles } = level;
   const orientOf = (i) => (orients ? orients[i] : (tiles[i].orient ?? 0));
   const segments = [];
@@ -55,9 +98,9 @@ export function traceBeams(level, orients = null, cells = buildCellIndex(level))
   const queue = [];
   const partners = portalPartners(tiles);
 
-  tiles.forEach((tile) => {
+  tiles.forEach((tile, i) => {
     if (tile.type === TILE.EMITTER) {
-      queue.push({ x: tile.x, y: tile.y, dir: DIRECTIONS[tile.dir], color: tile.color ?? 'sun' });
+      queue.push({ x: tile.x, y: tile.y, dir: DIRECTIONS[lampDirection(tile, orientOf(i))], color: tile.color ?? 'sun' });
     }
   });
 
@@ -95,13 +138,19 @@ export function traceBeams(level, orients = null, cells = buildCellIndex(level))
       }
       visited.add(key);
 
-      if (tile.type === TILE.WALL || tile.type === TILE.EMITTER) {
+      if (tile.type === TILE.GATE && openPairs.has(tile.pair)) continue;
+      if (tile.type === TILE.WALL || tile.type === TILE.EMITTER || tile.type === TILE.GATE) {
         endSegment(x - dir[0] * 0.5, y - dir[1] * 0.5);
         break;
       }
-      if (tile.type === TILE.GEM || tile.type === TILE.SHADE) {
+      if (tile.type === TILE.GEM || tile.type === TILE.SHADE || tile.type === TILE.SWITCH) {
         endSegment(x, y);
         recordHit(i, color);
+        break;
+      }
+      // The dark back of a one-sided mirror stops the light.
+      if (tile.type === TILE.MIRROR && tile.oneSided !== undefined && !hitsSilveredFace(dir, orientOf(i), tile.oneSided)) {
+        endSegment(x, y);
         break;
       }
       endSegment(x, y);
@@ -130,6 +179,7 @@ export function traceBeams(level, orients = null, cells = buildCellIndex(level))
 
   const litGems = new Set();
   const litShades = new Set();
+  const litSwitches = new Set();
   let gemCount = 0;
   tiles.forEach((tile, i) => {
     if (tile.type === TILE.GEM) {
@@ -137,6 +187,8 @@ export function traceBeams(level, orients = null, cells = buildCellIndex(level))
       if (hits.get(i)?.has(tile.color)) litGems.add(i);
     } else if (tile.type === TILE.SHADE && hits.has(i)) {
       litShades.add(i);
+    } else if (tile.type === TILE.SWITCH && hits.has(i)) {
+      litSwitches.add(i);
     }
   });
 
@@ -145,6 +197,7 @@ export function traceBeams(level, orients = null, cells = buildCellIndex(level))
     hits,
     litGems,
     litShades,
+    litSwitches,
     isSolved: gemCount > 0 && litGems.size === gemCount && litShades.size === 0,
   };
 }

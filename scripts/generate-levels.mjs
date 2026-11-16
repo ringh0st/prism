@@ -25,11 +25,21 @@ export const worldFileName = (world) => `world-${String(world).padStart(3, '0')}
 
 /** Ever-simpler versions of a preset, used when the full one is too complex to solve. */
 function simplifications(preset) {
+  // A light gate needs a second lamp to light its switch.
+  const fewestLamps = preset.gates ? 2 : 1;
   return [
     preset,
-    { ...preset, emitters: Math.max(1, preset.emitters - 1), decoys: Math.max(0, preset.decoys - 2) },
+    { ...preset, emitters: Math.max(fewestLamps, preset.emitters - 1), decoys: Math.max(0, preset.decoys - 2) },
     // More fixed mirrors make it easier to solve, but never before players have met them.
-    { ...preset, emitters: 1, splits: Math.min(1, preset.splits ?? 0), decoys: 1, lockedRatio: preset.lockedRatio > 0 ? 0.25 : 0 },
+    {
+      ...preset,
+      emitters: fewestLamps,
+      splits: Math.min(1, preset.splits ?? 0),
+      decoys: 1,
+      lockedRatio: preset.lockedRatio > 0 ? 0.25 : 0,
+    },
+    // Last resort for the biggest bosses: a smaller board with fewer extras.
+    { ...preset, emitters: fewestLamps, width: Math.max(6, preset.width - 2), height: Math.max(6, preset.height - 2), splits: 0, decoys: 1, shades: 0, fog: 0 },
   ];
 }
 

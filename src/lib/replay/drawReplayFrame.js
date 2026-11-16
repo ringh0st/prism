@@ -1,5 +1,5 @@
 import { DIRECTIONS, FRAGILE_TURNS, TILE } from '../../game/constants.js';
-import { traceBeams } from '../../game/beam.js';
+import { lampDirection, traceBeams } from '../../game/beam.js';
 import { shapePathFor } from '../../components/GemShape.jsx';
 
 /*
@@ -86,7 +86,7 @@ function drawGem(ctx, tile, isLit) {
   ctx.restore();
 }
 
-function drawTile(ctx, tile, { angle, isLit, turnsLeft }) {
+function drawTile(ctx, tile, { angle, orient, isLit, isOpen, turnsLeft }) {
   switch (tile.type) {
     case TILE.MIRROR:
     case TILE.SPLITTER:
@@ -96,7 +96,7 @@ function drawTile(ctx, tile, { angle, isLit, turnsLeft }) {
       ctx.fillStyle = '#ec9a55';
       roundRect(ctx, 14, 14, 72, 72, 20);
       ctx.fill();
-      const [dx, dy] = DIRECTIONS[tile.dir];
+      const [dx, dy] = DIRECTIONS[lampDirection(tile, orient)];
       ctx.fillStyle = '#fff';
       ctx.beginPath();
       ctx.moveTo(50 + dx * 40, 50 + dy * 40);
@@ -145,6 +145,23 @@ function drawTile(ctx, tile, { angle, isLit, turnsLeft }) {
       ctx.beginPath();
       ctx.arc(50, 50, 14, 0, Math.PI * 2);
       ctx.fill();
+      break;
+    case TILE.GATE:
+      ctx.strokeStyle = PAIRS[tile.pair];
+      ctx.lineWidth = 6;
+      ctx.fillStyle = isOpen ? 'rgba(0, 0, 0, 0)' : '#b48b66';
+      roundRect(ctx, 10, 10, 80, 80, 14);
+      ctx.fill();
+      ctx.stroke();
+      break;
+    case TILE.SWITCH:
+      ctx.strokeStyle = PAIRS[tile.pair];
+      ctx.lineWidth = 7;
+      ctx.fillStyle = isLit ? PAIRS[tile.pair] : '#fffaf2';
+      ctx.beginPath();
+      ctx.arc(50, 50, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
       break;
     case TILE.PRISM:
       ctx.fillStyle = '#f6e3c6';
@@ -203,7 +220,10 @@ function drawBoard(ctx, level, state, turnsUsed) {
     const base = -45 + (state.orients[i] ?? 0) * 90;
     const angle = turning ? base + 90 * ease(state.progress) : base;
     const turnsLeft = FRAGILE_TURNS - (turnsUsed[i] ?? 0);
-    inCell(ctx, cell, tile.x, tile.y, () => drawTile(ctx, tile, { angle, isLit: trace.litGems.has(i), turnsLeft }));
+    const isLit = trace.litGems.has(i) || trace.litSwitches.has(i);
+    const isOpen = tile.type === TILE.GATE && trace.openGates.has(tile.pair);
+    const orient = state.orients[i] ?? 0;
+    inCell(ctx, cell, tile.x, tile.y, () => drawTile(ctx, tile, { angle, orient, isLit, isOpen, turnsLeft }));
     if (turning) {
       // A tap ripple where the player touched.
       ctx.strokeStyle = `rgba(88, 172, 130, ${0.8 * (1 - state.progress)})`;

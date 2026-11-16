@@ -100,35 +100,55 @@ export function builtInLevelRefs(worldId) {
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-/** The first level of these worlds introduces a twist (see src/game/pieces.js). */
-const TWIST_INTROS = { '6-1': 'twins', '8-1': 'portal', '10-1': 'fragile', '12-1': 'fog', '14-1': 'prism' };
+/**
+ * One new piece every world through world 12 (see src/game/pieces.js): world 1 mirrors, walls and fixed
+ * mirrors, 2 splitters, 3 color glass, 4 shadow crystals, then these twists, each introduced on the world's
+ * first level and mixed into the worlds after it.
+ */
+const TWIST_WORLDS = { twins: 5, portal: 6, fragile: 7, fog: 8, prism: 9, gate: 10, lamp: 11, oneSided: 12 };
+const TWIST_INTROS = Object.fromEntries(Object.entries(TWIST_WORLDS).map(([twist, world]) => [`${world}-1`, twist]));
+/** How much of a twist its own world uses, and how often later worlds bring it back (every `every` levels). */
+const TWIST_MIX = {
+  twins: { own: 1, later: 1, every: 3, offset: 0 },
+  portal: { own: 1, later: 1, every: 4, offset: 1 },
+  fragile: { own: 2, later: 1, every: 3, offset: 2 },
+  fog: { own: 2, later: 2, every: 4, offset: 2 },
+  prism: { own: 1, later: 1, every: 5, offset: 3 },
+  gate: { own: 1, later: 1, every: 4, offset: 3 },
+  lamp: { own: 1, later: 1, every: 3, offset: 1 },
+  oneSided: { own: 2, later: 2, every: 4, offset: 0 },
+};
+const twistAmount = (twist, world, index) => {
+  const intro = TWIST_WORLDS[twist];
+  const { own, later, every, offset } = TWIST_MIX[twist];
+  if (world === intro) return own + (index > 10 ? 1 : 0);
+  return world > intro && (world + index) % every === offset ? later : 0;
+};
 
 /**
- * Generator settings for a world/level. The difficulty curve rises across all 50 worlds
- * (bigger boards, longer solutions, more decoys), ramps inside each world, and spikes on
- * Hard and boss levels. New pieces arrive one at a time (see src/game/pieces.js): world 1 teaches
- * mirrors, then walls (1-4), then fixed mirrors (1-10); world 2 splitters; world 3 color glass;
- * world 4 shadow crystals; then twists: world 6 twin mirrors, world 8 portals, world 10 cracking mirrors,
- * world 12 fog, world 14 prism crystals. Later worlds mix them.
+ * Generator settings for a world/level. Difficulty follows the level number (1–1000), so it keeps rising
+ * from world to world instead of starting over: longer solutions, bigger boards and more decoys, plus a
+ * spike on Hard and boss levels and a quick breather after them. New pieces arrive one per world.
  */
 export function generatorPresetFor(world, index) {
   const difficulty = difficultyFor(index);
-  const ramp = (index - 1) / (LEVELS_PER_WORLD - 1);
+  const number = (world - 1) * LEVELS_PER_WORLD + index;
+  const progress = (number - 1) / (WORLD_COUNT * LEVELS_PER_WORLD - 1); // 0 at level 1, 1 at level 1000
   const spike = difficulty === DIFFICULTY.EXTRA ? 2 : difficulty === DIFFICULTY.HARD ? 1 : 0;
-  const tier = Math.floor((world - 1) / 4); // grows every 4 worlds
-  const size = clamp(5 + Math.min(4, tier) + Math.round(ramp) + (spike > 0 ? 1 : 0), 4, 10);
-  const parStart = Math.min(10, 4 + Math.floor((world - 1) / 2));
-  // Early worlds spike more gently so new players aren't flattened by the first boss.
-  const minPar = Math.min(13, parStart + Math.round(ramp * 2) + spike * (world <= 2 ? 1 : 2));
+  const size = clamp(Math.round(5 + progress * 4.6) + (spike > 0 ? 1 : 0), 4, 10);
+  // Moves needed rise steadily with the level number: about 4 at the start, 13 by level 650.
+  const basePar = Math.min(13, 4 + Math.floor((number - 1) / 72));
+  const minPar = Math.min(14, basePar + spike * (world <= 2 ? 1 : 2));
+  const steps = Math.min(3, Math.floor(progress * 4));
 
   const preset = {
     width: size,
     height: size,
     emitters: spike === 2 ? (world >= 20 ? 3 : 2) : spike === 1 && world >= 10 ? 2 : 1,
-    turns: [2 + Math.round(ramp), 3 + Math.round(ramp) + spike + Math.min(2, tier)],
+    turns: [2 + Math.min(2, steps), 3 + steps + spike],
     segment: [1, 3],
-    decoys: Math.min(5, 1 + Math.round(ramp * 2) + spike + Math.floor(tier / 2)),
-    walls: 1 + Math.round(ramp * 2) + spike,
+    decoys: Math.min(6, 1 + steps + spike),
+    walls: 1 + steps + spike,
     minPar,
     maxPar: minPar + 4,
     lockedRatio: 0.1,
@@ -169,17 +189,20 @@ export function generatorPresetFor(world, index) {
   const variety = (world * 7 + index * 3) % 4;
   if (world === 2) return flavored({ ...preset, splits: 1 + (spike > 0 ? 1 : 0) });
   if (world === 3) return flavored({ ...preset, filters: 1 + (index > 10 ? 1 : 0), splits: index > 8 ? 1 : 0 });
-  if (world === 4) return { ...preset, shades: 1 + Math.round(ramp * 2) + spike, splits: index > 6 ? 1 : 0 };
-  // Twists, each the theme of its own world, then mixed in later: twin mirrors (world 6), portals (8),
-  // cracking mirrors (10), fog (12) and prism crystals (14).
+  if (world === 4) return { ...preset, shades: 1 + Math.round((index / LEVELS_PER_WORLD) * 2) + spike, splits: index > 6 ? 1 : 0 };
   const twists = {
-    twins: world === 6 ? 1 + (index > 10 ? 1 : 0) : world >= 7 && (world + index) % 3 === 0 ? 1 : 0,
-    portals: world === 8 ? 1 : world >= 9 && (world + index) % 4 === 1 ? 1 : 0,
-    fragile: world === 10 ? 2 : world >= 11 && (world + index) % 3 === 2 ? 1 : 0,
-    fog: world === 12 ? 2 : world >= 13 && (world + index) % 4 === 2 ? 2 : 0,
-    prisms: world === 14 ? 1 : world >= 15 && (world + index) % 5 === 3 ? 1 : 0,
+    twins: twistAmount('twins', world, index),
+    portals: twistAmount('portal', world, index),
+    fragile: twistAmount('fragile', world, index),
+    fog: twistAmount('fog', world, index),
+    prisms: twistAmount('prism', world, index),
+    gates: twistAmount('gate', world, index),
+    turningLamps: twistAmount('lamp', world, index),
+    oneSided: twistAmount('oneSided', world, index),
     mustHave: TWIST_INTROS[`${world}-${index}`] ?? null,
   };
+  // A light gate needs a second lamp to light its switch.
+  if (twists.gates) twists.emitters = Math.max(2, preset.emitters);
   // The level that introduces a twist shows it on its own: no other tricks, a smaller board.
   if (twists.mustHave) {
     const only = twists.mustHave;
@@ -191,6 +214,9 @@ export function generatorPresetFor(world, index) {
       fragile: only === 'fragile' ? 2 : 0,
       fog: only === 'fog' ? 2 : 0,
       prisms: only === 'prism' ? 1 : 0,
+      gates: only === 'gate' ? 1 : 0,
+      turningLamps: only === 'lamp' ? 1 : 0,
+      oneSided: only === 'oneSided' ? 2 : 0,
       width: 6,
       height: 6,
       splits: 0,
@@ -198,7 +224,7 @@ export function generatorPresetFor(world, index) {
       shades: 0,
       decoys: 1,
       walls: 1,
-      emitters: 1,
+      emitters: only === 'gate' ? 2 : 1,
       minPar: 3,
       maxPar: 6,
     };
@@ -208,6 +234,6 @@ export function generatorPresetFor(world, index) {
     ...twists,
     splits: variety === 0 || variety === 3 || spike > 0 ? 1 + (spike === 2 ? 1 : 0) : 0,
     filters: variety === 1 || variety === 3 ? 1 + (spike > 0 ? 1 : 0) : 0,
-    shades: variety === 2 || variety === 3 || spike > 0 ? 1 + spike + Math.min(2, Math.floor(tier / 3)) : 0,
+    shades: variety === 2 || variety === 3 || spike > 0 ? 1 + spike + Math.min(2, Math.floor(progress * 3)) : 0,
   };
 }

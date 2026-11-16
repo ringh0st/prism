@@ -28,6 +28,17 @@ export function validateLevel(level) {
     if ([TILE.EMITTER, TILE.GEM, TILE.FILTER].includes(tile.type) && !BEAM_COLOR_NAMES.includes(tile.color)) {
       problems.push(`${where}: needs a color.`);
     }
+    if (tile.type === TILE.EMITTER && tile.turnable && tile.orient !== undefined && tile.orient !== 0 && tile.orient !== 1) {
+      problems.push(`${where}: a turning lamp's orientation must be 0 or 1.`);
+    }
+    if (tile.oneSided !== undefined && (tile.type !== TILE.MIRROR || (tile.oneSided !== 0 && tile.oneSided !== 1))) {
+      problems.push(`${where}: only mirrors can be one-sided (face 0 or 1).`);
+    }
+    if ([TILE.GATE, TILE.SWITCH].includes(tile.type)) {
+      const other = tile.type === TILE.GATE ? TILE.SWITCH : TILE.GATE;
+      if (!tiles.some((t) => t.type === other && t.pair === tile.pair))
+        problems.push(`${where}: every light gate needs a switch with the same pair.`);
+    }
     if ([TILE.MIRROR, TILE.SPLITTER].includes(tile.type) && tile.orient !== 0 && tile.orient !== 1) {
       problems.push(`${where}: orientation must be 0 or 1.`);
     }
