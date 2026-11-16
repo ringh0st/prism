@@ -93,6 +93,11 @@ export const he = {
   'intro.sticker.night': 'שלב לילה',
 
   'board.lamp': 'מנורה',
+  'board.view.turnLeft': 'לסובב את הלוח שמאלה',
+  'board.view.turnRight': 'לסובב את הלוח ימינה',
+  'board.view.zoomIn': 'להתקרב',
+  'board.view.zoomOut': 'להתרחק',
+  'board.view.reset': 'לחזור לתצוגה הרגילה',
   'board.gem': 'אבן חן',
 
   'meter.left.one': 'נשאר מהלך אחד מתוך {limit}.',

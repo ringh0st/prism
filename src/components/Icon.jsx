@@ -74,6 +74,25 @@ const PATHS = {
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
+  minus: <path d="M5 12h14" />,
+  turnLeft: (
+    <>
+      <path d="M7 15a7 4 0 1 0 3-6.6" />
+      <path d="M10.5 5.5 10 8.4l2.9.6" />
+    </>
+  ),
+  turnRight: (
+    <>
+      <path d="M17 15a7 4 0 1 1-3-6.6" />
+      <path d="M13.5 5.5l.5 2.9-2.9.6" />
+    </>
+  ),
+  recenter: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+    </>
+  ),
   undo: (
     <>
       <path d="M9 14 4 9l5-5" />

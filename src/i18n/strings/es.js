@@ -93,6 +93,11 @@ export const es = {
   'intro.sticker.night': 'NIVEL DE NOCHE',
 
   'board.lamp': 'Lámpara',
+  'board.view.turnLeft': 'Girar la mesa a la izquierda',
+  'board.view.turnRight': 'Girar la mesa a la derecha',
+  'board.view.zoomIn': 'Acercar',
+  'board.view.zoomOut': 'Alejar',
+  'board.view.reset': 'Volver a la vista inicial',
   'board.gem': 'Gema',
 
   'meter.left.one': 'Te queda {count} movimiento de {limit}.',

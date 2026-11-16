@@ -166,6 +166,14 @@
 .board.board3d {
   background: none;
   box-shadow: none;
+  /* Drags turn the table and pinches zoom it, so the page mustn't scroll or zoom under them. */
+  touch-action: none;
+  user-select: none;
+}
+
+/* Taps are found by pointing into the 3D scene (Board3D); the buttons stay for the keyboard and screen readers. */
+.cells3d .cell {
+  pointer-events: none;
 }
 
 /* In 3D each cell's button is placed over its piece (Board3D measures where), so the grid is just a frame. */

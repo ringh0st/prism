@@ -73,6 +73,7 @@ export default function Board({
   const { width, height, tiles } = level;
   const [focusedCell, setFocusedCell] = useState(0);
   const cellRefs = useRef([]);
+  const boardRef = useRef(null);
   // In 3D, where each cell's piece is on screen (from Board3D), so its button sits over it.
   const [cellRects, setCellRects] = useState(null);
   const allTurns = useMemo(() => tiles.map((_, i) => turns[i] ?? orients[i] ?? 0), [tiles, turns, orients]);
@@ -143,6 +144,7 @@ export default function Board({
 
   return (
     <div
+      ref={boardRef}
       dir="ltr"
       className={`${styles.board} ${is3d ? styles.board3d : ''} ${styles[mood] ?? ''} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''} ${
         darkness && isEclipseMove(level, darkMoves) ? styles.eclipse : ''
@@ -152,7 +154,14 @@ export default function Board({
       <TileDefs />
       {is3d && (
         <Suspense fallback={null}>
-          <Board3D level={level} turns={allTurns} trace={trace} onLayout={setCellRects} />
+          <Board3D
+            level={level}
+            turns={allTurns}
+            trace={trace}
+            onLayout={setCellRects}
+            onTapCell={(cell) => cellRefs.current[cell]?.click()}
+            surfaceRef={boardRef}
+          />
         </Suspense>
       )}
       {!is3d && (

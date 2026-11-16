@@ -5,3 +5,39 @@
   height: 100%;
   border-radius: inherit;
 }
+
+/* Turn and zoom: a small row of round buttons under the table. */
+.controls {
+  position: absolute;
+  z-index: 4;
+  bottom: -6px;
+  left: 50%;
+  display: flex;
+  gap: 6px;
+  transform: translateX(-50%);
+}
+
+.control {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--text-strong);
+  background: var(--surface-card, #fffdf8);
+  box-shadow: 0 2px 0 rgba(43, 33, 24, 0.18);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.control:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.control:focus-visible {
+  outline: 3px solid var(--color-sage);
+  outline-offset: 2px;
+}

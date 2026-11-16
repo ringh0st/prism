@@ -97,6 +97,11 @@ export const en = {
   'intro.sticker.night': 'NIGHT LEVEL',
 
   'board.lamp': 'Lamp',
+  'board.view.turnLeft': 'Turn the table left',
+  'board.view.turnRight': 'Turn the table right',
+  'board.view.zoomIn': 'Zoom in',
+  'board.view.zoomOut': 'Zoom out',
+  'board.view.reset': 'Back to the start view',
   'board.gem': 'Gem',
 
   'meter.left.one': '{count} move left of {limit}.',
