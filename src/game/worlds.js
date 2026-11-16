@@ -107,6 +107,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
  */
 const TWIST_WORLDS = { twins: 5, portal: 6, fragile: 7, fog: 8, prism: 9, gate: 10, lamp: 11, oneSided: 12 };
 const TWIST_INTROS = Object.fromEntries(Object.entries(TWIST_WORLDS).map(([twist, world]) => [`${world}-1`, twist]));
+const DARK_INTROS = { '13-1': 'gloom', '14-1': 'fade', '15-1': 'power', '16-1': 'void', '17-1': 'eclipse' };
 /** How much of a twist its own world uses, and how often later worlds bring it back (every `every` levels). */
 const TWIST_MIX = {
   twins: { own: 1, later: 1, every: 3, offset: 0 },
@@ -118,6 +119,45 @@ const TWIST_MIX = {
   lamp: { own: 1, later: 1, every: 3, offset: 1 },
   oneSided: { own: 2, later: 2, every: 4, offset: 0 },
 };
+/**
+ * The darkness (darkness.js), one piece a world after the twists: creeping shadows (13), fading gems (14), dying
+ * lamps (15), voids (16) and eclipses (17), then mixed in like the twists. From world 15 every boss is a fight
+ * with Smudge's shadows.
+ */
+const DARK_WORLDS = { gloom: 13, fade: 14, power: 15, void: 16, eclipse: 17 };
+const DARK_MIX = {
+  gloom: { own: 1, later: 1, every: 3, offset: 0 },
+  fade: { own: 1, later: 1, every: 3, offset: 1 },
+  power: { own: 1, later: 1, every: 4, offset: 2 },
+  void: { own: 1, later: 1, every: 4, offset: 3 },
+  eclipse: { own: 1, later: 1, every: 5, offset: 4 },
+};
+const darkAmount = (piece, world, index) => {
+  const intro = DARK_WORLDS[piece];
+  const { own, later, every, offset } = DARK_MIX[piece];
+  if (world === intro) return own + (index > 10 && (piece === 'fade' || piece === 'void') ? 1 : 0);
+  return world > intro && (world + index) % every === offset ? later : 0;
+};
+/** Every how many moves an eclipse comes. */
+const ECLIPSE_EVERY = 3;
+
+/** The darkness plan for a level (see darknessBuilder.js), or null for none. */
+function darknessFor(world, index, difficulty) {
+  if (world < DARK_WORLDS.gloom) return null;
+  const plan = {
+    glooms: darkAmount('gloom', world, index),
+    fades: darkAmount('fade', world, index),
+    power: darkAmount('power', world, index),
+    voids: darkAmount('void', world, index),
+    eclipse: darkAmount('eclipse', world, index) ? ECLIPSE_EVERY : 0,
+  };
+  // Bosses from world 15 are a fight with Smudge: shadows on the march (two from world 25).
+  if (index === LEVELS_PER_WORLD && world >= DARK_WORLDS.power) plan.glooms = Math.max(plan.glooms, world >= 25 ? 2 : 1);
+  // An eclipse only matters when something is racing the clock.
+  if (plan.eclipse && !plan.glooms && !plan.fades) plan.glooms = 1;
+  return Object.values(plan).some(Boolean) ? { ...plan, gentle: difficulty === DIFFICULTY.NORMAL && world < 20 } : null;
+}
+
 const twistAmount = (twist, world, index) => {
   const intro = TWIST_WORLDS[twist];
   const { own, later, every, offset } = TWIST_MIX[twist];
@@ -202,8 +242,9 @@ export function generatorPresetFor(world, index) {
     gates: twistAmount('gate', world, index),
     turningLamps: twistAmount('lamp', world, index),
     oneSided: twistAmount('oneSided', world, index),
-    mustHave: TWIST_INTROS[`${world}-${index}`] ?? null,
+    mustHave: TWIST_INTROS[`${world}-${index}`] ?? DARK_INTROS[`${world}-${index}`] ?? null,
   };
+  const darkness = darknessFor(world, index, difficulty);
   // A light gate needs a second lamp to light its switch.
   if (twists.gates) twists.emitters = Math.max(2, preset.emitters);
   // The level that introduces a twist shows it on its own: no other tricks, a smaller board.
@@ -230,6 +271,18 @@ export function generatorPresetFor(world, index) {
       emitters: only === 'gate' ? 2 : 1,
       minPar: 3,
       maxPar: 6,
+      // A darkness piece is introduced on its own, gently (an eclipse comes with one creeping shadow to race).
+      darkness: DARK_WORLDS[only]
+        ? {
+            glooms: only === 'gloom' || only === 'eclipse' ? 1 : 0,
+            fades: only === 'fade' ? 1 : 0,
+            power: only === 'power' ? 1 : 0,
+            voids: only === 'void' ? 1 : 0,
+            eclipse: only === 'eclipse' ? ECLIPSE_EVERY : 0,
+            gentle: true,
+            intro: true,
+          }
+        : null,
     };
   }
   return {
@@ -238,5 +291,6 @@ export function generatorPresetFor(world, index) {
     splits: variety === 0 || variety === 3 || spike > 0 ? 1 + (spike === 2 ? 1 : 0) : 0,
     filters: variety === 1 || variety === 3 ? 1 + (spike > 0 ? 1 : 0) : 0,
     shades: variety === 2 || variety === 3 || spike > 0 ? 1 + spike + Math.min(2, Math.floor(progress * 3)) : 0,
+    darkness,
   };
 }

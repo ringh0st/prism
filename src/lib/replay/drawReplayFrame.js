@@ -170,6 +170,12 @@ function drawTile(ctx, tile, { angle, orient, isLit, isOpen, turnsLeft }) {
       ctx.fill(new Path2D('M50 12L86 76H14z'));
       ctx.stroke(new Path2D('M50 12L86 76H14z'));
       break;
+    case TILE.VOID:
+      ctx.fillStyle = '#2f2620';
+      ctx.beginPath();
+      ctx.arc(50, 50, 40, 0, Math.PI * 2);
+      ctx.fill();
+      break;
     default:
   }
 }

@@ -12,6 +12,7 @@ export const TILE = Object.freeze({
   PRISM: 'prism',
   GATE: 'gate',
   SWITCH: 'switch',
+  VOID: 'void',
 });
 
 /** A cracking mirror (`fragile`) can be turned this many times, then it cracks and stays put. */

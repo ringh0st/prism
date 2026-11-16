@@ -1159,7 +1159,10 @@ test('every Pal has a power that grows with it and never goes past the cap', asy
   for (const pal of PALS) {
     assert.ok(PAL_POWERS[pal.power], `${pal.id} has a known power`);
     const ladder = powerByForm(pal);
-    assert.ok(ladder.every((amount, i) => amount >= 1 && amount <= MAX_POWER_STRENGTH && amount >= (ladder[i - 1] ?? 0)), `${pal.id} grows`);
+    assert.ok(
+      ladder.every((amount, i) => amount >= 1 && amount <= MAX_POWER_STRENGTH && amount >= (ladder[i - 1] ?? 0)),
+      `${pal.id} grows`,
+    );
     assert.equal(ladder[4], MAX_POWER_STRENGTH, `${pal.id} is at full strength as a Master`);
     if (rarityOf(pal) !== 'common') assert.equal(palPower(pal, 0).amount, 2, `${pal.id} starts a step stronger`);
   }
@@ -1167,4 +1170,74 @@ test('every Pal has a power that grows with it and never goes past the cap', asy
   for (const id of Object.keys(PAL_POWERS)) assert.ok(PALS.filter((pal) => pal.power === id).length >= 10);
   assert.equal(partnerPower({ pal: { id: null, owned: {} } }), null);
   assert.deepEqual(partnerPower({ pal: { id: 'ember', owned: { ember: { stage: 2 } } } }).amount, 2);
+});
+
+test('the darkness: shadows burn in light and swallow gems, gems fade, lamps dim, voids swallow light', async () => {
+  const { darknessStart, darknessStep, findSafeOrder } = await import('./darkness.js');
+  // A lamp shines along the top row to a gem; a mirror at the bottom changes nothing when tapped.
+  const base = {
+    width: 5,
+    height: 3,
+    tiles: [
+      { type: 'emitter', x: 0, y: 0, dir: 'right', color: 'sun' },
+      { type: 'gem', x: 4, y: 0, color: 'sun' },
+      { type: 'mirror', x: 2, y: 2, orient: 0 },
+    ],
+  };
+  const start = base.tiles.map((tile) => tile.orient ?? 0);
+  const tapped = start.slice();
+  tapped[2] ^= 1;
+
+  // A shadow that starts in the light burns at once; one off the light creeps on and swallows its gem.
+  assert.ok(darknessStart({ ...base, glooms: [{ trail: [2, 7], gem: 1 }] }, start).burned.has(0));
+  const creeping = { ...base, glooms: [{ trail: [10, 11], gem: 1 }] };
+  let state = darknessStep(creeping, darknessStart(creeping, start), tapped, 1);
+  assert.equal(state.lost, null);
+  state = darknessStep(creeping, state, start, 2);
+  assert.equal(state.lost.kind, 'swallowed');
+
+  // A shadow that creeps into the light burns.
+  const intoLight = { ...base, glooms: [{ trail: [7, 2, 3], gem: 1 }] };
+  state = darknessStep(intoLight, darknessStart(intoLight, start), tapped, 1);
+  assert.ok(state.burned.has(0));
+
+  // A dark gem with one move to go fades; a lit one is saved.
+  const fading = { ...base, tiles: [...base.tiles, { type: 'gem', x: 4, y: 2, color: 'sun', fade: 1 }] };
+  assert.equal(darknessStep(fading, darknessStart(fading, start), tapped, 1).lost.kind, 'faded');
+
+  // A dying lamp reaches only so far, and goes out once its power is gone.
+  const dim = { ...base, tiles: base.tiles.map((tile, i) => (i === 0 ? { ...tile, power: 0, reach: 2 } : tile)) };
+  assert.equal(darknessStart(dim, start).trace.litGems.size, 0);
+  assert.equal(darknessStep(dim, darknessStart(dim, start), tapped, 1).lost.kind, 'lampOut');
+
+  // A void swallows light passing next to it.
+  const swallowed = { ...base, tiles: [...base.tiles, { type: 'void', x: 2, y: 1 }] };
+  assert.equal(traceBeams(swallowed).litGems.size, 0);
+
+  // The safe-order search finds an order when there is one.
+  assert.deepEqual(findSafeOrder(base, start, [[2]]), [0]);
+});
+
+test('darkness levels can be won in a safe order and every new piece is introduced', async () => {
+  const { findSafeOrder, hasDarkness } = await import('./darkness.js');
+  const { analyzeLevel } = await import('./solver.js');
+  const { piecesIn, PIECE_FIRST_LEVEL } = await import('./pieces.js');
+  for (const world of [13, 14, 15, 16, 17]) {
+    const levels = JSON.parse(readFileSync(new URL(`../data/worlds/world-${String(world).padStart(3, '0')}.json`, import.meta.url)));
+    const intro = Object.entries(PIECE_FIRST_LEVEL).find(([, id]) => id === levels[0].id)?.[0];
+    assert.ok(intro && piecesIn(levels[0]).includes(intro), `${levels[0].id} introduces its piece`);
+    for (const level of levels.filter(hasDarkness).slice(0, 6)) {
+      const analysis = analyzeLevel(level);
+      const best = analysis.solutions.filter((s) => s.mask.toString(2).replaceAll('0', '').length === analysis.par);
+      const start = level.tiles.map((tile) => tile.orient ?? 0);
+      const safe = best.some(({ mask }) =>
+        findSafeOrder(
+          level,
+          start,
+          analysis.groups.filter((_, g) => (mask >> g) & 1),
+        ),
+      );
+      assert.ok(safe, `${level.id} has a safe order`);
+    }
+  }
 });

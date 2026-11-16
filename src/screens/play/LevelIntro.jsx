@@ -8,6 +8,7 @@ import LumiSays from '../../components/game/LumiSays.jsx';
 import GemShape from '../../components/GemShape.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import TapIcon from './TapIcon.jsx';
+import { SmudgeArt } from '../../components/board/darkTileArt.jsx';
 import BoosterPicker from './BoosterPicker.jsx';
 import PalPowerChip from './PalPowerChip.jsx';
 import TeamSwitcher from '../pals/TeamSwitcher.jsx';
@@ -32,6 +33,13 @@ const MOODS = {
   disco: { key: 'intro.sticker.disco', art: <Icon name="spark" size={30} /> },
   night: { key: 'intro.sticker.night', art: moon },
 };
+
+/** Smudge's face, for bosses where his shadows are on the march. */
+const smudgeFace = (
+  <svg viewBox="0 0 100 100" width="40" height="40" aria-hidden="true">
+    <SmudgeArt />
+  </svg>
+);
 
 /** How long the intro stays before the level starts by itself (any tap starts it sooner). */
 const INTRO_MS = 3500;
@@ -97,7 +105,8 @@ export default function LevelIntro({
           <span className={styles.medallions} aria-hidden="true">
             {moods.map((id) => (
               <span key={id} className={`${styles.medallion} ${styles[`medal-${id}`]}`}>
-                {MOODS[id].art}
+                {/* A boss with Smudge's shadows shows Smudge himself. */}
+                {id === 'boss' && level.glooms?.length ? smudgeFace : MOODS[id].art}
               </span>
             ))}
           </span>

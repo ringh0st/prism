@@ -11,14 +11,24 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
  * missing (lit ones ticked, dark ones waiting with a "?"), retrying is one big tap, a hint is offered as a gentle
  * way forward. In the early worlds `onKeepGoing` adds `extraMoves` instead (for 1 star), so new players never hit a wall.
  * @param gems [{ color, isLit }] for every gem on the board
+ * @param darkKind when the darkness won instead (darkness.js): 'swallowed' | 'faded' | 'lampOut'
  */
-export default function OutOfMovesDialog({ gems, extraMoves = 0, backName = 'map', onRetry, onKeepGoing = null, onRetryWithHint = null, onMap }) {
+export default function OutOfMovesDialog({
+  gems,
+  darkKind = null,
+  extraMoves = 0,
+  backName = 'map',
+  onRetry,
+  onKeepGoing = null,
+  onRetryWithHint = null,
+  onMap,
+}) {
   const { t } = useI18n();
   const gemsLit = gems.filter((gem) => gem.isLit).length;
   const gemsLeft = gems.length - gemsLit;
   const isClose = gemsLit > 0 && gemsLeft === 1;
   return (
-    <Dialog title={t(isClose ? 'out.close' : 'out.title')} tone="gentle" onClose={onMap} closesOnBackdrop={false}>
+    <Dialog title={t(darkKind ? `out.dark.${darkKind}` : isClose ? 'out.close' : 'out.title')} tone="gentle" onClose={onMap} closesOnBackdrop={false}>
       <ul className={styles.gems} aria-label={gemsLit === 0 ? t('out.noneLit') : t('out.gemsToGo', { count: gemsLeft })}>
         {gems.map((gem, i) => (
           <li key={i} className={gem.isLit ? styles.lit : styles.missing} style={{ '--i': i }}>

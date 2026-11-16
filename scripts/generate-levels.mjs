@@ -16,10 +16,13 @@ import { MAX_RANDOM_SOLVE_RATE, randomSolveRate } from '../src/game/levelQuality
 import { REST_RECIPES } from '../src/game/recipes.js';
 import { difficultyFor, generatorPresetFor, levelId, LEVELS_PER_WORLD, WORLD_COUNT } from '../src/game/worlds.js';
 import { createRandom } from '../src/lib/random.js';
+import { addDarkness } from '../src/game/darknessBuilder.js';
 import { LEVEL_SCHEMA_VERSION } from '../src/game/constants.js';
 
 const OUTPUT_DIR = new URL('../src/data/worlds/', import.meta.url);
 const TIME_BUDGET_MS = 4000;
+/** Boards a darkness level tries the darkness on (checking the safe orders takes a moment). */
+const MAX_DARK_TRIES = 150;
 
 export const worldFileName = (world) => `world-${String(world).padStart(3, '0')}.json`;
 
@@ -39,7 +42,16 @@ function simplifications(preset) {
       lockedRatio: preset.lockedRatio > 0 ? 0.25 : 0,
     },
     // Last resort for the biggest bosses: a smaller board with fewer extras.
-    { ...preset, emitters: fewestLamps, width: Math.max(6, preset.width - 2), height: Math.max(6, preset.height - 2), splits: 0, decoys: 1, shades: 0, fog: 0 },
+    {
+      ...preset,
+      emitters: fewestLamps,
+      width: Math.max(6, preset.width - 2),
+      height: Math.max(6, preset.height - 2),
+      splits: 0,
+      decoys: 1,
+      shades: 0,
+      fog: 0,
+    },
   ];
 }
 
@@ -56,11 +68,17 @@ function bestLevelFor(world, index) {
   const needsCatch = needsCatchFor(world, index, preset);
   let best = null;
   let fallback = null; // the least random-solvable board, if none passes the catch check
+  let darkTries = 0;
   for (const [attempt, variant] of simplifications(preset).entries()) {
     const deadline = Date.now() + TIME_BUDGET_MS;
     for (let seed = 0; seed < 400 && Date.now() < deadline; seed++) {
       const random = createRandom(`prism-${levelId(world, index)}-${attempt}-${seed}`);
-      const level = generateLevel({ ...variant, minPar: Math.min(variant.minPar, 2) }, random, 25);
+      let level = generateLevel({ ...variant, minPar: Math.min(variant.minPar, 2) }, random, 25);
+      // The darkness goes on top of a finished board (darknessBuilder.js); a board that can't take it is skipped.
+      if (level && preset.darkness && level.par >= (best?.par ?? 0) && darkTries < MAX_DARK_TRIES) {
+        darkTries++;
+        level = addDarkness(level, preset.darkness, random, preset.maxPar);
+      } else if (preset.darkness) level = null;
       // A level that introduces a piece must actually contain it.
       const hasRequired = !preset.mustHave || (level && piecesIn(level).includes(preset.mustHave));
       // Every regular level needs a real "catch": random tapping mustn't solve it (levelQuality.js).
@@ -101,6 +119,8 @@ function generateWorld(world) {
       par: level.par,
       ...(preset.recipe ? { recipe: preset.recipe } : {}),
       tiles: level.tiles,
+      ...(level.glooms ? { glooms: level.glooms } : {}),
+      ...(level.eclipse ? { eclipse: level.eclipse } : {}),
     });
   }
   writeFileSync(new URL(worldFileName(world), OUTPUT_DIR), JSON.stringify(levels) + '\n');

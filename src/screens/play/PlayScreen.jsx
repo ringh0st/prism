@@ -37,6 +37,7 @@ import { BOOSTERS_FROM_WORLD, HELPERS, HELPER_IDS, LENS_DURATION_MS, toolFor } f
 import { useBoosters } from '../../hooks/useBoosters.js';
 import { streakBoosters } from '../../game/winStreak.js';
 import { partnerPower, powersWorkIn } from '../../game/palPowers.js';
+import { gloomsNow, isEclipseMove } from '../../game/darkness.js';
 import { palName } from '../../i18n/palText.js';
 import { playablePals } from '../../game/pals.js';
 import { isWorldComplete } from '../../game/progress.js';
@@ -47,7 +48,7 @@ import { quipLines } from '../../game/quips.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { flavorText, levelTitle, pieceText, worldName } from '../../i18n/gameText.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
-import { firstTileOf, newPiecesIn, piecesMetIn } from '../../game/pieces.js';
+import { PIECE_FIRST_LEVEL, firstTileOf, newPiecesIn, pieceCellOf, piecesMetIn } from '../../game/pieces.js';
 import { findHint, tapsLeftFinder } from '../../game/solver.js';
 import { isRotatable } from '../../game/beam.js';
 import { readJson, writeJson } from '../../lib/storage.js';
@@ -81,6 +82,8 @@ const KEEP_GOING_MOVES_LATER = 3;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const SEEN_PIECES_KEY = 'prism.seenPieces.v1';
+/** Lumi when the light burns one of Smudge's shadows (English; translated by key). */
+const DARK_BURNED_LINES = ['Take that, Smudge!', 'Poof! Shadow gone!', 'Light wins!', 'Bye-bye, Smudge!'];
 const SEEN_TIPS_KEY = 'prism.seenTips.v1';
 
 /** Pieces already introduced on this device, or (first time) the ones met in levels already solved. */
@@ -232,12 +235,22 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
             : world && lang !== 'en'
               ? worldName(lang, world) // the title already says "שלב 148"
               : `${world ? `${worldName(lang, world)} · ` : ''}${t('level.title', { label: levelLabel })}`;
-  // The intro speaks only when the picture can't say it: a friend's score to beat, or the Rush's spare moves.
+  // The intro speaks only when the picture can't say it: a friend's score to beat, the Rush's spare moves, or Smudge
+  // turning up for the first time.
   const introLine = useMemo(
-    () => (challenge ? t('intro.challenge', { count: challenge.moves }) : rush ? t('intro.rush', { count: rush.run.spare }) : ''),
+    () =>
+      challenge
+        ? t('intro.challenge', { count: challenge.moves })
+        : rush
+          ? t('intro.rush', { count: rush.run.spare })
+          : level.id === PIECE_FIRST_LEVEL.gloom && mode === 'level'
+            ? t('intro.smudge') // the darkness arrives: Lumi introduces Smudge once
+            : '',
     [challenge], // eslint-disable-line react-hooks/exhaustive-deps -- the rush line is set once per puzzle
   );
-  const isOver = trace.isSolved || isOutOfMoves || Boolean(result);
+  // The darkness (darkness.js) can win: a shadow reaches its gem, a gem fades, a lamp goes out.
+  const darkLost = puzzle.darkness?.lost ?? null;
+  const isOver = trace.isSolved || isOutOfMoves || Boolean(result) || Boolean(darkLost);
 
   // Cheers pop over the board and fade (a game shout, nothing to read); Lumi's box keeps the useful lines.
   const [callout, setCallout] = useState(null);
@@ -465,6 +478,43 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     return undefined;
   }, [moves, playLimit, trace.isSolved, say, react, playStats]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // The darkness wins: Smudge giggles and the level ends like running out of moves (in Light Rush it's a restart,
+  // which spends spare moves like any restart there).
+  useEffect(() => {
+    if (!darkLost || hasRecordedWin.current) return undefined;
+    const timer = setTimeout(() => {
+      sfx.darknessWins();
+      setLumi({ mood: 'worried', line: t(`lumi.dark.${darkLost.kind}`) });
+      if (mode === 'rush') {
+        restart();
+        return;
+      }
+      react('droop');
+      setIsOutOfMoves(true);
+      playStats.end('out_of_moves');
+      if (mode === 'level') endWinStreak();
+    }, 650);
+    return () => clearTimeout(timer);
+  }, [darkLost]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // The darkness moving: a fizz when light burns a shadow, a tiptoe when one is a move from its gem, a swell on
+  // an eclipse.
+  const darkSeen = useRef({ burned: 0, near: false, taps: 0 });
+  useEffect(() => {
+    const dark = puzzle.darkness;
+    if (!dark) return;
+    const seen = darkSeen.current;
+    const glooms = gloomsNow(level, dark).filter((gloom) => !gloom.isBurned);
+    const isNear = glooms.some((gloom) => gloom.stepsLeft === 1);
+    if (dark.burned.size > seen.burned) {
+      sfx.shadowBurn();
+      react('hop');
+      setLumi({ mood: 'excited', line: line('lumi.dark.burned', DARK_BURNED_LINES) });
+    } else if (isNear && !seen.near && !dark.lost) sfx.shadowNear();
+    if (puzzle.taps.length > seen.taps && isEclipseMove(level, puzzle.taps.length)) sfx.eclipse();
+    darkSeen.current = { burned: dark.burned.size, near: isNear, taps: puzzle.taps.length };
+  }, [puzzle.darkness]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Tapping a piece that can't turn says why (a little shake, a soft "nope" and a word from Lumi).
   const [nudgedCell, setNudgedCell] = useState(null);
   const onBlocked = useCallback(
@@ -567,10 +617,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   /** Spotlights for this level: each new piece where it sits on the board, then any first-time tips. */
   const buildTour = () => {
     const pieceSteps = newPieces.map((piece) => {
-      const tile = level.tiles[firstTileOf(level, piece.id)];
+      const cell = pieceCellOf(level, piece.id);
       return {
         id: `piece-${piece.id}`,
-        target: tile ? `[data-cell="${tile.y * level.width + tile.x}"]` : '[data-tour="board"]',
+        target: cell !== null ? `[data-cell="${cell}"]` : '[data-tour="board"]',
         ...pieceText(lang, piece),
         art: (
           <TileArt
@@ -761,6 +811,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
             glowbug && glowbugCell !== null ? { id: glowbug.id, cell: glowbugCell, isAwake: isGlowbugAwake, isFreed: solvedStars === 3 } : null
           }
           isLocked={isOver}
+          darkness={puzzle.darkness}
+          darkMoves={puzzle.taps.length}
           mood={modifier}
           label={t('play.boardLabel', { name: levelName })}
         />
@@ -867,11 +919,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       {isOutOfMoves && !result && mode !== 'rush' && (
         <OutOfMovesDialog
           backName={backName}
+          darkKind={darkLost?.kind ?? null}
           gems={gems.map(({ tile, i }) => ({ color: tile.color, isLit: trace.litGems.has(i) }))}
           extraMoves={keepGoingMoves}
           onRetry={restart}
           onKeepGoing={
-            canKeepGoing
+            canKeepGoing && !darkLost
               ? () => {
                   sfx.keepGoing();
                   setBonusMoves((extra) => extra + keepGoingMoves);

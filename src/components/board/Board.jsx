@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import TileArt, { TileDefs } from './TileArt.jsx';
 import BeamLayer from './BeamLayer.jsx';
+import DarknessLayer from './DarknessLayer.jsx';
+import { fadeLeft, gloomsNow, isEclipseMove, powerLeft } from '../../game/darkness.js';
 import LensPath from './LensPath.jsx';
 import GlowbugArt from '../glowbugs/GlowbugArt.jsx';
 import { glowbugById } from '../../game/glowbugs.js';
@@ -36,6 +38,8 @@ const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
  * @param nudgedCell   cell to give a little "nope" shake
  * @param lookHere     Set of cells to softly glow: the free "look around here" step of the hint ladder
  * @param coach        first-levels coaching: { tile: tile index the hand points at, or null; labels: show Lamp/Gem tags }
+ * @param darkness     the darkness now (darkness.js): creeping shadows, countdowns on fading gems and dying lamps
+ * @param darkMoves    moves that still stand (for the eclipse countdown)
  */
 export default function Board({
   level,
@@ -57,6 +61,8 @@ export default function Board({
   lookHere = null,
   onBlocked = null,
   nudgedCell = null,
+  darkness = null,
+  darkMoves = 0,
 }) {
   const { t, lang } = useI18n();
   const { width, height, tiles } = level;
@@ -113,12 +119,26 @@ export default function Board({
   }, [trace.litGems, tiles, width, isEditing]);
 
   const hasLitShade = trace.litShades.size > 0;
+  // Where each creeping shadow is, for the screen reader (the layer draws them).
+  const gloomAt = useMemo(
+    () =>
+      new Map(
+        darkness
+          ? gloomsNow(level, darkness)
+              .filter((g) => !g.isBurned)
+              .map((g) => [g.cell, g])
+          : [],
+      ),
+    [level, darkness],
+  );
   const litPlates = useMemo(() => (isEditing ? new Set() : cellsOnBeams(trace.segments, width, height)), [trace.segments, width, height, isEditing]);
 
   return (
     <div
       dir="ltr"
-      className={`${styles.board} ${styles[mood] ?? ''} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''}`}
+      className={`${styles.board} ${styles[mood] ?? ''} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''} ${
+        darkness && isEclipseMove(level, darkMoves) ? styles.eclipse : ''
+      }`}
       style={{ '--cols': width, '--rows': height }}
     >
       <TileDefs />
@@ -132,6 +152,7 @@ export default function Board({
         ))}
       </div>
       <BeamLayer width={width} height={height} segments={trace.segments} />
+      {darkness && <DarknessLayer level={level} darkness={darkness} moves={darkMoves} />}
       <div className={styles.cells} role="grid" aria-label={label} aria-rowcount={height} aria-colcount={width}>
         {Array.from({ length: height }, (_, row) => (
           <div role="row" key={row} className={styles.row}>
@@ -146,11 +167,25 @@ export default function Board({
                 tileIndex >= 0 && (trace.litGems.has(tileIndex) || trace.litShades.has(tileIndex) || Boolean(trace.litSwitches?.has(tileIndex)));
               const isOpen = tile?.type === TILE.GATE && Boolean(trace.openGates?.has(tile.pair));
               const isActionable = !isLocked && (isEditing || canRotate);
-              const description = describeTile(
-                tile,
-                { orient: orients[tileIndex], isLit, isOpen, isRotatable: canRotate, isFogged, turnsLeft: left },
-                t,
-              );
+              // The darkness: a countdown on fading gems and dying lamps, and a gem it took.
+              const darkCount =
+                !darkness || !tile
+                  ? undefined
+                  : tile.fade
+                    ? fadeLeft(level, darkness, tileIndex)
+                    : tile.power !== undefined
+                      ? powerLeft(level, darkness, tileIndex)
+                      : undefined;
+              const isDarkened = darkness?.lost?.tile === tileIndex && tile?.type === TILE.GEM;
+              const gloom = gloomAt.get(cell);
+              const darkWords = [
+                darkCount != null && t(tile.fade ? 'ui.cell.fadeLeft' : 'ui.cell.powerLeft', { count: darkCount }),
+                isDarkened && t('ui.cell.darkened'),
+                gloom && t('ui.cell.gloom', { count: gloom.stepsLeft }),
+              ].filter(Boolean);
+              const description =
+                describeTile(tile, { orient: orients[tileIndex], isLit, isOpen, isRotatable: canRotate, isFogged, turnsLeft: left }, t) +
+                (darkWords.length ? `, ${darkWords.join(', ')}` : '');
               return (
                 <div role="gridcell" key={col} className={styles.cellWrap}>
                   <button
@@ -191,6 +226,8 @@ export default function Board({
                         isRotatable={canRotate}
                         turnsLeft={left}
                         isFogged={isFogged}
+                        darkCount={darkCount}
+                        isDarkened={isDarkened}
                       />
                     )}
                   </button>

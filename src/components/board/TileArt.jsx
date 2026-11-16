@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { FRAGILE_TURNS, TILE } from '../../game/constants.js';
 import { beamColorVar, shapePathFor } from '../GemShape.jsx';
+import { DarkCounter, DarkenedGem, EclipseArt, SmudgeArt, VoidArt } from './darkTileArt.jsx';
 import styles from './Board.module.css';
 
 const DIRECTION_ANGLE = { right: 0, down: 90, left: 180, up: 270 };
@@ -299,8 +300,21 @@ function Wall() {
 /**
  * Visual for one tile. Pure presentation: no interaction here.
  * turnsLeft: a cracking mirror's remaining turns. isFogged: hidden under fog until light reaches it.
+ * darkCount: moves left on a fading gem or a dying lamp (darkness.js; null hides it, e.g. once a gem is saved);
+ * isDarkened: a gem the darkness took.
+ * The darkness pieces 'gloom' and 'eclipse' are drawn too, for the spotlight that introduces them.
  */
-function TileArt({ tile, turns = 0, isLit = false, isOpen = false, isRotatable = false, turnsLeft = FRAGILE_TURNS, isFogged = false }) {
+function TileArt({
+  tile,
+  turns = 0,
+  isLit = false,
+  isOpen = false,
+  isRotatable = false,
+  turnsLeft = FRAGILE_TURNS,
+  isFogged = false,
+  darkCount = undefined,
+  isDarkened = false,
+}) {
   let art = null;
   switch (isFogged ? 'fog' : tile.type) {
     case 'fog':
@@ -322,7 +336,16 @@ function TileArt({ tile, turns = 0, isLit = false, isOpen = false, isRotatable =
       art = <Emitter dir={tile.dir} color={tile.color} turnable={tile.turnable} turns={turns} />;
       break;
     case TILE.GEM:
-      art = <Gem color={tile.color} isLit={isLit} />;
+      art = isDarkened ? <DarkenedGem /> : <Gem color={tile.color} isLit={isLit} />;
+      break;
+    case TILE.VOID:
+      art = <VoidArt />;
+      break;
+    case 'gloom':
+      art = <SmudgeArt />;
+      break;
+    case 'eclipse':
+      art = <EclipseArt />;
       break;
     case TILE.FILTER:
       art = <Filter color={tile.color} />;
@@ -345,9 +368,12 @@ function TileArt({ tile, turns = 0, isLit = false, isOpen = false, isRotatable =
     default:
       return null;
   }
+  // Fading gems and dying lamps count down (the spotlight samples show their starting count).
+  const count = darkCount !== undefined ? darkCount : isFogged ? null : (tile.fade ?? tile.power ?? null);
   return (
     <svg className={styles.tileArt} viewBox="0 0 100 100" aria-hidden="true" focusable="false">
       {art}
+      {count !== null && !isDarkened && <DarkCounter value={count} />}
     </svg>
   );
 }

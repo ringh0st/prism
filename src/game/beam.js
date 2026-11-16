@@ -77,27 +77,51 @@ export function buildCellIndex({ width, height, tiles }) {
  * @param level  { width, height, tiles }
  * @param orients optional array (by tile index) overriding each tile's `orient`
  * @param cells  optional prebuilt cell index (for the solver's hot loop)
- * @returns {{ segments, hits, litGems, litShades, litSwitches, openGates, isSolved }}
+ * @param dark   optional darkness (darkness.js): { blockers: Map(cell -> shadow index), ranges: Map(lamp tile -> cells) }.
+ *               A creeping shadow stops the light that reaches it (and is hit), and a dying lamp's light reaches only so far.
+ * @returns {{ segments, hits, litGems, litShades, litSwitches, litGlooms, openGates, isSolved }}
  *   segments: [{ x1, y1, x2, y2, color }] in cell units, measured from cell centers
  *   hits: Map(tileIndex -> Set(color)) for gems, shades and switches the light reached
  *   openGates: the `pair` names of light gates whose switch is lit
  */
-export function traceBeams(level, orients = null, cells = buildCellIndex(level)) {
+export function traceBeams(level, orients = null, cells = buildCellIndex(level), dark = null) {
+  const voids = voidZone(level);
+  const context = { cells, dark, voids };
   // Light gates open while their switch is lit, which can change where the light goes: trace again until
   // the open gates stop changing (a few rounds at most).
   const hasGates = level.tiles.some((tile) => tile.type === TILE.GATE);
   let openPairs = new Set();
-  let result = traceOnce(level, orients, cells, openPairs);
+  let result = traceOnce(level, orients, context, openPairs);
   for (let round = 0; hasGates && round < 4; round++) {
     const lit = new Set([...result.litSwitches].map((i) => level.tiles[i].pair));
     if (lit.size === openPairs.size && [...lit].every((pair) => openPairs.has(pair))) break;
     openPairs = lit;
-    result = traceOnce(level, orients, cells, openPairs);
+    result = traceOnce(level, orients, context, openPairs);
   }
   return { ...result, openGates: openPairs };
 }
 
-function traceOnce(level, orients, cells, openPairs) {
+/** Cells a void swallows light in: its own and the four next to it. */
+function voidZone({ width, height, tiles }) {
+  const zone = new Set();
+  for (const tile of tiles) {
+    if (tile.type !== TILE.VOID) continue;
+    for (const [dx, dy] of [
+      [0, 0],
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ]) {
+      const x = tile.x + dx;
+      const y = tile.y + dy;
+      if (x >= 0 && y >= 0 && x < width && y < height) zone.add(y * width + x);
+    }
+  }
+  return zone;
+}
+
+function traceOnce(level, orients, { cells, dark, voids }, openPairs) {
   const { width, height, tiles } = level;
   const orientOf = (i) => {
     const orient = orients ? orients[i] : (tiles[i].orient ?? 0);
@@ -113,10 +137,12 @@ function traceOnce(level, orients, cells, openPairs) {
 
   tiles.forEach((tile, i) => {
     if (tile.type === TILE.EMITTER) {
-      queue.push({ x: tile.x, y: tile.y, dir: DIRECTIONS[lampDirection(tile, orientOf(i))], color: tile.color ?? 'sun' });
+      const reach = dark?.ranges?.get(i) ?? Infinity;
+      queue.push({ x: tile.x, y: tile.y, dir: DIRECTIONS[lampDirection(tile, orientOf(i))], color: tile.color ?? 'sun', left: reach });
     }
   });
 
+  const litGlooms = new Set();
   const recordHit = (i, color) => {
     if (!hits.has(i)) hits.set(i, new Set());
     hits.get(i).add(color);
@@ -124,7 +150,7 @@ function traceOnce(level, orients, cells, openPairs) {
 
   while (queue.length) {
     const beam = queue.pop();
-    let { x, y, dir, color } = beam;
+    let { x, y, dir, color, left } = beam;
     let startX = x;
     let startY = y;
     const endSegment = (ex, ey) => {
@@ -132,6 +158,11 @@ function traceOnce(level, orients, cells, openPairs) {
     };
 
     for (;;) {
+      // A dying lamp's light fades out once it has gone as far as the lamp can still reach.
+      if (left <= 0) {
+        endSegment(x + dir[0] * 0.4, y + dir[1] * 0.4);
+        break;
+      }
       const nx = x + dir[0];
       const ny = y + dir[1];
       if (nx < 0 || ny < 0 || nx >= width || ny >= height) {
@@ -140,7 +171,19 @@ function traceOnce(level, orients, cells, openPairs) {
       }
       x = nx;
       y = ny;
-      const i = cells[y * width + x];
+      left--;
+      const cell = y * width + x;
+      // A creeping shadow catches the light (and burns), and a void swallows light next to it.
+      if (dark?.blockers?.has(cell)) {
+        endSegment(x, y);
+        litGlooms.add(dark.blockers.get(cell));
+        break;
+      }
+      if (voids.has(cell)) {
+        endSegment(x, y);
+        break;
+      }
+      const i = cells[cell];
       if (i < 0) continue;
 
       const tile = tiles[i];
@@ -180,11 +223,11 @@ function traceOnce(level, orients, cells, openPairs) {
       } else if (tile.type === TILE.MIRROR) {
         dir = reflect(dir, orientOf(i));
       } else if (tile.type === TILE.SPLITTER) {
-        queue.push({ x, y, dir, color });
+        queue.push({ x, y, dir, color, left });
         dir = reflect(dir, orientOf(i));
       } else if (tile.type === TILE.PRISM) {
         // A prism crystal splits the light in two, out to both sides.
-        queue.push({ x, y, dir: reflect(dir, 0), color });
+        queue.push({ x, y, dir: reflect(dir, 0), color, left });
         dir = reflect(dir, 1);
       }
     }
@@ -211,6 +254,7 @@ function traceOnce(level, orients, cells, openPairs) {
     litGems,
     litShades,
     litSwitches,
+    litGlooms,
     isSolved: gemCount > 0 && litGems.size === gemCount && litShades.size === 0,
   };
 }

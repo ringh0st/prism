@@ -49,6 +49,8 @@ export function describeTile(
       return t(isLit ? 'ui.tile.switchLit' : 'ui.tile.switchDark');
     case TILE.SHADE:
       return t(isLit ? 'ui.tile.shadeLit' : 'ui.tile.shadeDark');
+    case TILE.VOID:
+      return t('ui.tile.void');
     default:
       return t('ui.tile.unknown');
   }

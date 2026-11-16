@@ -165,6 +165,32 @@ export const sfx = {
     [4, 2, 0].forEach((step, i) => tone(note(step), note(step) * 0.98, 0.07, { type: 'triangle', volume: 0.05, delay: i * 0.05 }));
     feel('light');
   },
+  /** The light burns a creeping shadow: a bright fizz and a little "eep!" from Smudge as he puffs away. */
+  shadowBurn() {
+    tone(500, 1600, 0.18, { type: 'triangle', volume: 0.06 });
+    tone(1200, 1900, 0.08, { volume: 0.05, delay: 0.14 });
+    bell(note(7), { delay: 0.2, volume: 0.07 });
+    feel('success');
+  },
+  /** A creeping shadow is one move from its gem: a soft low tiptoe (two quiet notes). */
+  shadowNear() {
+    tone(196, 185, 0.12, { type: 'triangle', volume: 0.05 });
+    tone(174, 165, 0.12, { type: 'triangle', volume: 0.045, delay: 0.16 });
+    feel('light');
+  },
+  /** An eclipse: the light dips for a moment, a slow low swell. */
+  eclipse() {
+    tone(220, 147, 0.7, { volume: 0.06, attack: 0.15 });
+    tone(330, 220, 0.6, { type: 'triangle', volume: 0.03, delay: 0.05, attack: 0.15 });
+    feel('medium');
+  },
+  /** The darkness won (a gem taken, a lamp out): Smudge's cheeky giggle, then a kind "awww". Never harsh. */
+  darknessWins() {
+    [0, 0.09, 0.18].forEach((delay, i) => tone(700 - i * 60, 760 - i * 60, 0.07, { type: 'triangle', volume: 0.04, delay }));
+    bell(note(2), { delay: 0.35, volume: 0.07 });
+    tone(note(1), note(0) * 0.94, 0.5, { volume: 0.05, delay: 0.5, attack: 0.04 });
+    feel('fail');
+  },
   /** Out of moves: a kind "awww", sliding gently down. Never harsh. */
   outOfMoves() {
     bell(note(4), { volume: 0.08 });

@@ -89,6 +89,37 @@ export const PIECES = [
     text: 'Shiny side bounces. The back blocks.',
     sample: { type: TILE.MIRROR, orient: 0, oneSided: 0 },
   },
+  // The darkness (darkness.js): Smudge's pieces race the player move by move.
+  {
+    id: 'gloom',
+    name: 'Creeping shadows',
+    text: 'It creeps to a gem each move. Light burns it!',
+    sample: { type: 'gloom' },
+  },
+  {
+    id: 'fade',
+    name: 'Fading gems',
+    text: 'Light it before the number runs out.',
+    sample: { type: TILE.GEM, color: 'sun', fade: 3 },
+  },
+  {
+    id: 'power',
+    name: 'Dying lamps',
+    text: 'Each move, the light reaches less far.',
+    sample: { type: TILE.EMITTER, dir: 'right', color: 'sun', power: 3, reach: 4 },
+  },
+  {
+    id: 'void',
+    name: 'Voids',
+    text: 'Light that passes next to it is swallowed.',
+    sample: { type: TILE.VOID },
+  },
+  {
+    id: 'eclipse',
+    name: 'Eclipses',
+    text: 'Every 3rd move, the darkness moves twice.',
+    sample: { type: 'eclipse' },
+  },
 ];
 
 const HAS = {
@@ -106,6 +137,15 @@ const HAS = {
   gate: (tile) => tile.type === TILE.GATE,
   lamp: (tile) => tile.type === TILE.EMITTER && Boolean(tile.turnable),
   oneSided: (tile) => tile.oneSided !== undefined,
+  fade: (tile) => Boolean(tile.fade),
+  power: (tile) => tile.power !== undefined,
+  void: (tile) => tile.type === TILE.VOID,
+};
+
+/** Pieces that belong to the whole level rather than a tile. */
+const LEVEL_HAS = {
+  gloom: (level) => Boolean(level.glooms?.length),
+  eclipse: (level) => Boolean(level.eclipse),
 };
 
 /** Where each piece is first taught (levels are built so each one brings at most one new piece). */
@@ -124,6 +164,11 @@ export const PIECE_FIRST_LEVEL = {
   gate: 'w10-01',
   lamp: 'w11-01',
   oneSided: 'w12-01',
+  gloom: 'w13-01',
+  fade: 'w14-01',
+  power: 'w15-01',
+  void: 'w16-01',
+  eclipse: 'w17-01',
 };
 
 /**
@@ -135,13 +180,22 @@ export function newPiecesIn(level, seenIds) {
 }
 
 /** Every kind of piece a level uses, in teaching order. */
-export const piecesIn = (level) => PIECES.filter((piece) => level.tiles.some(HAS[piece.id])).map((piece) => piece.id);
+export const piecesIn = (level) =>
+  PIECES.filter((piece) => (LEVEL_HAS[piece.id] ? LEVEL_HAS[piece.id](level) : level.tiles.some(HAS[piece.id]))).map((piece) => piece.id);
 
 /** Pieces a player has already met: those whose first level they've solved (for players from before the cards). */
 export const piecesMetIn = (solvedLevels) => PIECES.filter((piece) => solvedLevels[PIECE_FIRST_LEVEL[piece.id]]).map((piece) => piece.id);
 
-/** The first tile of a piece in a level (to point at it on the board), or -1. */
+/** The first tile of a piece in a level (to point at it on the board), or -1 (also for level-wide pieces). */
 export function firstTileOf(level, pieceId) {
   if (pieceId === 'basics') return level.tiles.findIndex((tile) => tile.type === TILE.MIRROR && !tile.locked);
+  if (!HAS[pieceId]) return -1;
   return level.tiles.findIndex(HAS[pieceId]);
+}
+
+/** The board cell to point at when teaching a piece: its first tile, where a shadow starts, or null (the whole board). */
+export function pieceCellOf(level, pieceId) {
+  if (pieceId === 'gloom') return level.glooms?.[0]?.trail[0] ?? null;
+  const tile = level.tiles[firstTileOf(level, pieceId)];
+  return tile ? tile.y * level.width + tile.x : null;
 }

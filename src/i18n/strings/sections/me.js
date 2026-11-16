@@ -1,5 +1,13 @@
 /* Texts for the me screens, in every language. Keys match across en/es/he (a test checks). */
 export const en = {
+  'ui.tile.void': 'Void: swallows light that passes next to it',
+  'ui.cell.fadeLeft.one': 'fades in {count} move',
+  'ui.cell.fadeLeft.other': 'fades in {count} moves',
+  'ui.cell.powerLeft.one': '{count} move of power left',
+  'ui.cell.powerLeft.other': '{count} moves of power left',
+  'ui.cell.gloom.one': 'A creeping shadow, {count} move from its gem',
+  'ui.cell.gloom.other': 'A creeping shadow, {count} moves from its gem',
+  'ui.cell.darkened': 'taken by the darkness',
   'ui.cell.glowbugAwake': '{name} the Glowbug is awake here',
   'ui.cell.glowbugAsleep': '{name} the Glowbug is asleep here',
   'ui.cell.position': 'Row {row}, column {col}',
@@ -205,6 +213,14 @@ export const en = {
 };
 
 export const es = {
+  'ui.tile.void': 'Vacío: se traga la luz que pasa a su lado',
+  'ui.cell.fadeLeft.one': 'se apaga en {count} movimiento',
+  'ui.cell.fadeLeft.other': 'se apaga en {count} movimientos',
+  'ui.cell.powerLeft.one': 'le queda energía para {count} movimiento',
+  'ui.cell.powerLeft.other': 'le queda energía para {count} movimientos',
+  'ui.cell.gloom.one': 'Una sombra que se arrastra, a {count} movimiento de su gema',
+  'ui.cell.gloom.other': 'Una sombra que se arrastra, a {count} movimientos de su gema',
+  'ui.cell.darkened': 'se la llevó la oscuridad',
   'ui.cell.glowbugAwake': 'Aquí está despierto el bichito de luz {name}',
   'ui.cell.glowbugAsleep': 'Aquí duerme el bichito de luz {name}',
   'ui.cell.position': 'Fila {row}, columna {col}',
@@ -416,6 +432,14 @@ export const es = {
 };
 
 export const he = {
+  'ui.tile.void': 'בולען: בולע אור שעובר לידו',
+  'ui.cell.fadeLeft.one': 'דועכת בעוד מהלך אחד',
+  'ui.cell.fadeLeft.other': 'דועכת בעוד {count} מהלכים',
+  'ui.cell.powerLeft.one': 'נשאר כוח למהלך אחד',
+  'ui.cell.powerLeft.other': 'נשאר כוח ל־{count} מהלכים',
+  'ui.cell.gloom.one': 'צל זוחל, מהלך אחד מאבן החן',
+  'ui.cell.gloom.other': 'צל זוחל, {count} מהלכים מאבן החן',
+  'ui.cell.darkened': 'החושך לקח אותה',
   'ui.cell.glowbugAwake': 'הזוהרון {name} ער כאן',
   'ui.cell.glowbugAsleep': 'הזוהרון {name} ישן כאן',
   'ui.cell.position': 'שורה {row}, עמודה {col}',

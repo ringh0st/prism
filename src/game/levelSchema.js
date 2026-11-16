@@ -48,7 +48,25 @@ export function validateLevel(level) {
     if (tile.type === TILE.PORTAL && tiles.filter((t) => t.type === TILE.PORTAL && t.pair === tile.pair).length !== 2) {
       problems.push(`${where}: every portal needs exactly one partner with the same pair.`);
     }
+    // The darkness (darkness.js).
+    if (tile.fade !== undefined && (tile.type !== TILE.GEM || !Number.isInteger(tile.fade) || tile.fade < 1))
+      problems.push(`${where}: only gems can fade, after 1 or more moves.`);
+    if (
+      tile.power !== undefined &&
+      (tile.type !== TILE.EMITTER || !Number.isInteger(tile.power) || !Number.isInteger(tile.reach) || tile.power < 0 || tile.reach < 1)
+    )
+      problems.push(`${where}: a dying lamp needs whole numbers for its power and reach.`);
   });
+  const taken = new Set(tiles.map((t) => t.y * width + t.x));
+  (level.glooms ?? []).forEach((gloom, g) => {
+    const where = `Shadow ${g + 1}`;
+    if (tiles[gloom.gem]?.type !== TILE.GEM) problems.push(`${where}: needs a gem to creep to.`);
+    if (!Array.isArray(gloom.trail) || gloom.trail.length < 1) problems.push(`${where}: needs a trail.`);
+    else if (gloom.trail.some((cell) => !Number.isInteger(cell) || cell < 0 || cell >= width * height || taken.has(cell)))
+      problems.push(`${where}: its trail must run over empty cells.`);
+  });
+  if (level.eclipse !== undefined && (!Number.isInteger(level.eclipse) || level.eclipse < 2))
+    problems.push('An eclipse comes every 2 or more moves.');
   if (!tiles.some((t) => t.type === TILE.EMITTER)) problems.push('Add at least one light source.');
   if (!tiles.some((t) => t.type === TILE.GEM)) problems.push('Add at least one gem.');
   return problems;

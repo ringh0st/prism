@@ -615,3 +615,157 @@
     }
   }
 }
+
+/* ---------- The darkness (darkness.js) ---------- */
+.darkness,
+.darknessPieces {
+  position: absolute;
+  inset: var(--pad);
+  pointer-events: none;
+}
+
+.darknessPieces {
+  z-index: 2;
+}
+
+/* Smudge glides one cell per move, bobs while he waits and puffs away in the light */
+.gloom {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  transition:
+    left 420ms var(--ease-out),
+    top 420ms var(--ease-out);
+}
+
+.gloom svg {
+  width: 92%;
+  height: 92%;
+  overflow: visible;
+  animation: gloomBob 1.6s ease-in-out infinite alternate;
+}
+
+.gloomClose svg {
+  animation: gloomBob 0.5s ease-in-out infinite alternate;
+}
+
+.gloomBurned {
+  animation: gloomPuff 650ms var(--ease-out) forwards;
+}
+
+@keyframes gloomBob {
+  to {
+    transform: translateY(-6%) scale(1.04, 0.97);
+  }
+}
+
+@keyframes gloomPuff {
+  30% {
+    opacity: 1;
+    transform: scale(1.15);
+    filter: brightness(2.2) sepia(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.3) translateY(-30%);
+    filter: brightness(3) sepia(1);
+  }
+}
+
+.smudge {
+  filter: drop-shadow(0 2px 2px rgba(43, 33, 24, 0.25));
+}
+
+.trail circle {
+  animation: trailPulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes trailPulse {
+  to {
+    opacity: 0.15;
+  }
+}
+
+/* A void turns slowly */
+.voidSwirl {
+  transform-origin: 50px 50px;
+  animation: voidTurn 6s linear infinite;
+}
+
+@keyframes voidTurn {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+/* A countdown about to run out pulses */
+.counterClose {
+  transform-origin: 78px 22px;
+  animation: counterPulse 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes counterPulse {
+  to {
+    transform: scale(1.15);
+  }
+}
+
+/* Moves until the next eclipse, in the board's corner */
+.eclipseChip {
+  position: absolute;
+  top: -4px;
+  inset-inline-end: -4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 9px 3px 5px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: #fffaf2;
+  background: #4a3a30;
+  box-shadow: var(--shadow-sm);
+}
+
+.eclipseSoon {
+  background: var(--color-terracotta);
+  animation: counterPulse 0.7s ease-in-out infinite alternate;
+}
+
+/* An eclipse move: the board dims for a moment */
+.board.eclipse::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: inherit;
+  pointer-events: none;
+  background: rgba(43, 33, 24, 0.45);
+  animation: eclipseDim 900ms ease-out forwards;
+}
+
+@keyframes eclipseDim {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gloom,
+  .gloom svg,
+  .gloomClose svg,
+  .trail circle,
+  .voidSwirl,
+  .counterClose,
+  .eclipseSoon,
+  .board.eclipse::before {
+    transition: none;
+    animation: none;
+  }
+
+  .gloomBurned {
+    animation: none;
+    opacity: 0;
+  }
+}
