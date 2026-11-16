@@ -5,6 +5,37 @@
   animation: arrive 700ms var(--ease-pop) both;
 }
 
+/* What your Pal does: three short lines, each with a picture */
+.does {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+  text-align: start;
+  font-weight: 700;
+}
+
+.does li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.doesIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
 @keyframes arrive {
   from {
     opacity: 0;

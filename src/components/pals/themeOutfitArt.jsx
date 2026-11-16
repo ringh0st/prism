@@ -28,14 +28,6 @@ export function ThemeOutfit({ id, hat, neck }) {
           <circle cx={hx} cy={hy + 6} r="2" fill="#4fbfad" />
         </g>
       );
-    case 'elvenCloak':
-      return (
-        <g>
-          <path d={`M28 ${neck - 3}q22 8 44 0l10 30q-32 9-64 0z`} fill="#4f9a72" opacity=".95" />
-          <path d={`M28 ${neck - 3}q22 8 44 0`} stroke="#3a7a57" strokeWidth="4" fill="none" />
-          <path d={`M50 ${neck - 3}c-4-5-3-10 0-12 3 2 4 7 0 12z`} fill="#c99a2e" transform={`translate(0 6)`} />
-        </g>
-      );
     case 'woodStaff':
       return (
         <g transform={`translate(80 ${neck + 2}) rotate(10)`}>

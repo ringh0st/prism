@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Dialog from '../../components/Dialog.jsx';
+import Icon from '../../components/Icon.jsx';
 import Button from '../../components/Button.jsx';
 import PalReveal from '../../components/pals/PalReveal.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
@@ -9,10 +10,16 @@ import styles from './FriendFoundDialog.module.css';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { palName } from '../../i18n/palText.js';
 
+const DOES = [
+  { icon: 'gift', key: 'friend.does.gifts' },
+  { icon: 'spark', key: 'friend.does.grows' },
+  { icon: 'home', key: 'friend.does.home' },
+];
+
 /**
  * "You found a friend!": after a few solved levels a Pal turns up as a reward and joins the player.
- * One tap, no decision needed (a different one can be picked any time in Pals). The Pal says it all; the
- * sentences are for screen readers.
+ * One tap, no decision needed (a different one can be picked any time in Pals). Below the Pal, three
+ * picture rows say what it does (playtesters loved the Pals but didn't know what they were for).
  */
 export default function FriendFoundDialog({ onDone }) {
   const { progress, choosePal } = usePlayer();
@@ -42,6 +49,16 @@ export default function FriendFoundDialog({ onDone }) {
         <PalReveal pal={friend} size={150} label={palName(lang, friend)} />
       </div>
       <p className="visually-hidden">{t('friend.text', { name: palName(lang, friend) })}</p>
+      <ul className={styles.does}>
+        {DOES.map(({ icon, key }) => (
+          <li key={key}>
+            <span className={styles.doesIcon} aria-hidden="true">
+              <Icon name={icon} size={22} />
+            </span>
+            {t(key)}
+          </li>
+        ))}
+      </ul>
       <Button size="lg" icon="heart" onClick={welcome} disabled={isSaving} data-autofocus>
         {t('friend.welcome', { name: palName(lang, friend) })}
       </Button>
