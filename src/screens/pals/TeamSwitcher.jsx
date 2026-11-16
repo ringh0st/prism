@@ -6,6 +6,8 @@ import { sfx } from '../../audio/sfx.js';
 import styles from './TeamSwitcher.module.css';
 import { palWithSpecies, stageName } from '../../i18n/palText.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
+import PalPowerBadge from '../../components/pals/PalPowerBadge.jsx';
+import { palPower } from '../../game/palPowers.js';
 
 /**
  * Your Pals in a row, youngest first (babies lead, so it's easy to pick one that still has growing to do), each
@@ -37,11 +39,12 @@ export default function TeamSwitcher() {
             type="button"
             role="radio"
             aria-checked={pal.id === partner}
-            aria-label={`${palWithSpecies(lang, pal)}, ${stageName(lang, PAL_STAGES[stageOf(owned(pal))])}`}
+            aria-label={`${palWithSpecies(lang, pal)}, ${stageName(lang, PAL_STAGES[stageOf(owned(pal))])}, ${t(`power.${pal.power}.line`, { count: palPower(pal, stageOf(owned(pal))).amount })}`}
             className={`${styles.teamPal} ${pal.id === partner ? styles.teamPalActive : ''}`}
             onClick={() => switchTo(pal.id)}
           >
             <PalArt palId={pal.id} stage={stageOf(owned(pal))} size={48} portrait />
+            <PalPowerBadge power={palPower(pal, stageOf(owned(pal)))} size="sm" iconOnly className={styles.power} />
             <GrowthPips stageIndex={stageOf(owned(pal))} />
           </button>
         ))}

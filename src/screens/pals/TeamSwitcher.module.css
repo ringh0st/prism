@@ -23,6 +23,7 @@
 }
 
 .teamPal {
+  position: relative;
   flex: none;
   display: grid;
   place-items: center;
@@ -63,4 +64,11 @@
 .teamPal > span:last-child svg {
   width: 10px;
   height: 10px;
+}
+
+/* The Pal's power, a small coin in the tile's corner */
+.power {
+  position: absolute;
+  top: 2px;
+  inset-inline-start: 2px;
 }

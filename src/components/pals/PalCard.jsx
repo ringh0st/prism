@@ -1,5 +1,7 @@
 import PalArt from './PalArt.jsx';
 import GrowthPips from './GrowthPips.jsx';
+import PalPowerBadge from './PalPowerBadge.jsx';
+import { palPower } from '../../game/palPowers.js';
 import { rarityOf } from '../../game/pals.js';
 import styles from './PalCard.module.css';
 import { palName, rarityName, stageName } from '../../i18n/palText.js';
@@ -11,7 +13,7 @@ const RIBBON_SYMBOLS = { common: '', legendary: '★ ', mythic: '✦ ' };
 /**
  * A Pal card. Every card has the same layout, so they're easy to compare at a glance:
  * the Pal, a rarity ribbon (Basic, ★ Legendary or ✦ Mythic, with a matching frame and a soft wash over
- * the card), the name, and its age as five growth icons (sprout → crown) with a tag in the age's color.
+ * the card), the name, its power in levels (shown even before it's unlocked), and its age as five growth icons (sprout → crown) with a tag in the age's color.
  * @param stage    the Pal's form (from palStage) if you have it, else null
  * @param onLook   opens the Pal's forms; without it the art isn't a button (locked Pals)
  * @param children the card's action (a button) or hint, at the bottom
@@ -40,6 +42,7 @@ export default function PalCard({ pal, stage = null, isUnlocked = true, isPartne
         {rarityName(lang, rarity)}
       </span>
       <span className={`game-title ${styles.name}`}>{isUnlocked ? name : '???'}</span>
+      <PalPowerBadge power={palPower(pal, stage?.index ?? 0)} />
       {stage && (
         <span className={styles.form}>
           <GrowthPips stageIndex={stage.index} />

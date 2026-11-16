@@ -105,6 +105,10 @@
   min-width: 0;
 }
 
+.power {
+  max-width: 100%;
+}
+
 .name {
   display: flex;
   flex-wrap: wrap;

@@ -8,12 +8,14 @@ import { sfx } from '../audio/sfx.js';
  * the player doesn't hold asks to be bought first (`onNeedBuy`).
  * @param enabled  boosters are offered on this level
  * @param free     boosters a win streak gives for free (always on, nothing spent), with `streak` its length
+ * @param palUndos take-backs the partner Pal's power adds once the level starts (palPowers.js)
  * @returns { picker, start, extraMoves, undosLeft, spendUndo, choose }
  */
-export function useBoosters({ enabled, free = [], streak = 0, owned, consumeHelper, puzzle, onNeedBuy }) {
+export function useBoosters({ enabled, free = [], streak = 0, palUndos = 0, owned, consumeHelper, puzzle, onNeedBuy }) {
   const [chosen, setChosen] = useState([]);
   const [active, setActive] = useState([]);
   const [undosUsed, setUndosUsed] = useState(0);
+  const [isStarted, setIsStarted] = useState(false);
 
   const choose = useCallback((id) => setChosen((list) => (list.includes(id) ? list : [...list, id])), []);
   const toggle = (id) => {
@@ -37,10 +39,11 @@ export function useBoosters({ enabled, free = [], streak = 0, owned, consumeHelp
     if (used.includes('headStart')) puzzle.startWithHeadStart();
     setActive(used);
     setChosen([]);
+    setIsStarted(true);
     return used;
   };
 
-  const undos = active.includes('steadyHand') ? BOOSTERS.steadyHand.undos : 0;
+  const undos = (active.includes('steadyHand') ? BOOSTERS.steadyHand.undos : 0) + (isStarted ? palUndos : 0);
   return {
     picker: enabled ? { owned, chosen, free, streak, onToggle: toggle } : null,
     start,

@@ -1,0 +1,46 @@
+/* A Pal's power: an icon in a honey coin and its amount */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.coin {
+  display: grid;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--reward-label);
+  background: var(--reward-top);
+  box-shadow: 0 2px 0 var(--reward-ledge);
+}
+
+.md .coin {
+  width: 32px;
+  height: 32px;
+}
+
+.sm {
+  gap: 3px;
+}
+
+.sm .coin {
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 1px 0 var(--reward-ledge);
+}
+
+.amount {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.sm .amount {
+  font-size: 0.85rem;
+}
+
+.line {
+  font-size: 0.9rem;
+  line-height: 1.2;
+}

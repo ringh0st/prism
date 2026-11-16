@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import PalArt from '../../components/pals/PalArt.jsx';
 import StageBadge from '../../components/pals/StageBadge.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
+import PalPowerBadge from '../../components/pals/PalPowerBadge.jsx';
+import { palPower } from '../../game/palPowers.js';
 import PalDetailDialog from './PalDetailDialog.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { palById, palStage, stageOf } from '../../game/pals.js';
@@ -13,7 +15,7 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 
 /**
  * Your partner Pal, big on a little stage (tap it for a hop and a word; it twirls when its outfit
- * changes), how close it is to its next form (tap the silhouette for all forms) and its treats.
+ * changes), how close it is to its next form (tap the silhouette for all forms), its power in levels and its treats.
  * Switching partner is in the Team tab (TeamSwitcher).
  */
 export default function PartnerSwitcher() {
@@ -95,6 +97,7 @@ export default function PartnerSwitcher() {
         <div className={styles.growth}>
           <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} onNext={() => setIsLooking(true)} />
         </div>
+        <PalPowerBadge power={palPower(partner, stage.index)} withLine className={styles.power} />
         {waiting > 0 && (
           <button
             type="button"

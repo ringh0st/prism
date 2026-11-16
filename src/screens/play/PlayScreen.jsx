@@ -36,6 +36,7 @@ import { moveLimitFor, starsForMoves } from '../../game/scoring.js';
 import { BOOSTERS_FROM_WORLD, HELPERS, HELPER_IDS, LENS_DURATION_MS, toolFor } from '../../game/catalog.js';
 import { useBoosters } from '../../hooks/useBoosters.js';
 import { streakBoosters } from '../../game/winStreak.js';
+import { partnerPower, powersWorkIn } from '../../game/palPowers.js';
 import { isWorldComplete } from '../../game/progress.js';
 import { dailyShareText } from '../../game/share.js';
 import { PUBLIC_GAME_URL } from '../../lib/config.js';
@@ -111,8 +112,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const { progress, settings, finishLevel, finishDaily, finishEventLevel, consumeHelper, endWinStreak } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
-  // Worlds 1–2: the first Hint in each level is free (beginners shouldn't run out of help).
-  const hasFreeHint = mode === 'level' && level.world <= KEEP_GOING_WORLDS && !puzzle.usedHelpers.includes('hint');
+  // The partner Pal's power for this visit (palPowers.js), fixed when the level opens; none in the first steps.
+  const [palHelp] = useState(() => (powersWorkIn(mode) && !isFirstStepsLevel(level, mode) ? partnerPower(progress) : null));
+  const palPowerAmount = (powerId) => (palHelp?.id === powerId ? palHelp.amount : 0);
+  // Worlds 1–2: the first Hint in each level is free (beginners shouldn't run out of help); a hint Pal adds more.
+  const freeHints = (mode === 'level' && level.world <= KEEP_GOING_WORLDS ? 1 : 0) + palPowerAmount('hint');
+  const hasFreeHint = puzzle.usedHelpers.filter((id) => id === 'hint').length < freeHints;
   const { trace, moves } = puzzle;
   const [result, setResult] = useState(null);
   const [solvedStars, setSolvedStars] = useState(0);
@@ -171,17 +176,19 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     enabled: canBoost,
     free: streakBoosters(streak),
     streak,
+    palUndos: palPowerAmount('undo'),
     owned: progress.helpers,
     consumeHelper,
     puzzle,
     onNeedBuy: setBuyingHelper,
   });
   const flavor = flavorText(lang, level);
-  // Spare Moves and every Undo add to the limit (never to the stars); Keep going adds too, with 1★ at most.
+  // Spare Moves, a moves Pal and every Undo add to the limit (never to the stars); Keep going adds too, with 1★ at most.
   const moveLimit =
     (mode === 'rush' ? rushMoveLimit(rush.run, level.par) : moveLimitFor(level.par, level.difficulty)) +
     bonusMoves +
     boosters.extraMoves +
+    palPowerAmount('moves') +
     puzzle.undos;
   // The very first levels teach without a counter, so they can't run out of moves either.
   const playLimit = isFirstSteps ? Infinity : moveLimit;
@@ -788,6 +795,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           waitsForTap={isFirstSteps}
           glowbugId={glowbug?.id}
           boosters={boosters.picker}
+          palHelp={palHelp}
+          palWearing={progress.pal.wearing}
           onDone={dismissIntro}
         />
       )}

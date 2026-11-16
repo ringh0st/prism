@@ -1152,3 +1152,19 @@ test('glowbug rows: the database knows every Glowbug level, and a full row is al
   for (const [level, value] of inSql) if (firefly.includes(value.split('|')[0])) levels[level] = { stars: 3 };
   assert.deepEqual(completedGlowbugRows(levels), [GLOWBUG_KINDS[0].id]);
 });
+
+test('every Pal has a power that grows with it and never goes past the cap', async () => {
+  const { PALS, rarityOf } = await import('./pals.js');
+  const { PAL_POWERS, palPower, powerByForm, partnerPower, MAX_POWER_STRENGTH } = await import('./palPowers.js');
+  for (const pal of PALS) {
+    assert.ok(PAL_POWERS[pal.power], `${pal.id} has a known power`);
+    const ladder = powerByForm(pal);
+    assert.ok(ladder.every((amount, i) => amount >= 1 && amount <= MAX_POWER_STRENGTH && amount >= (ladder[i - 1] ?? 0)), `${pal.id} grows`);
+    assert.equal(ladder[4], MAX_POWER_STRENGTH, `${pal.id} is at full strength as a Master`);
+    if (rarityOf(pal) !== 'common') assert.equal(palPower(pal, 0).amount, 2, `${pal.id} starts a step stronger`);
+  }
+  // Each of the three powers belongs to several Pals, starters included, so every first friend helps.
+  for (const id of Object.keys(PAL_POWERS)) assert.ok(PALS.filter((pal) => pal.power === id).length >= 10);
+  assert.equal(partnerPower({ pal: { id: null, owned: {} } }), null);
+  assert.deepEqual(partnerPower({ pal: { id: 'ember', owned: { ember: { stage: 2 } } } }).amount, 2);
+});

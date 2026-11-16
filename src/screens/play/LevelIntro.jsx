@@ -9,6 +9,7 @@ import GemShape from '../../components/GemShape.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import TapIcon from './TapIcon.jsx';
 import BoosterPicker from './BoosterPicker.jsx';
+import PalPowerChip from './PalPowerChip.jsx';
 import { glowbugById } from '../../game/glowbugs.js';
 import { glowbugName } from '../../i18n/groveText.js';
 import { moveLimitFor } from '../../game/scoring.js';
@@ -41,6 +42,7 @@ const INTRO_MS = 3500;
  * `flavor` ({ name, goal }, see recipes.js) is read out to screen readers; Lumi says its goal once the level starts.
  * `waitsForTap` keeps it up until the player taps (the very first levels, for new players).
  * `boosters` ({ owned, chosen, onToggle }) shows the booster picks; touching one keeps the card up until Let's go.
+ * `palHelp` (from partnerPower) shows your partner Pal and the power it brings to this level.
  */
 export default function LevelIntro({
   level,
@@ -54,6 +56,8 @@ export default function LevelIntro({
   waitsForTap = false,
   glowbugId = null,
   boosters = null,
+  palHelp = null,
+  palWearing = [],
   onDone,
 }) {
   // A Hard or Extra Hard level always says so, even when it's also a night or disco level (difficulty first).
@@ -126,6 +130,7 @@ export default function LevelIntro({
             <LumiSays mood="excited" size={72} line={lumiLine} />
           </div>
         ) : null}
+        {palHelp && <PalPowerChip help={palHelp} wearing={palWearing} />}
         {boosters && (
           <BoosterPicker
             owned={boosters.owned}
