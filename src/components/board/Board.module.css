@@ -187,6 +187,8 @@
 
 /* In 3D each cell's button is placed over its piece (Board3D measures where), so the grid is just a frame. */
 .cells3d {
+  /* Touches go to the 3D scene underneath; the buttons are for the keyboard and screen readers. */
+  pointer-events: none;
   position: absolute;
   inset: 0;
   display: block;

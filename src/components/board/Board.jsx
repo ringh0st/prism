@@ -19,6 +19,9 @@ import styles from './Board.module.css';
 /** Name tags for the first levels, so new players know which piece is which (translation keys). */
 // The 3D board (three.js) loads only when it's used, so the flat board stays light.
 const Board3D = lazy(() => import('../board3d/Board3D.jsx'));
+// Trial: level 160 is drawn with React Three Fiber and GSAP instead, to compare the two ways.
+const BoardFiber = lazy(() => import('../boardFiber/BoardFiber.jsx'));
+const FIBER_LEVELS = new Set(['w8-20']);
 
 const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
 
@@ -171,13 +174,17 @@ export default function Board({
       <TileDefs />
       {is3d && (
         <Suspense fallback={null}>
-          <Board3D
-            level={level}
-            state={state3d}
-            onLayout={setCellRects}
-            onTapCell={(cell) => cellRefs.current[cell]?.click()}
-            surfaceRef={boardRef}
-          />
+          {FIBER_LEVELS.has(level.id) ? (
+            <BoardFiber level={level} state={state3d} onLayout={setCellRects} onTapCell={(cell) => cellRefs.current[cell]?.click()} />
+          ) : (
+            <Board3D
+              level={level}
+              state={state3d}
+              onLayout={setCellRects}
+              onTapCell={(cell) => cellRefs.current[cell]?.click()}
+              surfaceRef={boardRef}
+            />
+          )}
         </Suspense>
       )}
       {!is3d && (
