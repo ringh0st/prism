@@ -250,6 +250,7 @@ export const he = {
   'power.hint.line.one': 'רמז חינם אחד בכל שלב',
   'power.hint.line.other': '{count} רמזים חינם בכל שלב',
   'power.chip': '{name} עוזר: {power}',
+  'power.switch': 'הקישו כדי לבחור חבר אחר',
 
   'hello.label': '{name} אומר: {line} הקישו כדי לבקר את החברים.',
   'hello.morning': 'בוקר טוב!',

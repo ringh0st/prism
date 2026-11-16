@@ -10,6 +10,7 @@ import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import TapIcon from './TapIcon.jsx';
 import BoosterPicker from './BoosterPicker.jsx';
 import PalPowerChip from './PalPowerChip.jsx';
+import TeamSwitcher from '../pals/TeamSwitcher.jsx';
 import { glowbugById } from '../../game/glowbugs.js';
 import { glowbugName } from '../../i18n/groveText.js';
 import { moveLimitFor } from '../../game/scoring.js';
@@ -42,7 +43,8 @@ const INTRO_MS = 3500;
  * `flavor` ({ name, goal }, see recipes.js) is read out to screen readers; Lumi says its goal once the level starts.
  * `waitsForTap` keeps it up until the player taps (the very first levels, for new players).
  * `boosters` ({ owned, chosen, onToggle }) shows the booster picks; touching one keeps the card up until Let's go.
- * `palHelp` (from partnerPower) shows your partner Pal and the power it brings to this level.
+ * `palHelp` (from partnerPower) shows your partner Pal and the power it brings to this level; with `canSwitchPal`
+ * a tap on it lists your other Pals to switch to (`onPalSwitched`), which keeps the card up like a booster.
  */
 export default function LevelIntro({
   level,
@@ -58,6 +60,8 @@ export default function LevelIntro({
   boosters = null,
   palHelp = null,
   palWearing = [],
+  canSwitchPal = false,
+  onPalSwitched,
   onDone,
 }) {
   // A Hard or Extra Hard level always says so, even when it's also a night or disco level (difficulty first).
@@ -65,6 +69,7 @@ export default function LevelIntro({
   const mood = MOODS[modifier] ? modifier : (moods[0] ?? null);
   // Picking boosters takes a moment: once one is touched, the card waits for Let's go.
   const [isPicking, setIsPicking] = useState(false);
+  const [isSwitchingPal, setIsSwitchingPal] = useState(false);
   useEffect(() => {
     // With boosters to pick, the card waits for Let's go (no rush to choose).
     if (waitsForTap || isPicking || boosters) return undefined;
@@ -130,7 +135,30 @@ export default function LevelIntro({
             <LumiSays mood="excited" size={72} line={lumiLine} />
           </div>
         ) : null}
-        {palHelp && <PalPowerChip help={palHelp} wearing={palWearing} />}
+        {palHelp && (
+          <PalPowerChip
+            help={palHelp}
+            wearing={palWearing}
+            isSwitching={isSwitchingPal}
+            onSwitch={
+              canSwitchPal
+                ? () => {
+                    setIsPicking(true);
+                    setIsSwitchingPal(!isSwitchingPal);
+                  }
+                : null
+            }
+          />
+        )}
+        {isSwitchingPal && (
+          <TeamSwitcher
+            compact
+            onSwitched={(palId) => {
+              onPalSwitched(palId);
+              setIsSwitchingPal(false);
+            }}
+          />
+        )}
         {boosters && (
           <BoosterPicker
             owned={boosters.owned}

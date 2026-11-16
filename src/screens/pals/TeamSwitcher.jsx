@@ -1,7 +1,7 @@
 import PalArt from '../../components/pals/PalArt.jsx';
 import GrowthPips from '../../components/pals/GrowthPips.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { PALS, PAL_STAGES, growthOf, stageOf } from '../../game/pals.js';
+import { PAL_STAGES, playablePals, stageOf } from '../../game/pals.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './TeamSwitcher.module.css';
 import { palWithSpecies, stageName } from '../../i18n/palText.js';
@@ -11,28 +11,38 @@ import { palPower } from '../../game/palPowers.js';
 
 /**
  * Your Pals in a row, youngest first (babies lead, so it's easy to pick one that still has growing to do), each
- * with its growth pips: tap one to make it your partner.
+ * with its power and growth pips: tap one to make it your partner. Unlocked Pals you haven't played with yet are
+ * here too (they join when picked). `compact` drops the heading and the card look (on the level card);
+ * `onSwitched(palId)` follows a switch.
  */
-export default function TeamSwitcher() {
+export default function TeamSwitcher({ compact = false, onSwitched = null }) {
   const { progress, choosePal } = usePlayer();
   const { t, lang } = useI18n();
   const partner = progress.pal.id;
   const owned = (pal) => progress.pal.owned[pal.id];
-  const team = PALS.filter(owned).sort((a, b) => stageOf(owned(a)) - stageOf(owned(b)) || growthOf(owned(a)) - growthOf(owned(b)));
+  const team = playablePals(progress);
   if (team.length < 2) return null;
 
   const switchTo = async (palId) => {
     if (palId === partner) return;
     await choosePal(palId);
     sfx.sparkle();
+    onSwitched?.(palId);
   };
 
   return (
-    <section className={styles.team} aria-labelledby="team-switch-title">
-      <h2 id="team-switch-title" className={`game-title ${styles.title}`}>
-        {t('pals.switch.title')}
-      </h2>
-      <div className={styles.pals} role="radiogroup" aria-labelledby="team-switch-title">
+    <section className={compact ? styles.compact : styles.team} aria-labelledby={compact ? undefined : 'team-switch-title'}>
+      {!compact && (
+        <h2 id="team-switch-title" className={`game-title ${styles.title}`}>
+          {t('pals.switch.title')}
+        </h2>
+      )}
+      <div
+        className={styles.pals}
+        role="radiogroup"
+        aria-labelledby={compact ? undefined : 'team-switch-title'}
+        aria-label={compact ? t('pals.switch.title') : undefined}
+      >
         {team.map((pal) => (
           <button
             key={pal.id}

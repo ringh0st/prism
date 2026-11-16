@@ -249,6 +249,7 @@ export const es = {
   'power.hint.line.one': '{count} pista gratis en cada nivel',
   'power.hint.line.other': '{count} pistas gratis en cada nivel',
   'power.chip': '{name} ayuda: {power}',
+  'power.switch': 'Toca para traer otro Pal',
 
   'hello.label': '{name} dice: {line} Visita a tus amigos.',
   'hello.morning': '¡Buenos días!',

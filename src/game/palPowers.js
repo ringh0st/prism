@@ -27,9 +27,9 @@ export function palPower(pal, stageIndex = 0) {
 /** The power's strength at each form, for the Pal's card. */
 export const powerByForm = (pal) => STRENGTH_BY_FORM.map((_, stageIndex) => palPower(pal, stageIndex).amount);
 
-/** The partner Pal, its form and the power it brings to the next level, or null without a partner. */
-export function partnerPower(progress) {
-  const pal = palById(progress.pal.id);
+/** The partner Pal (or `palId`, one just picked), its form and the power it brings to the next level; null without one. */
+export function partnerPower(progress, palId = progress.pal.id) {
+  const pal = palById(palId);
   if (!pal) return null;
   const stage = stageOf(progress.pal.owned[pal.id]);
   return { pal, stage, ...palPower(pal, stage) };

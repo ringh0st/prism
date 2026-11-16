@@ -18,3 +18,20 @@
   border-radius: 50%;
   background: var(--surface-raised);
 }
+
+.button {
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  box-shadow: 0 3px 0 var(--surface-cell-edge);
+  transition: transform 160ms var(--ease-spring);
+}
+
+.button:active {
+  transform: scale(0.95);
+}
+
+.more {
+  opacity: 0.6;
+}

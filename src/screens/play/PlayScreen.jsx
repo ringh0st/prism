@@ -37,6 +37,7 @@ import { BOOSTERS_FROM_WORLD, HELPERS, HELPER_IDS, LENS_DURATION_MS, toolFor } f
 import { useBoosters } from '../../hooks/useBoosters.js';
 import { streakBoosters } from '../../game/winStreak.js';
 import { partnerPower, powersWorkIn } from '../../game/palPowers.js';
+import { playablePals } from '../../game/pals.js';
 import { isWorldComplete } from '../../game/progress.js';
 import { dailyShareText } from '../../game/share.js';
 import { PUBLIC_GAME_URL } from '../../lib/config.js';
@@ -112,8 +113,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const { progress, settings, finishLevel, finishDaily, finishEventLevel, consumeHelper, endWinStreak } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
-  // The partner Pal's power for this visit (palPowers.js), fixed when the level opens; none in the first steps.
-  const [palHelp] = useState(() => (powersWorkIn(mode) && !isFirstStepsLevel(level, mode) ? partnerPower(progress) : null));
+  // The partner Pal's power for this visit (palPowers.js), fixed once the level starts (the partner can be
+  // switched on the level card); none in the first steps.
+  const [palHelp, setPalHelp] = useState(() => (powersWorkIn(mode) && !isFirstStepsLevel(level, mode) ? partnerPower(progress) : null));
   const palPowerAmount = (powerId) => (palHelp?.id === powerId ? palHelp.amount : 0);
   // Worlds 1–2: the first Hint in each level is free (beginners shouldn't run out of help); a hint Pal adds more.
   const freeHints = (mode === 'level' && level.world <= KEEP_GOING_WORLDS ? 1 : 0) + palPowerAmount('hint');
@@ -797,6 +799,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           boosters={boosters.picker}
           palHelp={palHelp}
           palWearing={progress.pal.wearing}
+          canSwitchPal={palHelp !== null && playablePals(progress).length > 1}
+          onPalSwitched={(palId) => setPalHelp(partnerPower(progress, palId))}
           onDone={dismissIntro}
         />
       )}

@@ -233,6 +233,17 @@ export const ALL_OUTFITS = [...PAL_ACCESSORIES, ...THEME_OUTFITS];
 export const accessoryById = (id) => ALL_OUTFITS.find((item) => item.id === id) ?? null;
 
 /** Is this Pal yours to pick? Owned Pals stay unlocked even if a streak later breaks. */
+/**
+ * The Pals you can play with: every one you have or have unlocked (an unlocked Pal joins the moment you pick it),
+ * youngest first so a Pal with growing still to do is easy to find.
+ */
+export function playablePals(progress) {
+  const owned = (pal) => progress.pal.owned[pal.id];
+  return PALS.filter((pal) => isPalUnlocked(progress, pal)).sort(
+    (a, b) => stageOf(owned(a)) - stageOf(owned(b)) || growthOf(owned(a)) - growthOf(owned(b)),
+  );
+}
+
 export function isPalUnlocked(progress, pal) {
   if (progress.pal.owned[pal.id]) return true;
   if (!progress.pal.id && pal.isStarter) return true;

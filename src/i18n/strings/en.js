@@ -244,6 +244,7 @@ export const en = {
   'power.hint.line.one': '{count} free hint in every level',
   'power.hint.line.other': '{count} free hints in every level',
   'power.chip': '{name} helps: {power}',
+  'power.switch': 'Tap to bring a different Pal',
 
   'hello.label': '{name} says: {line} Visit your Pals.',
   'hello.morning': 'Good morning!',

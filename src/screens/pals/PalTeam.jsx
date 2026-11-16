@@ -35,7 +35,7 @@ function LockHint({ unlock, label }) {
   );
 }
 
-/** All Pals: yours (pick a partner), unlocked ones waiting to join, and locked ones with how to get them. */
+/** All Pals: yours and unlocked ones (pick one to play with; a new one joins as it's picked), and locked ones with how to get them. */
 function Collection({ onError }) {
   const { progress, choosePal } = usePlayer();
   const [lookingAt, setLookingAt] = useState(null);
@@ -66,14 +66,9 @@ function Collection({ onError }) {
             wearing={isPartner ? progress.pal.wearing : []}
             onLook={isUnlocked ? () => setLookingAt(pal) : undefined}
           >
-            {owned && !isPartner && (
-              <button type="button" className={styles.pickButton} onClick={() => pick(pal.id)}>
+            {isUnlocked && !isPartner && (
+              <button type="button" className={`${styles.pickButton} ${owned ? '' : styles.newPal}`} onClick={() => pick(pal.id)}>
                 {t('pals.team.partnerUp')}
-              </button>
-            )}
-            {!owned && isUnlocked && (
-              <button type="button" className={`${styles.pickButton} ${styles.newPal}`} onClick={() => pick(pal.id)}>
-                {progress.pal.id ? t('pals.team.add') : t('pals.team.choose')}
               </button>
             )}
             {!isUnlocked && <LockHint unlock={pal.unlock} label={unlockText(lang, pal.unlock)} />}
@@ -85,7 +80,7 @@ function Collection({ onError }) {
   );
 }
 
-/** The Pals tab's Team: switch partner, the next Lucky Pal gift, and every Pal (pick one, see their forms). */
+/** The Pals tab's Collection: switch partner, the next Lucky Pal gift, and every Pal (pick one, see their forms). */
 export default function PalTeam() {
   const [message, setMessage] = useState('');
   const { t } = useI18n();

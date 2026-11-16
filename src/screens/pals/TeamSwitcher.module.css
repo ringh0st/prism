@@ -9,6 +9,10 @@
   box-shadow: var(--shadow-sm);
 }
 
+.compact {
+  margin-bottom: var(--space-3);
+}
+
 .title {
   margin: 0;
   font-size: 18px;
