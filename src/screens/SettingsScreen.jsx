@@ -17,6 +17,7 @@ import LanguageCard from './me/LanguageCard.jsx';
 import FeelToggles from './me/FeelToggles.jsx';
 import BeamStyles from './me/BeamStyles.jsx';
 import { useI18n } from '../i18n/I18nContext.jsx';
+import { areAllLevelsOpen, setAllLevelsOpen } from '../lib/openAllLevels.js';
 
 function GoogleLogo() {
   return (
@@ -47,6 +48,8 @@ const SYNC_ICONS = { local: 'phone', syncing: 'restart', synced: 'check', error:
 
 function AccountCard() {
   const { user, isAdmin, signInWithGoogle, signInWithApple, signOut, deleteAccount } = useAuth();
+  // The owner's testing switch: every level open on this device (no fake progress).
+  const [isEveryLevelOpen, setIsEveryLevelOpen] = useState(areAllLevelsOpen);
   const { syncStatus } = usePlayer();
   const { t } = useI18n();
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
@@ -89,6 +92,19 @@ function AccountCard() {
             {isAdmin && (
               <Button as="a" href="#/admin" icon="edit">
                 {t('me.account.editor')}
+              </Button>
+            )}
+            {isAdmin && (
+              <Button
+                variant="secondary"
+                icon={isEveryLevelOpen ? 'check' : 'lock'}
+                aria-pressed={isEveryLevelOpen}
+                onClick={() => {
+                  setAllLevelsOpen(!isEveryLevelOpen);
+                  setIsEveryLevelOpen(!isEveryLevelOpen);
+                }}
+              >
+                {t(isEveryLevelOpen ? 'me.account.levelsOpen' : 'me.account.openLevels')}
               </Button>
             )}
             <Button variant="secondary" onClick={signOut}>

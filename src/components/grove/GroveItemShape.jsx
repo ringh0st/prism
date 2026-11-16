@@ -1,4 +1,5 @@
 import { THEME_SHAPES } from './themeDecorShapes.jsx';
+import { BACKDROP_LANDS, BackdropThumb } from './groveBackdrops.jsx';
 
 /* Grove decor, each drawn in a 100×100 box standing on the ground at y≈95. Illustration colors are fixed (like the map). */
 const WOOD = '#B07A4E';
@@ -281,5 +282,6 @@ const SHAPES = {
 
 /** One piece of Grove decor as SVG content (a <g>) in a 100×100 box. */
 export default function GroveItemShape({ id }) {
+  if (BACKDROP_LANDS[id]) return <BackdropThumb id={id} />;
   return SHAPES[id] ?? THEME_SHAPES[id] ?? null;
 }

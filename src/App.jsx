@@ -33,6 +33,7 @@ import { SplashContext } from './state/SplashContext.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
 import { BEAM_THEMES, starsFor } from './game/progress.js';
 import { sfx } from './audio/sfx.js';
+import { areAllLevelsOpen } from './lib/openAllLevels.js';
 
 // The editor is only for admins, so players never download it.
 const AdminScreen = lazy(() => import('./screens/admin/AdminScreen.jsx'));
@@ -85,9 +86,9 @@ function LevelRoute({ levelId }) {
   if (isLoading) return <LoadingScreen />;
   if (isFailed) return <NotFoundScreen onRetry={retry} />;
   if (!level) return <NotFoundScreen />;
-  // A level opens once the one before it is solved (a link can't skip ahead).
+  // A level opens once the one before it is solved (a link can't skip ahead), unless the owner opened them all.
   const previousId = previousLevelIdBefore(level.id);
-  if (previousId && starsFor(progress, previousId) === 0) return <BackToMap />;
+  if (previousId && starsFor(progress, previousId) === 0 && !areAllLevelsOpen()) return <BackToMap />;
   const nextId = nextLevelIdAfter(level.id);
   return <PlayScreen key={level.id} level={level} nextLevel={nextId ? `#/play/${nextId}` : null} />;
 }

@@ -1,5 +1,7 @@
 /* Texts for the me screens, in every language. Keys match across en/es/he (a test checks). */
 export const en = {
+  'me.account.openLevels': 'Open every level (testing)',
+  'me.account.levelsOpen': 'Every level is open',
   'ui.tile.void': 'Void: swallows light that passes next to it',
   'ui.cell.fadeLeft.one': 'fades in {count} move',
   'ui.cell.fadeLeft.other': 'fades in {count} moves',
@@ -213,6 +215,8 @@ export const en = {
 };
 
 export const es = {
+  'me.account.openLevels': 'Abrir todos los niveles (pruebas)',
+  'me.account.levelsOpen': 'Todos los niveles abiertos',
   'ui.tile.void': 'Vacío: se traga la luz que pasa a su lado',
   'ui.cell.fadeLeft.one': 'se apaga en {count} movimiento',
   'ui.cell.fadeLeft.other': 'se apaga en {count} movimientos',
@@ -432,6 +436,8 @@ export const es = {
 };
 
 export const he = {
+  'me.account.openLevels': 'לפתוח את כל השלבים (בדיקות)',
+  'me.account.levelsOpen': 'כל השלבים פתוחים',
   'ui.tile.void': 'בולען: בולע אור שעובר לידו',
   'ui.cell.fadeLeft.one': 'דועכת בעוד מהלך אחד',
   'ui.cell.fadeLeft.other': 'דועכת בעוד {count} מהלכים',

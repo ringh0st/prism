@@ -22,6 +22,7 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
 import { chestId } from '../../game/surprises.js';
+import { areAllLevelsOpen } from '../../lib/openAllLevels.js';
 import { MAX_STARS } from '../../game/scoring.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { buildWorldStops, pathThrough, ROW_HEIGHT } from './mapLayout.js';
@@ -31,7 +32,7 @@ function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeR
   const stops = useMemo(() => buildWorldStops(levelRefs), [levelRefs]);
   const height = stops.length * ROW_HEIGHT;
   const earned = levelRefs.reduce((sum, ref) => sum + starsFor(progress, ref.id), 0);
-  const isLevelUnlocked = (position) => position === 0 || starsFor(progress, levelRefs[position - 1].id) > 0;
+  const isLevelUnlocked = (position) => position === 0 || areAllLevelsOpen() || starsFor(progress, levelRefs[position - 1].id) > 0;
 
   return (
     <section className={`${styles.world} ${styles[world.theme]}`} aria-labelledby={`world-${world.id}`}>

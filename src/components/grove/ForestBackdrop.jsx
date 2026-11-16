@@ -1,4 +1,5 @@
 import styles from './GroveScene.module.css';
+import { BACKDROP_LANDS } from './groveBackdrops.jsx';
 
 /** The sky through the day: soft pink mornings, warm days, peach evenings, quiet starry nights. */
 export const SKIES = {
@@ -56,8 +57,12 @@ function TreeDots({ color, season }) {
   );
 }
 
-/** Hills and trees under the sky of the moment and in the colors of the season; at night the moon and stars come out. */
-export default function ForestBackdrop({ time, season, hasMoon }) {
+/**
+ * Hills and trees under the sky of the moment and in the colors of the season; at night the moon and stars come out.
+ * A bought background (`backdrop`, see groveBackdrops.jsx) swaps the forest for its own land under the same sky.
+ */
+export default function ForestBackdrop({ time, season, hasMoon, backdrop = null }) {
+  const Land = BACKDROP_LANDS[backdrop];
   const sky = SKIES[time];
   const land = SEASONS[season];
   const isNight = time === 'night';
@@ -86,6 +91,15 @@ export default function ForestBackdrop({ time, season, hasMoon }) {
         fill="#FFFDF6"
         opacity=".85"
       />
+      {Land ? <Land /> : <ForestLand land={land} season={season} />}
+    </>
+  );
+}
+
+/** The enchanted forest: far and near treetops, the meadow and its path, in the season's colors. */
+function ForestLand({ land, season }) {
+  return (
+    <>
       <g fill={land.far} className={styles.canopy}>
         {FAR_TREES.map(([x, y, r]) => (
           <circle key={x} cx={x} cy={y} r={r} />

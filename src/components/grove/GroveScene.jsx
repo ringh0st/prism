@@ -25,6 +25,8 @@ const SPOT_PLACES = {
   garden: 'translate(2 182) scale(.95)',
   water: 'translate(262 168) scale(1.25)',
 };
+/** Backgrounds where seasons don't fall from the sky. */
+const SUNNY_BACKDROPS = new Set(['desertOasis', 'sunnyCove']);
 /** Draw order: far things first. */
 const DRAW_ORDER = ['sky', 'home', 'light', 'seat', 'garden', 'water'];
 
@@ -69,7 +71,7 @@ export default function GroveScene({ placed, partnerId, owned = {}, wearing = []
         aria-label={sceneLabel({ t, lang, bySpot, partner, friend, isNapping, season, partyWorld })}
         focusable="false"
       >
-        <ForestBackdrop time={time} season={season} hasMoon={bySpot.sky === 'moonStars'} />
+        <ForestBackdrop time={time} season={season} hasMoon={bySpot.sky === 'moonStars'} backdrop={bySpot.backdrop} />
         {DRAW_ORDER.map((spot) =>
           bySpot[spot] ? (
             <g key={spot} transform={SPOT_PLACES[spot]}>
@@ -80,7 +82,8 @@ export default function GroveScene({ placed, partnerId, owned = {}, wearing = []
         {partyWorld > 0 && <PartyBunting />}
         {SKIES[time].tint && <rect width="400" height="280" fill={SKIES[time].tint} />}
         <GroveCritters time={time} season={season} />
-        <SeasonFall season={season} />
+        {/* Leaves and snowflakes belong to the forest and the hills, not the desert or the beach. */}
+        {!SUNNY_BACKDROPS.has(bySpot.backdrop) && <SeasonFall season={season} />}
       </svg>
       {withPals && friend && !isNapping && (
         <GrovePal

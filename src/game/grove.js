@@ -6,6 +6,7 @@ import { THEME_DECOR } from './themes.js';
  * diamonds-only) and placed in spots, one item per spot. Prices must match supabase/grove.sql (a test checks).
  */
 export const GROVE_SPOTS = [
+  { id: 'backdrop', name: 'Backgrounds' },
   { id: 'home', name: 'Homes' },
   { id: 'seat', name: 'Seats & swings' },
   { id: 'light', name: 'Lights' },
@@ -33,6 +34,11 @@ export const GROVE_ITEMS = [
   { id: 'kites', name: 'Kites', spot: 'sky', price: 80 },
   { id: 'moonStars', name: 'Moon & stars', spot: 'sky', price: 100 },
   { id: 'rainbow', name: 'Rainbow', spot: 'sky', price: 150 },
+  // Backgrounds swap the whole forest for another land (groveBackdrops.jsx); without one it's the enchanted forest.
+  { id: 'blossomHills', name: 'Blossom hills', spot: 'backdrop', price: 300 },
+  { id: 'snowyPines', name: 'Snowy pines', spot: 'backdrop', price: 320 },
+  { id: 'desertOasis', name: 'Desert oasis', spot: 'backdrop', price: 350 },
+  { id: 'sunnyCove', name: 'Sunny cove', spot: 'backdrop', price: 400 },
 ];
 
 /** Every decoration: the regular ones plus the weekly theme collections'. */

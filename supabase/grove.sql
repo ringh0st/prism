@@ -31,6 +31,10 @@ as $$
     when 'kites' then '{"price": 80, "spot": "sky"}'::jsonb
     when 'moonStars' then '{"price": 100, "spot": "sky"}'::jsonb
     when 'rainbow' then '{"price": 150, "spot": "sky"}'::jsonb
+    when 'blossomHills' then '{"price": 300, "spot": "backdrop"}'::jsonb
+    when 'snowyPines' then '{"price": 320, "spot": "backdrop"}'::jsonb
+    when 'desertOasis' then '{"price": 350, "spot": "backdrop"}'::jsonb
+    when 'sunnyCove' then '{"price": 400, "spot": "backdrop"}'::jsonb
     else null
   end;
 $$;
