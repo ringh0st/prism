@@ -1,7 +1,7 @@
 {
   "name": "prism",
   "private": true,
-  "version": "1.2.2",
+  "version": "1.2.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,7 +11,8 @@
     "test": "node --test src/game/*.test.js",
     "levels": "node scripts/generate-levels.mjs",
     "events": "node scripts/generate-events.mjs",
-    "ios": "vite build && cap sync ios"
+    "ios": "vite build && cap sync ios",
+    "pals:fit": "node scripts/fit-pals.cjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",

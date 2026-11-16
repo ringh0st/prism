@@ -1,6 +1,7 @@
 import { accessoryById, palStage } from '../../game/pals.js';
 import { ThemeOutfit } from './themeOutfitArt.jsx';
 import styles from './PalArt.module.css';
+import PAL_FIT from './palFit.json';
 
 const SLOT_ORDER = ['neck', 'head', 'hand'];
 const slotOf = (id) => accessoryById(id)?.slot;
@@ -161,8 +162,9 @@ export function Accessory({ id, hat, neck }) {
 }
 
 /*
- * Every form is shown at the same size: growing up shows in the drawing (features, details, the Master's glow),
- * never in how big the Pal is on screen.
+ * Every form is shown at the same size: growing up shows in how the Pal looks (features, details, the Master's
+ * glow), never in how big it is. Each drawing has its own scale to one shared size (palFit.json, `npm run pals:fit`);
+ * it scales around the floor together with the outfit, which is drawn for the shared stage.
  */
 /** The square to show: the whole stage, or (as a portrait) just the Pal, for round avatars. */
 const viewBoxFor = (isPortrait) => (isPortrait ? '4 8 92 92' : '0 0 100 100');
@@ -178,6 +180,7 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
   const stageIndex = palStage(stage).index;
   const picture = PICTURES[`${palId}-${stageIndex + 1}`];
   if (!picture) return null;
+  const fit = PAL_FIT[`${palId}-${stageIndex + 1}`] ?? 1;
   return (
     <svg
       className={`${alive ? styles.alive : ''} ${className}`}
@@ -192,22 +195,24 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
       overflow="visible"
     >
       <ellipse cx="50" cy="95" rx="24" ry="4" fill="rgba(60,40,20,.14)" />
-      <g className={styles.body}>
-        {wearing
-          .filter((id) => WORN_BEHIND.has(id))
-          .map((id) => (
-            <g key={id} transform={`translate(50 ${NECK}) scale(1.25 1.05) translate(-50 ${-NECK})`}>
-              <Accessory id={id} hat={HAT} neck={NECK} />
-            </g>
-          ))}
-        <image href={picture} x="0" y="0" width="100" height="100" />
-        {wearing.some((id) => WORN_BEHIND.has(id)) && <circle cx="50" cy={NECK + 1} r="3.2" fill="#f0c14e" stroke="#c99a2e" strokeWidth="1" />}
-        {[...wearing]
-          .filter((id) => !WORN_BEHIND.has(id))
-          .sort(bySlotOrder)
-          .map((id) => (
-            <Accessory key={id} id={id} hat={HAT} neck={NECK} />
-          ))}
+      <g transform={`translate(50 94) scale(${fit}) translate(-50 -94)`}>
+        <g className={styles.body}>
+          {wearing
+            .filter((id) => WORN_BEHIND.has(id))
+            .map((id) => (
+              <g key={id} transform={`translate(50 ${NECK}) scale(1.25 1.05) translate(-50 ${-NECK})`}>
+                <Accessory id={id} hat={HAT} neck={NECK} />
+              </g>
+            ))}
+          <image href={picture} x="0" y="0" width="100" height="100" />
+          {wearing.some((id) => WORN_BEHIND.has(id)) && <circle cx="50" cy={NECK + 1} r="3.2" fill="#f0c14e" stroke="#c99a2e" strokeWidth="1" />}
+          {[...wearing]
+            .filter((id) => !WORN_BEHIND.has(id))
+            .sort(bySlotOrder)
+            .map((id) => (
+              <Accessory key={id} id={id} hat={HAT} neck={NECK} />
+            ))}
+        </g>
       </g>
     </svg>
   );
