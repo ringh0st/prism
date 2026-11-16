@@ -77,6 +77,23 @@ export function difficultyFor(index) {
   return DIFFICULTY.NORMAL;
 }
 
+/** Boss fights in rounds (bossFight.js) come in the worlds before the darkness; its own bosses race his shadows. */
+export const BOSS_FIGHT_WORLDS = 12;
+
+/**
+ * The plan for a world's boss fight (bossBuilder.js), or null for none: how many rounds, the fewest and most taps
+ * each later round needs, how many new gems Smudge hides and how many walls he moves.
+ */
+export function bossFightFor(world) {
+  if (world < 1 || world > BOSS_FIGHT_WORLDS) return null;
+  return {
+    phases: world <= 2 ? 2 : 3,
+    par: world <= 4 ? [3, 4] : [3, 5],
+    gems: world <= 2 ? [2, 2] : [2, 3],
+    walls: world === 1 ? 1 : 2,
+  };
+}
+
 /** A built-in level's place on the whole road, 1 to 1000 ("Level 148"), so players see how far they've come. */
 export const levelNumber = (world, index) => (world - 1) * LEVELS_PER_WORLD + index;
 

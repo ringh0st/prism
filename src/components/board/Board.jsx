@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import TileArt, { TileDefs } from './TileArt.jsx';
 import BeamLayer from './BeamLayer.jsx';
 import DarknessLayer from './DarknessLayer.jsx';
+import BossSmudge from './BossSmudge.jsx';
 import { fadeLeft, gloomsNow, isEclipseMove, powerLeft } from '../../game/darkness.js';
 import LensPath from './LensPath.jsx';
 import GlowbugArt from '../glowbugs/GlowbugArt.jsx';
@@ -40,6 +41,8 @@ const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
  * @param coach        first-levels coaching: { tile: tile index the hand points at, or null; labels: show Lamp/Gem tags }
  * @param darkness     the darkness now (darkness.js): creeping shadows, countdowns on fading gems and dying lamps
  * @param darkMoves    moves that still stand (for the eclipse countdown)
+ * @param smudge       a boss fight's Smudge (bossFight.js): { cell, isLit, isDefeated, hitKey }
+ * @param roundChange  what Smudge changed at the start of this round: { round, added, turned (Sets of cells), removed (Map cell -> tile) }
  */
 export default function Board({
   level,
@@ -63,6 +66,8 @@ export default function Board({
   nudgedCell = null,
   darkness = null,
   darkMoves = 0,
+  smudge = null,
+  roundChange = null,
 }) {
   const { t, lang } = useI18n();
   const { width, height, tiles } = level;
@@ -153,6 +158,7 @@ export default function Board({
       </div>
       <BeamLayer width={width} height={height} segments={trace.segments} />
       {darkness && <DarknessLayer level={level} darkness={darkness} moves={darkMoves} />}
+      {smudge && <BossSmudge width={width} height={height} {...smudge} />}
       <div className={styles.cells} role="grid" aria-label={label} aria-rowcount={height} aria-colcount={width}>
         {Array.from({ length: height }, (_, row) => (
           <div role="row" key={row} className={styles.row}>
@@ -183,9 +189,13 @@ export default function Board({
                 isDarkened && t('ui.cell.darkened'),
                 gloom && t('ui.cell.gloom', { count: gloom.stepsLeft }),
               ].filter(Boolean);
+              const isSmudgeHere = smudge?.cell === cell && !smudge.isDefeated;
               const description =
                 describeTile(tile, { orient: orients[tileIndex], isLit, isOpen, isRotatable: canRotate, isFogged, turnsLeft: left }, t) +
-                (darkWords.length ? `, ${darkWords.join(', ')}` : '');
+                (darkWords.length ? `, ${darkWords.join(', ')}` : '') +
+                (isSmudgeHere ? `, ${t('ui.cell.smudge')}` : '');
+              const pocketed = roundChange?.removed.get(cell);
+              const isChanged = Boolean(pocketed) || roundChange?.added.has(cell) || roundChange?.turned.has(cell);
               return (
                 <div role="gridcell" key={col} className={styles.cellWrap}>
                   <button
@@ -212,6 +222,13 @@ export default function Board({
                       </span>
                     )}
                     {coach?.tile === tileIndex && tileIndex >= 0 && <CoachHand />}
+                    {/* Smudge's mischief between rounds: a dark swirl where he changed something, and the pieces he took. */}
+                    {isChanged && <span key={`swirl-${roundChange.round}`} className={styles.smudgeSwirl} aria-hidden="true" />}
+                    {pocketed && (
+                      <span key={`pocketed-${roundChange.round}`} className={styles.pocketed} aria-hidden="true">
+                        <TileArt tile={pocketed} turns={pocketed.orient ?? 0} isLit={pocketed.type === TILE.GEM} isRotatable={false} />
+                      </span>
+                    )}
                     {coach?.labels && COACH_LABELS[tile?.type] && (
                       <span className={styles.coachLabel} aria-hidden="true">
                         {t(COACH_LABELS[tile.type])}

@@ -1,0 +1,84 @@
+/* Smudge pops up over the board between rounds, says his piece, and slips away */
+.taunt {
+  position: absolute;
+  top: 4%;
+  left: 50%;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: min(92%, 420px);
+  pointer-events: none;
+  transform: translateX(-50%);
+  animation: taunt 3.2s var(--ease-out) both;
+}
+
+.face {
+  flex: none;
+  width: 56px;
+  height: 56px;
+}
+
+.face svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.words {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+
+/* The new round's number, in the reward color like a cheer */
+.round {
+  padding: 2px 12px 3px;
+  border-radius: var(--radius-pill);
+  font-size: 20px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: inset 0 -3px 0 var(--reward-ledge);
+  transform: rotate(-3deg);
+}
+
+.bubble {
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #fff4e8;
+  background: #4a3a30;
+  box-shadow: var(--shadow-md);
+}
+
+@keyframes taunt {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -30%) scale(0.7) rotate(-4deg);
+  }
+  12% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.05) rotate(2deg);
+  }
+  20% {
+    transform: translate(-50%, 0) scale(1) rotate(0deg);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -25%);
+  }
+}
+
+/* Without motion it simply shows, and the level screen takes it away after the same moment */
+@media (prefers-reduced-motion: reduce) {
+  .taunt {
+    animation: none;
+  }
+}

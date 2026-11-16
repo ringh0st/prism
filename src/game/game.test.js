@@ -109,8 +109,108 @@ test('the 1000-level pack is valid, scrambled, and par is the true minimum', () 
   for (const level of levels.filter((l) => l.index === 1 + (l.world % LEVELS_PER_WORLD))) {
     const analysis = analyzeLevel(level);
     assert.equal(analysis.isSolvable, true, `${level.id} unsolvable`);
-    assert.equal(analysis.par, level.par, `${level.id} par mismatch`);
+    // A boss fight's own par is the sum of its rounds; its board is the first round.
+    assert.equal(analysis.par, level.phases?.[0].par ?? level.par, `${level.id} par mismatch`);
   }
+});
+
+test('boss fights: every round is solvable at its par, and Smudge stands where the light can hit him', async () => {
+  const { phaseLevels } = await import('./bossFight.js');
+  const { cellsOnBeams } = await import('./beam.js');
+  const { nearestSolution } = await import('./solver.js');
+  const { BOSS_FIGHT_WORLDS, bossFightFor } = await import('./worlds.js');
+  for (let world = 1; world <= WORLD_COUNT; world++) {
+    const file = new URL(`../data/worlds/world-${String(world).padStart(3, '0')}.json`, import.meta.url);
+    const boss = JSON.parse(readFileSync(file, 'utf8')).at(-1);
+    if (world > BOSS_FIGHT_WORLDS) {
+      assert.equal(boss.phases, undefined, `${boss.id} is a single board`);
+      continue;
+    }
+    assert.equal(boss.phases?.length, bossFightFor(world).phases, `${boss.id} rounds`);
+    assert.equal(
+      boss.par,
+      boss.phases.reduce((sum, phase) => sum + phase.par, 0),
+      `${boss.id}: ★★★ is the rounds' par summed`,
+    );
+    assert.equal(starsForMoves(boss.par, boss.par, boss.difficulty), 3);
+    assert.ok(moveLimitFor(boss.par, boss.difficulty) > boss.par, `${boss.id} has spare moves`);
+    for (const round of phaseLevels(boss)) {
+      const where = `${boss.id} round ${round.phase + 1}`;
+      const start = round.tiles.map((tile) => tile.orient ?? 0);
+      const analysis = analyzeLevel(round);
+      assert.equal(analysis.isSolvable, true, `${where} unsolvable`);
+      assert.equal(analysis.par, round.par, `${where} par`);
+      assert.equal(traceBeams(round).isSolved, false, `${where} starts solved`);
+      const lit = (orients) => cellsOnBeams(traceBeams(round, orients).segments, round.width, round.height);
+      assert.equal(lit(start).has(round.smudge), false, `${where}: Smudge starts in the dark`);
+      assert.equal(lit(nearestSolution(round, start)).has(round.smudge), true, `${where}: the solution's light hits Smudge`);
+    }
+  }
+});
+
+test('boss fights: health, the weakness, Undo and the board between rounds', async () => {
+  const { applyPhaseChanges, carryTurns, fightHealth, healthLeft, parAfterPhase, phaseChangeOf, phaseDamage, phaseLevels } =
+    await import('./bossFight.js');
+  // Round 1: a "/" mirror sends the light up and away; turned, it shines down past Smudge (cell 12) to the gem.
+  // Round 2: Smudge pockets that gem, turns the mirror back down and hides a gem above it; he stands at cell 6,
+  // in the light from the start (a free weakness hit).
+  const fight = {
+    id: 'w0-20',
+    width: 5,
+    height: 5,
+    difficulty: 'extra',
+    par: 2,
+    tiles: [
+      { x: 0, y: 1, type: 'emitter', dir: 'right', color: 'sun' },
+      { x: 2, y: 1, type: 'mirror', orient: 0 },
+      { x: 2, y: 3, type: 'gem', color: 'sun' },
+    ],
+    phases: [
+      { par: 1, smudge: 12 },
+      {
+        par: 1,
+        smudge: 6,
+        changes: [
+          { do: 'remove', x: 2, y: 3 },
+          { do: 'turn', x: 2, y: 1, orient: 1 },
+          { do: 'add', tile: { x: 2, y: 0, type: 'gem', color: 'sun' } },
+        ],
+      },
+    ],
+  };
+  assert.deepEqual(validateLevel(fight), []);
+  assert.match(validateLevel({ ...fight, par: 3 }).join(' '), /sum of its rounds/);
+  assert.match(validateLevel({ ...fight, phases: [fight.phases[0], { ...fight.phases[1], smudge: 2 }] }).join(' '), /empty cell/);
+  const [first, second] = phaseLevels(fight);
+  assert.deepEqual(second.tiles, applyPhaseChanges(fight.tiles, fight.phases[1].changes));
+  assert.equal(second.tiles[1].orient, 1);
+  assert.equal(fightHealth(fight), 6, 'a gem and the weakness (2) per round');
+  assert.equal(parAfterPhase(fight, 0), 1);
+
+  const start = (round) => round.tiles.map((tile) => tile.orient ?? 0);
+  assert.equal(phaseDamage(first, start(first), []).damage, 0);
+  assert.equal(healthLeft(fight, 0, 0), 6);
+  const won = phaseDamage(first, start(first), [[1]]);
+  assert.equal(won.isCleared, true);
+  assert.equal(won.isWeaknessHit, true, 'the light passes Smudge on its way down');
+  assert.equal(healthLeft(fight, 0, won.damage), 3, 'a cleared round counts in full');
+  // Turned and turned back: the gem and Smudge were each hit once, but the last point goes with the clearing blow.
+  const twice = phaseDamage(first, start(first), [[1], [1]]);
+  assert.equal(twice.damage, 2);
+  assert.equal(twice.isCleared, false);
+
+  const opening = phaseDamage(second, start(second), []);
+  assert.equal(opening.isWeaknessHit, true);
+  assert.equal(healthLeft(fight, 1, opening.damage), 1);
+  assert.equal(healthLeft(fight, 1, phaseDamage(second, start(second), [[1]]).damage), 0);
+
+  // The player's mirror already points down, so between rounds only the gems change.
+  const change = phaseChangeOf(first, [0, 1, 0], second);
+  assert.deepEqual([...change.added], [2]);
+  assert.deepEqual([...change.turned], []);
+  assert.deepEqual([...change.removed.keys()], [17]);
+  assert.deepEqual(carryTurns(first, [0, 1, 0], second), [0, 1, 0]);
+  assert.deepEqual(carryTurns(first, [0, 2, 0], second), [0, 3, 0], 'a turn only where Smudge changed it');
 });
 
 test('the generator produces a valid level for an easy preset', () => {

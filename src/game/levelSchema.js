@@ -1,4 +1,6 @@
 import { BEAM_COLOR_NAMES, DIFFICULTY, DIRECTION_NAMES, LEVEL_SCHEMA_VERSION, TILE } from './constants.js';
+import { phaseLevels } from './bossFight.js';
+import { hasDarkness } from './darkness.js';
 
 const TILE_TYPES = new Set(Object.values(TILE));
 const DIFFICULTIES = new Set(Object.values(DIFFICULTY));
@@ -67,8 +69,34 @@ export function validateLevel(level) {
   });
   if (level.eclipse !== undefined && (!Number.isInteger(level.eclipse) || level.eclipse < 2))
     problems.push('An eclipse comes every 2 or more moves.');
+  if (level.phases !== undefined) problems.push(...phaseProblems(level));
   if (!tiles.some((t) => t.type === TILE.EMITTER)) problems.push('Add at least one light source.');
   if (!tiles.some((t) => t.type === TILE.GEM)) problems.push('Add at least one gem.');
+  return problems;
+}
+
+const CHANGES = new Set(['remove', 'turn', 'add']);
+
+/** A boss fight's rounds (bossFight.js): each one a valid board of its own, with Smudge on an empty cell. */
+function phaseProblems(level) {
+  const { phases, width, height } = level;
+  if (!Array.isArray(phases) || phases.length < 2 || phases.length > 4) return ['A boss fight has 2–4 rounds.'];
+  const problems = [];
+  if (hasDarkness(level)) problems.push('A boss fight in rounds has no darkness pieces.');
+  phases.forEach((phase, k) => {
+    const where = `Round ${k + 1}`;
+    if (!Number.isInteger(phase.par) || phase.par < 1) problems.push(`${where}: needs a par of 1 or more.`);
+    if (!Number.isInteger(phase.smudge) || phase.smudge < 0 || phase.smudge >= width * height) problems.push(`${where}: Smudge needs a cell.`);
+    if (k === 0 && phase.changes !== undefined) problems.push(`${where}: the first round is the board itself.`);
+    if (k > 0 && (!Array.isArray(phase.changes) || phase.changes.some((change) => !CHANGES.has(change.do))))
+      problems.push(`${where}: needs a list of changes (remove, turn, add).`);
+  });
+  if (problems.length) return problems;
+  if (level.par !== phases.reduce((sum, phase) => sum + phase.par, 0)) problems.push('A boss fight’s par is the sum of its rounds.');
+  phaseLevels(level).forEach((round, k) => {
+    validateLevel(round).forEach((problem) => problems.push(`Round ${k + 1}: ${problem}`));
+    if (round.tiles.some((tile) => tile.y * width + tile.x === round.smudge)) problems.push(`Round ${k + 1}: Smudge must stand on an empty cell.`);
+  });
   return problems;
 }
 

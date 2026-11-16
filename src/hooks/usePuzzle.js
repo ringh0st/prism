@@ -4,6 +4,10 @@ import { findSafeOrder, hasDarkness, replayDarkness } from '../game/darkness.js'
 import { findHint, nearestSolution } from '../game/solver.js';
 import { starCapForHelpers } from '../game/catalog.js';
 import { FRAGILE_TURNS } from '../game/constants.js';
+import { carryTurns, fightHealth, healthLeft, parAfterPhase, phaseChangeOf, phaseDamage, phaseLevels, roundHealthEnds } from '../game/bossFight.js';
+
+/** In a boss fight, how long the cleared board stays (the clearing blow lands) before Smudge changes it. */
+export const ROUND_CHANGE_MS = 1600;
 
 const initialState = (level) => {
   const orients = level.tiles.map((tile) => tile.orient ?? 0);
@@ -19,6 +23,30 @@ const initialState = (level) => {
     ghostSegments: null,
     headStartTile: null,
     startOrients: null,
+    // Boss fights (bossFight.js): the round, the turn counts it started with (cracking mirrors start afresh each
+    // round) and what Smudge changed at its start.
+    phase: 0,
+    baseTurns: orients.slice(),
+    phaseChange: null,
+  };
+};
+
+/** The next round of a boss fight: Smudge's board, with every piece turning on from where it was. */
+const nextRound = (s, rounds) => {
+  const round = rounds[s.phase];
+  const next = rounds[s.phase + 1];
+  const turns = carryTurns(round, s.turns, next);
+  return {
+    ...s,
+    phase: s.phase + 1,
+    orients: next.tiles.map((tile) => tile.orient ?? 0),
+    turns,
+    baseTurns: turns.slice(),
+    taps: [],
+    hintTile: null,
+    ghostSegments: null,
+    startOrients: null,
+    phaseChange: { ...phaseChangeOf(round, s.orients, next), round: s.phase + 1 },
   };
 };
 
@@ -73,46 +101,78 @@ function safeHint(level, orients, darkness, moves, cells) {
   return order?.length ? groups[order[0]][0] : findHint(level, orients);
 }
 
-/** Turns a cracking mirror has left (Infinity for every other tile). */
-const turnsLeftOf = (tile, turns) => (tile.fragile ? Math.max(0, FRAGILE_TURNS - (turns - (tile.orient ?? 0))) : Infinity);
+/** Turns a cracking mirror has left this round (Infinity for every other tile). */
+const turnsLeftOf = (tile, turns, base) => (tile.fragile ? Math.max(0, FRAGILE_TURNS - (turns - base)) : Infinity);
 
 /**
  * Play state for one level: orientations, moves, helpers, and the live beam trace.
  * Cracking mirrors stop turning once their turns are used up; fog lifts for good wherever light reaches.
- * Re-keys itself when the level changes.
+ * A boss fight is played round by round (`round` is the board now); moves, helpers and Undos carry over, and the
+ * trace only counts as solved in the last round. Re-keys itself when the level changes.
  */
 export function usePuzzle(level) {
   const [state, setState] = useState(() => ({ levelId: level.id, ...initialState(level) }));
   const current = state.levelId === level.id ? state : { levelId: level.id, ...initialState(level) };
   if (current !== state) setState(current);
 
+  // A boss fight's rounds (a plain level is its own single round); everything below plays the round now.
+  const rounds = useMemo(() => phaseLevels(level), [level]);
+  const round = rounds[Math.min(current.phase, rounds.length - 1)];
+
   // The darkness (darkness.js) replays the taps that still stand, so an Undo takes it back a step too.
-  const isDark = useMemo(() => hasDarkness(level), [level]);
-  const cells = useMemo(() => buildCellIndex(level), [level]);
-  const startOrients = useMemo(() => current.startOrients ?? level.tiles.map((tile) => tile.orient ?? 0), [current.startOrients, level]);
+  const isDark = useMemo(() => hasDarkness(round), [round]);
+  const cells = useMemo(() => buildCellIndex(round), [round]);
+  const startOrients = useMemo(() => current.startOrients ?? round.tiles.map((tile) => tile.orient ?? 0), [current.startOrients, round]);
+  const tapGroups = useMemo(() => current.taps.map((i) => rotationGroup(round.tiles, i)), [current.taps, round]);
   const darkness = useMemo(
-    () =>
-      isDark
-        ? replayDarkness(
-            level,
-            startOrients,
-            current.taps.map((i) => rotationGroup(level.tiles, i)),
-            cells,
-          )
-        : null,
-    [isDark, level, startOrients, current.taps, cells],
+    () => (isDark ? replayDarkness(round, startOrients, tapGroups, cells) : null),
+    [isDark, round, startOrients, tapGroups, cells],
   );
-  const plainTrace = useMemo(() => (isDark ? null : traceBeams(level, current.orients, cells)), [isDark, level, current.orients, cells]);
-  const trace = darkness?.trace ?? plainTrace;
+  const plainTrace = useMemo(() => (isDark ? null : traceBeams(round, current.orients, cells)), [isDark, round, current.orients, cells]);
+  const roundTrace = darkness?.trace ?? plainTrace;
+  // A cleared round of a fight isn't the win yet: the board stays a moment, then Smudge changes it.
+  const isRoundCleared = rounds.length > 1 && current.phase < rounds.length - 1 && roundTrace.isSolved;
+  const trace = useMemo(() => (isRoundCleared ? { ...roundTrace, isSolved: false } : roundTrace), [isRoundCleared, roundTrace]);
+  useEffect(() => {
+    if (!isRoundCleared) return undefined;
+    const phase = current.phase;
+    const timer = setTimeout(() => setState((s) => (s.levelId === level.id && s.phase === phase ? nextRound(s, rounds) : s)), ROUND_CHANGE_MS);
+    return () => clearTimeout(timer);
+  }, [isRoundCleared, current.phase, level.id, rounds]);
+
+  // Smudge's health: every gem lit once in the round, and his weakness (light through his cell).
+  const hits = useMemo(
+    () => (rounds.length > 1 ? phaseDamage(round, startOrients, tapGroups, cells) : null),
+    [rounds, round, startOrients, tapGroups, cells],
+  );
+  const boss = useMemo(
+    () =>
+      hits && {
+        phase: current.phase,
+        phases: rounds.length,
+        health: healthLeft(level, current.phase, hits.damage),
+        maxHealth: fightHealth(level),
+        roundEnds: roundHealthEnds(level),
+        smudgeCell: round.smudge,
+        isWeaknessHit: hits.isWeaknessHit,
+        isRoundCleared,
+        parLater: parAfterPhase(level, current.phase),
+        change: current.phaseChange,
+      },
+    [hits, current.phase, current.phaseChange, rounds.length, level, round.smudge, isRoundCleared],
+  );
 
   // Cracked mirrors (no turns left) are fixed from now on, also for hints and the Lens.
-  const turnsLeft = useMemo(() => level.tiles.map((tile, i) => turnsLeftOf(tile, current.turns[i])), [level.tiles, current.turns]);
+  const turnsLeft = useMemo(
+    () => round.tiles.map((tile, i) => turnsLeftOf(tile, current.turns[i], current.baseTurns[i])),
+    [round.tiles, current.turns, current.baseTurns],
+  );
   const solverLevel = useMemo(
     () =>
       turnsLeft.some((left) => left === 0)
-        ? { ...level, tiles: level.tiles.map((tile, i) => (turnsLeft[i] === 0 ? { ...tile, locked: true } : tile)) }
-        : level,
-    [level, turnsLeft],
+        ? { ...round, tiles: round.tiles.map((tile, i) => (turnsLeft[i] === 0 ? { ...tile, locked: true } : tile)) }
+        : round,
+    [round, turnsLeft],
   );
 
   // Fog lifts for good once light touches a cell.
@@ -130,23 +190,23 @@ export function usePuzzle(level) {
   const rotate = useCallback(
     (tileIndex) =>
       setState((s) => {
-        if (turnsLeftOf(level.tiles[tileIndex], s.turns[tileIndex]) === 0) return s;
-        return rotated(s, level.tiles, tileIndex);
+        if (turnsLeftOf(round.tiles[tileIndex], s.turns[tileIndex], s.baseTurns[tileIndex]) === 0) return s;
+        return rotated(s, round.tiles, tileIndex);
       }),
-    [level.tiles],
+    [round.tiles],
   );
 
   // A Head Start stays for the whole visit: a restart begins from the turned mirror again.
   const hasHeadStart = useRef(false);
   const fresh = useCallback(() => {
     const start = { levelId: level.id, ...initialState(level) };
-    return hasHeadStart.current ? withHeadStart(start, level) : start;
-  }, [level]);
+    return hasHeadStart.current ? withHeadStart(start, rounds[0]) : start;
+  }, [level, rounds]);
   const restart = useCallback(() => setState(fresh()), [fresh]);
   const startWithHeadStart = useCallback(() => {
     hasHeadStart.current = true;
-    setState((s) => (s.headStartTile === null && s.moves === 0 ? withHeadStart(s, level) : s));
-  }, [level]);
+    setState((s) => (s.headStartTile === null && s.moves === 0 ? withHeadStart(s, rounds[0]) : s));
+  }, [rounds]);
 
   /** Undo: takes back the last tap. It still counts toward the stars, but gives the move back (`undos`). */
   const undo = useCallback(
@@ -154,9 +214,9 @@ export function usePuzzle(level) {
       setState((s) => {
         const tileIndex = s.taps.at(-1);
         if (tileIndex === undefined) return s;
-        return { ...s, ...turned(s, level.tiles, tileIndex, -1), taps: s.taps.slice(0, -1), history: [...s.history, tileIndex], undos: s.undos + 1 };
+        return { ...s, ...turned(s, round.tiles, tileIndex, -1), taps: s.taps.slice(0, -1), history: [...s.history, tileIndex], undos: s.undos + 1 };
       }),
-    [level.tiles],
+    [round.tiles],
   );
 
   /**
@@ -173,7 +233,7 @@ export function usePuzzle(level) {
       if (helperId === 'lens') {
         const target = nearestSolution(solverLevel, current.orients);
         if (!target) return false;
-        setState((s) => markUsed(s, { ghostSegments: traceBeams(level, target).segments }));
+        setState((s) => markUsed(s, { ghostSegments: traceBeams(round, target).segments }));
         return true;
       }
       const tileIndex = darkness
@@ -181,16 +241,18 @@ export function usePuzzle(level) {
         : findHint(solverLevel, current.orients);
       if (tileIndex === null) return false;
       if (helperId === 'hint') setState((s) => markUsed(s, { hintTile: tileIndex }));
-      if (helperId === 'autoturn') setState((s) => markUsed(rotated(s, level.tiles, tileIndex)));
+      if (helperId === 'autoturn') setState((s) => markUsed(rotated(s, round.tiles, tileIndex)));
       return true;
     },
-    [level, solverLevel, current.orients, darkness, current.taps.length, cells],
+    [round, solverLevel, current.orients, darkness, current.taps.length, cells],
   );
 
   const clearGhost = useCallback(() => setState((s) => ({ ...s, ghostSegments: null })), []);
 
   return {
     ...current,
+    round,
+    boss,
     trace,
     darkness,
     turnsLeft,

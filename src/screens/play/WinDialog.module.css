@@ -358,3 +358,48 @@
     animation: none;
   }
 }
+
+/* A boss fight won: Smudge runs off with a little white flag */
+.smudgeBeaten {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  color: var(--text-soft);
+}
+
+.smudgeRunning {
+  width: 56px;
+  height: 56px;
+  animation: runOff 1.6s var(--ease-out) 0.6s both;
+}
+
+.smudgeRunning svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@keyframes runOff {
+  0% {
+    opacity: 0;
+    transform: translateX(-30%) rotate(-10deg);
+  }
+  30% {
+    opacity: 1;
+    transform: translateX(0) rotate(4deg);
+  }
+  60% {
+    transform: translateX(6%) rotate(-4deg);
+  }
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smudgeRunning {
+    animation: none;
+  }
+}

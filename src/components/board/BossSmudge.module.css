@@ -1,0 +1,108 @@
+/* Smudge on his cell in a boss fight: above the light, below nothing tappable (it lets taps through) */
+.layer {
+  position: absolute;
+  inset: var(--pad);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.smudge {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  transition:
+    left 700ms var(--ease-out),
+    top 700ms var(--ease-out);
+}
+
+.body {
+  display: block;
+  width: 96%;
+  height: 96%;
+  animation: flinch 520ms var(--ease-wobble);
+}
+
+.body svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: bob 1.4s ease-in-out infinite alternate;
+}
+
+/* His weakness: a little sun with "×2" (light on him hits twice) */
+.weakness {
+  position: absolute;
+  right: -4%;
+  bottom: -2%;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 1px 5px 1px 2px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: clamp(10px, 2.6vw, 13px);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--reward-label);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
+
+.weakness svg {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+/* Beaten: a spin, a flash of light and a puff */
+.defeated {
+  animation: defeated 1.2s var(--ease-out) 0.2s forwards;
+}
+
+@keyframes flinch {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(0.82, 1.12) rotate(-8deg);
+    filter: brightness(1.8) sepia(0.6);
+  }
+  60% {
+    transform: scale(1.08, 0.94) rotate(4deg);
+  }
+}
+
+@keyframes bob {
+  to {
+    transform: translateY(-5%) scale(1.03, 0.97);
+  }
+}
+
+@keyframes defeated {
+  30% {
+    transform: scale(1.25) rotate(-20deg);
+    filter: brightness(2.4) sepia(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60%) scale(0.2) rotate(240deg);
+    filter: brightness(3) sepia(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smudge {
+    transition: none;
+  }
+  .body,
+  .body svg {
+    animation: none;
+  }
+  .defeated {
+    animation: fadeOut 600ms ease 0.2s forwards;
+  }
+  @keyframes fadeOut {
+    to {
+      opacity: 0;
+    }
+  }
+}

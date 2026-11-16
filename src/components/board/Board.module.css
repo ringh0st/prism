@@ -769,3 +769,61 @@
     opacity: 0;
   }
 }
+
+/* A boss fight's new round: a dark swirl where Smudge changed a piece, and the gems he took floating off to him */
+.smudgeSwirl {
+  position: absolute;
+  inset: -6%;
+  z-index: 4;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 38%, rgb(74 58 48 / 0.55) 40%, transparent 62%),
+    conic-gradient(rgb(74 58 48 / 0.5), rgb(74 58 48 / 0) 25%, rgb(74 58 48 / 0.45) 50%, rgb(74 58 48 / 0) 75%, rgb(74 58 48 / 0.5));
+  filter: blur(1.5px);
+  opacity: 0;
+  pointer-events: none;
+  animation: smudgeSwirl 1.1s var(--ease-out) both;
+}
+
+.pocketed {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  animation: pocketed 900ms var(--ease-out) forwards;
+}
+
+@keyframes smudgeSwirl {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(0deg);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.1) rotate(220deg);
+  }
+}
+
+@keyframes pocketed {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40%) scale(0.3) rotate(-30deg);
+    filter: grayscale(1) brightness(0.5);
+  }
+}
+
+/* Without motion the swirls stay away: Smudge's word and Lumi's line say the board changed */
+@media (prefers-reduced-motion: reduce) {
+  .smudgeSwirl,
+  .pocketed {
+    display: none;
+  }
+}

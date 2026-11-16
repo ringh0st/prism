@@ -54,6 +54,9 @@ import { isRotatable } from '../../game/beam.js';
 import { readJson, writeJson } from '../../lib/storage.js';
 import { EVENT_LEVELS, parseEventLevelId } from '../../game/events.js';
 import ComboBurst from './ComboBurst.jsx';
+import BossBar from './BossBar.jsx';
+import BossTaunt from './BossTaunt.jsx';
+import { isBossFight } from '../../game/bossFight.js';
 import Callout from './Callout.jsx';
 import { treatFoundBy } from '../../game/treats.js';
 import { newStickersFor } from '../../game/stickers.js';
@@ -67,6 +70,8 @@ import { comboFor } from '../../game/combos.js';
 import styles from './PlayScreen.module.css';
 
 const WIN_DIALOG_DELAY_MS = 1300;
+/** How long Smudge's word stays over the board between the rounds of a boss fight. */
+const BOSS_TAUNT_MS = 3200;
 /** Lumi's quips that are just cheers: shown as a pop-up word over the board, not in her speech box. */
 const CALLOUT_EVENTS = new Set(['start', 'gem', 'combo', 'win1', 'win2', 'win3', 'streak']);
 const IDLE_AFTER_MS = 30000;
@@ -85,6 +90,10 @@ const SEEN_PIECES_KEY = 'prism.seenPieces.v1';
 /** Lumi when the light burns one of Smudge's shadows (English; translated by key). */
 const DARK_BURNED_LINES = ['Take that, Smudge!', 'Poof! Shadow gone!', 'Light wins!', 'Bye-bye, Smudge!'];
 const SEEN_TIPS_KEY = 'prism.seenTips.v1';
+/** Smudge between the rounds of a boss fight, cheeky but kind (English; translated by key). */
+const SMUDGE_TAUNTS = ['Hee hee! Not done yet!', 'Missed me! New gems, new mess!', 'I moved your mirrors. Oops!', 'Catch me if you can!'];
+/** Lumi when the light shines on Smudge (his weakness). */
+const WEAKNESS_LINES = ['Right on Smudge: double hit!', 'He hates the light!', 'Ouch, Smudge! Two hits!'];
 
 /** Pieces already introduced on this device, or (first time) the ones met in levels already solved. */
 function seenPieces(progress) {
@@ -125,6 +134,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const freeHints = (mode === 'level' && level.world <= KEEP_GOING_WORLDS ? 1 : 0) + palPowerAmount('hint');
   const hasFreeHint = puzzle.usedHelpers.filter((id) => id === 'hint').length < freeHints;
   const { trace, moves } = puzzle;
+  // The board now: a boss fight's current round (bossFight.js), else the level itself.
+  const board = puzzle.round;
+  const boss = puzzle.boss;
   const [result, setResult] = useState(null);
   const [solvedStars, setSolvedStars] = useState(0);
 
@@ -202,7 +214,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const isEarlyWorld = level.world <= KEEP_GOING_WORLDS;
   const keepGoingMoves = isEarlyWorld ? KEEP_GOING_MOVES : KEEP_GOING_MOVES_LATER;
   const canKeepGoing = mode === 'level' && (isEarlyWorld || bonusMoves === 0);
-  const gems = level.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
+  const gems = board.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
   // Daily and event puzzles can't be skipped.
   // World 1 offers just Hint (fewer buttons to take in); the others join from World 2.
   const offeredHelpers =
@@ -245,12 +257,16 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           ? t('intro.rush', { count: rush.run.spare })
           : level.id === PIECE_FIRST_LEVEL.gloom && mode === 'level'
             ? t('intro.smudge') // the darkness arrives: Lumi introduces Smudge once
-            : '',
+            : isBossFight(level)
+              ? t('intro.bossFight', { count: level.phases.length }) // a boss fight in rounds
+              : '',
     [challenge], // eslint-disable-line react-hooks/exhaustive-deps -- the rush line is set once per puzzle
   );
   // The darkness (darkness.js) can win: a shadow reaches its gem, a gem fades, a lamp goes out.
   const darkLost = puzzle.darkness?.lost ?? null;
   const isOver = trace.isSolved || isOutOfMoves || Boolean(result) || Boolean(darkLost);
+  // Between the rounds of a boss fight the board rests while Smudge changes it.
+  const isBetweenRounds = Boolean(boss?.isRoundCleared);
 
   // Cheers pop over the board and fade (a game shout, nothing to read); Lumi's box keeps the useful lines.
   const [callout, setCallout] = useState(null);
@@ -295,9 +311,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   // Auto-turn turns it), so the "aha" is still the player's.
   const [lookHere, setLookHere] = useState(null);
   const suggestHint = () => {
-    const tileIndex = findHint(level, puzzle.orients);
-    const tile = tileIndex === null ? null : level.tiles[tileIndex];
-    setLookHere(tile ? lookHereCells(tile, level.width, level.height) : null);
+    const tileIndex = findHint(board, puzzle.orients);
+    const tile = tileIndex === null ? null : board.tiles[tileIndex];
+    setLookHere(tile ? lookHereCells(tile, board.width, board.height) : null);
     setLumi({ mood: 'happy', line: t(tile ? 'lumi.lookHere' : 'lumi.stuckHint') });
     sfx.lumiTalk();
     setIsNudgingHint(true);
@@ -464,7 +480,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
   // Out of moves.
   useEffect(() => {
-    if (!trace.isSolved && moves >= playLimit && !hasRecordedWin.current) {
+    if (!trace.isSolved && !isBetweenRounds && moves >= playLimit && !hasRecordedWin.current) {
       const timer = setTimeout(() => {
         sfx.outOfMoves();
         say('sad', null);
@@ -476,7 +492,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [moves, playLimit, trace.isSolved, say, react, playStats]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [moves, playLimit, trace.isSolved, isBetweenRounds, say, react, playStats]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The darkness wins: Smudge giggles and the level ends like running out of moves (in Light Rush it's a restart,
   // which spends spare moves like any restart there).
@@ -515,23 +531,55 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     darkSeen.current = { burned: dark.burned.size, near: isNear, taps: puzzle.taps.length };
   }, [puzzle.darkness]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // A boss fight: every hit makes Smudge flinch (his weakness rings twice), a cleared round knocks him back, and
+  // each new round he pops up with a cheeky word while the board changes; the last round puffs him away.
+  const bossSeen = useRef({ health: null, weakness: false, phase: 0 });
+  const [bossTaunt, setBossTaunt] = useState(null);
+  useEffect(() => {
+    if (!bossTaunt) return undefined;
+    const timer = setTimeout(() => setBossTaunt(null), BOSS_TAUNT_MS);
+    return () => clearTimeout(timer);
+  }, [bossTaunt]);
+  const [smudgeHits, setSmudgeHits] = useState(0);
+  useEffect(() => {
+    if (!boss) return;
+    const seen = bossSeen.current;
+    if (boss.phase > seen.phase) {
+      sfx.bossRound();
+      setBossTaunt({ round: t('boss.round', { n: boss.phase + 1 }), text: line('boss.taunt', SMUDGE_TAUNTS), key: Date.now() });
+      setLumi({ mood: 'excited', line: t('lumi.boss.again') });
+      react('shake');
+    } else if (seen.health !== null && boss.health < seen.health) {
+      const isWeakness = boss.isWeaknessHit && !seen.weakness;
+      if (trace.isSolved) sfx.bossDefeated();
+      else sfx.bossHit(isWeakness);
+      setSmudgeHits((n) => n + 1);
+      if (isWeakness) setLumi({ mood: 'excited', line: line('lumi.boss.weakness', WEAKNESS_LINES) });
+      if (boss.isRoundCleared) {
+        setCallout({ text: t('boss.roundWon'), key: Date.now(), isBig: true });
+        react('spin');
+      }
+    }
+    bossSeen.current = { health: boss.health, weakness: boss.isWeaknessHit, phase: boss.phase };
+  }, [boss?.health, boss?.phase, boss?.isWeaknessHit]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Tapping a piece that can't turn says why (a little shake, a soft "nope" and a word from Lumi).
   const [nudgedCell, setNudgedCell] = useState(null);
   const onBlocked = useCallback(
     (cell, tileIndex) => {
-      if (isOver) return;
-      const tile = level.tiles[tileIndex];
+      if (isOver || isBetweenRounds) return;
+      const tile = board.tiles[tileIndex];
       sfx.locked();
       setNudgedCell(null);
       requestAnimationFrame(() => setNudgedCell(cell));
       setLumi({ mood: 'happy', line: t(`lumi.blocked.${['mirror', 'wall', 'emitter', 'gem'].includes(tile.type) ? tile.type : 'other'}`) });
     },
-    [isOver, level.tiles, t],
+    [isOver, isBetweenRounds, board.tiles, t],
   );
 
   const onActivate = useCallback(
     (_cell, tileIndex) => {
-      if (isOver || tileIndex < 0 || moves >= playLimit) return;
+      if (isOver || isBetweenRounds || tileIndex < 0 || moves >= playLimit) return;
       sfx.rotate();
       // A cracking mirror's last turn: crack! (it stays put from now on)
       if (puzzle.turnsLeft[tileIndex] === 1) {
@@ -540,7 +588,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       }
       puzzle.rotate(tileIndex);
     },
-    [isOver, moves, playLimit, puzzle, say],
+    [isOver, isBetweenRounds, moves, playLimit, puzzle, say],
   );
 
   const restart = useCallback(() => {
@@ -554,6 +602,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     setIsOutOfMoves(false);
     setBonusMoves(0);
     setSolvedStars(0);
+    bossSeen.current = { health: null, weakness: false, phase: 0 };
+    setBossTaunt(null);
     hasRecordedWin.current = false;
     say('happy', 'start');
     setPalReaction(null);
@@ -582,7 +632,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
   const requestHelper = useCallback(
     (helperId) => {
-      if (isOver) return;
+      if (isOver || isBetweenRounds) return;
       if (helperId === 'autoturn' && moves >= moveLimit) return;
       const owned = progress.helpers[helperId] ?? 0;
       if (mode !== 'playtest' && owned < 1 && !(helperId === 'hint' && hasFreeHint)) {
@@ -592,7 +642,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       if (helperId === 'skip') setIsConfirmingSkip(true);
       else spendHelper(helperId);
     },
-    [isOver, moves, moveLimit, progress.helpers, mode, spendHelper],
+    [isOver, isBetweenRounds, moves, moveLimit, progress.helpers, mode, spendHelper],
   );
 
   // "Try again with a hint": once the board has reset, spend the hint.
@@ -636,11 +686,13 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     const showsTips = ['level', 'daily', 'event'].includes(mode) && !isFirstSteps && pieceSteps.length === 0;
     const tipParams = palHelp ? { name: palName(lang, palHelp.pal), power: t(`power.${palHelp.id}.line`, { count: palHelp.amount }) } : {};
     const tipSteps = showsTips
-      ? unseenTips(readJson(SEEN_TIPS_KEY, []), { hasPal: Boolean(palHelp), hasGlowbug: glowbugCell !== null }).map((tip) => ({
-          ...tip,
-          target: tip.id === 'glowbug' ? `[data-cell="${glowbugCell}"]` : tip.target,
-          title: t(`tip.${tip.id}.title`, tipParams),
-        }))
+      ? unseenTips(readJson(SEEN_TIPS_KEY, []), { hasPal: Boolean(palHelp), hasGlowbug: glowbugCell !== null, hasBoss: Boolean(boss) }).map(
+          (tip) => ({
+            ...tip,
+            target: tip.id === 'glowbug' ? `[data-cell="${glowbugCell}"]` : tip.id === 'smudge' ? `[data-cell="${boss.smudgeCell}"]` : tip.target,
+            title: t(`tip.${tip.id}.title`, tipParams),
+          }),
+        )
       : [];
     return [...pieceSteps, ...tipSteps];
   };
@@ -727,12 +779,12 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
   const [findTapsLeft, setFindTapsLeft] = useState(null);
   useEffect(() => {
     setFindTapsLeft(null);
-    const timer = setTimeout(() => setFindTapsLeft(() => tapsLeftFinder(level)), 50);
+    const timer = setTimeout(() => setFindTapsLeft(() => tapsLeftFinder(board)), 50);
     return () => clearTimeout(timer);
-  }, [level]);
+  }, [board]);
   const minTapsLeft = useMemo(
-    () => (trace.isSolved ? 0 : findTapsLeft ? findTapsLeft(puzzle.orients) : 0),
-    [findTapsLeft, puzzle.orients, trace.isSolved],
+    () => (trace.isSolved ? 0 : (findTapsLeft ? findTapsLeft(puzzle.orients) : 0) + (boss?.parLater ?? 0)),
+    [findTapsLeft, puzzle.orients, trace.isSolved, boss?.parLater],
   );
   const coachTile = useMemo(
     () => (isFirstSteps && isCoachDue && !showIntro && !isOver ? findHint(level, puzzle.orients) : null),
@@ -773,6 +825,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         </span>
       </header>
 
+      {boss && <BossBar boss={boss} isBeaten={trace.isSolved} />}
       <section className={styles.status} aria-label={t('play.status')} data-tour="meter">
         {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} spent={finaleSpent} />}
         <ul className={styles.gems} aria-label={t('play.gemsLit', { n: trace.litGems.size, total: gems.length })}>
@@ -792,8 +845,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       >
         {combo && <ComboBurst combo={combo} />}
         {callout && <Callout callout={callout} />}
+        {bossTaunt && <BossTaunt taunt={bossTaunt} />}
         <Board
-          level={level}
+          level={board}
           orients={puzzle.orients}
           turns={puzzle.turns}
           trace={trace}
@@ -810,7 +864,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           glowbug={
             glowbug && glowbugCell !== null ? { id: glowbug.id, cell: glowbugCell, isAwake: isGlowbugAwake, isFreed: solvedStars === 3 } : null
           }
-          isLocked={isOver}
+          isLocked={isOver || isBetweenRounds}
+          smudge={boss ? { cell: boss.smudgeCell, isLit: litCells.has(boss.smudgeCell), isDefeated: trace.isSolved, hitKey: smudgeHits } : null}
+          roundChange={boss?.change ?? null}
           darkness={puzzle.darkness}
           darkMoves={puzzle.taps.length}
           mood={modifier}
@@ -832,7 +888,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
                 <HelperBar
                   helperIds={offeredHelpers}
                   inventory={progress.helpers}
-                  disabled={isOver}
+                  disabled={isOver || isBetweenRounds}
                   onUse={requestHelper}
                   nudgeId={isNudgingHint ? 'hint' : null}
                   freeIds={hasFreeHint ? ['hint'] : []}
@@ -960,7 +1016,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           showWinGifts={mode === 'level' && !isFirstSteps}
           challenge={mode === 'level' && !result.isSkipped && !isFirstSteps ? { levelId: level.id, levelLabel, moves: result.moves } : null}
           backName={backName}
-          replay={mode === 'playtest' || isFirstSteps ? null : { level: replayLevel, history: puzzle.history, title: levelName, subtitle }}
+          replay={mode === 'playtest' || isFirstSteps || boss ? null : { level: replayLevel, history: puzzle.history, title: levelName, subtitle }}
+          isBossFight={Boolean(boss)}
           result={result}
           par={level.par}
           difficulty={level.difficulty}

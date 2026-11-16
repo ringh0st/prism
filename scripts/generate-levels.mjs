@@ -1,10 +1,11 @@
 // Generates the built-in level pack: one JSON file per world in src/data/worlds/.
-// Run: npm run levels            (all worlds, in parallel)
-//      npm run levels -- 5 6 7   (only these worlds)
+// Run: npm run levels                      (all worlds, in parallel)
+//      npm run levels -- 5 6 7             (only these worlds)
+//      npm run levels -- --bosses 1 2 3    (only rebuild these worlds' boss fights, on their existing boss boards)
 //
 // For each level the generator searches for a while and keeps the hardest valid puzzle
 // it finds (highest par), stopping early once the target is reached.
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { cpus } from 'node:os';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { fileURLToPath } from 'node:url';
@@ -14,7 +15,9 @@ import { validateLevel } from '../src/game/levelSchema.js';
 import { PIECE_FIRST_LEVEL, piecesIn } from '../src/game/pieces.js';
 import { MAX_RANDOM_SOLVE_RATE, randomSolveRate, solvesWithoutPlanning } from '../src/game/levelQuality.js';
 import { REST_RECIPES } from '../src/game/recipes.js';
-import { difficultyFor, generatorPresetFor, levelId, LEVELS_PER_WORLD, WORLD_COUNT } from '../src/game/worlds.js';
+import { bossFightFor, difficultyFor, generatorPresetFor, levelId, LEVELS_PER_WORLD, WORLD_COUNT } from '../src/game/worlds.js';
+import { addBossPhases, withoutPhases } from '../src/game/bossBuilder.js';
+import { glowbugCellOf } from '../src/game/glowbugs.js';
 import { createRandom } from '../src/lib/random.js';
 import { addDarkness } from '../src/game/darknessBuilder.js';
 import { LEVEL_SCHEMA_VERSION } from '../src/game/constants.js';
@@ -23,6 +26,8 @@ const OUTPUT_DIR = new URL('../src/data/worlds/', import.meta.url);
 const TIME_BUDGET_MS = 4000;
 /** Boards a darkness level tries the darkness on (checking the safe orders takes a moment). */
 const MAX_DARK_TRIES = 150;
+/** Seeds a boss fight tries before the boss stays a single board. */
+const BOSS_SEEDS = 16;
 
 export const worldFileName = (world) => `world-${String(world).padStart(3, '0')}.json`;
 
@@ -100,6 +105,30 @@ function bestLevelFor(world, index) {
   return best;
 }
 
+/** The world's boss as a fight with Smudge in rounds (bossBuilder.js), when the world has one. */
+function withBossFight(level, world) {
+  const plan = bossFightFor(world);
+  if (level.index !== LEVELS_PER_WORLD || !plan) return level;
+  const board = withoutPhases(level);
+  // The round boards keep the boss's Glowbug cell free.
+  const glowbugCell = glowbugCellOf(board);
+  for (let seed = 0; seed < BOSS_SEEDS; seed++) {
+    const fight = addBossPhases(board, plan, createRandom(`prism-boss-${level.id}-${seed}`), new Set(glowbugCell === null ? [] : [glowbugCell]));
+    if (fight) return fight;
+  }
+  console.warn(`${level.id}: no boss fight found; it stays a single board`);
+  return board;
+}
+
+/** Rebuild only the boss fight of a world, on its existing boss board. */
+function rebuildBoss(world) {
+  const file = new URL(worldFileName(world), OUTPUT_DIR);
+  const levels = JSON.parse(readFileSync(file, 'utf8')).map((level) => (level.index === LEVELS_PER_WORLD ? withBossFight(level, world) : level));
+  writeFileSync(file, JSON.stringify(levels) + '\n');
+  const boss = levels.at(-1);
+  return `world ${String(world).padStart(2)}: boss ${boss.phases ? `fight in ${boss.phases.length} rounds, par ${boss.phases.map((phase) => phase.par).join(' + ')}` : `par ${boss.par}`}`;
+}
+
 function generateWorld(world) {
   const levels = [];
   for (let index = 1; index <= LEVELS_PER_WORLD; index++) {
@@ -110,7 +139,7 @@ function generateWorld(world) {
     if (problems.length || !check.isSolvable || check.par !== level.par) {
       throw new Error(`${levelId(world, index)} failed validation: ${problems.join(' ')}`);
     }
-    levels.push({
+    const built = {
       id: levelId(world, index),
       version: LEVEL_SCHEMA_VERSION,
       world,
@@ -123,7 +152,8 @@ function generateWorld(world) {
       tiles: level.tiles,
       ...(level.glooms ? { glooms: level.glooms } : {}),
       ...(level.eclipse ? { eclipse: level.eclipse } : {}),
-    });
+    };
+    levels.push(withBossFight(built, world));
   }
   writeFileSync(new URL(worldFileName(world), OUTPUT_DIR), JSON.stringify(levels) + '\n');
   const pars = levels.map((l) => l.par);
@@ -132,6 +162,7 @@ function generateWorld(world) {
 
 if (isMainThread) {
   mkdirSync(OUTPUT_DIR, { recursive: true });
+  const bossesOnly = process.argv.includes('--bosses');
   const requested = process.argv.slice(2).map(Number).filter(Boolean);
   const queue = requested.length ? requested : Array.from({ length: WORLD_COUNT }, (_, i) => i + 1);
   const workerCount = Math.min(cpus().length, queue.length);
@@ -140,7 +171,7 @@ if (isMainThread) {
     const world = queue.shift();
     if (world === undefined) return;
     active++;
-    const worker = new Worker(fileURLToPath(import.meta.url), { workerData: { world } });
+    const worker = new Worker(fileURLToPath(import.meta.url), { workerData: { world, bossesOnly } });
     worker.on('message', (line) => console.log(line));
     worker.on('error', (error) => {
       console.error(error);
@@ -154,5 +185,5 @@ if (isMainThread) {
   };
   for (let i = 0; i < workerCount; i++) startNext();
 } else {
-  parentPort.postMessage(generateWorld(workerData.world));
+  parentPort.postMessage(workerData.bossesOnly ? rebuildBoss(workerData.world) : generateWorld(workerData.world));
 }

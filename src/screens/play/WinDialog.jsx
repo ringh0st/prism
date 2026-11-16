@@ -24,6 +24,7 @@ import { cheerFor } from '../../game/palCheers.js';
 import LevelUp from './LevelUp.jsx';
 import ChallengeShare from './ChallengeShare.jsx';
 import TapIcon from './TapIcon.jsx';
+import { SmudgeArt } from '../../components/board/darkTileArt.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './WinDialog.module.css';
 import { palName } from '../../i18n/palText.js';
@@ -66,6 +67,7 @@ function ShareResult({ text }) {
  * replay: { level, history, title, subtitle } for the "Share replay" video (null to hide it).
  * challenge: { levelId, levelLabel, moves } for "Challenge a friend" (null to hide it).
  * cap: { stars, icon } when a helper (or Keep going) held the stars down, so the screen shows why.
+ * isBossFight: the level was a boss fight with Smudge (bossFight.js): he runs off, waving a little white flag.
  */
 export default function WinDialog({
   result,
@@ -78,6 +80,7 @@ export default function WinDialog({
   shareMessage = null,
   replay = null,
   challenge = null,
+  isBossFight = false,
   backName = 'map',
   onNext,
   onReplay,
@@ -124,6 +127,20 @@ export default function WinDialog({
         <p className={`game-title ${styles.milestone}`} aria-hidden="true">
           <Icon name="trophy" size={36} />
           <span dir="ltr">{milestone}</span>
+        </p>
+      )}
+      {isBossFight && !isSkipped && (
+        <p className={styles.smudgeBeaten}>
+          <span className={styles.smudgeRunning} aria-hidden="true">
+            <svg viewBox="0 0 100 100">
+              <path d="M78 64V14" stroke="#8a705c" strokeWidth="4" strokeLinecap="round" />
+              <path d="M80 14h20l-6 9 6 9H80z" fill="#fffaf2" stroke="#c9b9a4" strokeWidth="2" />
+              <g transform="translate(6 18) scale(0.8)">
+                <SmudgeArt isScared />
+              </g>
+            </svg>
+          </span>
+          <strong>{t('win.smudgeBeaten')}</strong>
         </p>
       )}
       <Stars count={stars} size={46} animate className={styles.stars} />

@@ -191,6 +191,25 @@ export const sfx = {
     tone(note(1), note(0) * 0.94, 0.5, { volume: 0.05, delay: 0.5, attack: 0.04 });
     feel('fail');
   },
+  /** A boss fight: the light hits Smudge (a soft "bonk"); his weakness, the light on him, rings twice. */
+  bossHit(isWeakness = false) {
+    tone(320, 180, 0.12, { type: 'triangle', volume: 0.06 });
+    bell(note(5), { delay: 0.06, volume: 0.06 });
+    if (isWeakness) bell(note(7), { delay: 0.16, volume: 0.07 });
+    feel(isWeakness ? 'success' : 'medium');
+  },
+  /** Smudge shuffles the board for the next round: his cheeky giggle and a swirl of air. */
+  bossRound() {
+    tone(260, 520, 0.4, { type: 'triangle', volume: 0.04, attack: 0.08 });
+    [0.3, 0.38, 0.46].forEach((delay, i) => tone(640 + i * 70, 700 + i * 70, 0.07, { type: 'triangle', volume: 0.04, delay }));
+    feel('medium');
+  },
+  /** Smudge is beaten: a puff, then a bright little run upward as the light comes back. */
+  bossDefeated() {
+    tone(900, 300, 0.25, { type: 'triangle', volume: 0.05 });
+    [0, 2, 4, 7].forEach((step, i) => bell(note(step + 3), { delay: 0.25 + i * 0.09, volume: 0.07 }));
+    feel('success');
+  },
   /** Out of moves: a kind "awww", sliding gently down. Never harsh. */
   outOfMoves() {
     bell(note(4), { volume: 0.08 });
