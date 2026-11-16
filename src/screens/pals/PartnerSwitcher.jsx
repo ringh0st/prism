@@ -6,7 +6,9 @@ import PalPowerBadge from '../../components/pals/PalPowerBadge.jsx';
 import { palPower } from '../../game/palPowers.js';
 import PalDetailDialog from './PalDetailDialog.jsx';
 import PalGuide from './PalGuide.jsx';
-import { readJson, writeJson } from '../../lib/storage.js';
+import GuideButton from '../../components/guide/GuideButton.jsx';
+import { useFirstTimeGuide } from '../../hooks/useFirstTimeGuide.js';
+import { readJson } from '../../lib/storage.js';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { palById, palStage, stageOf, unannouncedPals } from '../../game/pals.js';
 import { SEEN_PALS_KEY } from './PalUnlockNotice.jsx';
@@ -31,9 +33,7 @@ export default function PartnerSwitcher() {
   const { t, line, lang } = useI18n();
   const [isLooking, setIsLooking] = useState(false);
   // The first visit opens the guide, unless another notice (new Pals, a Lucky Pal) is up: then it waits for the next visit.
-  const [isGuideOpen, setIsGuideOpen] = useState(
-    () => !readJson(SEEN_GUIDE_KEY, false) && !player.luckyGift && unannouncedPals(progress, readJson(SEEN_PALS_KEY, [])).length === 0,
-  );
+  const guide = useFirstTimeGuide(SEEN_GUIDE_KEY, !player.luckyGift && unannouncedPals(progress, readJson(SEEN_PALS_KEY, [])).length === 0);
   const [moment, setMoment] = useState(null);
   const partner = palById(progress.pal.id);
   const outfit = progress.pal.wearing.join(',');
@@ -122,19 +122,9 @@ export default function PartnerSwitcher() {
           </button>
         )}
       </div>
-      <button type="button" className={`game-title ${styles.guide}`} onClick={() => setIsGuideOpen(true)} aria-label={t('palGuide.open')}>
-        ?
-      </button>
+      <GuideButton label={t('palGuide.open')} onOpen={guide.open} className={styles.guide} />
       {isLooking && <PalDetailDialog pal={partner} onClose={() => setIsLooking(false)} />}
-      {isGuideOpen && (
-        <PalGuide
-          pal={partner}
-          onClose={() => {
-            writeJson(SEEN_GUIDE_KEY, true);
-            setIsGuideOpen(false);
-          }}
-        />
-      )}
+      {guide.isOpen && <PalGuide pal={partner} onClose={guide.close} />}
     </section>
   );
 }

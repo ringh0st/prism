@@ -7,7 +7,10 @@ export const LEVEL_TIPS = [
   { id: 'stars', target: '[data-tour="meter"]', title: 'Fewer taps, more ★' },
   // Your partner Pal and the power it brings (only when one is helping).
   { id: 'pal', target: '[data-tour="pal"]', title: '{name} helps you: {power}', needsPal: true },
+  // A Glowbug napping on the board (no fixed target: the level screen points at its cell).
+  { id: 'glowbug', target: null, title: 'Light it up and get ★★★ to rescue it!', needsGlowbug: true },
 ];
 
 /** The tips still to show, in order. (Helpers are taught when the player gets stuck, not up front.) */
-export const unseenTips = (seenIds, { hasPal = false } = {}) => LEVEL_TIPS.filter((tip) => !seenIds.includes(tip.id) && (hasPal || !tip.needsPal));
+export const unseenTips = (seenIds, { hasPal = false, hasGlowbug = false } = {}) =>
+  LEVEL_TIPS.filter((tip) => !seenIds.includes(tip.id) && (hasPal || !tip.needsPal) && (hasGlowbug || !tip.needsGlowbug));

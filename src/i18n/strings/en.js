@@ -143,6 +143,8 @@ export const en = {
 
   'tip.stars.title': 'Fewer taps, more ★',
   'tip.pal.title': '{name} helps you: {power}',
+  'tip.glowbug.title': 'Light it up and get ★★★ to rescue it!',
+  'guide.done': 'Got it!',
 
   'skip.title': 'Skip this level?',
   'skip.text': 'You’ll get 1 star. You can come back for more stars any time.',

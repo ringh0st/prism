@@ -4,7 +4,9 @@ import BottomNav from '../../components/game/BottomNav.jsx';
 import Dialog from '../../components/Dialog.jsx';
 import Button from '../../components/Button.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
-import HelpTip from '../../components/game/HelpTip.jsx';
+import GuideButton from '../../components/guide/GuideButton.jsx';
+import GlowbugGuide from './GlowbugGuide.jsx';
+import { useFirstTimeGuide } from '../../hooks/useFirstTimeGuide.js';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { GLOWBUGS, GLOWBUG_KINDS, rescuedGlowbugs } from '../../game/glowbugs.js';
 import GlowbugRowPrize from './GlowbugRowPrize.jsx';
@@ -12,9 +14,13 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 import { glowbugBio, glowbugName, glowbugTitle } from '../../i18n/groveText.js';
 import styles from './GlowbugGarden.module.css';
 
+/** Remembers that "How Glowbugs work" was seen, so it opens by itself only on the first visit. */
+const SEEN_GUIDE_KEY = 'prism.seenGlowbugGuide.v1';
+
 /**
  * The Glowbug Garden: every Glowbug you've rescued (by three-starring the level it napped on), with the
- * ones still out there as gentle silhouettes (★ for rare ones). Tap a rescued one to meet it; "?" says how.
+ * ones still out there as gentle silhouettes (★ for rare ones). Tap a rescued one to meet it; "?" opens
+ * "How Glowbugs work" (GlowbugGuide), which also opens by itself on the first visit.
  * One row per kind (its 5 colors): a full row earns a diamond, collected at the row's end.
  */
 export default function GlowbugGarden() {
@@ -22,6 +28,7 @@ export default function GlowbugGarden() {
   const { t, lang } = useI18n();
   const [meeting, setMeeting] = useState(null);
   const [message, setMessage] = useState('');
+  const guide = useFirstTimeGuide(SEEN_GUIDE_KEY);
   const rescued = rescuedGlowbugs(progress.levels);
   const found = GLOWBUGS.filter((bug) => rescued.has(bug.id)).length;
   const meetingName = meeting && glowbugName(lang, meeting);
@@ -45,9 +52,7 @@ export default function GlowbugGarden() {
               {found}/{GLOWBUGS.length}
             </span>
           </div>
-          <HelpTip title={t('garden.title')}>
-            <p>{t('garden.how')}</p>
-          </HelpTip>
+          <GuideButton label={t('glowbugGuide.open')} onOpen={guide.open} />
         </section>
         {message && (
           <p className={styles.message} role="status">
@@ -99,6 +104,7 @@ export default function GlowbugGarden() {
           })}
         </ul>
       </main>
+      {guide.isOpen && <GlowbugGuide onClose={guide.close} />}
       <BottomNav active="pals" />
       {meeting && (
         <Dialog title={meetingName} tone="celebrate" onClose={() => setMeeting(null)}>

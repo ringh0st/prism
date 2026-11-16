@@ -586,7 +586,11 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
     const showsTips = ['level', 'daily', 'event'].includes(mode) && !isFirstSteps && pieceSteps.length === 0;
     const tipParams = palHelp ? { name: palName(lang, palHelp.pal), power: t(`power.${palHelp.id}.line`, { count: palHelp.amount }) } : {};
     const tipSteps = showsTips
-      ? unseenTips(readJson(SEEN_TIPS_KEY, []), { hasPal: Boolean(palHelp) }).map((tip) => ({ ...tip, title: t(`tip.${tip.id}.title`, tipParams) }))
+      ? unseenTips(readJson(SEEN_TIPS_KEY, []), { hasPal: Boolean(palHelp), hasGlowbug: glowbugCell !== null }).map((tip) => ({
+          ...tip,
+          target: tip.id === 'glowbug' ? `[data-cell="${glowbugCell}"]` : tip.target,
+          title: t(`tip.${tip.id}.title`, tipParams),
+        }))
       : [];
     return [...pieceSteps, ...tipSteps];
   };
@@ -654,7 +658,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       const line = used.includes('headStart') ? t('lumi.headStart') : streak >= 3 ? t('lumi.streak', { count: streak }) : t('lumi.boosters');
       setLumi({ mood: 'excited', line });
     });
-  }, [playStats, isFirstSteps, flavor, progress, newPieces, mode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [playStats, isFirstSteps, flavor, progress, newPieces, mode, palHelp, glowbugCell]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // First levels: a hand points at the next mirror to turn.
   const [isCoachDue, setIsCoachDue] = useState(level.index === 1);

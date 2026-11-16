@@ -145,6 +145,8 @@ export const he = {
 
   'tip.stars.title': 'פחות הקשות, יותר ★',
   'tip.pal.title': '{name} עוזר לכם: {power}',
+  'tip.glowbug.title': 'האירו אותו והשיגו ★★★ כדי להציל אותו!',
+  'guide.done': 'הבנתי!',
 
   'skip.title': 'לדלג על השלב?',
   'skip.text': 'תקבלו כוכב אחד. אפשר לחזור ולהשיג עוד כוכבים מתי שרוצים.',

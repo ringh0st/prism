@@ -1,5 +1,11 @@
 /* Texts for the grove screens, in every language. Keys match across en/es/he (a test checks). */
 export const en = {
+  'glowbugGuide.title': 'How Glowbugs work',
+  'glowbugGuide.nap': 'Glowbugs nap in some levels. Light wakes them up',
+  'glowbugGuide.rescue': 'Get ★★★ to bring it home to your Garden',
+  'glowbugGuide.row': 'All 5 colors of a kind: a diamond!',
+  'glowbugGuide.map': 'A sleeping Glowbug on the map shows where one waits',
+  'glowbugGuide.open': 'How Glowbugs work',
   'grove.title': 'The Grove',
   'grove.decorate': 'Decorate',
   'grove.decorateHelp': 'One piece per spot. Decor is yours forever, and you can swap any time.',
@@ -42,7 +48,6 @@ export const en = {
   'garden.title': 'Glowbug Garden',
   'garden.found': '{found} of {total} Glowbugs found',
   'garden.meter': 'Glowbugs found',
-  'garden.how': 'Glowbugs nap on some levels (look for them on the map). Get ★★★ there to rescue them. The rare ones hide in Hard and boss levels.',
   'garden.bugLabel': '{name} the {title}',
   'garden.bugLabelTimes': '{name} the {title}, rescued {times} times',
   'garden.missing': 'Not found yet',
@@ -58,6 +63,12 @@ export const en = {
 };
 
 export const es = {
+  'glowbugGuide.title': 'Cómo funcionan los bichitos de luz',
+  'glowbugGuide.nap': 'Duermen en algunos niveles. La luz los despierta',
+  'glowbugGuide.rescue': 'Consigue ★★★ para llevarlo a tu jardín',
+  'glowbugGuide.row': 'Los 5 colores de un tipo: ¡un diamante!',
+  'glowbugGuide.map': 'Un bichito dormido en el mapa marca dónde espera uno',
+  'glowbugGuide.open': 'Cómo funcionan los bichitos de luz',
   'grove.title': 'El Bosquecito',
   'grove.decorate': 'Decorar',
   'grove.decorateHelp': 'Una pieza por lugar. Las decoraciones son tuyas para siempre y puedes cambiarlas cuando quieras.',
@@ -100,8 +111,6 @@ export const es = {
   'garden.title': 'Jardín de bichitos de luz',
   'garden.found': '{found} de {total} bichitos de luz encontrados',
   'garden.meter': 'Bichitos de luz encontrados',
-  'garden.how':
-    'Los bichitos de luz duermen la siesta en algunos niveles (búscalos en el mapa). Consigue ★★★ allí para rescatarlos. Los raros se esconden en los niveles difíciles y de jefe.',
   'garden.bugLabel': '{name}, {title}',
   'garden.bugLabelTimes': '{name}, {title}, rescatado {times} veces',
   'garden.missing': 'Aún no encontrado',
@@ -196,6 +205,12 @@ export const es = {
 };
 
 export const he = {
+  'glowbugGuide.title': 'איך הזוהרונים עובדים',
+  'glowbugGuide.nap': 'זוהרונים מנמנמים בחלק מהשלבים. האור מעיר אותם',
+  'glowbugGuide.rescue': 'השיגו ★★★ כדי להביא אותו הביתה לגן',
+  'glowbugGuide.row': 'כל 5 הצבעים של סוג אחד: יהלום!',
+  'glowbugGuide.map': 'זוהרון ישן במפה מראה איפה מחכה אחד',
+  'glowbugGuide.open': 'איך הזוהרונים עובדים',
   'grove.title': 'החורשה',
   'grove.decorate': 'לקשט',
   'grove.decorateHelp': 'קישוט אחד בכל מקום. הקישוטים שלכם לתמיד, ואפשר להחליף מתי שרוצים.',
@@ -238,7 +253,6 @@ export const he = {
   'garden.title': 'גן הזוהרונים',
   'garden.found': 'נמצאו {found} מתוך {total} זוהרונים',
   'garden.meter': 'זוהרונים שנמצאו',
-  'garden.how': 'זוהרונים מנמנמים בחלק מהשלבים (חפשו אותם במפה). השיגו שם ★★★ כדי להציל אותם. הנדירים מתחבאים בשלבים קשים ובשלבי בוס.',
   'garden.bugLabel': '{name}, {title}',
   'garden.bugLabelTimes': '{name}, {title}, הצלתם אותו {times} פעמים',
   'garden.missing': 'עוד לא נמצא',
