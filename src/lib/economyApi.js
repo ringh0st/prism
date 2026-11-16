@@ -105,6 +105,12 @@ export const fetchMyQuests = () => rpc('my_quests');
 
 export const claimQuestOnServer = (questId) => rpc('claim_pal_quest', { p_quest: questId });
 
+/** Daily missions (supabase/daily_missions.sql): today's counts since the player's midnight, and collecting one. */
+export const fetchMyDailyMissions = (dateKey, since) => rpc('my_daily_missions', { p_date: dateKey, p_since: since });
+
+export const claimDailyMissionOnServer = (missionId, dateKey, since) =>
+  rpc('claim_daily_mission', { p_mission: missionId, p_date: dateKey, p_since: since });
+
 /** Light Rush (supabase/rush.sql): a run's puzzles cleared (pays new milestones), this week's record, and the board. */
 export const recordRushRunOnServer = (cleared) => rpc('record_rush_run', { p_cleared: cleared });
 

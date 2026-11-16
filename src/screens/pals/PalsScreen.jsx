@@ -6,9 +6,12 @@ import PartnerSwitcher from './PartnerSwitcher.jsx';
 import PalTeam from './PalTeam.jsx';
 import PalWardrobe from './PalWardrobe.jsx';
 import PalQuests from './PalQuests.jsx';
+import DailyMissions from './DailyMissions.jsx';
 import GroveHome from '../grove/GroveHome.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { isQuestReady, questLogFor, questsForWeek, questWeekOf } from '../../game/quests.js';
+import { readyMissionCount } from '../../game/dailyMissions.js';
+import { todayKey } from '../../game/daily.js';
 import styles from './PalsScreen.module.css';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 
@@ -16,16 +19,16 @@ const TAB_IDS = ['team', 'wardrobe', 'grove', 'quests'];
 
 /**
  * Everything about your Pals: your partner on top, then tabs (pinned while scrolling) for the team,
- * the wardrobe, the Grove and this week's quests. The tab is in the address (#/pals/wardrobe), so links
+ * the wardrobe, the Grove, and today's missions with this week's quests. The tab is in the address (#/pals/wardrobe), so links
  * can open one directly.
  */
 export default function PalsScreen({ initialTab }) {
-  const { progress } = usePlayer();
+  const { progress, isSignedIn } = usePlayer();
   const { t } = useI18n();
   const [tab, setTab] = useState(TAB_IDS.includes(initialTab) ? initialTab : 'team');
   const week = questWeekOf();
   const log = questLogFor(progress, week);
-  const questsReady = questsForWeek(week).filter((quest) => isQuestReady(log, quest)).length;
+  const questsReady = questsForWeek(week).filter((quest) => isQuestReady(log, quest)).length + readyMissionCount(progress, todayKey(), isSignedIn);
 
   const choose = (id) => {
     setTab(id);
@@ -55,7 +58,12 @@ export default function PalsScreen({ initialTab }) {
           {tab === 'team' && <PalTeam />}
           {tab === 'wardrobe' && <PalWardrobe />}
           {tab === 'grove' && <GroveHome />}
-          {tab === 'quests' && <PalQuests />}
+          {tab === 'quests' && (
+            <>
+              <DailyMissions />
+              <PalQuests />
+            </>
+          )}
         </div>
       </main>
       <BottomNav active="pals" />

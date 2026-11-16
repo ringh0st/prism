@@ -59,6 +59,7 @@ export const es = {
   'map.extra.daily': 'Diario',
   'map.extra.event': 'Evento',
   'map.extra.rush': 'Carrera',
+  'map.extra.missions': 'Hoy',
   'map.sign.stars.one': '{count} de {total} estrellas',
   'map.sign.stars.other': '{count} de {total} estrellas',
 
@@ -85,7 +86,7 @@ export const es = {
   'intro.challenge.other': '¡Supera {count} movimientos!',
   'intro.rush.one': 'Te queda {count} movimiento extra',
   'intro.rush.other': 'Te quedan {count} movimientos extra',
-  'intro.smudge': "¡Oh no, es Smudge! Está robando la luz. ¡Quema sus sombras con tus rayos!",
+  'intro.smudge': '¡Oh no, es Smudge! Está robando la luz. ¡Quema sus sombras con tus rayos!',
   'intro.sticker.hard': 'NIVEL DIFÍCIL',
   'intro.sticker.extra': '¡NIVEL EXTRA DIFÍCIL!',
   'intro.sticker.boss': '¡NIVEL JEFE!',

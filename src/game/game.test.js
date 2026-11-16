@@ -813,6 +813,76 @@ test('Pal quests: three a week, counted per level, paid once, and the same on th
   }
 });
 
+test('daily missions: three a day the player can do, kept all day, counted per level, paid once with a bonus', async () => {
+  const missions = await import('./dailyMissions.js');
+  const solvedLevels = (n) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`w1-${String(i + 1).padStart(2, '0')}`, { stars: 1 }]));
+  const ids = (date, solved, isSignedIn = false) => missions.dailyMissionIdsFor(date, { solved, isSignedIn });
+
+  assert.deepEqual(ids('2026-11-16', 2), [], 'nothing before the map extras show up');
+  assert.deepEqual(ids('2026-11-16', 3), ['solve4', 'daily1', 'perfect2'], 'no Hard mission before a Hard level is reached');
+  assert.deepEqual(ids('2026-11-16', 6), ['solve4', 'hard1', 'daily1']);
+  assert.deepEqual(ids('2026-11-21', 50), ['solve3', 'combo1', 'present1']);
+  assert.deepEqual(ids('2026-11-21', 50, true), ['solve3', 'glowbug1', 'hard1'], 'accounts only get missions the server counts');
+  for (let day = 0; day < 120; day++) {
+    const date = new Date(Date.UTC(2026, 0, 1 + day)).toISOString().slice(0, 10);
+    for (const solved of [3, 4, 6, 50]) {
+      const today = ids(date, solved).map(missions.missionById);
+      assert.equal(today.length, 3, `${date} ${solved}`);
+      assert.equal(today[0].kind, 'solved');
+      assert.equal(new Set(today.map((m) => m.kind)).size, 3, 'three different kinds');
+      assert.ok(today.every((m) => solved >= m.minSolved));
+    }
+  }
+
+  const today = '2026-11-16';
+  let progress = { sparks: 0, levels: solvedLevels(3), daily: { lastDate: null }, presents: { opened: 0 }, missions: null };
+  assert.deepEqual(missions.missionLogFor(progress, today).missions, ['solve4', 'daily1', 'perfect2']);
+  progress = missions.startMissionDay(progress, today);
+  // Reaching a Hard level later today doesn't change today's three.
+  progress = { ...progress, levels: solvedLevels(10) };
+  assert.deepEqual(missions.missionLogFor(progress, today).missions, ['solve4', 'daily1', 'perfect2']);
+  for (const [id, bestStars, combo] of [
+    ['w1-05', 3, 2],
+    ['w1-05', 3, 0],
+    ['daily-x', 3, 0],
+    ['w1-07', 3, 0],
+    ['w1-08', 1, 0],
+  ])
+    progress = missions.recordMissionLevel(progress, id, { bestStars, combo }, today);
+  const log = missions.missionLogFor(progress, today);
+  assert.deepEqual([log.solved.length, log.perfect.length, log.hard.length, log.glowbug.length, log.combo.length], [3, 2, 1, 1, 1]);
+  assert.equal(missions.readyMissionCount(progress, today), 1, 'only ★★★ ×2 is done');
+  assert.throws(() => missions.claimMissionLocally(progress, 'solve4', today));
+  assert.throws(() => missions.claimMissionLocally(progress, 'hard1', today), 'not on today’s list');
+  let claimed = missions.claimMissionLocally(progress, 'perfect2', today);
+  assert.deepEqual(claimed.gift, { sparks: 15 });
+  progress = claimed.progress;
+  assert.throws(() => missions.claimMissionLocally(progress, 'perfect2', today), 'paid once');
+  progress = missions.recordMissionLevel({ ...progress, daily: { lastDate: today } }, 'w1-09', { bestStars: 2 }, today);
+  progress = missions.claimMissionLocally(progress, 'daily1', today).progress;
+  claimed = missions.claimMissionLocally(progress, 'solve4', today);
+  assert.deepEqual(claimed.gift, { sparks: 20 + missions.MISSIONS_BONUS_SPARKS }, 'the last one brings the bonus');
+  assert.equal(claimed.progress.sparks, 15 + 15 + 20 + missions.MISSIONS_BONUS_SPARKS);
+  assert.equal(missions.missionLogFor(claimed.progress, '2026-11-17').claimed.length, 0, 'a new day starts fresh');
+  const opened = missions.recordMissionPresent(
+    { ...missions.startMissionDay(claimed.progress, '2026-11-21'), presents: { opened: 4 } },
+    '2026-11-21',
+  );
+  assert.equal(missions.missionLogFor(opened, '2026-11-21').present.length, 1);
+
+  // The server has the same missions (without the guests-only ones), bonus and draw.
+  const sql = readFileSync(new URL('../../supabase/daily_missions.sql', import.meta.url), 'utf8');
+  missions.DAILY_MISSIONS.forEach((m, pos) => {
+    const row = `(${pos}, '${m.id}', '${m.kind}', ${m.target}, ${m.sparks}, ${m.minSolved})`;
+    if (m.guestOnly) assert.ok(!sql.includes(`'${m.id}'`), `${m.id} is for guests only`);
+    else assert.ok(sql.includes(row), row);
+  });
+  assert.match(sql, new RegExp(`select ${missions.MISSIONS_BONUS_SPARKS};`));
+  assert.match(sql, new RegExp(`if p_solved < ${missions.MISSIONS_AFTER_LEVELS} then`));
+  assert.match(sql, /\(\(v_day \+ 1\) \* \(2 \* p\.pos \+ 1\) \* 2654435761\) % 4294967296, p\.pos/);
+  assert.match(sql, /p_day - date '2025-12-31'/);
+});
+
 test('the solve replay plays the winning taps back in order and ends solved', async () => {
   const { replayTimeline, replayStateAt, replayDuration, REPLAY_TIMING } = await import('./replay.js');
   const { nearestSolution } = await import('./solver.js');
