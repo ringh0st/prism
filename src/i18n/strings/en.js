@@ -63,6 +63,7 @@ export const en = {
   'map.extra.daily': 'Daily',
   'map.extra.event': 'Event',
   'map.extra.rush': 'Rush',
+  'map.extra.missions': 'Today',
   'map.sign.stars.one': '{count} of {total} stars',
   'map.sign.stars.other': '{count} of {total} stars',
 

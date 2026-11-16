@@ -1,0 +1,152 @@
+/* Today's three daily missions */
+.card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--highlight), var(--shadow-md);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.title {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 20px;
+}
+
+/* The bonus for all three: a gift, a dot per mission (filled once collected) and its sparks */
+.bonus {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.bonusDone {
+  color: var(--action-label);
+  background: var(--action-bottom);
+}
+
+.bonusDots {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.dot,
+.dotDone {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+
+.dotDone {
+  background: currentColor;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mission {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 6px;
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+}
+
+.ready {
+  background: color-mix(in srgb, var(--color-honey) 30%, var(--surface-raised));
+}
+
+.claimed {
+  opacity: 0.7;
+}
+
+.ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+}
+
+.ring > svg {
+  position: absolute;
+  inset: 0;
+}
+
+.ringTrack,
+.ringFill {
+  fill: none;
+  stroke-width: 7;
+}
+
+.ringTrack {
+  stroke: color-mix(in srgb, var(--text-strong) 10%, transparent);
+}
+
+.ringFill {
+  stroke: var(--color-sage);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 600ms var(--ease-out);
+}
+
+.ready .ringFill {
+  stroke: var(--color-honey);
+}
+
+.ringIcon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  color: var(--text-strong);
+}
+
+.count {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  min-height: 40px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-soft);
+}
+
+.paid {
+  color: var(--text-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ringFill {
+    transition: none;
+  }
+}

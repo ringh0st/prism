@@ -123,6 +123,8 @@ export const en = {
   'ui.error.finishChest': 'Finish the levels before this chest to open it.',
   'ui.error.questNotDone': 'This quest isn’t finished yet.',
   'ui.error.questNotListed': 'That quest isn’t on this week’s list.',
+  'ui.error.missionNotDone': 'This mission isn’t finished yet.',
+  'ui.error.missionNotListed': 'That mission isn’t on today’s list.',
   'ui.error.dailyUnavailable': 'That daily puzzle is not available.',
 
   'ui.hud.open': 'Open the store',
@@ -141,6 +143,8 @@ export const en = {
   'ui.daily.labelStreak': 'Daily puzzle: a new puzzle and reward are waiting, {n} day streak',
   'ui.event.label': 'Weekend event: {name}, {solved} of {total} puzzles solved',
   'ui.rush.label': 'Light Rush: best run this week {best} of {total}',
+  'ui.missions.label.one': '{count} daily mission ready to collect',
+  'ui.missions.label.other': '{count} daily missions ready to collect',
 
   'ui.notFound.title': 'Nothing to see here',
   'ui.notFound.text': 'This level doesn’t exist, or it hasn’t been published yet.',
@@ -342,6 +346,8 @@ export const es = {
   'ui.error.finishChest': 'Termina los niveles antes de este cofre para abrirlo.',
   'ui.error.questNotDone': 'Esta misión aún no está terminada.',
   'ui.error.questNotListed': 'Esa misión no está en la lista de esta semana.',
+  'ui.error.missionNotDone': 'Esta misión de hoy aún no está terminada.',
+  'ui.error.missionNotListed': 'Esa misión no está en la lista de hoy.',
   'ui.error.dailyUnavailable': 'Ese puzle diario no está disponible.',
 
   'ui.hud.open': 'Abrir la tienda',
@@ -360,6 +366,8 @@ export const es = {
   'ui.daily.labelStreak': 'Puzzle del día: te esperan un puzzle nuevo y un premio, racha de {n} días',
   'ui.event.label': 'Evento de fin de semana: {name}, {solved} de {total} puzzles resueltos',
   'ui.rush.label': 'Carrera de luz: mejor carrera de esta semana {best} de {total}',
+  'ui.missions.label.one': '{count} misión de hoy lista para cobrar',
+  'ui.missions.label.other': '{count} misiones de hoy listas para cobrar',
 
   'ui.notFound.title': 'Aquí no hay nada',
   'ui.notFound.text': 'Este nivel no existe o todavía no se ha publicado.',
@@ -563,6 +571,8 @@ export const he = {
   'ui.error.finishChest': 'סיימו את השלבים שלפני התיבה כדי לפתוח אותה.',
   'ui.error.questNotDone': 'המשימה הזאת עוד לא הושלמה.',
   'ui.error.questNotListed': 'המשימה הזאת לא ברשימה של השבוע.',
+  'ui.error.missionNotDone': 'המשימה היומית הזאת עוד לא הושלמה.',
+  'ui.error.missionNotListed': 'המשימה הזאת לא ברשימה של היום.',
   'ui.error.dailyUnavailable': 'חידת היום הזאת לא זמינה.',
 
   'ui.hud.open': 'פתיחת החנות',
@@ -581,6 +591,8 @@ export const he = {
   'ui.daily.labelStreak': 'חידת היום: חידה חדשה ופרס מחכים לכם, רצף של {n} ימים',
   'ui.event.label': 'אירוע סוף שבוע: {name}, נפתרו {solved} מתוך {total} חידות',
   'ui.rush.label': 'מרתון האור: המרתון הכי טוב השבוע, {best} מתוך {total}',
+  'ui.missions.label.one': 'משימה יומית אחת מוכנה לאיסוף',
+  'ui.missions.label.other': '{count} משימות יומיות מוכנות לאיסוף',
 
   'ui.notFound.title': 'אין כאן כלום',
   'ui.notFound.text': 'השלב הזה לא קיים, או שעוד לא פורסם.',

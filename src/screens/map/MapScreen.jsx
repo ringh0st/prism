@@ -13,6 +13,7 @@ import DailyGift from '../../components/game/DailyGift.jsx';
 import DailyButton from '../../components/game/DailyButton.jsx';
 import InstallButton from '../../components/install/InstallButton.jsx';
 import RushButton from '../../components/game/RushButton.jsx';
+import MissionsButton from '../../components/game/MissionsButton.jsx';
 import EventButton from '../../components/game/EventButton.jsx';
 import PresentButton from '../../components/gifts/PresentButton.jsx';
 import PalPresent from '../../components/gifts/PalPresent.jsx';
@@ -139,6 +140,7 @@ export default function MapScreen() {
           {solvedCount >= EXTRAS_AFTER_LEVELS && (
             <>
               <DailyButton />
+              <MissionsButton />
               <EventButton />
               <RushButton />
               <PresentButton />

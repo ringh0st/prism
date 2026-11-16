@@ -59,6 +59,7 @@ export const he = {
   'map.extra.daily': 'יומי',
   'map.extra.event': 'אירוע',
   'map.extra.rush': 'מרתון',
+  'map.extra.missions': 'היום',
   'map.sign.stars.one': '{count} מתוך {total} כוכבים',
   'map.sign.stars.other': '{count} מתוך {total} כוכבים',
 
@@ -85,7 +86,7 @@ export const he = {
   'intro.challenge.other': 'נצחו {count} מהלכים!',
   'intro.rush.one': 'נשאר מהלך רזרבה אחד',
   'intro.rush.other': 'נשארו {count} מהלכי רזרבה',
-  'intro.smudge': "אוי לא, זה כתמון! הוא גונב את האור. שרפו את הצללים שלו בקרני האור!",
+  'intro.smudge': 'אוי לא, זה כתמון! הוא גונב את האור. שרפו את הצללים שלו בקרני האור!',
   'intro.sticker.hard': 'שלב קשה',
   'intro.sticker.extra': 'שלב קשה במיוחד!',
   'intro.sticker.boss': 'שלב בוס!',

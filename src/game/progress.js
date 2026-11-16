@@ -55,6 +55,8 @@ export function createEmptyProgress() {
     treatsFed: 0,
     // This week's Pal quests: { week, solved, perfect, hard, claimed } (see quests.js).
     quests: null,
+    // Today's daily missions: { date, missions, solved, perfect, hard, glowbug, combo, present, claimed } (see dailyMissions.js).
+    missions: null,
     // This week's Light Rush best and paid milestones: { week, best, paid } (see rush.js).
     rush: null,
     // A guest's number for their daily Shop picks (accounts use their id instead).
@@ -255,6 +257,7 @@ export function withServerState(progress, state, today) {
     luckyPals: { claimed: state.luckyPalsClaimed ?? progress.luckyPals.claimed },
     events: state.events ?? progress.events,
     quests: state.quests ?? progress.quests,
+    missions: state.missions ?? progress.missions,
     rush: state.rush ?? progress.rush,
   };
 }

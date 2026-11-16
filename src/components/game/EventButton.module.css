@@ -53,3 +53,32 @@
   color: var(--warm-label);
   background: var(--warm-bottom);
 }
+
+/* A daily mission is ready: a sage tile that gently pulses (still for reduced motion) */
+.missions {
+  color: var(--action-label);
+  background: var(--action-bottom);
+  animation: missions-ready 2.4s var(--ease-out) infinite;
+}
+
+.missions .count {
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+@keyframes missions-ready {
+  0%,
+  80%,
+  100% {
+    transform: scale(1);
+  }
+  88% {
+    transform: scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .missions {
+    animation: none;
+  }
+}
