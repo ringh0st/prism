@@ -22,12 +22,12 @@ export function makeBeam(level, segment) {
   const tube = new THREE.Group();
   // A wide soft glow and a nearer one (light flowing along both), a solid golden body and a white-hot core.
   const glows = [
-    glowMaterial(color, { opacity: 0.75, sharpness: 2.6, flow: 0.45, length }),
-    glowMaterial(color.clone().lerp(new THREE.Color('#ffffff'), 0.3), { opacity: 0.9, sharpness: 1.1, flow: 0.3, length }),
+    glowMaterial(color, { opacity: 0.42, sharpness: 2.2, flow: 0.45, length, additive: false }),
+    glowMaterial(color, { opacity: 0.75, sharpness: 1.1, flow: 0.3, length, additive: false }),
   ];
   const layers = [
-    { radius: 0.26, material: glows[0] },
-    { radius: 0.11, material: glows[1] },
+    { radius: 0.2, material: glows[0] },
+    { radius: 0.1, material: glows[1] },
     { radius: 0.055, material: new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.95, depthWrite: false }) },
     { radius: 0.026, material: new THREE.MeshBasicMaterial({ color: '#ffffff', depthWrite: false, transparent: true }) },
   ];
@@ -48,9 +48,10 @@ export function makeBeam(level, segment) {
   group.add(tube);
   // Sparks: about two per cell, spaced evenly, moving from the lamp's side to the far end.
   const sparks = [];
-  const count = Math.max(1, Math.round(length * 1.6));
+  // Pulses of light: about one per cell, bright dots travelling the light's way (the design guide's "pulsing").
+  const count = Math.max(1, Math.round(length * 0.9));
   for (let n = 0; n < count; n++) {
-    const sprite = glowSprite(color.clone().lerp(new THREE.Color('#ffffff'), 0.6), 0.16, 0.95);
+    const sprite = glowSprite(color.clone().lerp(new THREE.Color('#ffffff'), 0.7), 0.26, 1);
     group.add(sprite);
     sparks.push({ sprite, phase: n / count });
   }

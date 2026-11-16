@@ -12,6 +12,7 @@ import { FRAGILE_TURNS } from '../../game/constants.js';
 import { addShadowed, darkenedColor, glowSprite, makeFog, makePiece, mat } from './elements/index.js';
 import { starSprite } from './lightMaterials.js';
 import { makeBeam, place } from './elements/beam.js';
+import { breathe } from './elements/style.js';
 import { TILE } from '../../game/constants.js';
 
 /** The flat board's colors (Board3D reads the world's own from its CSS; these are World 1's). */
@@ -272,7 +273,7 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
       }
     }
     pieces.forEach((piece, i) => {
-      if (piece.lampGlow && !calm) piece.lampGlow.material.opacity = 0.7 + Math.sin(time * 3 + i) * 0.2;
+      if (piece.lampGlow && !calm) piece.lampGlow.material.opacity = 0.65 + 0.3 * breathe(time, i);
       if (piece.gemGlow && litGems.has(i) && !calm) {
         // A brief swell as the gem fills with light, then a gentle shimmer.
         const since = time - (piece.litAt ?? -10);

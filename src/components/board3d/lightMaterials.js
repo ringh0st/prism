@@ -6,10 +6,11 @@
 import * as THREE from 'three';
 
 /**
- * A soft glow for a tube or cone along its length (uv.y runs along it). `flow` makes bands of light run along it.
+ * A soft glow for a tube or cone along its length (uv.y runs along it). `flow` makes bands of light run along it;
+ * `additive` adds the light (brighter, whiter) rather than tinting.
  * The returned material's `uniforms.time` is advanced by the scene.
  */
-export function glowMaterial(color, { opacity = 1, sharpness = 1.6, flow = 0, length = 1 } = {}) {
+export function glowMaterial(color, { opacity = 1, sharpness = 1.6, flow = 0, length = 1, additive = true } = {}) {
   return new THREE.ShaderMaterial({
     uniforms: {
       color: { value: new THREE.Color(color) },
@@ -47,7 +48,8 @@ export function glowMaterial(color, { opacity = 1, sharpness = 1.6, flow = 0, le
       }`,
     transparent: true,
     depthWrite: false,
-    blending: THREE.AdditiveBlending,
+    // Added light brightens; on the pale tiles plain blending keeps a glow its own color instead of white.
+    blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
     side: THREE.DoubleSide,
   });
 }
