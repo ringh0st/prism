@@ -9,18 +9,16 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { cellsOnBeams, isRotatable } from '../../game/beam.js';
 import { FRAGILE_TURNS } from '../../game/constants.js';
-import { BEAM_HEIGHT, BEAM_HEX, addShadowed, darkenedColor, glowSprite, makeFog, makePiece, mat } from './boardPieces.js';
-import { glowMaterial, starSprite } from './lightMaterials.js';
+import { addShadowed, darkenedColor, glowSprite, makeFog, makePiece, mat } from './elements/index.js';
+import { starSprite } from './lightMaterials.js';
+import { makeBeam, place } from './elements/beam.js';
 import { TILE } from '../../game/constants.js';
 
 /** The flat board's colors (Board3D reads the world's own from its CSS; these are World 1's). */
 export const DEFAULT_THEME = { board: '#c6d9b4', cell: '#f3f6ea', cellAlt: '#e2ecd8', honey: '#f0c14e', piece: '#3f8a64', pivot: '#9fcf9a' };
 
-/** Cell (x, y) to the table's coordinates: x to the right, z towards the player. */
 /** Pieces that turn the light: a beam that ends on one flashes there. */
 const TURNING_TILES = new Set([TILE.MIRROR, TILE.SPLITTER, TILE.PRISM, TILE.PORTAL]);
-
-const place = (level, x, y) => new THREE.Vector3(x - level.width / 2 + 0.5, 0, y - level.height / 2 + 0.5);
 
 /** The tray in the world's board color, with a rounded tile on every cell (kept to warm them where light passes). */
 function makeTable(level, theme) {
@@ -45,54 +43,6 @@ function makeTable(level, theme) {
     }
   }
   return { group, plates };
-}
-
-/**
- * A beam between two cell centres: a bright white core inside golden light, with a pool of its light on the
- * tiles and little sparks travelling the way the light goes (the scene moves them). Returns { group, sparks }.
- */
-function makeBeam(level, segment) {
-  const from = place(level, segment.x1, segment.y1).setY(BEAM_HEIGHT);
-  const to = place(level, segment.x2, segment.y2).setY(BEAM_HEIGHT);
-  const length = from.distanceTo(to) + 0.06;
-  const group = new THREE.Group();
-  const color = new THREE.Color(BEAM_HEX[segment.color] ?? BEAM_HEX.sun);
-  const tube = new THREE.Group();
-  // A wide soft glow and a nearer one (light flowing along both), a solid golden body and a white-hot core.
-  const glows = [
-    glowMaterial(color, { opacity: 0.75, sharpness: 2.6, flow: 0.45, length }),
-    glowMaterial(color.clone().lerp(new THREE.Color('#ffffff'), 0.3), { opacity: 0.9, sharpness: 1.1, flow: 0.3, length }),
-  ];
-  const layers = [
-    { radius: 0.26, material: glows[0] },
-    { radius: 0.11, material: glows[1] },
-    { radius: 0.055, material: new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.95, depthWrite: false }) },
-    { radius: 0.026, material: new THREE.MeshBasicMaterial({ color: '#ffffff', depthWrite: false, transparent: true }) },
-  ];
-  for (const layer of layers) {
-    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(layer.radius, layer.radius, length, 20, 1, true), layer.material);
-    mesh.rotation.z = Math.PI / 2;
-    tube.add(mesh);
-  }
-  const pool = new THREE.Mesh(
-    new THREE.PlaneGeometry(length, 0.5),
-    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.16, depthWrite: false }),
-  );
-  pool.rotation.x = -Math.PI / 2;
-  pool.position.y = 0.03 - BEAM_HEIGHT;
-  tube.add(pool);
-  tube.position.copy(from).lerp(to, 0.5);
-  tube.rotation.y = -Math.atan2(to.z - from.z, to.x - from.x);
-  group.add(tube);
-  // Sparks: about two per cell, spaced evenly, moving from the lamp's side to the far end.
-  const sparks = [];
-  const count = Math.max(1, Math.round(length * 1.6));
-  for (let n = 0; n < count; n++) {
-    const sprite = glowSprite(color.clone().lerp(new THREE.Color('#ffffff'), 0.6), 0.16, 0.95);
-    group.add(sprite);
-    sparks.push({ sprite, phase: n / count });
-  }
-  return { group, sparks, from, to, length, glows, color };
 }
 
 /** A creeping shadow's trail to its gem: dark footprints that fade further along. */
