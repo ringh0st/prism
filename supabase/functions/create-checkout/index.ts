@@ -11,8 +11,9 @@ const STRIPE_API_VERSION = '2026-04-22.dahlia';
 
 // Players may only be sent back to the game's own site after paying (the old GitHub address still works).
 const ALLOWED_RETURN_PREFIXES = ['https://lumipals.app/', 'https://ringh0st.github.io/prism/'];
-const DEFAULT_RETURN_URL = 'https://lumipals.app/play/#/store/thanks';
-const CANCEL_URL = 'https://lumipals.app/play/#/store';
+// The game turns ?checkout=… into its store route (src/lib/checkoutReturn.js); a #fragment can get lost on the way.
+const DEFAULT_RETURN_URL = 'https://lumipals.app/play/?checkout=thanks';
+const CANCEL_URL = 'https://lumipals.app/play/?checkout=cancel';
 
 type Pack = { id: string; variant_id: string | null; stripe_price_id: string | null };
 type Buyer = { id: string; email?: string };

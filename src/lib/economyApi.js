@@ -1,5 +1,6 @@
 import { supabase } from './supabase.js';
 import { EconomyError } from '../game/progress.js';
+import { checkoutReturnUrl } from './checkoutReturn.js';
 
 /** The message for a request that never reached the server. */
 export const OFFLINE_MESSAGE = 'You seem to be offline. Please try again.';
@@ -85,7 +86,7 @@ export async function saveBeamTheme(userId, themeId) {
 
 /** Starts a real-money checkout and returns the payment page URL. */
 export async function startDiamondCheckout(packId) {
-  const returnUrl = `${window.location.origin}${window.location.pathname}#/store/thanks`;
+  const returnUrl = checkoutReturnUrl('thanks');
   const { data, error } = await supabase.functions.invoke('create-checkout', { body: { packId, returnUrl } });
   if (error || !data?.url) throw new EconomyError('Checkout isn’t available right now. Please try again later.');
   return data.url;

@@ -29,6 +29,7 @@ import LuckyPalDialog from './screens/pals/LuckyPalDialog.jsx';
 import NotFoundScreen from './screens/NotFoundScreen.jsx';
 import LoadingScreen from './screens/LoadingScreen.jsx';
 import SplashScreen from './components/splash/SplashScreen.jsx';
+import { isCheckoutThanks } from './lib/checkoutReturn.js';
 import { SplashContext } from './state/SplashContext.jsx';
 import { dailyLevelFor, todayKey } from './game/daily.js';
 import { BEAM_THEMES, starsFor } from './game/progress.js';
@@ -144,12 +145,12 @@ function Routes() {
   }
 }
 
-/** The splash shows once each time the game opens (not for admin test plays); the game loads underneath. */
+/** The splash shows once each time the game opens (not for admin test plays or back from paying); the game loads underneath. */
 const SKIP_SPLASH_ROUTES = ['admin', 'test'];
 
 export default function App() {
   const route = useHashRoute();
-  const [showsSplash, setShowsSplash] = useState(() => !SKIP_SPLASH_ROUTES.includes(route.name));
+  const [showsSplash, setShowsSplash] = useState(() => !SKIP_SPLASH_ROUTES.includes(route.name) && !isCheckoutThanks(route));
   const hideSplash = useCallback(() => setShowsSplash(false), []);
 
   // Browsers only allow audio after a user gesture.

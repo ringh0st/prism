@@ -16,9 +16,12 @@ import App from './App.jsx';
 import { startAutoUpdate } from './lib/autoUpdate.js';
 import { isNativeApp } from './lib/platform.js';
 import { listenForInstallPrompt } from './lib/installApp.js';
+import { applyCheckoutReturn } from './lib/checkoutReturn.js';
 
 // Catch the browser's install offer early, for the Home Screen helper.
 listenForInstallPrompt();
+// Back from a payment page: open the store's thank-you screen.
+applyCheckoutReturn();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
