@@ -157,17 +157,17 @@ export function Accessory({ id, hat, neck }) {
  * it scales around the floor together with the outfit, which is drawn for the shared stage.
  */
 /**
- * Worn items get a sticker border like the Pals themselves: a cream outline with a soft brown edge outside it, so a
+ * Worn items get a bold sticker border like the Pals themselves: a cream outline with a dark brown edge outside it, so a
  * peach beanie still stands out on an orange tiger and a white scarf on a snowy yeti.
  */
 function ItemOutline({ id }) {
   return (
     <defs>
       <filter id={id} x="-25%" y="-25%" width="150%" height="150%">
-        <feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="wide" />
-        <feFlood floodColor="#5a4636" floodOpacity="0.5" />
+        <feMorphology in="SourceAlpha" operator="dilate" radius="3.2" result="wide" />
+        <feFlood floodColor="#4a3a30" floodOpacity="0.9" />
         <feComposite in2="wide" operator="in" result="edge" />
-        <feMorphology in="SourceAlpha" operator="dilate" radius="1.5" result="near" />
+        <feMorphology in="SourceAlpha" operator="dilate" radius="1.9" result="near" />
         <feFlood floodColor="#fffaf2" />
         <feComposite in2="near" operator="in" result="border" />
         <feMerge>
