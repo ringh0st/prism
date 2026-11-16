@@ -120,24 +120,19 @@ export function flyToCounter(fromElement, toElement, color = '#F0C14E', onLand =
 }
 
 /**
- * A solved level: a burst from the board, plus side cannons for 3 stars and an extra star shower for
- * big moments (boss levels, finished worlds, a Pal growing).
+ * A solved level: one short, light burst from the board (gone in about 1.5 s); big moments (boss levels,
+ * finished worlds, a Pal growing) add two side bursts. Kept brief on purpose: playtesters found longer
+ * confetti too much.
  */
 export function celebrate({ stars = 3, isBig = false, from = null } = {}) {
   const origin = from ? originOf(from) : { x: 0.5, y: 0.45 };
-  fire({ origin, particleCount: 50 + stars * 25, spread: 80 + stars * 15, startVelocity: 38, scalar: 1, shapes: [STAR, 'square', 'circle'] });
-  if (stars >= 3 || isBig) {
-    setTimeout(() => {
-      fire({ origin: { x: 0, y: 0.7 }, angle: 60, spread: 55, particleCount: 60, startVelocity: 55 });
-      fire({ origin: { x: 1, y: 0.7 }, angle: 120, spread: 55, particleCount: 60, startVelocity: 55 });
-    }, 220);
-  }
+  const quick = { ticks: 90, decay: 0.9, gravity: 1.1 };
+  fire({ ...quick, origin, particleCount: 24 + stars * 12, spread: 70 + stars * 10, startVelocity: 34, shapes: [STAR, 'square', 'circle'] });
   if (isBig) {
-    setTimeout(
-      () =>
-        fire({ origin: { x: 0.5, y: 0 }, angle: 270, spread: 140, particleCount: 80, startVelocity: 20, gravity: 0.7, shapes: [STAR], scalar: 1.2 }),
-      520,
-    );
+    setTimeout(() => {
+      fire({ ...quick, origin: { x: 0, y: 0.7 }, angle: 60, spread: 50, particleCount: 35, startVelocity: 48 });
+      fire({ ...quick, origin: { x: 1, y: 0.7 }, angle: 120, spread: 50, particleCount: 35, startVelocity: 48 });
+    }, 200);
   }
 }
 
@@ -145,9 +140,11 @@ export function celebrate({ stars = 3, isBig = false, from = null } = {}) {
 export function rewardShower(from = null) {
   fire({
     origin: from ? originOf(from) : { x: 0.5, y: 0.35 },
-    particleCount: 70,
+    particleCount: 45,
     spread: 100,
     startVelocity: 30,
+    ticks: 100,
+    decay: 0.9,
     shapes: [STAR, 'circle'],
     scalar: 1.1,
   });

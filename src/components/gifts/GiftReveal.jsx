@@ -17,7 +17,9 @@ import styles from './GiftReveal.module.css';
 const SHAKE_MS = 700;
 const CHARGE_STEP_MS = 650;
 const ITEM_GAP_MS = 380;
-const NEXT_GIFT_MS = 1100;
+// How long one present's things stay up before the next present opens: enough to read them (a tap moves on).
+const NEXT_GIFT_MS = 2200;
+const READ_MS_PER_ITEM = 600;
 /** After "Open all": plain presents go straight to the pile, special ones still glow up, just quicker. */
 const FAST_SHAKE_MS = 150;
 const FAST_CHARGE_STEP_MS = 300;
@@ -175,9 +177,10 @@ export default function GiftReveal({
       setOpenedCount(i + 1);
       // Quick mode: a special present still glows up and pops, and its things wait for the summary.
       if (fast.current) setItems([]);
-      else await showItems(giftItems(lang, gift, partner));
+      const shownItems = fast.current ? [] : giftItems(lang, gift, partner);
+      if (!fast.current) await showItems(shownItems);
       opened.push(gift);
-      if (i < count - 1) await pause(fast.current ? FAST_NEXT_GIFT_MS : NEXT_GIFT_MS);
+      if (i < count - 1) await pause(fast.current ? FAST_NEXT_GIFT_MS : NEXT_GIFT_MS + READ_MS_PER_ITEM * shownItems.length);
       if (!isMounted.current) return;
     }
     // Everything together at the end (for several gifts, a summary).
