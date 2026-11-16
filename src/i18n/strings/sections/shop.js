@@ -40,7 +40,7 @@ export const en = {
   'shop.packs.buy.other': 'Buy {count} diamonds for {price}',
   'shop.packs.opening': 'Opening…',
   'shop.packs.parent': 'Under 18? Ask a parent first.',
-  'shop.packs.legal': 'One-time buys, no surprises. Paid via Lemon Squeezy.',
+  'shop.packs.legal': 'One-time buys, no surprises. Secure checkout.',
   'shop.packs.terms': 'Terms',
   'shop.packs.bonus': '+{bonus} free',
 
@@ -217,7 +217,7 @@ export const es = {
   'shop.packs.buy.other': 'Comprar {count} diamantes por {price}',
   'shop.packs.opening': 'Abriendo…',
   'shop.packs.parent': '¿Menor de 18? Pregunta a un adulto.',
-  'shop.packs.legal': 'Compras únicas, sin sorpresas. Pago con Lemon Squeezy.',
+  'shop.packs.legal': 'Compras únicas, sin sorpresas. Pago seguro.',
   'shop.packs.terms': 'Términos',
   'shop.packs.bonus': '+{bonus} gratis',
 
@@ -333,7 +333,7 @@ export const he = {
   'shop.packs.buy.other': 'לקנות {count} יהלומים ב-{price}',
   'shop.packs.opening': 'פותחים…',
   'shop.packs.parent': 'מתחת לגיל 18? שאלו הורה קודם.',
-  'shop.packs.legal': 'קנייה חד־פעמית, בלי הפתעות. התשלום דרך Lemon Squeezy.',
+  'shop.packs.legal': 'קנייה חד־פעמית, בלי הפתעות. תשלום מאובטח.',
   'shop.packs.terms': 'תנאים',
   'shop.packs.bonus': '\u2066+{bonus}\u2069 מתנה',
 

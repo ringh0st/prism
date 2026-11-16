@@ -103,7 +103,7 @@ export const STORE_ITEMS = [
   { id: 'sparks-large', kind: 'sparks', price: { diamonds: 10 }, grants: { sparks: 1000 } },
 ];
 
-/** Real-money diamond packs. Prices are set in Lemon Squeezy (store currency: EUR); these are for display and must match. */
+/** Real-money diamond packs. Prices are set at the payment provider (Stripe; Lemon Squeezy until March 2027; EUR); these are for display and must match. */
 export const DIAMOND_PACKS = [
   { id: 'diamonds-10', diamonds: 10, bonus: 0, displayPrice: '€0.99' },
   { id: 'diamonds-60', diamonds: 50, bonus: 10, displayPrice: '€4.99', tag: 'Popular' },

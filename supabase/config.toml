@@ -7,3 +7,6 @@ verify_jwt = true
 # Payment providers can't send a Supabase login token; the function checks the webhook signature instead.
 [functions.lemonsqueezy-webhook]
 verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false

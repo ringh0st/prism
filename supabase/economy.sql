@@ -60,7 +60,7 @@ alter table public.store_items enable row level security;
 drop policy if exists "Everyone reads the store" on public.store_items;
 create policy "Everyone reads the store" on public.store_items for select using (true);
 
--- Real-money packs, mapped to the Lemon Squeezy product variants ("Lumipals Diamonds").
+-- Real-money packs, mapped to the Lemon Squeezy product variants ("Lumipals Diamonds") and, for Stripe, its prices.
 create table if not exists public.diamond_packs (
   id text primary key,
   diamonds integer not null check (diamonds > 0),
@@ -72,6 +72,10 @@ insert into public.diamond_packs (id, diamonds, variant_id) values
   ('diamonds-60', 60, '2372493'),
   ('diamonds-130', 130, '2372494')
 on conflict (id) do update set diamonds = excluded.diamonds, variant_id = excluded.variant_id;
+
+-- Stripe (Managed Payments) price per pack, from the Stripe dashboard (see PAYMENTS.md): set them with
+--   update public.diamond_packs set stripe_price_id = 'price_…' where id = 'diamonds-10';
+alter table public.diamond_packs add column if not exists stripe_price_id text unique;
 
 alter table public.diamond_packs enable row level security;
 drop policy if exists "Everyone reads diamond packs" on public.diamond_packs;

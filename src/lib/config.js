@@ -11,7 +11,7 @@ export const PRIVACY_URL = 'https://lumipals.app/privacy.html';
 export const TERMS_URL = 'https://lumipals.app/terms.html';
 
 /**
- * Real-money diamond purchases on the website (Lemon Squeezy, see PAYMENTS.md). App stores require
+ * Real-money diamond purchases on the website (Stripe Managed Payments, see PAYMENTS.md). App stores require
  * their own payment systems, so the apps don't sell diamonds (yet): players earn them by playing.
  */
 export const PAYMENTS_ENABLED = !isNativeApp;

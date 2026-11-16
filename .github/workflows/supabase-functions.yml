@@ -41,3 +41,4 @@ jobs:
           # --yes: CI can't answer the CLI's confirmation prompts
           supabase functions deploy create-checkout --project-ref "$PROJECT_REF" --yes
           supabase functions deploy lemonsqueezy-webhook --project-ref "$PROJECT_REF" --no-verify-jwt --yes
+          supabase functions deploy stripe-webhook --project-ref "$PROJECT_REF" --no-verify-jwt --yes
