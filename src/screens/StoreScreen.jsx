@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ScreenHeader from '../components/game/ScreenHeader.jsx';
 import BottomNav from '../components/game/BottomNav.jsx';
 import Button from '../components/Button.jsx';
@@ -17,6 +17,7 @@ import { DAILY_SPARK_PURCHASE_LIMIT, DIAMOND_PACKS, DIAMOND_REWARDS, INVENTORY_C
 import { sparkPurchasesLeft } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
 import { startDiamondCheckout } from '../lib/economyApi.js';
+import { flyRewardsToCounter } from '../lib/rewardFlight.js';
 import { PAYMENTS_ENABLED, TERMS_URL } from '../lib/config.js';
 import { sfx } from '../audio/sfx.js';
 import { useI18n } from '../i18n/I18nContext.jsx';
@@ -212,12 +213,27 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
     isReturningFromCheckout ? { mood: 'dance', line: t('shop.lumi.thanks') } : { mood: 'happy', line: t('shop.lumi.welcome') },
   );
 
-  // After checkout the payment webhook adds the diamonds; check back a couple of times.
+  // After checkout the payment webhook adds the diamonds; check back a few times, and when they arrive they fly
+  // into the diamond counter.
   useEffect(() => {
     if (!isReturningFromCheckout) return undefined;
-    const timers = [3000, 8000, 15000].map((ms) => setTimeout(refresh, ms));
+    const timers = [1500, 4000, 8000, 15000, 25000].map((ms) => setTimeout(refresh, ms));
     return () => timers.forEach(clearTimeout);
   }, [isReturningFromCheckout, refresh]);
+  const diamondsBefore = useRef(null);
+  useEffect(() => {
+    if (!isReturningFromCheckout || !isSignedIn) return;
+    if (diamondsBefore.current === null) {
+      diamondsBefore.current = progress.diamonds;
+      return;
+    }
+    const arrived = progress.diamonds - diamondsBefore.current;
+    diamondsBefore.current = progress.diamonds;
+    if (arrived > 0) {
+      flyRewardsToCounter('diamond', arrived);
+      setLumi({ mood: 'dance', line: t('shop.lumi.arrived', { count: arrived }) });
+    }
+  }, [isReturningFromCheckout, isSignedIn, progress.diamonds, t]);
 
   const buy = async (itemId, currency) => {
     setBusyItem(itemId);

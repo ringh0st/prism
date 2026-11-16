@@ -9,6 +9,7 @@ export const en = {
 
   'shop.lumi.welcome': 'Take a look!',
   'shop.lumi.thanks': 'Thank you! Your diamonds are on their way!',
+  'shop.lumi.arrived': 'Here they come! +{count} diamonds!',
   'shop.lumi.kaching': 'Ka-ching! Pleasure doing business!',
   'shop.lumi.adopted': 'Welcome home, {name}!',
 
@@ -184,6 +185,7 @@ export const es = {
 
   'shop.lumi.welcome': '¡Echa un vistazo!',
   'shop.lumi.thanks': '¡Gracias! ¡Tus diamantes ya vienen en camino!',
+  'shop.lumi.arrived': '¡Aquí llegan! ¡+{count} diamantes!',
   'shop.lumi.kaching': '¡Chin-chin! ¡Un placer hacer negocios contigo!',
   'shop.lumi.adopted': '¡Bienvenido a casa, {name}!',
 
@@ -300,6 +302,7 @@ export const he = {
 
   'shop.lumi.welcome': 'בואו להציץ!',
   'shop.lumi.thanks': 'תודה! היהלומים שלכם כבר בדרך!',
+  'shop.lumi.arrived': 'הנה הם מגיעים! +{count} יהלומים!',
   'shop.lumi.kaching': 'צ׳ינג! תענוג לעשות איתכם עסקים!',
   'shop.lumi.adopted': 'ברוך הבא הביתה, {name}!',
 
