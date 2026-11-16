@@ -54,6 +54,14 @@ function portalPartners(tiles) {
   return partners;
 }
 
+/** An orientation the solver hasn't chosen yet; tracing light into such a piece throws NeedsDecision. */
+export const UNDECIDED = -1;
+export class NeedsDecision {
+  constructor(tileIndex) {
+    this.tileIndex = tileIndex;
+  }
+}
+
 /** Index tiles by cell so tracing is O(1) per step. */
 export function buildCellIndex({ width, height, tiles }) {
   const cells = new Int16Array(width * height).fill(-1);
@@ -91,7 +99,12 @@ export function traceBeams(level, orients = null, cells = buildCellIndex(level))
 
 function traceOnce(level, orients, cells, openPairs) {
   const { width, height, tiles } = level;
-  const orientOf = (i) => (orients ? orients[i] : (tiles[i].orient ?? 0));
+  const orientOf = (i) => {
+    const orient = orients ? orients[i] : (tiles[i].orient ?? 0);
+    // The solver leaves pieces the light hasn't reached yet undecided (-1) and asks about them only when needed.
+    if (orient === UNDECIDED) throw new NeedsDecision(i);
+    return orient;
+  };
   const segments = [];
   const hits = new Map();
   const visited = new Set();

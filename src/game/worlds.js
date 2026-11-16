@@ -136,9 +136,10 @@ export function generatorPresetFor(world, index) {
   const progress = (number - 1) / (WORLD_COUNT * LEVELS_PER_WORLD - 1); // 0 at level 1, 1 at level 1000
   const spike = difficulty === DIFFICULTY.EXTRA ? 2 : difficulty === DIFFICULTY.HARD ? 1 : 0;
   const size = clamp(Math.round(5 + progress * 4.6) + (spike > 0 ? 1 : 0), 4, 10);
-  // Moves needed rise steadily with the level number: about 4 at the start, 13 by level 650.
-  const basePar = Math.min(13, 4 + Math.floor((number - 1) / 72));
-  const minPar = Math.min(14, basePar + spike * (world <= 2 ? 1 : 2));
+  // Moves needed rise steadily with the level number: about 4 at the start, 6 by level 150, 13 by level 500
+  // and 20 at the end (the light-following solver handles boards with up to 30 turning pieces).
+  const basePar = Math.min(20, 4 + Math.floor((number - 1) / 55));
+  const minPar = Math.min(22, basePar + spike * (world <= 2 ? 1 : 2));
   const steps = Math.min(3, Math.floor(progress * 4));
 
   const preset = {
@@ -149,7 +150,7 @@ export function generatorPresetFor(world, index) {
     // board can't (playtesters found level 151 with four mirrors and three moves).
     turns: [2 + Math.min(2, steps), Math.max(3 + steps + spike, minPar)],
     segment: [1, 3],
-    decoys: Math.min(9, 2 + Math.floor(minPar / 2) + spike),
+    decoys: Math.min(10, 2 + Math.floor(minPar / 2) + spike),
     walls: 1 + steps + spike,
     minPar,
     maxPar: minPar + 4,

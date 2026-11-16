@@ -19,7 +19,7 @@ import { createRandom } from '../src/lib/random.js';
 import { LEVEL_SCHEMA_VERSION } from '../src/game/constants.js';
 
 const OUTPUT_DIR = new URL('../src/data/worlds/', import.meta.url);
-const TIME_BUDGET_MS = 2500;
+const TIME_BUDGET_MS = 4000;
 
 export const worldFileName = (world) => `world-${String(world).padStart(3, '0')}.json`;
 

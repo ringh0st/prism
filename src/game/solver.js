@@ -1,7 +1,9 @@
-import { buildCellIndex, isRotatable, traceBeams } from './beam.js';
+import { NeedsDecision, UNDECIDED, buildCellIndex, isRotatable, traceBeams } from './beam.js';
 
-/** Above this many rotatable tiles the exhaustive search gets too slow. */
-export const MAX_SOLVER_PIECES = 16;
+/** Most switches a board may have (solutions are kept as bit masks). */
+export const MAX_SOLVER_PIECES = 30;
+/** Above this many explored positions the search gives up and the board counts as too complex. */
+const MAX_SEARCH_NODES = 400000;
 
 function popcount(n) {
   let count = 0;
@@ -35,71 +37,82 @@ function switchGroups(level) {
   return groups;
 }
 
-const orientsFor = (startOrients, groups, mask) => {
-  const orients = startOrients.slice();
-  groups.forEach((group, bit) => {
-    if ((mask >> bit) & 1) group.forEach((tileIndex) => (orients[tileIndex] ^= 1));
-  });
-  return orients;
-};
-
 /**
- * Explore every combination of switches (rotatable tiles; twins count as one). Each has two states,
- * so a solution's distance from the start is the number of switches flipped (one tap each).
+ * Every way to solve the board, found by following the light: a switch is only decided once light reaches it,
+ * so pieces the light never touches don't multiply the search (big boards with many decoys stay fast).
+ * Each solution is { mask, care }: `care` holds the switches that matter, `mask` which of them are flipped
+ * from the start (one tap each); switches outside `care` can stay as they are.
  *
- * @returns {{ isSolvable, par, solutionCount, solutionMasks, groups, tooComplex }}
- *   par: minimum taps from the starting position to any solution; masks are relative to the start
+ * @returns {{ isSolvable, par, solutionCount, solutions, groups, tooComplex }}
+ *   par: minimum taps from the starting position to any solution
  */
 export function analyzeLevel(level, startOrients = level.tiles.map((t) => t.orient ?? 0)) {
   const groups = switchGroups(level);
-  if (groups.length > MAX_SOLVER_PIECES) {
-    return { isSolvable: false, par: null, solutionCount: 0, solutionMasks: [], groups, tooComplex: true };
-  }
+  if (groups.length > MAX_SOLVER_PIECES) return unsolved(groups, true);
 
+  const groupOf = new Int16Array(level.tiles.length).fill(-1);
+  groups.forEach((group, g) => group.forEach((tileIndex) => (groupOf[tileIndex] = g)));
   const cells = buildCellIndex(level);
-  const solutionMasks = [];
-  let par = Infinity;
-  for (let mask = 0; mask < 1 << groups.length; mask++) {
-    if (traceBeams(level, orientsFor(startOrients, groups, mask), cells).isSolved) {
-      solutionMasks.push(mask);
-      par = Math.min(par, popcount(mask));
-    }
-  }
+  const orients = startOrients.slice();
+  groups.forEach((group) => group.forEach((tileIndex) => (orients[tileIndex] = UNDECIDED)));
+  const solutions = [];
+  let nodes = 0;
 
-  return {
-    isSolvable: solutionMasks.length > 0,
-    par: solutionMasks.length ? par : null,
-    solutionCount: solutionMasks.length,
-    solutionMasks,
-    groups,
-    tooComplex: false,
+  const explore = (mask, care) => {
+    if (++nodes > MAX_SEARCH_NODES) return false;
+    let trace;
+    try {
+      trace = traceBeams(level, orients, cells);
+    } catch (needed) {
+      if (!(needed instanceof NeedsDecision)) throw needed;
+      const g = groupOf[needed.tileIndex];
+      const bit = 1 << g;
+      for (const flip of [0, 1]) {
+        for (const tileIndex of groups[g]) orients[tileIndex] = startOrients[tileIndex] ^ flip;
+        if (!explore(flip ? mask | bit : mask, care | bit)) return false;
+      }
+      for (const tileIndex of groups[g]) orients[tileIndex] = UNDECIDED;
+      return true;
+    }
+    if (trace.isSolved) solutions.push({ mask, care });
+    return true;
   };
+
+  if (!explore(0, 0)) return unsolved(groups, true);
+  const par = solutions.length ? Math.min(...solutions.map((solution) => popcount(solution.mask))) : null;
+  return { isSolvable: solutions.length > 0, par, solutionCount: solutions.length, solutions, groups, tooComplex: false };
 }
+
+const unsolved = (groups, tooComplex) => ({ isSolvable: false, par: null, solutionCount: 0, solutions: [], groups, tooComplex });
 
 /**
  * The solved orientations closest to the current position (fewest taps away).
  * @returns orients array, or null if the level can't be solved
  */
 export function nearestSolution(level, currentOrients) {
-  const { isSolvable, solutionMasks, groups } = analyzeLevel(level, currentOrients);
+  const { isSolvable, solutions, groups } = analyzeLevel(level, currentOrients);
   if (!isSolvable) return null;
-  const best = solutionMasks.reduce((a, b) => (popcount(a) <= popcount(b) ? a : b));
-  return orientsFor(currentOrients, groups, best);
+  const best = solutions.reduce((a, b) => (popcount(a.mask) <= popcount(b.mask) ? a : b));
+  const orients = currentOrients.slice();
+  groups.forEach((group, g) => {
+    if ((best.mask >> g) & 1) group.forEach((tileIndex) => (orients[tileIndex] ^= 1));
+  });
+  return orients;
 }
 
 /**
  * The level's solutions worked out once, so the fewest taps left can be read on every move without searching
- * again (the full search takes a moment on big boards and slow phones).
+ * again (the search takes a moment on big boards and slow phones).
  * @returns (currentOrients) => fewest taps still needed (twins count once), or null if it can't be solved
  */
 export function tapsLeftFinder(level) {
   const start = level.tiles.map((t) => t.orient ?? 0);
-  const { isSolvable, solutionMasks, groups } = analyzeLevel(level, start);
+  const { isSolvable, solutions, groups } = analyzeLevel(level, start);
   return (currentOrients) => {
     if (!isSolvable) return null;
     const current = groups.reduce((mask, group, bit) => (currentOrients[group[0]] !== start[group[0]] ? mask | (1 << bit) : mask), 0);
     let fewest = Infinity;
-    for (const solution of solutionMasks) fewest = Math.min(fewest, popcount(solution ^ current));
+    for (const { mask, care } of solutions) fewest = Math.min(fewest, popcount((mask ^ current) & care));
     return fewest;
   };
 }
