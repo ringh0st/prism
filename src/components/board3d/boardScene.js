@@ -9,12 +9,16 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { cellsOnBeams, isRotatable } from '../../game/beam.js';
 import { FRAGILE_TURNS } from '../../game/constants.js';
-import { BEAM_HEIGHT, BEAM_HEX, addShadowed, darkenedColor, makeFog, makePiece, mat } from './boardPieces.js';
+import { BEAM_HEIGHT, BEAM_HEX, addShadowed, darkenedColor, glowSprite, makeFog, makePiece, mat } from './boardPieces.js';
+import { TILE } from '../../game/constants.js';
 
 /** The flat board's colors (Board3D reads the world's own from its CSS; these are World 1's). */
 export const DEFAULT_THEME = { board: '#c6d9b4', cell: '#f3f6ea', cellAlt: '#e2ecd8', honey: '#f0c14e', piece: '#3f8a64', pivot: '#9fcf9a' };
 
 /** Cell (x, y) to the table's coordinates: x to the right, z towards the player. */
+/** Pieces that turn the light: a beam that ends on one flashes there. */
+const TURNING_TILES = new Set([TILE.MIRROR, TILE.SPLITTER, TILE.PRISM, TILE.PORTAL]);
+
 const place = (level, x, y) => new THREE.Vector3(x - level.width / 2 + 0.5, 0, y - level.height / 2 + 0.5);
 
 /** The tray in the world's board color, with a rounded tile on every cell (kept to warm them where light passes). */
@@ -42,17 +46,21 @@ function makeTable(level, theme) {
   return { group, plates };
 }
 
-/** A beam between two cell centres: a bright core inside a soft halo, and a pool of its light on the tiles. */
+/**
+ * A beam between two cell centres: a bright white core inside golden light, with a pool of its light on the
+ * tiles and little sparks travelling the way the light goes (the scene moves them). Returns { group, sparks }.
+ */
 function makeBeam(level, segment) {
   const from = place(level, segment.x1, segment.y1).setY(BEAM_HEIGHT);
   const to = place(level, segment.x2, segment.y2).setY(BEAM_HEIGHT);
   const length = from.distanceTo(to) + 0.06;
   const group = new THREE.Group();
   const color = new THREE.Color(BEAM_HEX[segment.color] ?? BEAM_HEX.sun);
+  const tube = new THREE.Group();
   const layers = [
-    { radius: 0.13, color, opacity: 0.22 },
-    { radius: 0.065, color, opacity: 0.85 },
-    { radius: 0.028, color: new THREE.Color('#fffdf2'), opacity: 1 },
+    { radius: 0.15, color, opacity: 0.2 },
+    { radius: 0.075, color, opacity: 0.9 },
+    { radius: 0.032, color: new THREE.Color('#ffffff'), opacity: 1 },
   ];
   for (const layer of layers) {
     const mesh = new THREE.Mesh(
@@ -60,7 +68,7 @@ function makeBeam(level, segment) {
       new THREE.MeshBasicMaterial({ color: layer.color, transparent: true, opacity: layer.opacity, depthWrite: false }),
     );
     mesh.rotation.z = Math.PI / 2;
-    group.add(mesh);
+    tube.add(mesh);
   }
   const pool = new THREE.Mesh(
     new THREE.PlaneGeometry(length, 0.5),
@@ -68,10 +76,19 @@ function makeBeam(level, segment) {
   );
   pool.rotation.x = -Math.PI / 2;
   pool.position.y = 0.03 - BEAM_HEIGHT;
-  group.add(pool);
-  group.position.copy(from).lerp(to, 0.5);
-  group.rotation.y = -Math.atan2(to.z - from.z, to.x - from.x);
-  return group;
+  tube.add(pool);
+  tube.position.copy(from).lerp(to, 0.5);
+  tube.rotation.y = -Math.atan2(to.z - from.z, to.x - from.x);
+  group.add(tube);
+  // Sparks: about two per cell, spaced evenly, moving from the lamp's side to the far end.
+  const sparks = [];
+  const count = Math.max(1, Math.round(length * 1.6));
+  for (let n = 0; n < count; n++) {
+    const sprite = glowSprite(color.clone().lerp(new THREE.Color('#ffffff'), 0.6), 0.16, 0.95);
+    group.add(sprite);
+    sparks.push({ sprite, phase: n / count });
+  }
+  return { group, sparks, from, to, length };
 }
 
 /** A creeping shadow's trail to its gem: dark footprints that fade further along. */
@@ -190,6 +207,20 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
    * Show the board now.
    * @param state { turns, trace, turnsLeft, revealedCells, darkenedTile, glooms }
    */
+  const tileIndexAt = new Map(level.tiles.map((tile, i) => [tile.y * level.width + tile.x, i]));
+  const tileAt = (x, y) => (x >= 0 && y >= 0 && x < level.width && y < level.height ? level.tiles[tileIndexAt.get(y * level.width + x)] : null);
+  let beamParts = [];
+  const bursts = [];
+  /** A gem that just lit: a ring of little sparkles flying out of it. */
+  const burstAt = (piece) => {
+    for (let n = 0; n < 10; n++) {
+      const sprite = glowSprite(piece.color.clone().lerp(new THREE.Color('#ffffff'), 0.5), 0.14, 1);
+      const angle = (n / 10) * Math.PI * 2;
+      sprite.position.copy(piece.group.position).setY(0.45);
+      scene.add(sprite);
+      bursts.push({ sprite, velocity: new THREE.Vector3(Math.cos(angle), 0.6 + (n % 3) * 0.3, Math.sin(angle)).multiplyScalar(0.9), age: 0 });
+    }
+  };
   const update = ({ turns, trace, turnsLeft = null, revealedCells = null, darkenedTile = null, glooms = [] }) => {
     level.tiles.forEach((tile, i) => {
       const piece = pieces[i];
@@ -198,10 +229,15 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
       if (piece.lampHead && tile.turnable) rotorTargets[i] = piece.baseAngle - (turn % 2) * (Math.PI / 2);
       if (piece.gem) {
         const isLit = trace.litGems.has(i);
+        if (isLit && !litGems.has(i) && !isFirstTick) {
+          burstAt(piece);
+          piece.litAt = performance.now() / 1000;
+        }
         if (isLit) litGems.add(i);
         else litGems.delete(i);
         const isDarkened = darkenedTile === i;
-        piece.material.emissiveIntensity = isLit ? 0.6 : 0;
+        piece.material.emissiveIntensity = isLit ? 0.55 : 0;
+        piece.gemGlow.material.opacity = isLit ? 0.8 : 0;
         piece.material.color.copy(isDarkened ? darkenedColor : isLit ? piece.color : piece.color.clone().lerp(new THREE.Color('#b9ab98'), 0.35));
       }
       if (piece.shadeMaterial) piece.shadeMaterial.emissiveIntensity = trace.litShades.has(i) ? 0.9 : 0;
@@ -218,7 +254,17 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
       }
     });
     beams.clear();
-    for (const segment of trace.segments) beams.add(makeBeam(level, segment));
+    beamParts = trace.segments.map((segment) => {
+      const beam = makeBeam(level, segment);
+      beams.add(beam.group);
+      // Where the light turns (a mirror, splitter, prism or portal) it flashes; where something stops it, it fades out.
+      const endTile = tileAt(segment.x2, segment.y2);
+      const turns = endTile && TURNING_TILES.has(endTile.type);
+      const flash = glowSprite(beam.group.children[0].children[1].material.color, turns ? 0.55 : 0.3, turns ? 0.9 : 0.35);
+      flash.position.copy(beam.to);
+      beams.add(flash);
+      return { ...beam, flash, turns };
+    });
     trails.clear();
     for (const gloom of glooms) if (!gloom.isBurned) trails.add(makeTrail(level, gloom.trail.slice(1)));
     // Tiles the light passes over warm to honey, as on the flat board.
@@ -249,6 +295,36 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
       if (piece.swirl) piece.swirl.rotation.z += dt * 0.8;
       if (piece.stone) piece.stone.rotation.y += dt * 0.4;
     });
+    // Sparks run along each beam in the light's direction; flashes at mirrors and the lamp's glow breathe.
+    for (const beam of beamParts) {
+      beam.sparks.forEach((spark) => {
+        const along = calm ? spark.phase : (spark.phase + time * (1.4 / beam.length)) % 1;
+        spark.sprite.position.copy(beam.from).lerp(beam.to, along);
+        spark.sprite.material.opacity = calm ? 0.7 : Math.sin(along * Math.PI) * 0.95;
+      });
+      if (beam.turns && !calm) beam.flash.scale.setScalar(0.55 + Math.sin(time * 6) * 0.08);
+    }
+    pieces.forEach((piece, i) => {
+      if (piece.lampGlow && !calm) piece.lampGlow.material.opacity = 0.7 + Math.sin(time * 3 + i) * 0.2;
+      if (piece.gemGlow && litGems.has(i) && !calm) {
+        // A brief swell as the gem fills with light, then a gentle shimmer.
+        const since = time - (piece.litAt ?? -10);
+        const swell = since < 0.6 ? 1 + Math.sin((since / 0.6) * Math.PI) * 0.7 : 1;
+        piece.gemGlow.scale.setScalar(0.9 * swell + Math.sin(time * 3 + i) * 0.04);
+      }
+    });
+    for (let n = bursts.length - 1; n >= 0; n--) {
+      const burst = bursts[n];
+      burst.age += dt;
+      burst.sprite.position.addScaledVector(burst.velocity, dt);
+      burst.velocity.y -= dt * 1.5;
+      burst.sprite.material.opacity = Math.max(0, 1 - burst.age / 0.7);
+      if (burst.age > 0.7 || calm) {
+        scene.remove(burst.sprite);
+        burst.sprite.material.dispose();
+        bursts.splice(n, 1);
+      } else isMoving = true;
+    }
     isFirstTick = false;
     return isMoving;
   };

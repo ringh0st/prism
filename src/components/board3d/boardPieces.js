@@ -19,6 +19,7 @@ const pairLook = (pair) => PAIR_LOOKS[pair] ?? PAIR_LOOKS.a;
 
 const COLORS = {
   lamp: '#ef9c5a',
+  lampDeep: '#d9773f',
   lampCap: '#f6c08a',
   stone: '#cdb9a0',
   wall: '#b98d68',
@@ -92,59 +93,140 @@ function gemGeometry(color) {
   }
 }
 
-/** A mirror or splitter on its turntable (a stone plate when it's fixed), with marks for twins and cracking. */
+/**
+ * A soft round glow (light without a full-screen bloom pass, so it stays cheap on phones): a sprite with a
+ * radial fade, added on top of what's behind it.
+ */
+let glowTexture = null;
+export function glowSprite(color, size, opacity = 1) {
+  if (!glowTexture) {
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 128;
+    const draw = canvas.getContext('2d');
+    const gradient = draw.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gradient.addColorStop(0, 'rgba(255,255,255,1)');
+    gradient.addColorStop(0.25, 'rgba(255,255,255,0.75)');
+    gradient.addColorStop(0.6, 'rgba(255,255,255,0.18)');
+    gradient.addColorStop(1, 'rgba(255,255,255,0)');
+    draw.fillStyle = gradient;
+    draw.fillRect(0, 0, 128, 128);
+    glowTexture = new THREE.CanvasTexture(canvas);
+  }
+  const sprite = new THREE.Sprite(
+    new THREE.SpriteMaterial({ map: glowTexture, color, transparent: true, opacity, blending: THREE.AdditiveBlending, depthWrite: false }),
+  );
+  sprite.scale.setScalar(size);
+  return sprite;
+}
+
+/** Reflective glass: pale silver-blue with a clear coat that catches the room's light. */
+const mirrorGlass = (environment) =>
+  new THREE.MeshPhysicalMaterial({
+    color: '#a9c8dc',
+    metalness: 0.78,
+    roughness: 0.04,
+    clearcoat: 1,
+    clearcoatRoughness: 0.03,
+    envMap: environment,
+    envMapIntensity: 2.2,
+  });
+const metalFrame = (environment) =>
+  new THREE.MeshPhysicalMaterial({ color: '#c9ccd1', metalness: 1, roughness: 0.28, envMap: environment, envMapIntensity: 1.4 });
+
+/**
+ * A mirror: a real looking-glass, silver-blue reflective glass in a thin metal frame, standing on its turntable,
+ * with a curved arrow on the turntable that says "I turn" (a fixed one stands on a stone plate with studs instead).
+ * A splitter is half-silvered sea-green glass. Twins wear their pair's mark; cracking mirrors show dots.
+ */
 function makeMirror(tile, { environment, theme, isRotatable }) {
   const group = new THREE.Group();
   const base = addShadowed(
     group,
     new THREE.Mesh(
-      isRotatable ? new THREE.CylinderGeometry(0.36, 0.38, 0.08, 40) : new RoundedBoxGeometry(0.78, 0.08, 0.78, 3, 0.03),
+      isRotatable ? new THREE.CylinderGeometry(0.37, 0.39, 0.08, 40) : new RoundedBoxGeometry(0.78, 0.08, 0.78, 3, 0.03),
       mat(isRotatable ? new THREE.Color(theme.pivot).lerp(new THREE.Color(theme.cell), 0.45) : COLORS.stone),
     ),
   );
   base.position.y = 0.06;
+  if (isRotatable) {
+    // The turn handle: a curved arrow around the turntable, in the world's piece color.
+    const arrowColor = mat(theme.piece, { roughness: 0.5 });
+    const arc = new THREE.Mesh(new THREE.TorusGeometry(0.33, 0.022, 8, 40, Math.PI * 0.55), arrowColor);
+    arc.rotation.x = -Math.PI / 2;
+    arc.rotation.z = Math.PI * 0.95;
+    arc.position.y = 0.105;
+    group.add(arc);
+    const tip = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.11, 12), arrowColor);
+    const end = Math.PI * 0.95 + Math.PI * 0.55;
+    tip.position.set(Math.cos(end) * 0.33, 0.105, -Math.sin(end) * 0.33);
+    tip.rotation.set(Math.PI / 2, 0, 0);
+    tip.rotateZ(-end);
+    group.add(tip);
+  } else {
+    for (const [x, z] of [
+      [-0.28, -0.28],
+      [0.28, -0.28],
+      [-0.28, 0.28],
+      [0.28, 0.28],
+    ]) {
+      const stud = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.03, 12), mat('#9c8873'));
+      stud.position.set(x, 0.115, z);
+      group.add(stud);
+    }
+  }
   const rotor = new THREE.Group();
   rotor.position.y = 0.1;
   const isSplitter = tile.type === TILE.SPLITTER;
-  const frame = addShadowed(
-    rotor,
-    new THREE.Mesh(new RoundedBoxGeometry(0.86, 0.44, 0.12, 3, 0.04), mat(isSplitter ? '#17988c' : theme.piece, { roughness: 0.55 })),
-  );
-  frame.position.y = 0.22;
+  // A thin metal frame around the glass, on a small foot.
+  const frame = addShadowed(rotor, new THREE.Mesh(new RoundedBoxGeometry(0.88, 0.46, 0.08, 3, 0.03), metalFrame(environment)));
+  frame.position.y = 0.25;
+  const foot = addShadowed(rotor, new THREE.Mesh(new RoundedBoxGeometry(0.34, 0.05, 0.16, 2, 0.02), metalFrame(environment)));
+  foot.position.y = 0.025;
   const glass = new THREE.Mesh(
-    new THREE.BoxGeometry(0.76, 0.34, 0.13),
+    new THREE.BoxGeometry(0.8, 0.38, 0.09),
     isSplitter
       ? new THREE.MeshPhysicalMaterial({
-          color: '#9fe3d6',
+          color: '#a8e6da',
+          metalness: 0.3,
           roughness: 0.05,
-          transmission: 0.6,
+          transmission: 0.55,
+          clearcoat: 1,
           transparent: true,
-          opacity: 0.75,
+          opacity: 0.8,
           envMap: environment,
         })
-      : new THREE.MeshStandardMaterial({ color: '#f4f1ea', metalness: 1, roughness: 0.08, envMap: environment, envMapIntensity: 1.2 }),
+      : mirrorGlass(environment),
   );
-  glass.position.y = 0.22;
+  glass.position.y = 0.25;
   rotor.add(glass);
+  // A bright streak across the glass, so it reads as a reflecting surface from any side.
+  for (const side of [1, -1]) {
+    const streak = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.1, 0.42),
+      new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.55, depthWrite: false }),
+    );
+    streak.position.set(-0.18, 0.25, side * 0.047);
+    streak.rotation.set(0, side > 0 ? 0 : Math.PI, 0.5);
+    rotor.add(streak);
+  }
   if (tile.oneSided !== undefined) {
     // The dark back of a one-sided mirror covers the side that isn't silvered.
-    const back = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.36, 0.05), mat('#5e4a3f'));
-    back.position.set(0, 0.22, tile.oneSided === 0 ? 0.05 : -0.05);
+    const back = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.4, 0.04), mat('#5e4a3f'));
+    back.position.set(0, 0.25, tile.oneSided === 0 ? 0.05 : -0.05);
     rotor.add(back);
   }
   group.add(rotor);
-  // A twin's pair mark rides on top of the mirror, so the matching ones are easy to spot.
+  // A twin's pair mark rides on top of the frame, so the matching ones are easy to spot.
   if (tile.link) {
     const look = pairLook(tile.link);
-    const mark = addSticker(rotor, sticker({ background: look.color, ring: '#ffffff', path: look.symbol, ink: look.ink }), 0.13, 0.47);
-    mark.rotation.x = -Math.PI / 2;
+    addSticker(rotor, sticker({ background: look.color, ring: '#ffffff', path: look.symbol, ink: look.ink }), 0.13, 0.49);
   }
   // A cracking mirror: three peach dots that go out one by one.
   let crackDots = null;
   if (tile.fragile) {
     crackDots = [0, 1, 2].map((i) => {
       const dot = new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 8), mat('#F2A67E'));
-      dot.position.set(-0.12 + i * 0.12, 0.12, 0.38);
+      dot.position.set(-0.12 + i * 0.12, 0.12, 0.4);
       group.add(dot);
       return dot;
     });
@@ -152,7 +234,10 @@ function makeMirror(tile, { environment, theme, isRotatable }) {
   return { group, rotor, crackDots };
 }
 
-/** The lamp: a chunky orange block with a lens in the beam's color facing its way (a turning lamp sits on a turntable). */
+/**
+ * The lamp: an orange lantern block with a short barrel pointing the way the light leaves, a glass lens with a
+ * white-hot centre, and a soft glow that breathes (a turning lamp sits on a turntable).
+ */
 function makeLamp(tile, { theme }) {
   const group = new THREE.Group();
   if (tile.turnable) {
@@ -161,37 +246,60 @@ function makeLamp(tile, { theme }) {
   }
   const head = new THREE.Group();
   head.rotation.y = DIRECTION_ANGLE[tile.dir] ?? 0;
-  const body = addShadowed(head, new THREE.Mesh(new RoundedBoxGeometry(0.7, 0.46, 0.7, 5, 0.17), mat(COLORS.lamp, { roughness: 0.6 })));
-  body.position.y = 0.27;
-  const cap = new THREE.Mesh(new RoundedBoxGeometry(0.58, 0.06, 0.58, 3, 0.03), mat(COLORS.lampCap, { roughness: 0.6 }));
-  cap.position.y = 0.5;
+  const body = addShadowed(head, new THREE.Mesh(new RoundedBoxGeometry(0.6, 0.46, 0.62, 5, 0.16), mat(COLORS.lamp, { roughness: 0.6 })));
+  body.position.set(-0.06, 0.27, 0);
+  const cap = new THREE.Mesh(new RoundedBoxGeometry(0.48, 0.06, 0.5, 3, 0.03), mat(COLORS.lampCap, { roughness: 0.6 }));
+  cap.position.set(-0.06, 0.5, 0);
   head.add(cap);
-  const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.05, 32), mat(COLORS.cream, { roughness: 0.4 }));
-  const lens = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.12, 0.12, 0.06, 32),
-    new THREE.MeshBasicMaterial({ color: new THREE.Color(BEAM_HEX[tile.color] ?? BEAM_HEX.sun).multiplyScalar(1.15) }),
-  );
-  for (const [mesh, x] of [
-    [ring, 0.355],
-    [lens, 0.375],
-  ]) {
-    mesh.rotation.z = Math.PI / 2;
-    mesh.position.set(x, BEAM_HEIGHT, 0);
-    head.add(mesh);
-  }
+  // The barrel: light comes out of this end, so the way it points is plain to see.
+  const barrel = addShadowed(head, new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.2, 0.2, 32), mat(COLORS.lampDeep, { roughness: 0.5 })));
+  barrel.rotation.z = -Math.PI / 2;
+  barrel.position.set(0.3, BEAM_HEIGHT, 0);
+  const beamColor = new THREE.Color(BEAM_HEX[tile.color] ?? BEAM_HEX.sun);
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.025, 10, 32), mat(COLORS.cream, { roughness: 0.35 }));
+  rim.rotation.y = Math.PI / 2;
+  rim.position.set(0.405, BEAM_HEIGHT, 0);
+  head.add(rim);
+  const lens = new THREE.Mesh(new THREE.CircleGeometry(0.15, 32), new THREE.MeshBasicMaterial({ color: beamColor }));
+  lens.rotation.y = Math.PI / 2;
+  lens.position.set(0.402, BEAM_HEIGHT, 0);
+  head.add(lens);
+  const core = new THREE.Mesh(new THREE.CircleGeometry(0.075, 24), new THREE.MeshBasicMaterial({ color: '#fffbe6' }));
+  core.rotation.y = Math.PI / 2;
+  core.position.set(0.406, BEAM_HEIGHT, 0);
+  head.add(core);
+  const glow = glowSprite(beamColor.clone().lerp(new THREE.Color('#ffffff'), 0.3), 0.75, 0.85);
+  glow.position.set(0.45, BEAM_HEIGHT, 0);
+  head.add(glow);
   group.add(head);
-  return { group, lampHead: head, baseAngle: head.rotation.y };
+  return { group, lampHead: head, baseAngle: head.rotation.y, lampGlow: glow };
 }
 
+/**
+ * A gem: a faceted crystal in its color's own shape on a little stand. Dim until light reaches it; then it fills
+ * with light from inside, glows and sparkles (the scene plays the sparkle burst).
+ */
 function makeGem(tile) {
   const group = new THREE.Group();
   const color = new THREE.Color(BEAM_HEX[tile.color] ?? BEAM_HEX.sun);
   const stand = addShadowed(group, new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.26, 0.1, 6), mat(COLORS.stone)));
   stand.position.y = 0.05;
-  const material = new THREE.MeshStandardMaterial({ color, roughness: 0.3, flatShading: true, emissive: color, emissiveIntensity: 0 });
+  const material = new THREE.MeshPhysicalMaterial({
+    color,
+    roughness: 0.12,
+    metalness: 0,
+    clearcoat: 1,
+    flatShading: true,
+    emissive: color,
+    emissiveIntensity: 0,
+  });
   const gem = addShadowed(group, new THREE.Mesh(gemGeometry(tile.color), material));
   gem.position.y = 0.42;
-  return { group, gem, material, color };
+  // The light it has caught, glowing from inside.
+  const inner = glowSprite(color.clone().lerp(new THREE.Color('#ffffff'), 0.4), 0.9, 0);
+  inner.position.y = 0.42;
+  group.add(inner);
+  return { group, gem, material, color, gemGlow: inner };
 }
 
 function makeWall() {
