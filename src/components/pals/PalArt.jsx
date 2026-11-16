@@ -4,6 +4,7 @@ import { ThemeOutfit } from './themeOutfitArt.jsx';
 import Cloak, { isCloak } from './Cloak.jsx';
 import styles from './PalArt.module.css';
 import PAL_FIT from './palFit.json';
+import OUTFIT_FIT from './palOutfitFit.json';
 
 const SLOT_ORDER = ['neck', 'head', 'hand'];
 const slotOf = (id) => accessoryById(id)?.slot;
@@ -170,6 +171,18 @@ function ItemOutline({ id }) {
   );
 }
 
+/** Where hats meet the head: their brim line sits about here on the shared stage (HAT is the head's top). */
+const BRIM = [HAT[0], HAT[1] + 6];
+
+/**
+ * A hat fitted to this drawing (palOutfitFit.json, measured by `npm run pals:fit`): widened to the forehead and
+ * lowered onto heads that sit lower than the shared head top, scaled around the brim so it stays on the head.
+ */
+function hatFit(drawing) {
+  const { drop = 0, scale = 1 } = OUTFIT_FIT[drawing] ?? {};
+  return `translate(${BRIM[0]} ${BRIM[1] + drop}) scale(${scale}) translate(${-BRIM[0]} ${-BRIM[1]})`;
+}
+
 /** The square to show: the whole stage, or (as a portrait) just the Pal, for round avatars. */
 const viewBoxFor = (isPortrait) => (isPortrait ? '4 8 92 92' : '0 0 100 100');
 
@@ -210,11 +223,16 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
           </g>
           <image href={picture} x="0" y="0" width="100" height="100" />
           <g filter={`url(#${outline})`}>
-            {[...wearing]
-              .sort(bySlotOrder)
-              .map((id) =>
-                isCloak(id) ? <Cloak key={id} id={id} part="front" neck={NECK} /> : <Accessory key={id} id={id} hat={HAT} neck={NECK} />,
-              )}
+            {[...wearing].sort(bySlotOrder).map((id) => {
+              if (isCloak(id)) return <Cloak key={id} id={id} part="front" neck={NECK} />;
+              // Hats are fitted to this drawing's head; neck pieces and gear stay on the shared stage.
+              const isHat = accessoryById(id)?.slot === 'head';
+              return (
+                <g key={id} transform={isHat ? hatFit(`${palId}-${stageIndex + 1}`) : undefined}>
+                  <Accessory id={id} hat={HAT} neck={NECK} />
+                </g>
+              );
+            })}
           </g>
         </g>
       </g>
