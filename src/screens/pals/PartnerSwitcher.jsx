@@ -5,17 +5,24 @@ import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import PalPowerBadge from '../../components/pals/PalPowerBadge.jsx';
 import { palPower } from '../../game/palPowers.js';
 import PalDetailDialog from './PalDetailDialog.jsx';
+import PalGuide from './PalGuide.jsx';
+import { readJson, writeJson } from '../../lib/storage.js';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { palById, palStage, stageOf } from '../../game/pals.js';
+import { palById, palStage, stageOf, unannouncedPals } from '../../game/pals.js';
+import { SEEN_PALS_KEY } from './PalUnlockNotice.jsx';
 import { nextTreat, treatsWaiting } from '../../game/treats.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './PartnerSwitcher.module.css';
 import { palName, treatName } from '../../i18n/palText.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 
+/** Remembers that the "How Pals work" card was seen, so it opens by itself only the first time. */
+const SEEN_GUIDE_KEY = 'prism.seenPalGuide.v1';
+
 /**
  * Your partner Pal, big on a little stage (tap it for a hop and a word; it twirls when its outfit
  * changes), how close it is to its next form (tap the silhouette for all forms), its power in levels and its treats.
+ * A ? button opens "How Pals work" (PalGuide), which also opens by itself on the first visit.
  * Switching partner is in the Team tab (TeamSwitcher).
  */
 export default function PartnerSwitcher() {
@@ -23,6 +30,10 @@ export default function PartnerSwitcher() {
   const { progress } = player;
   const { t, line, lang } = useI18n();
   const [isLooking, setIsLooking] = useState(false);
+  // The first visit opens the guide, unless another notice (new Pals, a Lucky Pal) is up: then it waits for the next visit.
+  const [isGuideOpen, setIsGuideOpen] = useState(
+    () => !readJson(SEEN_GUIDE_KEY, false) && !player.luckyGift && unannouncedPals(progress, readJson(SEEN_PALS_KEY, [])).length === 0,
+  );
   const [moment, setMoment] = useState(null);
   const partner = palById(progress.pal.id);
   const outfit = progress.pal.wearing.join(',');
@@ -111,7 +122,19 @@ export default function PartnerSwitcher() {
           </button>
         )}
       </div>
+      <button type="button" className={`game-title ${styles.guide}`} onClick={() => setIsGuideOpen(true)} aria-label={t('palGuide.open')}>
+        ?
+      </button>
       {isLooking && <PalDetailDialog pal={partner} onClose={() => setIsLooking(false)} />}
+      {isGuideOpen && (
+        <PalGuide
+          pal={partner}
+          onClose={() => {
+            writeJson(SEEN_GUIDE_KEY, true);
+            setIsGuideOpen(false);
+          }}
+        />
+      )}
     </section>
   );
 }

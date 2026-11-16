@@ -37,6 +37,7 @@ import { BOOSTERS_FROM_WORLD, HELPERS, HELPER_IDS, LENS_DURATION_MS, toolFor } f
 import { useBoosters } from '../../hooks/useBoosters.js';
 import { streakBoosters } from '../../game/winStreak.js';
 import { partnerPower, powersWorkIn } from '../../game/palPowers.js';
+import { palName } from '../../i18n/palText.js';
 import { playablePals } from '../../game/pals.js';
 import { isWorldComplete } from '../../game/progress.js';
 import { dailyShareText } from '../../game/share.js';
@@ -583,7 +584,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       };
     });
     const showsTips = ['level', 'daily', 'event'].includes(mode) && !isFirstSteps && pieceSteps.length === 0;
-    const tipSteps = showsTips ? unseenTips(readJson(SEEN_TIPS_KEY, [])).map((tip) => ({ ...tip, title: t(`tip.${tip.id}.title`) })) : [];
+    const tipParams = palHelp ? { name: palName(lang, palHelp.pal), power: t(`power.${palHelp.id}.line`, { count: palHelp.amount }) } : {};
+    const tipSteps = showsTips
+      ? unseenTips(readJson(SEEN_TIPS_KEY, []), { hasPal: Boolean(palHelp) }).map((tip) => ({ ...tip, title: t(`tip.${tip.id}.title`, tipParams) }))
+      : [];
     return [...pieceSteps, ...tipSteps];
   };
 
@@ -709,7 +713,9 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
               data-count={boosters.undosLeft}
             />
           )}
-          <span className={styles.headerSpacer}>{mode !== 'playtest' && <PalBuddy reaction={palReaction} />}</span>
+          <span className={styles.headerSpacer} data-tour="pal">
+            {mode !== 'playtest' && <PalBuddy reaction={palReaction} />}
+          </span>
         </span>
       </header>
 

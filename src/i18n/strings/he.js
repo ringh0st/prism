@@ -144,6 +144,7 @@ export const he = {
   'helpers.none': 'אין במלאי. הקישו כדי להשיג עוד.',
 
   'tip.stars.title': 'פחות הקשות, יותר ★',
+  'tip.pal.title': '{name} עוזר לכם: {power}',
 
   'skip.title': 'לדלג על השלב?',
   'skip.text': 'תקבלו כוכב אחד. אפשר לחזור ולהשיג עוד כוכבים מתי שרוצים.',

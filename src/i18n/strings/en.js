@@ -142,6 +142,7 @@ export const en = {
   'helpers.none': 'None left, tap to get more.',
 
   'tip.stars.title': 'Fewer taps, more ★',
+  'tip.pal.title': '{name} helps you: {power}',
 
   'skip.title': 'Skip this level?',
   'skip.text': 'You’ll get 1 star. You can come back for more stars any time.',

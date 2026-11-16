@@ -10,6 +10,8 @@ import { DIFFICULTY } from '../../game/constants.js';
 import { shareText } from '../../lib/shareText.js';
 import PalArt from '../../components/pals/PalArt.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
+import PalPowerBadge from '../../components/pals/PalPowerBadge.jsx';
+import { palPower } from '../../game/palPowers.js';
 import PresentNote from '../../components/gifts/PresentNote.jsx';
 import WinGiftLadder from '../../components/gifts/WinGiftLadder.jsx';
 import PalRecordNote from '../../components/pals/PalRecordNote.jsx';
@@ -242,9 +244,13 @@ export default function WinDialog({
             </span>
             <div className={styles.cheerText}>
               {palGrewTo ? (
-                <p role="status">
-                  <strong>{t('win.grew', { name: palName(lang, partner), stage: t(`stage.${palGrewTo.id}`, {}, palGrewTo.name) })}</strong>
-                </p>
+                <>
+                  <p role="status">
+                    <strong>{t('win.grew', { name: palName(lang, partner), stage: t(`stage.${palGrewTo.id}`, {}, palGrewTo.name) })}</strong>
+                  </p>
+                  {/* Growing up makes its help stronger: show the power it has now. */}
+                  <PalPowerBadge power={palPower(partner, stageOf(progress.pal.owned[partner.id]))} withLine />
+                </>
               ) : (
                 <>
                   <PalGrowthBar pal={partner} owned={progress.pal.owned[partner.id]} />

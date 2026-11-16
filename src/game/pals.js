@@ -244,6 +244,10 @@ export function playablePals(progress) {
   );
 }
 
+/** Pals the player can now pick that the "New Pal unlocked!" notice hasn't shown yet (`seenIds` from that notice). */
+export const unannouncedPals = (progress, seenIds) =>
+  progress.pal.id ? PALS.filter((pal) => !progress.pal.owned[pal.id] && !seenIds.includes(pal.id) && isPalUnlocked(progress, pal)) : [];
+
 export function isPalUnlocked(progress, pal) {
   if (progress.pal.owned[pal.id]) return true;
   if (!progress.pal.id && pal.isStarter) return true;

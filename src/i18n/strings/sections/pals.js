@@ -1,5 +1,12 @@
 /* Texts for the pals screens, in every language. Keys match across en/es/he (a test checks). */
 export const en = {
+  'palGuide.title': 'How Pals work',
+  'palGuide.grow': 'Win levels and your Pal grows up',
+  'palGuide.power': 'The bigger it grows, the stronger its help in levels',
+  'palGuide.gift': 'Every 10 ★ it brings you a present',
+  'palGuide.more': 'More Pals join as you play. Pick who plays with you!',
+  'palGuide.done': 'Got it!',
+  'palGuide.open': 'How Pals work',
   'records.title': 'Records together',
   'records.new': 'New medal with {name}:',
   'records.brave.name': 'Brave together',
@@ -118,6 +125,13 @@ export const en = {
 };
 
 export const es = {
+  'palGuide.title': 'Cómo funcionan los Pals',
+  'palGuide.grow': 'Gana niveles y tu Pal crece',
+  'palGuide.power': 'Cuanto más crece, más te ayuda en los niveles',
+  'palGuide.gift': 'Cada 10 ★ te trae un regalo',
+  'palGuide.more': 'Se unen más Pals mientras juegas. ¡Elige quién juega contigo!',
+  'palGuide.done': '¡Entendido!',
+  'palGuide.open': 'Cómo funcionan los Pals',
   'records.title': 'Récords juntos',
   'records.new': 'Nueva medalla con {name}:',
   'records.brave.name': 'Valientes juntos',
@@ -359,6 +373,13 @@ export const es = {
 };
 
 export const he = {
+  'palGuide.title': 'איך החברים עובדים',
+  'palGuide.grow': 'מנצחים בשלבים, והחבר גדל',
+  'palGuide.power': 'ככל שהוא גדל, הוא עוזר יותר בשלבים',
+  'palGuide.gift': 'על כל 10 ★ הוא מביא לכם מתנה',
+  'palGuide.more': 'עוד חברים מצטרפים ככל שמשחקים. בחרו מי משחק איתכם!',
+  'palGuide.done': 'הבנתי!',
+  'palGuide.open': 'איך החברים עובדים',
   'records.title': 'שיאים ביחד',
   'records.new': 'מדליה חדשה עם {name}:',
   'records.brave.name': 'אמיצים ביחד',

@@ -1,5 +1,6 @@
 /* Your partner Pal, big on a little stage */
 .hero {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 46%) minmax(0, 1fr);
   align-items: center;
@@ -270,4 +271,25 @@
   .bubble {
     animation: none;
   }
+}
+
+/* "How Pals work" */
+.guide {
+  position: absolute;
+  top: 10px;
+  inset-inline-start: 10px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  font-size: 18px;
+  color: var(--text-strong);
+  background: var(--surface-sunken);
+  box-shadow: 0 2px 0 var(--surface-cell-edge);
+  cursor: pointer;
+}
+
+.guide:active {
+  transform: scale(0.92);
 }

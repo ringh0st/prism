@@ -144,6 +144,7 @@ export const es = {
   'helpers.none': 'No te quedan. Toca para conseguir más.',
 
   'tip.stars.title': 'Menos toques, más ★',
+  'tip.pal.title': '{name} te ayuda: {power}',
 
   'skip.title': '¿Saltar este nivel?',
   'skip.text': 'Ganarás 1 estrella. Puedes volver por más cuando quieras.',
