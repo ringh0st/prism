@@ -162,6 +162,23 @@
   grid-template-rows: repeat(var(--rows), 1fr);
 }
 
+/* In 3D the table is the board: no card behind it. */
+.board.board3d {
+  background: none;
+  box-shadow: none;
+}
+
+/* In 3D each cell's button is placed over its piece (Board3D measures where), so the grid is just a frame. */
+.cells3d {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.cells3d .row {
+  display: contents;
+}
+
 .row {
   display: grid;
   grid-template-columns: repeat(var(--cols), 1fr);

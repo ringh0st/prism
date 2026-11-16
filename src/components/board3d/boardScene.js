@@ -5,14 +5,10 @@
  */
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { TILE } from '../../game/constants.js';
 
-const BEAM_COLORS = { sun: '#ffd23f', coral: '#ff5a4e', lime: '#7ccf3c', sky: '#45b4ea' };
+const BEAM_COLORS = { sun: '#ffc61a', coral: '#ff5a4e', lime: '#7ccf3c', sky: '#45b4ea' };
 const PALETTE = {
   table: '#c99a6b',
   tableEdge: '#a8794f',
@@ -118,7 +114,7 @@ function makeGem(tile) {
     emissive: color,
     emissiveIntensity: 0,
   });
-  const gem = addShadowed(group, new THREE.Mesh(new THREE.OctahedronGeometry(0.3, 0), material));
+  const gem = addShadowed(group, new THREE.Mesh(new THREE.OctahedronGeometry(0.34, 0), material));
   gem.scale.set(1, 1.3, 1);
   gem.position.y = 0.42;
   return { group, gem, material, color };
@@ -154,25 +150,40 @@ function makePiece(tile, environment) {
   }
 }
 
-/** A beam between two cell centres: a glowing tube with a white-hot core (the only things bright enough to bloom). */
+/** A beam between two cell centres: a bright core inside two soft halos (added light, so it glows without bloom). */
 function makeBeam(level, segment) {
   const from = place(level, segment.x1, segment.y1).setY(BEAM_HEIGHT);
   const to = place(level, segment.x2, segment.y2).setY(BEAM_HEIGHT);
-  const length = from.distanceTo(to);
+  const length = from.distanceTo(to) + 0.06;
   const group = new THREE.Group();
   const color = new THREE.Color(BEAM_COLORS[segment.color] ?? BEAM_COLORS.sun);
-  const glow = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.07, 0.07, length, 12, 1, true),
-    new THREE.MeshBasicMaterial({ color: color.clone().multiplyScalar(3), toneMapped: false }),
-  );
-  const core = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.025, 0.025, length, 8),
-    new THREE.MeshBasicMaterial({ color: new THREE.Color(3, 3, 2.6), toneMapped: false }),
-  );
-  for (const mesh of [glow, core]) {
+  const layers = [
+    { radius: 0.13, color, opacity: 0.22 },
+    { radius: 0.065, color, opacity: 0.85 },
+    { radius: 0.028, color: new THREE.Color('#fffdf2'), opacity: 1 },
+  ];
+  for (const layer of layers) {
+    const mesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(layer.radius, layer.radius, length, 16, 1, true),
+      new THREE.MeshBasicMaterial({
+        color: layer.color,
+        transparent: true,
+        opacity: layer.opacity,
+        depthWrite: false,
+        toneMapped: false,
+      }),
+    );
     mesh.rotation.z = Math.PI / 2;
     group.add(mesh);
   }
+  // A small pool of light on the table under the beam.
+  const pool = new THREE.Mesh(
+    new THREE.PlaneGeometry(length, 0.5),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.16, depthWrite: false }),
+  );
+  pool.rotation.x = -Math.PI / 2;
+  pool.position.y = 0.03 - BEAM_HEIGHT;
+  group.add(pool);
   group.position.copy(from).lerp(to, 0.5);
   group.rotation.y = -Math.atan2(to.z - from.z, to.x - from.x);
   return group;
@@ -190,7 +201,6 @@ export function createBoardScene(canvas, level, { tilt = 0.62 } = {}) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color('#faf6ee');
   const pmrem = new THREE.PMREMGenerator(renderer);
   const environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
   scene.environment = environment;
@@ -222,43 +232,95 @@ export function createBoardScene(canvas, level, { tilt = 0.62 } = {}) {
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
   const fitCamera = (aspect) => {
     camera.aspect = aspect;
-    const span = (Math.max(level.width / aspect, level.height) + 1.2) / 2;
-    const distance = span / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) + 1;
+    const span = (Math.max(level.width / aspect, level.height) + 1.3) / 2;
+    const distance = span / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
     camera.position.set(0, Math.cos(tilt) * distance, Math.sin(tilt) * distance);
     camera.lookAt(0, 0, 0.1);
     camera.updateProjectionMatrix();
   };
 
-  const composer = new EffectComposer(renderer);
-  composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(1, 1), 0.45, 0.35, 1.6);
-  composer.addPass(bloom);
-  composer.addPass(new OutputPass());
-
-  const update = (orients, trace) => {
+  // Mirrors swing smoothly to their new angle; lit gems turn slowly and bob.
+  const rotorTargets = level.tiles.map(() => 0);
+  const litGems = new Set();
+  const update = (turns, trace) => {
     level.tiles.forEach((tile, i) => {
       const piece = pieces[i];
-      if (piece.rotor) piece.rotor.rotation.y = -THREE.MathUtils.degToRad(-45 + (orients[i] ?? 0) * 90);
+      if (piece.rotor) rotorTargets[i] = -THREE.MathUtils.degToRad(-45 + (turns[i] ?? 0) * 90);
       if (piece.gem) {
         const isLit = trace.litGems.has(i);
-        piece.material.emissiveIntensity = isLit ? 2.2 : 0;
-        piece.material.color.copy(isLit ? piece.color : piece.color.clone().lerp(new THREE.Color('#b9ab98'), 0.55));
+        if (isLit) litGems.add(i);
+        else litGems.delete(i);
+        piece.material.emissiveIntensity = isLit ? 0.6 : 0;
+        piece.material.color.copy(isLit ? piece.color : piece.color.clone().lerp(new THREE.Color('#b9ab98'), 0.35));
       }
     });
     beams.clear();
     for (const segment of trace.segments) beams.add(makeBeam(level, segment));
   };
+  let isFirstUpdate = true;
+  /** Advance the animations by `dt` seconds (0 jumps straight to the end). Returns true while anything still moves. */
+  const tick = (dt, time = 0, calm = false) => {
+    let isMoving = false;
+    pieces.forEach((piece, i) => {
+      if (piece.rotor) {
+        const gap = rotorTargets[i] - piece.rotor.rotation.y;
+        if (Math.abs(gap) > 0.001 && !isFirstUpdate && dt > 0) {
+          piece.rotor.rotation.y += gap * Math.min(1, dt * 14);
+          isMoving = true;
+        } else piece.rotor.rotation.y = rotorTargets[i];
+      }
+      if (piece.gem && !calm) {
+        const isLit = litGems.has(i);
+        piece.gem.rotation.y += dt * (isLit ? 1.6 : 0.3);
+        piece.gem.position.y = 0.42 + (isLit ? Math.sin(time * 2.4 + i) * 0.04 : 0);
+      }
+    });
+    isFirstUpdate = false;
+    return isMoving;
+  };
+
+  /** Each cell's box on screen (pixels from the canvas's top left), for placing the tap targets over the pieces. */
+  const cellRects = (width, height) => {
+    const rects = [];
+    const corner = new THREE.Vector3();
+    for (let y = 0; y < level.height; y++) {
+      for (let x = 0; x < level.width; x++) {
+        const centre = place(level, x, y);
+        let left = Infinity;
+        let right = -Infinity;
+        let top = Infinity;
+        let bottom = -Infinity;
+        for (const [dx, dz] of [
+          [-0.5, -0.5],
+          [0.5, -0.5],
+          [-0.5, 0.5],
+          [0.5, 0.5],
+        ]) {
+          corner.set(centre.x + dx, 0.15, centre.z + dz).project(camera);
+          const px = ((corner.x + 1) / 2) * width;
+          const py = ((1 - corner.y) / 2) * height;
+          left = Math.min(left, px);
+          right = Math.max(right, px);
+          top = Math.min(top, py);
+          bottom = Math.max(bottom, py);
+        }
+        rects.push({ left, top, width: right - left, height: bottom - top });
+      }
+    }
+    return rects;
+  };
 
   const resize = (width, height) => {
     renderer.setSize(width, height, false);
-    composer.setSize(width, height);
     fitCamera(width / height);
   };
 
   return {
     update,
+    tick,
+    cellRects,
     resize,
-    render: () => composer.render(),
+    render: () => renderer.render(scene, camera),
     dispose: () => {
       renderer.dispose();
       pmrem.dispose();

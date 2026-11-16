@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import TileArt, { TileDefs } from './TileArt.jsx';
 import BeamLayer from './BeamLayer.jsx';
 import DarknessLayer from './DarknessLayer.jsx';
@@ -16,6 +16,9 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './Board.module.css';
 
 /** Name tags for the first levels, so new players know which piece is which (translation keys). */
+// The 3D board (three.js) loads only when it's used, so the flat board stays light.
+const Board3D = lazy(() => import('../board3d/Board3D.jsx'));
+
 const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
 
 /**
@@ -40,6 +43,7 @@ const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
  * @param coach        first-levels coaching: { tile: tile index the hand points at, or null; labels: show Lamp/Gem tags }
  * @param darkness     the darkness now (darkness.js): creeping shadows, countdowns on fading gems and dying lamps
  * @param darkMoves    moves that still stand (for the eclipse countdown)
+ * @param is3d         draw the board as a 3D tabletop (prototype): the buttons stay, placed over the 3D pieces
  */
 export default function Board({
   level,
@@ -63,11 +67,15 @@ export default function Board({
   nudgedCell = null,
   darkness = null,
   darkMoves = 0,
+  is3d = false,
 }) {
   const { t, lang } = useI18n();
   const { width, height, tiles } = level;
   const [focusedCell, setFocusedCell] = useState(0);
   const cellRefs = useRef([]);
+  // In 3D, where each cell's piece is on screen (from Board3D), so its button sits over it.
+  const [cellRects, setCellRects] = useState(null);
+  const allTurns = useMemo(() => tiles.map((_, i) => turns[i] ?? orients[i] ?? 0), [tiles, turns, orients]);
 
   const tileAtCell = useMemo(() => {
     const map = Array.from({ length: width * height }, () => -1);
@@ -136,24 +144,31 @@ export default function Board({
   return (
     <div
       dir="ltr"
-      className={`${styles.board} ${styles[mood] ?? ''} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''} ${
+      className={`${styles.board} ${is3d ? styles.board3d : ''} ${styles[mood] ?? ''} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''} ${
         darkness && isEclipseMove(level, darkMoves) ? styles.eclipse : ''
       }`}
       style={{ '--cols': width, '--rows': height }}
     >
       <TileDefs />
-      <div className={styles.floor} aria-hidden="true">
-        {/* A checkerboard in the world's colors; the cells the light passes through glow in its color. */}
-        {Array.from({ length: width * height }, (_, cell) => (
-          <span
-            key={cell}
-            className={`${styles.plate} ${(Math.floor(cell / width) + (cell % width)) % 2 ? styles.plateAlt : ''} ${litPlates.has(cell) ? styles.plateLit : ''}`}
-          />
-        ))}
-      </div>
-      <BeamLayer width={width} height={height} segments={trace.segments} />
-      {darkness && <DarknessLayer level={level} darkness={darkness} moves={darkMoves} />}
-      <div className={styles.cells} role="grid" aria-label={label} aria-rowcount={height} aria-colcount={width}>
+      {is3d && (
+        <Suspense fallback={null}>
+          <Board3D level={level} turns={allTurns} trace={trace} onLayout={setCellRects} />
+        </Suspense>
+      )}
+      {!is3d && (
+        <div className={styles.floor} aria-hidden="true">
+          {/* A checkerboard in the world's colors; the cells the light passes through glow in its color. */}
+          {Array.from({ length: width * height }, (_, cell) => (
+            <span
+              key={cell}
+              className={`${styles.plate} ${(Math.floor(cell / width) + (cell % width)) % 2 ? styles.plateAlt : ''} ${litPlates.has(cell) ? styles.plateLit : ''}`}
+            />
+          ))}
+        </div>
+      )}
+      {!is3d && <BeamLayer width={width} height={height} segments={trace.segments} />}
+      {darkness && !is3d && <DarknessLayer level={level} darkness={darkness} moves={darkMoves} />}
+      <div className={`${styles.cells} ${is3d ? styles.cells3d : ''}`} role="grid" aria-label={label} aria-rowcount={height} aria-colcount={width}>
         {Array.from({ length: height }, (_, row) => (
           <div role="row" key={row} className={styles.row}>
             {Array.from({ length: width }, (_, col) => {
@@ -187,7 +202,22 @@ export default function Board({
                 describeTile(tile, { orient: orients[tileIndex], isLit, isOpen, isRotatable: canRotate, isFogged, turnsLeft: left }, t) +
                 (darkWords.length ? `, ${darkWords.join(', ')}` : '');
               return (
-                <div role="gridcell" key={col} className={styles.cellWrap}>
+                <div
+                  role="gridcell"
+                  key={col}
+                  className={styles.cellWrap}
+                  style={
+                    is3d && cellRects
+                      ? {
+                          position: 'absolute',
+                          left: cellRects[cell].left,
+                          top: cellRects[cell].top,
+                          width: cellRects[cell].width,
+                          height: cellRects[cell].height,
+                        }
+                      : undefined
+                  }
+                >
                   <button
                     ref={(element) => {
                       cellRefs.current[cell] = element;
@@ -217,7 +247,7 @@ export default function Board({
                         {t(COACH_LABELS[tile.type])}
                       </span>
                     )}
-                    {tile && (
+                    {tile && !is3d && (
                       <TileArt
                         tile={tile}
                         turns={turns[tileIndex] ?? orients[tileIndex] ?? 0}
@@ -237,7 +267,7 @@ export default function Board({
           </div>
         ))}
       </div>
-      {ghostSegments && <LensPath width={width} height={height} segments={ghostSegments} />}
+      {ghostSegments && !is3d && <LensPath width={width} height={height} segments={ghostSegments} />}
     </div>
   );
 }

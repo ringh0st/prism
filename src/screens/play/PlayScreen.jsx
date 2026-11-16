@@ -113,7 +113,17 @@ function piecesToIntroduce(level, mode, progress) {
  * | 'challenge' (a friend's "beat my score" link: no helpers, records nothing; `challenge` is { levelId, moves, name })
  * | 'rush' (Light Rush: no helpers, the run's spare moves set the limit; `rush` is from RushRoute)
  */
-export default function PlayScreen({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey, challenge = null, rush = null }) {
+export default function PlayScreen({
+  level,
+  mode = 'level',
+  title,
+  backHref = '#/',
+  nextLevel = null,
+  dateKey,
+  challenge = null,
+  rush = null,
+  is3d = false,
+}) {
   const { progress, settings, finishLevel, finishDaily, finishEventLevel, consumeHelper, endWinStreak } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
@@ -815,6 +825,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           darkMoves={puzzle.taps.length}
           mood={modifier}
           label={t('play.boardLabel', { name: levelName })}
+          is3d={is3d}
         />
       </div>
 
