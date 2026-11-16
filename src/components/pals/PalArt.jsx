@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { accessoryById, palStage } from '../../game/pals.js';
 import { ThemeOutfit } from './themeOutfitArt.jsx';
 import Cloak, { isCloak } from './Cloak.jsx';
@@ -155,6 +156,30 @@ export function Accessory({ id, hat, neck }) {
  * glow), never in how big it is. Each drawing has its own scale to one shared size (palFit.json, `npm run pals:fit`);
  * it scales around the floor together with the outfit, which is drawn for the shared stage.
  */
+/**
+ * Worn items get a sticker border like the Pals themselves: a cream outline with a soft brown edge outside it, so a
+ * peach beanie still stands out on an orange tiger and a white scarf on a snowy yeti.
+ */
+function ItemOutline({ id }) {
+  return (
+    <defs>
+      <filter id={id} x="-25%" y="-25%" width="150%" height="150%">
+        <feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="wide" />
+        <feFlood floodColor="#5a4636" floodOpacity="0.5" />
+        <feComposite in2="wide" operator="in" result="edge" />
+        <feMorphology in="SourceAlpha" operator="dilate" radius="1.5" result="near" />
+        <feFlood floodColor="#fffaf2" />
+        <feComposite in2="near" operator="in" result="border" />
+        <feMerge>
+          <feMergeNode in="edge" />
+          <feMergeNode in="border" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+  );
+}
+
 /** The square to show: the whole stage, or (as a portrait) just the Pal, for round avatars. */
 const viewBoxFor = (isPortrait) => (isPortrait ? '4 8 92 92' : '0 0 100 100');
 
@@ -170,6 +195,7 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
   const picture = PICTURES[`${palId}-${stageIndex + 1}`];
   if (!picture) return null;
   const fit = PAL_FIT[`${palId}-${stageIndex + 1}`] ?? 1;
+  const outline = `pal-item-${useId().replaceAll(':', '')}`;
   return (
     <svg
       className={`${alive ? styles.alive : ''} ${className}`}
@@ -183,16 +209,23 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
       focusable="false"
       overflow="visible"
     >
+      {wearing.length > 0 && <ItemOutline id={outline} />}
       <ellipse cx="50" cy="95" rx="24" ry="4" fill="rgba(60,40,20,.14)" />
       <g transform={`translate(50 94) scale(${fit}) translate(-50 -94)`}>
         <g className={styles.body}>
-          {wearing.filter(isCloak).map((id) => (
-            <Cloak key={id} id={id} part="back" neck={NECK} />
-          ))}
+          <g filter={`url(#${outline})`}>
+            {wearing.filter(isCloak).map((id) => (
+              <Cloak key={id} id={id} part="back" neck={NECK} />
+            ))}
+          </g>
           <image href={picture} x="0" y="0" width="100" height="100" />
-          {[...wearing]
-            .sort(bySlotOrder)
-            .map((id) => (isCloak(id) ? <Cloak key={id} id={id} part="front" neck={NECK} /> : <Accessory key={id} id={id} hat={HAT} neck={NECK} />))}
+          <g filter={`url(#${outline})`}>
+            {[...wearing]
+              .sort(bySlotOrder)
+              .map((id) =>
+                isCloak(id) ? <Cloak key={id} id={id} part="front" neck={NECK} /> : <Accessory key={id} id={id} hat={HAT} neck={NECK} />,
+              )}
+          </g>
         </g>
       </g>
     </svg>
