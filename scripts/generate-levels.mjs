@@ -12,7 +12,7 @@ import { generateLevel } from '../src/game/generator.js';
 import { analyzeLevel } from '../src/game/solver.js';
 import { validateLevel } from '../src/game/levelSchema.js';
 import { PIECE_FIRST_LEVEL, piecesIn } from '../src/game/pieces.js';
-import { MAX_RANDOM_SOLVE_RATE, randomSolveRate } from '../src/game/levelQuality.js';
+import { MAX_RANDOM_SOLVE_RATE, randomSolveRate, solvesWithoutPlanning } from '../src/game/levelQuality.js';
 import { REST_RECIPES } from '../src/game/recipes.js';
 import { difficultyFor, generatorPresetFor, levelId, LEVELS_PER_WORLD, WORLD_COUNT } from '../src/game/worlds.js';
 import { createRandom } from '../src/lib/random.js';
@@ -81,8 +81,10 @@ function bestLevelFor(world, index) {
       } else if (preset.darkness) level = null;
       // A level that introduces a piece must actually contain it.
       const hasRequired = !preset.mustHave || (level && piecesIn(level).includes(preset.mustHave));
-      // Every regular level needs a real "catch": random tapping mustn't solve it (levelQuality.js).
-      const rate = level && hasRequired && needsCatch ? randomSolveRate({ ...level, difficulty: difficultyFor(index) }) : 0;
+      // Every regular level needs a real "catch": random tapping mustn't solve it, and nor may a player who just
+      // lights the most each move without planning (levelQuality.js). Such a board counts as fully guessable.
+      const rated = level && { ...level, difficulty: difficultyFor(index) };
+      const rate = level && hasRequired && needsCatch ? (solvesWithoutPlanning(rated) ? 1 : randomSolveRate(rated)) : 0;
       if (level && hasRequired && level.par <= preset.maxPar && (!fallback || rate < fallback.rate)) fallback = { level, rate };
       if (level && hasRequired && level.par <= preset.maxPar && (!best || level.par > best.par) && rate <= MAX_RANDOM_SOLVE_RATE) best = level;
       if (best && best.par >= preset.minPar) return best;

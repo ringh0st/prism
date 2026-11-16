@@ -206,7 +206,8 @@ function addGlooms(level, solution, count, targetRisk, random, minLength = 2) {
       }
       if (best && (targetRisk !== null ? best.score > -0.1 : best.score > 0.7)) break;
     }
-    if (!best) return null;
+    // A second shadow is a bonus: keep the first if there's no room for another.
+    if (!best) return n > 0 ? current : null;
     current = best.level;
   }
   return current;
