@@ -42,7 +42,7 @@ update public.diamond_packs set stripe_price_id = 'price_…' where id = 'diamon
 update public.diamond_packs set stripe_price_id = 'price_…' where id = 'diamonds-130';
 ```
 
-(Run `supabase/economy.sql` once first if you haven't since this update: it adds the `stripe_price_id` column.) Test-mode and live prices have different IDs, so do this again with the live ones when you go live.
+(First add the column once, with this line on its own, rather than re-running economy.sql, whose functions later scripts build on: `alter table public.diamond_packs add column if not exists stripe_price_id text unique;`) Test-mode and live prices have different IDs, so do this again with the live ones when you go live.
 
 ## 3. Keys from Stripe
 
