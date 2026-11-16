@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { supportsWebGL } from '../../lib/webgl.js';
 import Board from '../../components/board/Board.jsx';
 import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
@@ -825,7 +826,7 @@ export default function PlayScreen({
           darkMoves={puzzle.taps.length}
           mood={modifier}
           label={t('play.boardLabel', { name: levelName })}
-          is3d={is3d}
+          is3d={is3d || (settings.board3d !== false && supportsWebGL())}
         />
       </div>
 

@@ -171,6 +171,15 @@
   user-select: none;
 }
 
+/* In 3D, Smudge and countdowns float over their piece. */
+.overlay3d {
+  position: absolute;
+  inset: -10%;
+  width: 120%;
+  height: 120%;
+  pointer-events: none;
+}
+
 /* Taps are found by pointing into the 3D scene (Board3D); the buttons stay for the keyboard and screen readers. */
 .cells3d .cell {
   pointer-events: none;

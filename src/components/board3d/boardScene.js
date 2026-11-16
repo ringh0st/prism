@@ -1,40 +1,21 @@
 /*
- * A 3D board (prototype): the same level drawn as a little tabletop diorama in the flat board's own look: the
- * world's board color as the tray, soft rounded tiles in its two cell colors that warm to honey where light
- * passes, an orange lamp block, sage mirrors on pale sage turntables and honey gems. Pieces are chunky toys
- * with soft shadows; only the light glows. The game logic is unchanged: this only draws the turns and the trace.
+ * The 3D board: the same level drawn as a little tabletop in the flat board's own look (the world's board color
+ * as the tray, rounded tiles in its two cell colors that warm to honey where light passes, pieces as chunky toys
+ * from boardPieces.js with soft shadows; only the light glows). It only draws: the game logic is unchanged.
+ * The camera turns all the way round, tilts and zooms (setView) and always fits the whole table on screen.
  */
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
-import { TILE } from '../../game/constants.js';
-import { cellsOnBeams } from '../../game/beam.js';
+import { cellsOnBeams, isRotatable } from '../../game/beam.js';
+import { FRAGILE_TURNS } from '../../game/constants.js';
+import { BEAM_HEIGHT, BEAM_HEX, addShadowed, darkenedColor, makeFog, makePiece, mat } from './boardPieces.js';
 
-const BEAM_COLORS = { sun: '#ffc61a', coral: '#ff5a4e', lime: '#7ccf3c', sky: '#45b4ea' };
 /** The flat board's colors (Board3D reads the world's own from its CSS; these are World 1's). */
 export const DEFAULT_THEME = { board: '#c6d9b4', cell: '#f3f6ea', cellAlt: '#e2ecd8', honey: '#f0c14e', piece: '#3f8a64', pivot: '#9fcf9a' };
-const PALETTE = {
-  lamp: '#ef9c5a',
-  lampDeep: '#e5864f',
-  sage: '#58ac82',
-  sageDeep: '#3f8f68',
-  stone: '#cdb9a0',
-  wall: '#b98d68',
-};
-const BEAM_HEIGHT = 0.28;
-const DIRECTION_ANGLE = { right: 0, down: -Math.PI / 2, left: Math.PI, up: Math.PI / 2 };
-
-const mat = (color, options = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.75, ...options });
 
 /** Cell (x, y) to the table's coordinates: x to the right, z towards the player. */
 const place = (level, x, y) => new THREE.Vector3(x - level.width / 2 + 0.5, 0, y - level.height / 2 + 0.5);
-
-function addShadowed(group, mesh) {
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  group.add(mesh);
-  return mesh;
-}
 
 /** The tray in the world's board color, with a rounded tile on every cell (kept to warm them where light passes). */
 function makeTable(level, theme) {
@@ -53,6 +34,7 @@ function makeTable(level, theme) {
       const plate = new THREE.Mesh(plateShape, mat(color, { roughness: 0.9 }));
       plate.position.copy(place(level, x, y)).setY(0.02);
       plate.receiveShadow = true;
+      plate.userData.cell = y * level.width + x;
       group.add(plate);
       plates.push({ mesh: plate, color, lit: color.clone().lerp(new THREE.Color(theme.honey), 0.32) });
     }
@@ -60,122 +42,13 @@ function makeTable(level, theme) {
   return { group, plates };
 }
 
-/** A mirror on its pivot: a wooden puck (or a square plate when fixed) with an upright silver panel. */
-function makeMirror(tile, environment, theme) {
-  const group = new THREE.Group();
-  const isFixed = tile.locked;
-  const base = addShadowed(
-    group,
-    new THREE.Mesh(
-      isFixed ? new RoundedBoxGeometry(0.8, 0.08, 0.8, 2, 0.03) : new THREE.CylinderGeometry(0.36, 0.38, 0.08, 32),
-      mat(isFixed ? PALETTE.stone : new THREE.Color(theme.pivot).lerp(new THREE.Color(theme.cell), 0.45)),
-    ),
-  );
-  base.position.y = 0.06;
-  const rotor = new THREE.Group();
-  rotor.position.y = 0.1;
-  const isSplitter = tile.type === TILE.SPLITTER;
-  const frame = addShadowed(
-    rotor,
-    new THREE.Mesh(new RoundedBoxGeometry(0.86, 0.44, 0.12, 3, 0.04), mat(isSplitter ? '#17988c' : theme.piece, { roughness: 0.55 })),
-  );
-  frame.position.y = 0.22;
-  const glass = new THREE.Mesh(
-    new THREE.BoxGeometry(0.76, 0.34, 0.13),
-    isSplitter
-      ? new THREE.MeshPhysicalMaterial({ color: '#9fe3d6', roughness: 0.05, transmission: 0.6, transparent: true, opacity: 0.7, envMap: environment })
-      : new THREE.MeshStandardMaterial({ color: '#f4f1ea', metalness: 1, roughness: 0.08, envMap: environment, envMapIntensity: 1.2 }),
-  );
-  glass.position.y = 0.22;
-  rotor.add(glass);
-  group.add(rotor);
-  return { group, rotor };
-}
-
-/** The lamp: a chunky orange block like the flat lamp tile, with a glowing lens in the beam's color facing its way. */
-function makeLamp(tile) {
-  const group = new THREE.Group();
-  const head = new THREE.Group();
-  head.rotation.y = DIRECTION_ANGLE[tile.dir] ?? 0;
-  const body = addShadowed(head, new THREE.Mesh(new RoundedBoxGeometry(0.74, 0.46, 0.74, 5, 0.17), mat(PALETTE.lamp, { roughness: 0.6 })));
-  body.position.y = 0.25;
-  const cap = new THREE.Mesh(new RoundedBoxGeometry(0.62, 0.06, 0.62, 3, 0.03), mat('#f6c08a', { roughness: 0.6 }));
-  cap.position.y = 0.48;
-  head.add(cap);
-  // The lens on the side the light leaves from, ringed in white.
-  const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.17, 0.05, 32), mat('#fffaf0', { roughness: 0.4 }));
-  const lens = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.12, 0.12, 0.06, 32),
-    new THREE.MeshBasicMaterial({ color: new THREE.Color(BEAM_COLORS[tile.color] ?? BEAM_COLORS.sun).multiplyScalar(1.15), toneMapped: false }),
-  );
-  for (const [mesh, x] of [
-    [ring, 0.37],
-    [lens, 0.39],
-  ]) {
-    mesh.rotation.z = Math.PI / 2;
-    mesh.position.set(x, BEAM_HEIGHT, 0);
-    head.add(mesh);
-  }
-  group.add(head);
-  return { group };
-}
-
-function makeGem(tile) {
-  const group = new THREE.Group();
-  const color = new THREE.Color(BEAM_COLORS[tile.color] ?? BEAM_COLORS.sun);
-  const stand = addShadowed(group, new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.26, 0.1, 6), mat(PALETTE.stone)));
-  stand.position.y = 0.05;
-  const material = new THREE.MeshStandardMaterial({
-    color,
-    roughness: 0.25,
-    metalness: 0.1,
-    flatShading: true,
-    emissive: color,
-    emissiveIntensity: 0,
-  });
-  const gem = addShadowed(group, new THREE.Mesh(new THREE.OctahedronGeometry(0.34, 0), material));
-  gem.scale.set(1, 1.3, 1);
-  gem.position.y = 0.42;
-  return { group, gem, material, color };
-}
-
-function makeWall() {
-  const group = new THREE.Group();
-  const block = addShadowed(group, new THREE.Mesh(new RoundedBoxGeometry(0.84, 0.5, 0.84, 4, 0.14), mat(PALETTE.wall)));
-  block.position.y = 0.25;
-  return { group };
-}
-
-/** Anything not drawn yet in the prototype: a plain marker so the board still reads. */
-function makePlaceholder() {
-  const group = new THREE.Group();
-  addShadowed(group, new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.2, 6), mat('#bfae96'))).position.y = 0.1;
-  return { group };
-}
-
-function makePiece(tile, environment, theme) {
-  switch (tile.type) {
-    case TILE.MIRROR:
-    case TILE.SPLITTER:
-      return makeMirror(tile, environment, theme);
-    case TILE.EMITTER:
-      return makeLamp(tile);
-    case TILE.GEM:
-      return makeGem(tile);
-    case TILE.WALL:
-      return makeWall();
-    default:
-      return makePlaceholder();
-  }
-}
-
-/** A beam between two cell centres: a bright core inside two soft halos (added light, so it glows without bloom). */
+/** A beam between two cell centres: a bright core inside a soft halo, and a pool of its light on the tiles. */
 function makeBeam(level, segment) {
   const from = place(level, segment.x1, segment.y1).setY(BEAM_HEIGHT);
   const to = place(level, segment.x2, segment.y2).setY(BEAM_HEIGHT);
   const length = from.distanceTo(to) + 0.06;
   const group = new THREE.Group();
-  const color = new THREE.Color(BEAM_COLORS[segment.color] ?? BEAM_COLORS.sun);
+  const color = new THREE.Color(BEAM_HEX[segment.color] ?? BEAM_HEX.sun);
   const layers = [
     { radius: 0.13, color, opacity: 0.22 },
     { radius: 0.065, color, opacity: 0.85 },
@@ -184,18 +57,11 @@ function makeBeam(level, segment) {
   for (const layer of layers) {
     const mesh = new THREE.Mesh(
       new THREE.CylinderGeometry(layer.radius, layer.radius, length, 16, 1, true),
-      new THREE.MeshBasicMaterial({
-        color: layer.color,
-        transparent: true,
-        opacity: layer.opacity,
-        depthWrite: false,
-        toneMapped: false,
-      }),
+      new THREE.MeshBasicMaterial({ color: layer.color, transparent: true, opacity: layer.opacity, depthWrite: false }),
     );
     mesh.rotation.z = Math.PI / 2;
     group.add(mesh);
   }
-  // A small pool of light on the table under the beam.
   const pool = new THREE.Mesh(
     new THREE.PlaneGeometry(length, 0.5),
     new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.16, depthWrite: false }),
@@ -208,12 +74,27 @@ function makeBeam(level, segment) {
   return group;
 }
 
+/** A creeping shadow's trail to its gem: dark footprints that fade further along. */
+function makeTrail(level, cells) {
+  const group = new THREE.Group();
+  cells.forEach((cell, step) => {
+    const dot = new THREE.Mesh(
+      new THREE.CircleGeometry(0.09 + 0.02 * Math.max(0, 3 - step), 20),
+      new THREE.MeshBasicMaterial({ color: '#4a3a30', transparent: true, opacity: Math.max(0.12, 0.55 - step * 0.06), depthWrite: false }),
+    );
+    dot.rotation.x = -Math.PI / 2;
+    dot.position.copy(place(level, cell % level.width, Math.floor(cell / level.width))).setY(0.08);
+    group.add(dot);
+  });
+  return group;
+}
+
 /**
  * Build the scene on a canvas.
- * @returns { update(orients, trace), resize(width, height), render(), dispose() }
+ * @returns { update, tick, cellRects, cellAt, setView, resetView, getView, resize, render, dispose }
  */
 export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_THEME } = {}) {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -240,87 +121,142 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
 
   const table = makeTable(level, theme);
   scene.add(table.group);
-  const pieces = level.tiles.map((tile) => {
-    const piece = makePiece(tile, environment, theme);
+  const pieces = level.tiles.map((tile, i) => {
+    const piece = makePiece(tile, { environment, theme, isRotatable: isRotatable(tile) });
     piece.group.position.copy(place(level, tile.x, tile.y));
+    piece.group.userData.cell = tile.y * level.width + tile.x;
+    piece.index = i;
     scene.add(piece.group);
+    // Fog hides a piece until light reaches its cell.
+    if (tile.fog) {
+      piece.fog = makeFog();
+      piece.fog.position.copy(piece.group.position);
+      piece.fog.userData.cell = piece.group.userData.cell;
+      scene.add(piece.fog);
+    }
     return piece;
   });
   const beams = new THREE.Group();
-  scene.add(beams);
+  const trails = new THREE.Group();
+  scene.add(beams, trails);
 
-  // Looking down at the table: `tilt` from straight down (0) towards the player, `yaw` turns around the table,
-  // `zoom` above 1 comes closer. The player can turn and zoom (setView); reset brings back the start view.
-  const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+  // The camera: `tilt` from straight down (0) towards the player, `yaw` all the way round the table, `zoom` above 1
+  // comes closer. At zoom 1 the whole table always fits, at any angle.
+  const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 200);
   const START_VIEW = { yaw: 0, tilt, zoom: 1 };
   const view = { ...START_VIEW };
   let aspect = 1;
-  const fitCamera = () => {
-    camera.aspect = aspect;
-    const span = (Math.max(level.width / aspect, level.height) + 1.3) / 2;
-    const distance = span / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / view.zoom;
+  const halfW = level.width / 2 + 0.25;
+  const halfH = level.height / 2 + 0.25;
+  const tableCorners = [-1, 1].flatMap((sx) => [-1, 1].flatMap((sz) => [0.55, -0.5].map((y) => new THREE.Vector3(sx * halfW, y, sz * halfH))));
+  const aim = (distance) => {
     const ground = Math.sin(view.tilt) * distance;
     camera.position.set(Math.sin(view.yaw) * ground, Math.cos(view.tilt) * distance, Math.cos(view.yaw) * ground);
     camera.lookAt(0, 0, 0);
+    camera.updateMatrixWorld();
+  };
+  const fitCamera = () => {
+    camera.aspect = aspect;
+    camera.updateProjectionMatrix();
+    // Move back until every corner of the table is on screen with a little room, then apply the zoom.
+    let distance = Math.max(level.width, level.height) * 2.5;
+    const point = new THREE.Vector3();
+    for (let pass = 0; pass < 4; pass++) {
+      aim(distance);
+      let reach = 0;
+      for (const corner of tableCorners) {
+        point.copy(corner).project(camera);
+        reach = Math.max(reach, Math.abs(point.x), Math.abs(point.y));
+      }
+      distance *= reach / 0.94;
+    }
+    aim(distance / view.zoom);
     camera.updateProjectionMatrix();
   };
   /** Change the view (any of yaw, tilt, zoom), kept within comfortable limits. Returns the view now. */
   const setView = (change) => {
     if (change.yaw !== undefined) view.yaw = change.yaw;
-    if (change.tilt !== undefined) view.tilt = THREE.MathUtils.clamp(change.tilt, 0.12, 1.05);
-    if (change.zoom !== undefined) view.zoom = THREE.MathUtils.clamp(change.zoom, 0.7, 2.2);
+    if (change.tilt !== undefined) view.tilt = THREE.MathUtils.clamp(change.tilt, 0.05, 1.1);
+    if (change.zoom !== undefined) view.zoom = THREE.MathUtils.clamp(change.zoom, 1, 2.6);
     fitCamera();
     return { ...view };
   };
   const resetView = () => setView(START_VIEW);
 
-  // Mirrors swing smoothly to their new angle; lit gems turn slowly and bob.
+  // Mirrors and turning lamps swing smoothly to their new angle; lit gems turn slowly and bob.
   const rotorTargets = level.tiles.map(() => 0);
   const litGems = new Set();
-  const update = (turns, trace) => {
+  /**
+   * Show the board now.
+   * @param state { turns, trace, turnsLeft, revealedCells, darkenedTile, glooms }
+   */
+  const update = ({ turns, trace, turnsLeft = null, revealedCells = null, darkenedTile = null, glooms = [] }) => {
     level.tiles.forEach((tile, i) => {
       const piece = pieces[i];
-      if (piece.rotor) rotorTargets[i] = -THREE.MathUtils.degToRad(-45 + (turns[i] ?? 0) * 90);
+      const turn = turns[i] ?? 0;
+      if (piece.rotor) rotorTargets[i] = -THREE.MathUtils.degToRad(-45 + turn * 90);
+      if (piece.lampHead && tile.turnable) rotorTargets[i] = piece.baseAngle - (turn % 2) * (Math.PI / 2);
       if (piece.gem) {
         const isLit = trace.litGems.has(i);
         if (isLit) litGems.add(i);
         else litGems.delete(i);
+        const isDarkened = darkenedTile === i;
         piece.material.emissiveIntensity = isLit ? 0.6 : 0;
-        piece.material.color.copy(isLit ? piece.color : piece.color.clone().lerp(new THREE.Color('#b9ab98'), 0.35));
+        piece.material.color.copy(isDarkened ? darkenedColor : isLit ? piece.color : piece.color.clone().lerp(new THREE.Color('#b9ab98'), 0.35));
+      }
+      if (piece.shadeMaterial) piece.shadeMaterial.emissiveIntensity = trace.litShades.has(i) ? 0.9 : 0;
+      if (piece.switchMaterial) piece.switchMaterial.emissiveIntensity = trace.litSwitches?.has(i) ? 0.7 : 0;
+      if (piece.door) piece.door.userData.target = trace.openGates?.has(tile.pair) ? -0.48 : 0;
+      if (piece.crackDots) {
+        const left = turnsLeft?.[i] ?? FRAGILE_TURNS;
+        piece.crackDots.forEach((dot, n) => dot.material.color.set(n < left ? '#F2A67E' : '#cbbfb2'));
+      }
+      if (piece.fog) {
+        const isHidden = revealedCells !== null && !revealedCells.has(piece.group.userData.cell);
+        piece.fog.visible = isHidden;
+        piece.group.visible = !isHidden;
       }
     });
     beams.clear();
     for (const segment of trace.segments) beams.add(makeBeam(level, segment));
+    trails.clear();
+    for (const gloom of glooms) if (!gloom.isBurned) trails.add(makeTrail(level, gloom.trail.slice(1)));
     // Tiles the light passes over warm to honey, as on the flat board.
     const litCells = cellsOnBeams(trace.segments, level.width, level.height);
     table.plates.forEach((plate, cell) => plate.mesh.material.color.copy(litCells.has(cell) ? plate.lit : plate.color));
   };
-  let isFirstUpdate = true;
-  /** Advance the animations by `dt` seconds (0 jumps straight to the end). Returns true while anything still moves. */
+
+  let isFirstTick = true;
+  /** Advance the animations by `dt` seconds. Returns true while anything still moves. */
   const tick = (dt, time = 0, calm = false) => {
     let isMoving = false;
+    const ease = (current, target) => {
+      const gap = target - current;
+      if (isFirstTick || Math.abs(gap) < 0.001) return target;
+      isMoving = true;
+      return current + gap * Math.min(1, dt * 14);
+    };
     pieces.forEach((piece, i) => {
-      if (piece.rotor) {
-        const gap = rotorTargets[i] - piece.rotor.rotation.y;
-        if (Math.abs(gap) > 0.001 && !isFirstUpdate && dt > 0) {
-          piece.rotor.rotation.y += gap * Math.min(1, dt * 14);
-          isMoving = true;
-        } else piece.rotor.rotation.y = rotorTargets[i];
-      }
-      if (piece.gem && !calm) {
+      if (piece.rotor) piece.rotor.rotation.y = ease(piece.rotor.rotation.y, rotorTargets[i]);
+      if (piece.lampHead && level.tiles[i].turnable) piece.lampHead.rotation.y = ease(piece.lampHead.rotation.y, rotorTargets[i]);
+      if (piece.door) piece.door.position.y = ease(piece.door.position.y, piece.door.userData.target ?? 0);
+      if (calm) return;
+      if (piece.gem) {
         const isLit = litGems.has(i);
         piece.gem.rotation.y += dt * (isLit ? 1.6 : 0.3);
         piece.gem.position.y = 0.42 + (isLit ? Math.sin(time * 2.4 + i) * 0.04 : 0);
       }
+      if (piece.swirl) piece.swirl.rotation.z += dt * 0.8;
+      if (piece.stone) piece.stone.rotation.y += dt * 0.4;
     });
-    isFirstUpdate = false;
+    isFirstTick = false;
     return isMoving;
   };
 
-  /** Each cell's box on screen (pixels from the canvas's top left), for placing the tap targets over the pieces. */
+  /** Each cell's box on screen (pixels from the canvas's top left), for placing the buttons over the pieces. */
   const cellRects = (width, height) => {
     const rects = [];
-    const corner = new THREE.Vector3();
+    const point = new THREE.Vector3();
     for (let y = 0; y < level.height; y++) {
       for (let x = 0; x < level.width; x++) {
         const centre = place(level, x, y);
@@ -334,9 +270,9 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
           [-0.5, 0.5],
           [0.5, 0.5],
         ]) {
-          corner.set(centre.x + dx, 0.15, centre.z + dz).project(camera);
-          const px = ((corner.x + 1) / 2) * width;
-          const py = ((1 - corner.y) / 2) * height;
+          point.set(centre.x + dx, 0.15, centre.z + dz).project(camera);
+          const px = ((point.x + 1) / 2) * width;
+          const py = ((1 - point.y) / 2) * height;
           left = Math.min(left, px);
           right = Math.max(right, px);
           top = Math.min(top, py);
@@ -352,16 +288,21 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
     return rects;
   };
 
-  /** The cell under a point on the canvas (pixels), or -1: a ray from the camera to the table. */
+  /** The cell under a point on the canvas (pixels), or -1: the first piece or tile the ray from the camera meets. */
   const raycaster = new THREE.Raycaster();
-  const tableTop = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.05);
+  const targets = [table.group, ...pieces.map((piece) => piece.group), ...pieces.filter((piece) => piece.fog).map((piece) => piece.fog)];
   const cellAt = (px, py, width, height) => {
     raycaster.setFromCamera(new THREE.Vector2((px / width) * 2 - 1, 1 - (py / height) * 2), camera);
-    const hit = raycaster.ray.intersectPlane(tableTop, new THREE.Vector3());
-    if (!hit) return -1;
-    const x = Math.floor(hit.x + level.width / 2);
-    const y = Math.floor(hit.z + level.height / 2);
-    return x >= 0 && y >= 0 && x < level.width && y < level.height ? y * level.width + x : -1;
+    for (const hit of raycaster.intersectObjects(targets, true)) {
+      let cell;
+      let isShown = true;
+      for (let node = hit.object; node; node = node.parent) {
+        isShown &&= node.visible;
+        cell ??= node.userData.cell;
+      }
+      if (isShown && cell !== undefined) return cell;
+    }
+    return -1;
   };
 
   const resize = (width, height) => {

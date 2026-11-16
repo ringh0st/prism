@@ -25,6 +25,12 @@ const ART = {
       <path d="M3.5 8v8M20.5 8v8" />
     </>
   ),
+  board3d: (
+    <>
+      <path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z" />
+      <path d="M4 7.5 12 12l8-4.5M12 12v9" />
+    </>
+  ),
   calmBoard: (
     <>
       <path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14" />
@@ -34,7 +40,7 @@ const ART = {
 };
 
 /**
- * Sound and feel as four big picture switches (sound, music, vibration, a calm board): lit when on,
+ * Sound and feel as big picture switches (sound, music, vibration, a calm board, the 3D board): lit when on,
  * crossed out when off. What each does is behind the "?".
  */
 export default function FeelToggles({ className = '' }) {
@@ -45,6 +51,7 @@ export default function FeelToggles({ className = '' }) {
     { id: 'music', label: t('settings.music'), isOn: settings.music && settings.sound, isDisabled: !settings.sound },
     { id: 'haptics', label: t('settings.vibration'), isOn: settings.haptics },
     { id: 'calmBoard', label: t('settings.calm'), isOn: settings.calmBoard },
+    { id: 'board3d', label: t('settings.board3d'), isOn: settings.board3d !== false },
   ];
   const flip = (id, isOn) => {
     updateSettings({ [id]: isOn });
@@ -59,6 +66,7 @@ export default function FeelToggles({ className = '' }) {
             <li>{t(settings.sound ? 'settings.musicHint' : 'settings.musicNeedsSound')}</li>
             <li>{t('settings.vibrationHint')}</li>
             <li>{t('settings.calmHint')}</li>
+            <li>{t('settings.board3dHint')}</li>
           </ul>
         </HelpTip>
       </div>

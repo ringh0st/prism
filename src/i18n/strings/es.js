@@ -282,6 +282,8 @@ export const es = {
   'settings.vibration': 'Vibración',
   'settings.vibrationHint': 'En los teléfonos compatibles',
   'settings.calm': 'Tablero tranquilo',
+  'settings.board3d': 'Tablero 3D',
+  'settings.board3dHint': 'El tablero 3D gira y se acerca: arrastra para girarlo y pellizca para acercarlo. Apágalo para el tablero plano.',
   'settings.calmHint': 'Nada se mueve alrededor del tablero mientras piensas',
 
   'howTo.title': 'Cómo jugar',

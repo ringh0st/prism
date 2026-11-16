@@ -283,6 +283,8 @@ export const he = {
   'settings.vibration': 'רטט',
   'settings.vibrationHint': 'בטלפונים שתומכים בזה',
   'settings.calm': 'לוח רגוע',
+  'settings.board3d': 'לוח תלת־ממדי',
+  'settings.board3dHint': 'את הלוח התלת־ממדי אפשר לסובב ולהגדיל: גוררים כדי לסובב וצובטים כדי להתקרב. כבו אותו כדי לחזור ללוח השטוח.',
   'settings.calmHint': 'שום דבר לא זז ליד הלוח בזמן שאתם חושבים',
 
   'howTo.title': 'איך משחקים',

@@ -45,9 +45,10 @@ const ZOOM_STEP = 1.25;
  * pointing into the scene; a drag turns and tilts the table, a pinch or the mouse wheel zooms, and small buttons
  * do the same. `onLayout` gets each cell's box on screen so the buttons (hint rings, the coach hand) sit over
  * the pieces; `onTapCell` gets the cell under a tap.
+ * @param state what to show: { turns, trace, turnsLeft, revealedCells, darkenedTile, glooms } (boardScene's update)
  * @param surfaceRef the board element, which receives the touches
  */
-export default function Board3D({ level, turns, trace, onLayout, onTapCell, surfaceRef }) {
+export default function Board3D({ level, state, onLayout, onTapCell, surfaceRef }) {
   const { t } = useI18n();
   const canvasRef = useRef(null);
   const sceneRef = useRef(null);
@@ -115,9 +116,9 @@ export default function Board3D({ level, turns, trace, onLayout, onTapCell, surf
   }, [level]);
 
   useEffect(() => {
-    sceneRef.current?.update(turns, trace);
+    sceneRef.current?.update(state);
     wakeRef.current();
-  }, [turns, trace]);
+  }, [state]);
 
   // Touches on the board: one finger taps or drags (turn and tilt), two fingers pinch (zoom); the wheel zooms.
   useEffect(() => {

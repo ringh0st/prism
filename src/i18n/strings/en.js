@@ -277,6 +277,8 @@ export const en = {
   'settings.vibration': 'Vibration',
   'settings.vibrationHint': 'On supported phones',
   'settings.calm': 'Calm board',
+  'settings.board3d': '3D board',
+  'settings.board3dHint': 'The 3D board turns and zooms: drag to spin it, pinch to zoom. Switch it off for the flat board.',
   'settings.calmHint': 'Nothing moves around the board while you think',
 
   'howTo.title': 'How to play',

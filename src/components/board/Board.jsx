@@ -13,6 +13,7 @@ import { TILE } from '../../game/constants.js';
 import { flyToCounter, gemBurst } from '../../lib/effects.js';
 import CoachHand from './CoachHand.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
+import { DarkCounter, SmudgeArt } from './darkTileArt.jsx';
 import styles from './Board.module.css';
 
 /** Name tags for the first levels, so new players know which piece is which (translation keys). */
@@ -140,6 +141,22 @@ export default function Board({
       ),
     [level, darkness],
   );
+  // What the 3D board shows (it draws the pieces itself; countdowns and Smudge ride on the buttons over them).
+  const state3d = useMemo(
+    () =>
+      is3d
+        ? {
+            turns: allTurns,
+            trace,
+            turnsLeft,
+            revealedCells,
+            darkenedTile: darkness?.lost?.tile ?? null,
+            glooms: darkness ? gloomsNow(level, darkness) : [],
+          }
+        : null,
+    [is3d, allTurns, trace, turnsLeft, revealedCells, darkness, level],
+  );
+  const eclipseIn = is3d && darkness && level.eclipse ? level.eclipse - (darkMoves % level.eclipse) : null;
   const litPlates = useMemo(() => (isEditing ? new Set() : cellsOnBeams(trace.segments, width, height)), [trace.segments, width, height, isEditing]);
 
   return (
@@ -156,8 +173,7 @@ export default function Board({
         <Suspense fallback={null}>
           <Board3D
             level={level}
-            turns={allTurns}
-            trace={trace}
+            state={state3d}
             onLayout={setCellRects}
             onTapCell={(cell) => cellRefs.current[cell]?.click()}
             surfaceRef={boardRef}
@@ -256,6 +272,16 @@ export default function Board({
                         {t(COACH_LABELS[tile.type])}
                       </span>
                     )}
+                    {is3d && gloom && (
+                      <svg className={styles.overlay3d} viewBox="0 0 100 100" aria-hidden="true">
+                        <SmudgeArt />
+                      </svg>
+                    )}
+                    {is3d && darkCount != null && !isDarkened && !isFogged && (
+                      <svg className={styles.overlay3d} viewBox="0 0 100 100" aria-hidden="true">
+                        <DarkCounter value={darkCount} />
+                      </svg>
+                    )}
                     {tile && !is3d && (
                       <TileArt
                         tile={tile}
@@ -276,6 +302,17 @@ export default function Board({
           </div>
         ))}
       </div>
+      {eclipseIn !== null && (
+        <div className={styles.darknessPieces} aria-hidden="true">
+          <span className={`${styles.eclipseChip} ${eclipseIn === 1 ? styles.eclipseSoon : ''}`}>
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <circle cx="12" cy="12" r="8" fill="#f0c14e" />
+              <circle cx="15" cy="10" r="7" fill="#4a3a30" />
+            </svg>
+            {eclipseIn}
+          </span>
+        </div>
+      )}
       {ghostSegments && !is3d && <LensPath width={width} height={height} segments={ghostSegments} />}
     </div>
   );
