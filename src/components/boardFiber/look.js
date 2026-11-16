@@ -71,3 +71,33 @@ export function starShape(radius) {
   }
   return shape;
 }
+
+/** A rectangle with its corners cut off (an octagon-ish outline): the faceted style's basic shape. */
+export function chamferedRect(width, height, cut) {
+  const [w, h, c] = [width / 2, height / 2, Math.min(cut, width / 2, height / 2)];
+  const shape = new THREE.Shape();
+  shape.moveTo(-w + c, -h);
+  shape.lineTo(w - c, -h);
+  shape.lineTo(w, -h + c);
+  shape.lineTo(w, h - c);
+  shape.lineTo(w - c, h);
+  shape.lineTo(-w + c, h);
+  shape.lineTo(-w, h - c);
+  shape.lineTo(-w, -h + c);
+  shape.closePath();
+  return shape;
+}
+
+/** A crisp faceted block: a chamfered outline extruded upwards with one flat bevel all round (low-poly look). */
+export function facetedBlock(width, depth, height, cut, bevel = Math.min(height * 0.2, 0.05)) {
+  const geometry = new THREE.ExtrudeGeometry(chamferedRect(width - bevel * 2, depth - bevel * 2, Math.max(0.005, cut - bevel)), {
+    depth: Math.max(0.001, height - bevel * 2),
+    bevelEnabled: true,
+    bevelThickness: bevel,
+    bevelSize: bevel,
+    bevelSegments: 1,
+  });
+  geometry.rotateX(-Math.PI / 2);
+  geometry.translate(0, bevel, 0);
+  return geometry;
+}

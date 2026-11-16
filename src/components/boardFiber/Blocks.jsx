@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
-import { LOOK, glowing, pillow } from './look.js';
+import { LOOK, facetedBlock, glowing } from './look.js';
 
 /** A wall (design guide: "Blocker"): a soft stone block with a carved cross. */
 export function Wall() {
-  const block = useMemo(() => pillow(0.78, 0.78, 0.5, 0.2, 0.1), []);
+  const block = useMemo(() => facetedBlock(0.8, 0.8, 0.5, 0.18, 0.05), []);
   return (
     <group position={[0, 0.17, 0]}>
       <mesh geometry={block} castShadow receiveShadow>
-        <meshPhysicalMaterial color={LOOK.stone} roughness={0.75} clearcoat={0.2} />
+        <meshStandardMaterial color={LOOK.stone} roughness={0.75} flatShading />
       </mesh>
       {[1, -1].map((tilt) => (
         <mesh key={tilt} position={[0, 0.505, 0]} rotation={[-Math.PI / 2, 0, (tilt * Math.PI) / 4]}>

@@ -34,8 +34,8 @@ export default function Beam({ level, segment, calm }) {
     <>
       <group ref={group} position={middle} rotation={[0, angle, 0]}>
         <mesh rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.12, 0.12, length, 20, 1, true]} />
-          <meshBasicMaterial color={glowing(color, 2.43)} toneMapped={false} transparent opacity={0.85} depthWrite={false} />
+          <cylinderGeometry args={[0.085, 0.085, length, 16, 1, true]} />
+          <meshBasicMaterial color={glowing(color, 2)} toneMapped={false} transparent opacity={0.55} depthWrite={false} />
         </mesh>
         <mesh rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.045, 0.045, length, 12]} />

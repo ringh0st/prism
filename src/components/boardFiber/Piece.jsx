@@ -1,20 +1,18 @@
 import { isRotatable } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
-import Lamp from './Lamp.jsx';
-import Mirror from './Mirror.jsx';
-import Gem from './Gem.jsx';
+import { FacetedGem, FacetedLamp, FacetedMirror } from './Faceted.jsx';
 import { Marker, ShadeCrystal, Wall } from './Blocks.jsx';
 
 /** Each tile type's element; add a new piece here. Types without their own design get a plain marker. */
 export default function Piece({ tile, turn, isLit, isDarkened, calm }) {
   switch (tile.type) {
     case TILE.EMITTER:
-      return <Lamp tile={tile} turn={turn} calm={calm} />;
+      return <FacetedLamp tile={tile} turn={turn} calm={calm} />;
     case TILE.MIRROR:
     case TILE.SPLITTER:
-      return <Mirror tile={tile} turn={turn} isRotatable={isRotatable(tile)} />;
+      return <FacetedMirror tile={tile} turn={turn} isRotatable={isRotatable(tile)} />;
     case TILE.GEM:
-      return <Gem tile={tile} isLit={isLit} isDarkened={isDarkened} calm={calm} />;
+      return <FacetedGem tile={tile} isLit={isLit} isDarkened={isDarkened} calm={calm} />;
     case TILE.WALL:
       return <Wall />;
     case TILE.SHADE:
