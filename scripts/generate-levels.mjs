@@ -48,8 +48,8 @@ const needsCatchFor = (world, index, preset) =>
   world <= CATCH_WORLDS && !(world === 1 && index <= 3) && !INTRO_LEVELS.has(levelId(world, index)) && !REST_RECIPES.includes(preset.recipe);
 /** Levels that teach a new piece stay gentle. */
 const INTRO_LEVELS = new Set(Object.values(PIECE_FIRST_LEVEL));
-/** Worlds built with the catch check so far (later worlds keep their earlier boards until regenerated). */
-const CATCH_WORLDS = 6;
+/** Every world is built with the catch check. */
+const CATCH_WORLDS = 50;
 
 function bestLevelFor(world, index) {
   const preset = generatorPresetFor(world, index);
@@ -69,7 +69,8 @@ function bestLevelFor(world, index) {
       if (level && hasRequired && level.par <= preset.maxPar && (!best || level.par > best.par) && rate <= MAX_RANDOM_SOLVE_RATE) best = level;
       if (best && best.par >= preset.minPar) return best;
     }
-    if (best && best.par >= preset.minPar - 2) return best;
+    // Only settle for a board one move short of the target (two for piece introductions, which stay gentle).
+    if (best && best.par >= preset.minPar - (preset.mustHave ? 2 : 1)) return best;
   }
   if (!best && fallback) {
     console.warn(`${levelId(world, index)}: no board with a clear catch; using the hardest to guess (${Math.round(fallback.rate * 100)}%)`);

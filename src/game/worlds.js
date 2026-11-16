@@ -145,9 +145,11 @@ export function generatorPresetFor(world, index) {
     width: size,
     height: size,
     emitters: spike === 2 ? (world >= 20 ? 3 : 2) : spike === 1 && world >= 10 ? 2 : 1,
-    turns: [2 + Math.min(2, steps), 3 + steps + spike],
+    // Enough mirrors on the light's path and enough decoys to actually reach the moves needed: a sparse
+    // board can't (playtesters found level 151 with four mirrors and three moves).
+    turns: [2 + Math.min(2, steps), Math.max(3 + steps + spike, minPar)],
     segment: [1, 3],
-    decoys: Math.min(6, 1 + steps + spike),
+    decoys: Math.min(9, 2 + Math.floor(minPar / 2) + spike),
     walls: 1 + steps + spike,
     minPar,
     maxPar: minPar + 4,
