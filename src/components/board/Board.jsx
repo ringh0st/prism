@@ -12,6 +12,7 @@ import { cellsOnBeams, isRotatable as tileIsRotatable } from '../../game/beam.js
 import { TILE } from '../../game/constants.js';
 import { flyToCounter, gemBurst } from '../../lib/effects.js';
 import CoachHand from './CoachHand.jsx';
+import BonusGoalIcon from '../bonus/BonusGoalIcon.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { DarkCounter, SmudgeArt } from './darkTileArt.jsx';
 import styles from './Board.module.css';
@@ -45,6 +46,7 @@ const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
  * @param darkness     the darkness now (darkness.js): creeping shadows, countdowns on fading gems and dying lamps
  * @param darkMoves    moves that still stand (for the eclipse countdown)
  * @param is3d         draw the board as a 3D tabletop (prototype): the buttons stay, placed over the 3D pieces
+ * @param bonusMark    { kind, tiles, state }: the pieces or gem the bonus goal is about, tagged in a corner (bonusGoals.js)
  */
 export default function Board({
   level,
@@ -69,6 +71,7 @@ export default function Board({
   darkness = null,
   darkMoves = 0,
   is3d = false,
+  bonusMark = null,
 }) {
   const { t, lang } = useI18n();
   const { width, height, tiles } = level;
@@ -218,14 +221,16 @@ export default function Board({
                       : undefined;
               const isDarkened = darkness?.lost?.tile === tileIndex && tile?.type === TILE.GEM;
               const gloom = gloomAt.get(cell);
-              const darkWords = [
+              const isBonusMarked = Boolean(bonusMark?.tiles.includes(tileIndex));
+              const cellNotes = [
                 darkCount != null && t(tile.fade ? 'ui.cell.fadeLeft' : 'ui.cell.powerLeft', { count: darkCount }),
                 isDarkened && t('ui.cell.darkened'),
                 gloom && t('ui.cell.gloom', { count: gloom.stepsLeft }),
+                isBonusMarked && t(`ui.cell.bonus.${bonusMark.kind}`),
               ].filter(Boolean);
               const description =
                 describeTile(tile, { orient: orients[tileIndex], isLit, isOpen, isRotatable: canRotate, isFogged, turnsLeft: left }, t) +
-                (darkWords.length ? `, ${darkWords.join(', ')}` : '');
+                (cellNotes.length ? `, ${cellNotes.join(', ')}` : '');
               return (
                 <div
                   role="gridcell"
@@ -267,6 +272,11 @@ export default function Board({
                       </span>
                     )}
                     {coach?.tile === tileIndex && tileIndex >= 0 && <CoachHand />}
+                    {isBonusMarked && (
+                      <span className={`${styles.bonusMark} ${bonusMark.state === 'missed' ? styles.bonusMissed : ''}`} aria-hidden="true">
+                        <BonusGoalIcon kind={bonusMark.kind === 'untouched' ? 'untouched' : `${bonusMark.kind}Tag`} size="100%" />
+                      </span>
+                    )}
                     {coach?.labels && COACH_LABELS[tile?.type] && (
                       <span className={styles.coachLabel} aria-hidden="true">
                         {t(COACH_LABELS[tile.type])}

@@ -24,6 +24,7 @@ import { cheerFor } from '../../game/palCheers.js';
 import LevelUp from './LevelUp.jsx';
 import ChallengeShare from './ChallengeShare.jsx';
 import TapIcon from './TapIcon.jsx';
+import BonusGoalResult from './BonusGoalResult.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './WinDialog.module.css';
 import { palName } from '../../i18n/palText.js';
@@ -92,6 +93,8 @@ export default function WinDialog({
     sparksEarned = 0,
     diamondsEarned = 0,
     isNewBest,
+    previousBest = null,
+    bonus = null,
     streak = 0,
     shieldsUsed = 0,
     shieldEarned = false,
@@ -182,7 +185,24 @@ export default function WinDialog({
             <span className="visually-hidden">{t('win.diamonds', { count: diamondsEarned })}</span>
           </span>
         )}
-        {isNewBest && <span className={`${styles.reward} ${styles.best}`}>{t('win.newBest')}</span>}
+        {isNewBest && (
+          // A new best: the trophy, the old number crossed out and the new one (words for screen readers).
+          <span
+            className={`game-title ${styles.reward} ${styles.best}`}
+            role="img"
+            aria-label={t('win.newBest', { count: moves, old: previousBest })}
+          >
+            <Icon name="trophy" size={18} />
+            <s dir="ltr" className={styles.oldBest}>
+              {previousBest}
+            </s>
+            <span className={styles.capArrow} aria-hidden="true">
+              →
+            </span>
+            <span dir="ltr">{moves}</span>
+            <TapIcon size={16} />
+          </span>
+        )}
         {hotStreak >= 2 && (
           <span className={`${styles.reward} ${styles.streak}`} role="img" aria-label={t('win.perfectRow', { count: hotStreak })}>
             <Icon name="flame" size={18} />
@@ -209,6 +229,7 @@ export default function WinDialog({
           </span>
         )}
       </div>
+      {bonus && !isSkipped && <BonusGoalResult bonus={bonus} />}
       {/* One big Next right under the result, then Play again and the map as two equal buttons under it (the map
           softly tinted, so going back to the path is easy to see). Every button lines up to the same edges. */}
       <div className={styles.actions}>

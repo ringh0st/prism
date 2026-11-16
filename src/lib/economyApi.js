@@ -111,6 +111,9 @@ export const fetchMyDailyMissions = (dateKey, since) => rpc('my_daily_missions',
 export const claimDailyMissionOnServer = (missionId, dateKey, since) =>
   rpc('claim_daily_mission', { p_mission: missionId, p_date: dateKey, p_since: since });
 
+/** Bonus goals met (supabase/bonus_goals.sql): pays the new ones, returns the wallet and every level met. */
+export const claimBonusGoalsOnServer = (levelIds) => rpc('claim_bonus_goals', { p_levels: levelIds });
+
 /** Light Rush (supabase/rush.sql): a run's puzzles cleared (pays new milestones), this week's record, and the board. */
 export const recordRushRunOnServer = (cleared) => rpc('record_rush_run', { p_cleared: cleared });
 

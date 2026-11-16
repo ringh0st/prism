@@ -1,0 +1,45 @@
+/* The bonus goal on the win screen: it pops in with the rewards; met ones get their sparks beside them */
+.result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  opacity: 0;
+  animation: pop 500ms var(--ease-pop) 1.5s forwards;
+}
+
+.sparks {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.sparks svg {
+  color: var(--color-peach-deep);
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result {
+    opacity: 1;
+    animation: none;
+  }
+}

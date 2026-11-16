@@ -55,6 +55,10 @@
   box-shadow: var(--highlight), var(--shadow-md);
 }
 
+.withBonus {
+  grid-template-columns: 1fr auto auto;
+}
+
 .gems {
   display: flex;
   flex-wrap: wrap;

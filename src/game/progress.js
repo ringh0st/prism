@@ -1,5 +1,6 @@
 import { sparksForDaily, sparksForNewStars, starsForMoves, STARTING_SPARKS } from './scoring.js';
 import { daysBetween } from './daily.js';
+import { mergeBonusGoals } from './bonusGoals.js';
 import { DAILY_SPARK_PURCHASE_LIMIT, INVENTORY_CAP, storeItem, toolFor } from './catalog.js';
 
 export const BEAM_THEMES = [
@@ -51,6 +52,8 @@ export function createEmptyProgress() {
     luckyPals: { claimed: 0 },
     // Weekend events: { [saturday]: { stars: { [number]: stars }, claimed } } (see events.js).
     events: {},
+    // Levels whose bonus goal was met (see bonusGoals.js; accounts sync them through the server).
+    bonusGoals: [],
     // Treats eaten (how many were found comes from the solved levels; see treats.js).
     treatsFed: 0,
     // This week's Pal quests: { week, solved, perfect, hard, claimed } (see quests.js).
@@ -96,7 +99,7 @@ export const isWorldComplete = (progress, worldLevels) => worldLevels.length > 0
 /**
  * Record a finished level.
  * @param result { moves, starCap = 3, forcedStars } forcedStars is used by Skip.
- * @returns {{ progress, stars, previousStars, sparksEarned, isNewBest }}
+ * @returns {{ progress, stars, previousStars, sparksEarned, isNewBest, previousBest }}
  */
 export function recordLevelResult(progress, level, { moves, starCap = 3, forcedStars = null }) {
   const stars = forcedStars ?? Math.min(starsForMoves(moves, level.par, level.difficulty), starCap);
@@ -117,7 +120,7 @@ export function recordLevelResult(progress, level, { moves, starCap = 3, forcedS
       },
     },
   };
-  return { progress: next, stars, previousStars, sparksEarned, isNewBest };
+  return { progress: next, stars, previousStars, sparksEarned, isNewBest, previousBest: previous?.bestMoves ?? null };
 }
 
 /**
@@ -259,5 +262,6 @@ export function withServerState(progress, state, today) {
     quests: state.quests ?? progress.quests,
     missions: state.missions ?? progress.missions,
     rush: state.rush ?? progress.rush,
+    bonusGoals: state.bonusGoals ? mergeBonusGoals(progress.bonusGoals, state.bonusGoals) : progress.bonusGoals,
   };
 }

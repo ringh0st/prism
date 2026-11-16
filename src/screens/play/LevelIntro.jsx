@@ -11,6 +11,7 @@ import TapIcon from './TapIcon.jsx';
 import { SmudgeArt } from '../../components/board/darkTileArt.jsx';
 import BoosterPicker from './BoosterPicker.jsx';
 import PalPowerChip from './PalPowerChip.jsx';
+import BonusGoalBadge from '../../components/bonus/BonusGoalBadge.jsx';
 import TeamSwitcher from '../pals/TeamSwitcher.jsx';
 import { glowbugById } from '../../game/glowbugs.js';
 import { glowbugName } from '../../i18n/groveText.js';
@@ -51,6 +52,8 @@ const INTRO_MS = 3500;
  * `flavor` ({ name, goal }, see recipes.js) is read out to screen readers; Lumi says its goal once the level starts.
  * `waitsForTap` keeps it up until the player taps (the very first levels, for new players).
  * `boosters` ({ owned, chosen, onToggle }) shows the booster picks; touching one keeps the card up until Let's go.
+ * `best` is the player's fewest moves on this level so far (a trophy and the number), `bonus` ({ goal, gemColor,
+ * isDone }) the level's bonus goal (bonusGoals.js), which pops in once it's worked out.
  * `palHelp` (from partnerPower) shows your partner Pal and the power it brings to this level; with `canSwitchPal`
  * a tap on it lists your other Pals to switch to (`onPalSwitched`), which keeps the card up like a booster.
  */
@@ -65,6 +68,8 @@ export default function LevelIntro({
   flavor = null,
   waitsForTap = false,
   glowbugId = null,
+  best = null,
+  bonus = null,
   boosters = null,
   palHelp = null,
   palWearing = [],
@@ -133,6 +138,18 @@ export default function LevelIntro({
             </span>
           </span>
         </div>
+        {(Number.isFinite(best) || bonus) && (
+          <div className={styles.extras}>
+            {Number.isFinite(best) && (
+              <p className={`game-title ${styles.best}`} role="img" aria-label={t('intro.best', { count: best })}>
+                <Icon name="trophy" size={20} />
+                <span dir="ltr">{best}</span>
+                <TapIcon size={20} />
+              </p>
+            )}
+            {bonus && <BonusGoalBadge goal={bonus.goal} gemColor={bonus.gemColor} state={bonus.isDone ? 'done' : 'open'} className={styles.bonus} />}
+          </div>
+        )}
         {glowbugId && (
           <p className={styles.glowbug} role="img" aria-label={t('intro.rescue', { name: glowbugName(lang, glowbugById(glowbugId)) })}>
             <GlowbugArt id={glowbugId} size={44} isAwake={false} />
