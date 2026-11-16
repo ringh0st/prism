@@ -7,8 +7,8 @@
 <clipPath id="riddle-f5-capclip"><path d="M23 44C22 31 34 23 50 23 66 23 78 31 77 44 72 40 62 37.5 50 37.5 38 37.5 28 40 23 44Z"/></clipPath>
 <clipPath id="riddle-f5-lapclip"><path d="M26 61L33 63 36 84 28 84ZM74 61L67 63 64 84 72 84Z"/></clipPath>
 <filter id="riddle-f5-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.6"/></filter>
-<filter id="riddle-f5-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter><radialGradient id="riddle-f5-halo" cx="50" cy="52" r="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe9a6" stop-opacity="1"/><stop offset=".72" stop-color="#ffd977" stop-opacity=".7"/><stop offset="1" stop-color="#ffe29a" stop-opacity="0"/></radialGradient></defs>
-<circle cx="50" cy="52" r="48" fill="url(#riddle-f5-halo)"/><g filter="url(#riddle-f5-st)">
+<radialGradient id="riddle-f5-halo" cx="50" cy="52" r="50" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffe9a6" stop-opacity="1"/><stop offset=".72" stop-color="#ffd977" stop-opacity=".7"/><stop offset="1" stop-color="#ffe29a" stop-opacity="0"/></radialGradient></defs>
+<circle cx="50" cy="52" r="48" fill="url(#riddle-f5-halo)"/><g>
  <!-- tail -->
  <g transform="translate(71 90) scale(1.08 1.2) translate(-72 -90)"><path d="M72 90C84 93 92 86 91 76 90.5 70 87 67 84 69" fill="none" stroke="#b07a35" stroke-width="6.5" stroke-linecap="round"/>
  <path d="M72 90C84 93 92 86 91 76 90.5 70 87 67 84 69" fill="none" stroke="url(#riddle-f5-fur)" stroke-width="3.87" stroke-linecap="round"/>

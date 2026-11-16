@@ -2,7 +2,7 @@
 <linearGradient id="splash-fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1ebe2"/><stop offset="1" stop-color="#d2c6b4"/></linearGradient>
 <linearGradient id="splash-cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbf5"/><stop offset="1" stop-color="#f3e8d8"/></linearGradient>
 <linearGradient id="splash-fin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dcd0be"/><stop offset="1" stop-color="#bfb09a"/></linearGradient>
-<filter id="splash-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#splash-st)" stroke-linejoin="round" stroke-linecap="round">
+</defs><g stroke-linejoin="round" stroke-linecap="round">
 <path d="M78 84C82 78 86 72 93 69 95 76 92 84 85 88Z" fill="url(#splash-fin)" stroke="#97866f" stroke-width="1.5"/>
 <path d="M80 89C86 86 92 86 95 90 91 94 85 94 80 93Z" fill="url(#splash-fin)" stroke="#97866f" stroke-width="1.5"/>
 <path d="M24 92C16 86 20 70 38 66H58C70 67 79 75 85 83 88 87 87 93 81 94H31C28 94 26 93 24 92Z" fill="url(#splash-fur)" stroke="#97866f" stroke-width="1.5"/>

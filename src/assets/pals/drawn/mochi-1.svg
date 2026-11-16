@@ -3,8 +3,8 @@
 <linearGradient id="mochi-f1-cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#fbe6d2"/></linearGradient>
 <linearGradient id="mochi-f1-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#e5a93a"/></linearGradient>
 <linearGradient id="mochi-f1-bow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd2b8"/><stop offset="1" stop-color="#f2a67e"/></linearGradient>
-<filter id="mochi-f1-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<g filter="url(#mochi-f1-st)">
+</defs>
+<g>
 <path d="M64 90C70 91.6 74.6 88.6 74.6 84.4 74.6 81 71.8 79.8 70.2 81.6" fill="none" stroke="#c27a52" stroke-width="8" stroke-linecap="round"/><path d="M64 90C70 91.6 74.6 88.6 74.6 84.4 74.6 81 71.8 79.8 70.2 81.6" fill="none" stroke="url(#mochi-f1-fur)" stroke-width="5" stroke-linecap="round"/>
 <path d="M30 89C29 83.5 32 80 37 80 42 80 44.5 84 43.5 89 43 92.5 40 94 36.5 94 33 94 30.6 92.5 30 89Z" fill="url(#mochi-f1-fur)" stroke="#c27a52" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M70.0 89.0 C71.0 83.5 68.0 80.0 63.0 80.0 58.0 80.0 55.5 84.0 56.5 89.0 57.0 92.5 60.0 94.0 63.5 94.0 67.0 94.0 69.4 92.5 70.0 89.0Z" fill="url(#mochi-f1-fur)" stroke="#c27a52" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>

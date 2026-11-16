@@ -3,7 +3,7 @@
 <linearGradient id="mossy-shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#93c470"/><stop offset="1" stop-color="#4e8c4b"/></linearGradient>
 <linearGradient id="mossy-plate" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff5d2"/><stop offset="1" stop-color="#f0d18a"/></linearGradient>
 <linearGradient id="mossy-leaf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c4e57e"/><stop offset="1" stop-color="#7fb446"/></linearGradient>
-<filter id="mossy-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#mossy-st)">
+</defs><g>
 
 <path d="M22 91C13 82 12 67 22 62 30 58 70 58 78 62 88 67 87 82 78 91 74 94 26 94 22 91Z" fill="url(#mossy-shell)" stroke="#3f6d33" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M17 72c3 1 6 1 8-1M15.5 82c3 0 6-1 8-3M83 72c-3 1-6 1-8-1M84.5 82c-3 0-6-1-8-3" stroke="#3f6d33" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".8"/>

@@ -2,7 +2,7 @@
 <linearGradient id="waddles-back" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7d6e63"/><stop offset="1" stop-color="#55483f"/></linearGradient>
 <linearGradient id="waddles-cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffbf4"/><stop offset="1" stop-color="#f3e6d3"/></linearGradient>
 <linearGradient id="waddles-peach" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f9be98"/><stop offset="1" stop-color="#eb9a6e"/></linearGradient>
-<filter id="waddles-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#waddles-st)" stroke-linejoin="round" stroke-linecap="round">
+</defs><g stroke-linejoin="round" stroke-linecap="round">
 <path d="M34 89C30 90 26 93 28 95 32 96 38 95 44 93 44 90 40 88 34 89Z" fill="url(#waddles-peach)" stroke="#c4724a" stroke-width="1.5"/>
 <path d="M66 89C70 90 74 93 72 95 68 96 62 95 56 93 56 90 60 88 66 89Z" fill="url(#waddles-peach)" stroke="#c4724a" stroke-width="1.5"/>
 <path d="M22 58C14 62 9 70 10 79 13 80 18 76 22 70Z" fill="url(#waddles-back)" stroke="#3f342d" stroke-width="1.5"/>

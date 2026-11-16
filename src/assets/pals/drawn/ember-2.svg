@@ -6,8 +6,8 @@
 <linearGradient id="ember-f2-flame" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd66b"/><stop offset="1" stop-color="#f2a83a"/></linearGradient>
 <linearGradient id="ember-f2-blaze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc95a"/><stop offset="1" stop-color="#fff6e6"/></linearGradient>
 <radialGradient id="ember-f2-spark" cx=".5" cy=".55" r=".5"><stop offset="0" stop-color="#fff2b8" stop-opacity=".9"/><stop offset="1" stop-color="#ffd66b" stop-opacity="0"/></radialGradient>
-<filter id="ember-f2-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<g filter="url(#ember-f2-st)">
+</defs>
+<g>
 <path d="M37 92C23 95 11 88 11 76 11 68 14 63 19 62 24 62 26 67 25 72 24 79 27 83 35 85Z" fill="url(#ember-f2-fur)" stroke="#b5592c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M11.2 74C11.2 67.5 14 63 19 62 24 62 26 67 25 72L23 69.6 21.6 73 19 70.4 16.6 74 14.2 71 12.4 74.6Z" fill="url(#ember-f2-cream)" stroke="#b5592c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M17 80c1.4 3.6 3.6 6 7 7.4" stroke="#d97a42" stroke-width="1.2" fill="none" opacity=".6" stroke-linecap="round"/>

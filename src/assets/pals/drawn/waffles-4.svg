@@ -3,8 +3,8 @@
 <linearGradient id="waffles-f4-ear" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dba466"/><stop offset="1" stop-color="#b4763e"/></linearGradient>
 <linearGradient id="waffles-f4-cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf1"/><stop offset="1" stop-color="#f8e6cc"/></linearGradient>
 <linearGradient id="waffles-f4-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#e5a93a"/></linearGradient>
-<filter id="waffles-f4-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<g filter="url(#waffles-f4-st)">
+</defs>
+<g>
 <path d="M66.1 85.7 C74.9 83.5 81.5 78.0 84.8 70.3 86.6 65.9 89.9 64.4 91.8 66.6 93.6 68.8 92.1 73.6 89.2 78.0 83.7 85.7 74.9 90.1 67.2 91.2Z" fill="url(#waffles-f4-fur)" stroke="#a86f3c" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M87.0 69.6 C88.5 68.1 89.9 67.9 90.7 68.5" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.7"/>
 <path d="M95.1 62.2 C96.9 63.7 97.6 65.9 97.3 68.1 M96.2 74.7 C97.8 75.4 98.7 76.7 98.9 78.0" stroke="#d9a766" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.8"/>

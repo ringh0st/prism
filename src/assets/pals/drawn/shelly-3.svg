@@ -2,7 +2,7 @@
 <linearGradient id="shelly-skin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9ecc2"/><stop offset="1" stop-color="#a9cd8f"/></linearGradient>
 <linearGradient id="shelly-belly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6fbe9"/><stop offset="1" stop-color="#e2efcb"/></linearGradient>
 <linearGradient id="shelly-shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbd2b2"/><stop offset="1" stop-color="#ec9a72"/></linearGradient>
-<filter id="shelly-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#shelly-st)" stroke-linejoin="round" stroke-linecap="round">
+</defs><g stroke-linejoin="round" stroke-linecap="round">
 <path d="M66 92C74 92 84 92 91 89 94 87 93 84 89 84 84 84 78 84 72 82Z" fill="url(#shelly-skin)" stroke="#6e9858" stroke-width="1.5"/>
 <circle cx="73" cy="56" r="21.6" fill="url(#shelly-shell)" stroke="#b8694a" stroke-width="1.5"/>
 <path d="M74 56C74 53 78 52 80 54 83 57 81 62 76 63 70 64 66 58 68 53 70 47 78 45 83 48 90 52 91 62 86 68 80 75 68 75 62 68" fill="none" stroke="#c97a56" stroke-width="2"/>

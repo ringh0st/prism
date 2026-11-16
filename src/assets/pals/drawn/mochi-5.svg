@@ -4,9 +4,9 @@
 <linearGradient id="mochi-f5-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#e5a93a"/></linearGradient>
 <linearGradient id="mochi-f5-bow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd2b8"/><stop offset="1" stop-color="#f2a67e"/></linearGradient>
 <radialGradient id="mochi-f5-halo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe49a" stop-opacity=".85"/><stop offset=".6" stop-color="#ffe7a8" stop-opacity=".45"/><stop offset="1" stop-color="#fff0c8" stop-opacity="0"/></radialGradient>
-<filter id="mochi-f5-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+</defs>
 <circle cx="50" cy="52" r="49" fill="url(#mochi-f5-halo)"/>
-<g filter="url(#mochi-f5-st)">
+<g>
 <path d="M66.6 87.6 C81.0 92.4 93.0 82.8 93.0 68.4 93.0 57.6 84.6 52.8 78.6 57.6 73.8 61.2 76.2 67.2 82.2 64.8" fill="none" stroke="#c27a52" stroke-width="12.4" stroke-linecap="round"/><path d="M66.6 87.6 C81.0 92.4 93.0 82.8 93.0 68.4 93.0 57.6 84.6 52.8 78.6 57.6 73.8 61.2 76.2 67.2 82.2 64.8" fill="none" stroke="url(#mochi-f5-fur)" stroke-width="9.4" stroke-linecap="round"/>
 <path d="M90.6 61.2 C91.8 66.0 90.6 69.6 88.2 72.0" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.7"/>
 <path d="M24 88C22 80 26 74 33 74 40 74 43 81 41 88 40 92 36 94 31 94 27 94 25 92 24 88Z" fill="url(#mochi-f5-fur)" stroke="#c27a52" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>

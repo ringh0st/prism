@@ -5,8 +5,8 @@
 <linearGradient id="frosty-mint" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9f0e6"/><stop offset="1" stop-color="#7fd0bf"/></linearGradient>
 <linearGradient id="frosty-horn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#eadfc9"/></linearGradient>
 <filter id="frosty-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter>
-<filter id="frosty-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<g filter="url(#frosty-st)">
+</defs>
+<g>
 <g opacity=".7" filter="url(#frosty-glow)"><circle cx="21" cy="18" r="5" fill="#9fe6d6"/><circle cx="79" cy="18" r="5" fill="#9fe6d6"/></g>
  <path d="M33 34C26 32 20 26 20 17 23 14 26 16 26.5 19 27.5 24 31 27 37 29Z" fill="url(#frosty-horn)" stroke="#b9a98c" stroke-width="1.5" stroke-linejoin="round"/>
  <path d="M20 17C23 14 26 16 26.5 19 25 21.5 22 21.5 20.3 20Z" fill="url(#frosty-mint)" stroke="#5fae9c" stroke-width="1.1" stroke-linejoin="round"/>

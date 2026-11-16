@@ -4,7 +4,7 @@
 <linearGradient id="fawn-cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf2"/><stop offset="1" stop-color="#f6e2cb"/></linearGradient>
 <linearGradient id="fawn-hoof" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8e6248"/><stop offset="1" stop-color="#6e4532"/></linearGradient>
 <linearGradient id="fawn-nub" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbe6c4"/><stop offset="1" stop-color="#e8c493"/></linearGradient>
-<filter id="fawn-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g filter="url(#fawn-st)" stroke-linejoin="round" stroke-linecap="round">
+</defs><g stroke-linejoin="round" stroke-linecap="round">
 <path d="M70 72C74 68 78 66 80 67 81 70 78 74 73 76Z" fill="url(#fawn-cream)" stroke="#a46a44" stroke-width="1.4"/>
 <path d="M33 80C32 85 32 89 33 92H39C39 88 39 84 40 80Z" fill="url(#fawn-deep)" stroke="#a46a44" stroke-width="1.5"/>
 <path d="M33 90.6H39.2V93.6C39.2 94.4 33 94.4 33 93.6Z" fill="url(#fawn-hoof)" stroke="#5c3a2a" stroke-width="1.3"/>

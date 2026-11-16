@@ -3,8 +3,8 @@
 <linearGradient id="mochi-f4-cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#fbe6d2"/></linearGradient>
 <linearGradient id="mochi-f4-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#e5a93a"/></linearGradient>
 <linearGradient id="mochi-f4-bow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd2b8"/><stop offset="1" stop-color="#f2a67e"/></linearGradient>
-<filter id="mochi-f4-st" x="-10%" y="-10%" width="120%" height="120%"><feMorphology in="SourceAlpha" operator="dilate" radius="2.4" result="d"/><feFlood flood-color="#fff"/><feComposite in2="d" operator="in" result="w"/><feMerge><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
-<g filter="url(#mochi-f4-st)">
+</defs>
+<g>
 <path d="M66.2 87.8 C79.7 92.2 90.9 83.3 90.9 69.8 90.9 59.8 83.0 55.3 77.4 59.8 73.0 63.1 75.2 68.7 80.8 66.5" fill="none" stroke="#c27a52" stroke-width="11.4" stroke-linecap="round"/><path d="M66.2 87.8 C79.7 92.2 90.9 83.3 90.9 69.8 90.9 59.8 83.0 55.3 77.4 59.8 73.0 63.1 75.2 68.7 80.8 66.5" fill="none" stroke="url(#mochi-f4-fur)" stroke-width="8.4" stroke-linecap="round"/>
 <path d="M88.6 63.1 C89.8 67.6 88.6 71.0 86.4 73.2" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.7"/>
 <path d="M24 88C22 80 26 74 33 74 40 74 43 81 41 88 40 92 36 94 31 94 27 94 25 92 24 88Z" fill="url(#mochi-f4-fur)" stroke="#c27a52" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
