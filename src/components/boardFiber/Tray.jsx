@@ -10,7 +10,7 @@ export default function Tray({ level, theme, litCells, onTileClick }) {
   const tray = useMemo(() => facetedBlock(level.width + 0.5, level.height + 0.5, 0.42, 0.3, 0.06), [level]);
   const lip = useMemo(() => facetedBlock(level.width + 0.7, level.height + 0.7, 0.3, 0.4, 0.06), [level]);
   const tile = useMemo(() => facetedBlock(0.94, 0.94, 0.16, 0.1, 0.035), []);
-  const honey = useMemo(() => new THREE.Color(LOOK.butter), []);
+  const honey = useMemo(() => new THREE.Color(LOOK.butter).lerp(new THREE.Color('#ffffff'), 0.2), []);
   const board = new THREE.Color(theme.board);
   return (
     <group>

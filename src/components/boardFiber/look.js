@@ -20,6 +20,25 @@ export const LOOK = {
   shade: '#4a3a32',
 };
 
+/**
+ * The warm faceted palette (owner: "warmer, like the example, but not orange"): golden honey and butter, cream, and a
+ * warm rose-red for the pieces, lit by a low golden sun.
+ */
+export const WARM = {
+  tray: '#e3b456',
+  trayDeep: '#c9933f',
+  tile: '#fbefd6',
+  tileAlt: '#f5dc9c',
+  litTile: '#ffe7a3',
+  piece: '#d9675f',
+  pieceDeep: '#b94f4f',
+  stand: '#f8ecd6',
+  standRotating: '#efd28a',
+  sun: '#ffe2b0',
+  sky: '#fff6e4',
+  ground: '#a8744a',
+};
+
 export const BEAM_COLORS = { sun: '#ffd23f', coral: '#ff6a4e', lime: '#8ad64a', sky: '#5cc4f0' };
 export const BEAM_HEIGHT = 0.36;
 

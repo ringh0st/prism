@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import gsap from 'gsap';
 import * as THREE from 'three';
-import { BEAM_COLORS, BEAM_HEIGHT, LOOK, chamferedRect, facetedBlock, glowing } from './look.js';
+import { BEAM_COLORS, BEAM_HEIGHT, LOOK, WARM, chamferedRect, facetedBlock, glowing } from './look.js';
 
 const matte = (color) => <meshStandardMaterial color={color} roughness={0.7} flatShading />;
 const DIRECTION_ANGLE = { right: 0, down: -Math.PI / 2, left: Math.PI, up: Math.PI / 2 };
@@ -37,11 +37,11 @@ export function FacetedMirror({ tile, turn, isRotatable }) {
   return (
     <group>
       <mesh geometry={plinth} position={[0, 0.17, 0]} castShadow receiveShadow>
-        {matte(isRotatable ? LOOK.mint : LOOK.stone)}
+        {matte(isRotatable ? WARM.standRotating : LOOK.stone)}
       </mesh>
       <group ref={rotor} rotation={[0, angle, 0]} position={[0, 0.25 + 0.31, 0]}>
         <mesh geometry={frame} castShadow receiveShadow>
-          {matte(isSplitter ? '#7fcfb8' : LOOK.coral)}
+          {matte(isSplitter ? '#e9a99a' : WARM.piece)}
         </mesh>
         {[0.012, -0.012].map((z) => (
           <mesh key={z} geometry={pane} position={[0, 0, z]} rotation={[0, z < 0 ? Math.PI : 0, 0]}>
@@ -92,14 +92,14 @@ export function FacetedLamp({ tile, turn, calm }) {
   return (
     <group>
       <mesh geometry={pedestal} position={[0, 0.17, 0]} castShadow receiveShadow>
-        {matte(tile.turnable ? LOOK.sage : LOOK.cream)}
+        {matte(tile.turnable ? WARM.standRotating : WARM.stand)}
       </mesh>
       <group ref={head} rotation={[0, angle, 0]}>
         <mesh geometry={crystal} position={[0, 0.59, 0]} castShadow>
-          {matte(LOOK.coral)}
+          {matte(WARM.piece)}
         </mesh>
         <mesh geometry={tip} position={[0, 0.89, 0]} castShadow>
-          {matte(LOOK.coralDeep)}
+          {matte(WARM.pieceDeep)}
         </mesh>
         <group position={[0.25, BEAM_HEIGHT, 0]} rotation={[0, Math.PI / 2, 0]}>
           <mesh>
@@ -176,7 +176,7 @@ export function FacetedGem({ tile, isLit, isDarkened, calm }) {
   return (
     <group>
       <mesh geometry={stand} position={[0, 0.17, 0]} castShadow receiveShadow>
-        {matte(LOOK.cream)}
+        {matte(WARM.stand)}
       </mesh>
       <group ref={jewel} position={[0, 0.62, 0]}>
         <mesh geometry={geometry} castShadow>
