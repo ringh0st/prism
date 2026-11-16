@@ -17,7 +17,7 @@ export default function GrovePal({
   wearing = [],
   spots,
   isNapping = false,
-  size = 30,
+  size = 22,
   start,
   petLines,
   petLinesKey,

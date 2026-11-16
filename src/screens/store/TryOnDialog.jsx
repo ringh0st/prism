@@ -75,7 +75,7 @@ export default function TryOnDialog({ item, onClose, onGetDiamonds }) {
             <PalArt palId={partnerId} stage={stageOf(progress.pal.owned[partnerId])} wearing={wearing} size="100%" alive />
           </div>
         ) : (
-          <GroveScene placed={placed} partnerId={progress.pal.id} owned={{}} wearing={progress.pal.wearing} worldsFinished={0} />
+          <GroveScene placed={placed} partnerId={progress.pal.id} owned={{}} worldsFinished={0} withPals={false} />
         )}
       </div>
       {theme && (

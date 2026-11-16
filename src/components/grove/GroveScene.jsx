@@ -35,8 +35,10 @@ const FRIEND_START = { left: 34, top: 82 };
  * The Grove: your partner Pal's home in the enchanted forest, with the decor you placed. The Pal wanders,
  * visits the decor, plays, follows the time of day and the season, and naps late at night. Now and then
  * one of your other Pals drops by, and after you finish a world there's a party. Tap a Pal to pet it.
+ * `withPals` false leaves the Pals out (the Shop's preview of a decoration, so nothing hides it). Pals stand small
+ * enough not to hide the decor.
  */
-export default function GroveScene({ placed, partnerId, owned = {}, wearing = [], worldsFinished = 0 }) {
+export default function GroveScene({ placed, partnerId, owned = {}, wearing = [], worldsFinished = 0, withPals = true }) {
   const { t, lang } = useI18n();
   const now = useGroveClock();
   const time = timeOfDay(now);
@@ -80,19 +82,19 @@ export default function GroveScene({ placed, partnerId, owned = {}, wearing = []
         <GroveCritters time={time} season={season} />
         <SeasonFall season={season} />
       </svg>
-      {friend && !isNapping && (
+      {withPals && friend && !isNapping && (
         <GrovePal
           palId={friend.id}
           stage={stageOf(owned[friend.id])}
           spots={spots}
-          size={22}
+          size={17}
           start={FRIEND_START}
           petLines={FRIEND_LINES}
           petLinesKey="quips.groveVisitor"
           label={t('grove.petVisitor', { name: t(`palName.${friend.id}`, {}, friend.name) })}
         />
       )}
-      {partner && (
+      {withPals && partner && (
         <GrovePal
           palId={partner.id}
           stage={stageOf(owned[partner.id])}
