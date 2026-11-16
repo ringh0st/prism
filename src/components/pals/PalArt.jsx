@@ -10,7 +10,7 @@ const bySlotOrder = (a, b) => SLOT_ORDER.indexOf(slotOf(a)) - SLOT_ORDER.indexOf
  * Pals are hand-drawn kawaii stickers, one SVG per form (assets/pals/drawn/<id>-<1…5>.svg, Baby to Master) on a
  * shared 100×100 stage: every Pal sits on y≈94 with the top of its head at y≈25, its eyes at (39,51)/(61,51) and
  * its neck at y≈70, so each outfit piece fits every Pal and form. Each form is drawn older and grander (the Master
- * brings its own golden glow) and is shown a little bigger.
+ * brings its own golden glow); every form is shown at the same size.
  */
 const PICTURES = Object.fromEntries(
   Object.entries(import.meta.glob('../../assets/pals/drawn/*.svg', { eager: true, query: '?url', import: 'default' })).map(([path, url]) => [
@@ -160,15 +160,12 @@ export function Accessory({ id, hat, neck }) {
   }
 }
 
-/** Each form is a little bigger. */
-const STAGE_SCALES = [0.72, 0.84, 0.94, 1, 1.04];
-
-/** The square to show: the whole stage, or (as a portrait) just the Pal, so small forms still fill a round avatar. */
-function viewBoxFor(scale, isPortrait) {
-  if (!isPortrait) return '0 0 100 100';
-  const side = Math.min(100, 92 * scale);
-  return `${50 - side / 2} ${100 - side} ${side} ${side}`;
-}
+/*
+ * Every form is shown at the same size: growing up shows in the drawing (features, details, the Master's glow),
+ * never in how big the Pal is on screen.
+ */
+/** The square to show: the whole stage, or (as a portrait) just the Pal, for round avatars. */
+const viewBoxFor = (isPortrait) => (isPortrait ? '4 8 92 92' : '0 0 100 100');
 
 /** A steady, different breathing rhythm for each Pal, so a group never moves in unison. */
 const blinkDelay = (palId) => `${-([...palId].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 50) / 10}s`;
@@ -181,14 +178,13 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
   const stageIndex = palStage(stage).index;
   const picture = PICTURES[`${palId}-${stageIndex + 1}`];
   if (!picture) return null;
-  const scale = STAGE_SCALES[stageIndex];
   return (
     <svg
       className={`${alive ? styles.alive : ''} ${className}`}
       style={alive ? { '--blink-delay': blinkDelay(palId) } : undefined}
       width={size}
       height={size}
-      viewBox={viewBoxFor(scale, portrait)}
+      viewBox={viewBoxFor(portrait)}
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
@@ -196,24 +192,22 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
       overflow="visible"
     >
       <ellipse cx="50" cy="95" rx="24" ry="4" fill="rgba(60,40,20,.14)" />
-      <g transform={`translate(50 94) scale(${scale}) translate(-50 -94)`}>
-        <g className={styles.body}>
-          {wearing
-            .filter((id) => WORN_BEHIND.has(id))
-            .map((id) => (
-              <g key={id} transform={`translate(50 ${NECK}) scale(1.25 1.05) translate(-50 ${-NECK})`}>
-                <Accessory id={id} hat={HAT} neck={NECK} />
-              </g>
-            ))}
-          <image href={picture} x="0" y="0" width="100" height="100" />
-          {wearing.some((id) => WORN_BEHIND.has(id)) && <circle cx="50" cy={NECK + 1} r="3.2" fill="#f0c14e" stroke="#c99a2e" strokeWidth="1" />}
-          {[...wearing]
-            .filter((id) => !WORN_BEHIND.has(id))
-            .sort(bySlotOrder)
-            .map((id) => (
-              <Accessory key={id} id={id} hat={HAT} neck={NECK} />
-            ))}
-        </g>
+      <g className={styles.body}>
+        {wearing
+          .filter((id) => WORN_BEHIND.has(id))
+          .map((id) => (
+            <g key={id} transform={`translate(50 ${NECK}) scale(1.25 1.05) translate(-50 ${-NECK})`}>
+              <Accessory id={id} hat={HAT} neck={NECK} />
+            </g>
+          ))}
+        <image href={picture} x="0" y="0" width="100" height="100" />
+        {wearing.some((id) => WORN_BEHIND.has(id)) && <circle cx="50" cy={NECK + 1} r="3.2" fill="#f0c14e" stroke="#c99a2e" strokeWidth="1" />}
+        {[...wearing]
+          .filter((id) => !WORN_BEHIND.has(id))
+          .sort(bySlotOrder)
+          .map((id) => (
+            <Accessory key={id} id={id} hat={HAT} neck={NECK} />
+          ))}
       </g>
     </svg>
   );
