@@ -39,7 +39,7 @@ const needsCatchFor = (world, index, preset) =>
 /** Levels that teach a new piece stay gentle. */
 const INTRO_LEVELS = new Set(Object.values(PIECE_FIRST_LEVEL));
 /** Worlds built with the catch check so far (later worlds keep their earlier boards until regenerated). */
-const CATCH_WORLDS = 3;
+const CATCH_WORLDS = 6;
 
 function bestLevelFor(world, index) {
   const preset = generatorPresetFor(world, index);

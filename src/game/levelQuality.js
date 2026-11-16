@@ -28,4 +28,4 @@ export function randomSolveRate(level, { moveLimit = moveLimitFor(level.par, lev
 }
 
 /** Highest random-solve rate a regular level may have (quick "rest" flavors and tutorials are exempt). */
-export const MAX_RANDOM_SOLVE_RATE = 0.15;
+export const MAX_RANDOM_SOLVE_RATE = 0.08;

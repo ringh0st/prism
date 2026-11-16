@@ -121,9 +121,17 @@ export function recipeOf(level) {
  */
 export function recipePreset(recipe, base, { world, index, spike }) {
   const preset = flavorPreset(recipe, base, { world, spike });
-  // The second half of each world bites harder (playtesters breezed through it): one more move needed.
-  if (index > 10 && !REST_RECIPES.includes(recipe)) return { ...preset, minPar: preset.minPar + 1, maxPar: preset.maxPar + 1 };
-  return preset;
+  if (REST_RECIPES.includes(recipe)) return preset;
+  // Playtesters found the early worlds far too easy: every regular flavor needs two more moves and has an
+  // extra turn and decoy, and the second half of each world one move more again.
+  const later = index > 10 ? 1 : 0;
+  return {
+    ...preset,
+    turns: [preset.turns[0] + 1, preset.turns[1] + 1],
+    decoys: preset.decoys + 1,
+    minPar: preset.minPar + 2 + later,
+    maxPar: preset.maxPar + 2 + later,
+  };
 }
 
 function flavorPreset(recipe, base, { world, spike }) {
@@ -181,8 +189,8 @@ function flavorPreset(recipe, base, { world, spike }) {
         walls: 0,
         splits: Math.min(1, base.splits ?? 0),
         filters: Math.min(1, base.filters ?? 0),
-        minPar: 2,
-        maxPar: 4,
+        minPar: 3,
+        maxPar: 5,
       };
     case 'wallMaze':
       return {

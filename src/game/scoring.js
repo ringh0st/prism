@@ -12,13 +12,13 @@ const DIFFICULTY_MULTIPLIER = {
 };
 
 /**
- * Moves allowed before the level is lost. Spare moves shrink on harder levels.
- * Normal: par + 50% (min 2) · Hard: par + 34% (min 2) · Extra Hard: par + 25% (min 1).
+ * Moves allowed before the level is lost. Spare moves shrink on harder levels (tightened after playtesters
+ * found the game too easy). Normal: par + a third (min 1) · Hard: par + 25% (min 1) · Extra Hard: par + 15% (min 1).
  */
 export function moveLimitFor(par, difficulty = DIFFICULTY.NORMAL) {
-  if (difficulty === DIFFICULTY.EXTRA) return par + Math.max(1, Math.ceil(par * 0.25));
-  if (difficulty === DIFFICULTY.HARD) return par + Math.max(2, Math.ceil(par * 0.34));
-  return par + Math.max(2, Math.ceil(par * 0.5));
+  if (difficulty === DIFFICULTY.EXTRA) return par + Math.max(1, Math.ceil(par * 0.15));
+  if (difficulty === DIFFICULTY.HARD) return par + Math.max(1, Math.ceil(par * 0.25));
+  return par + Math.max(1, Math.ceil(par / 3));
 }
 
 /**

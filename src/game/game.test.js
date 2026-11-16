@@ -86,9 +86,9 @@ test('stars and sparks', () => {
   assert.equal(starsForMoves(3, 3), 3);
   assert.equal(starsForMoves(4, 3), 2);
   assert.equal(starsForMoves(5, 3), 1);
-  assert.equal(moveLimitFor(3), 5);
-  assert.equal(moveLimitFor(8, 'hard'), 11);
-  assert.equal(moveLimitFor(10, 'extra'), 13);
+  assert.equal(moveLimitFor(3), 4);
+  assert.equal(moveLimitFor(8, 'hard'), 10);
+  assert.equal(moveLimitFor(10, 'extra'), 12);
   assert.equal(sparksForNewStars(1, 3, 'hard'), 20);
   assert.equal(sparksForNewStars(3, 2), 0);
 });

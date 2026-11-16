@@ -117,7 +117,7 @@ export function generatorPresetFor(world, index) {
   const spike = difficulty === DIFFICULTY.EXTRA ? 2 : difficulty === DIFFICULTY.HARD ? 1 : 0;
   const tier = Math.floor((world - 1) / 4); // grows every 4 worlds
   const size = clamp(5 + Math.min(4, tier) + Math.round(ramp) + (spike > 0 ? 1 : 0), 4, 10);
-  const parStart = Math.min(8, 2 + Math.floor((world - 1) / 3));
+  const parStart = Math.min(10, 4 + Math.floor((world - 1) / 2));
   // Early worlds spike more gently so new players aren't flattened by the first boss.
   const minPar = Math.min(13, parStart + Math.round(ramp * 2) + spike * (world <= 2 ? 1 : 2));
 
