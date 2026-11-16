@@ -10,6 +10,7 @@ import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeom
 import { cellsOnBeams, isRotatable } from '../../game/beam.js';
 import { FRAGILE_TURNS } from '../../game/constants.js';
 import { BEAM_HEIGHT, BEAM_HEX, addShadowed, darkenedColor, glowSprite, makeFog, makePiece, mat } from './boardPieces.js';
+import { glowMaterial, starSprite } from './lightMaterials.js';
 import { TILE } from '../../game/constants.js';
 
 /** The flat board's colors (Board3D reads the world's own from its CSS; these are World 1's). */
@@ -57,16 +58,19 @@ function makeBeam(level, segment) {
   const group = new THREE.Group();
   const color = new THREE.Color(BEAM_HEX[segment.color] ?? BEAM_HEX.sun);
   const tube = new THREE.Group();
+  // A wide soft glow and a nearer one (light flowing along both), a solid golden body and a white-hot core.
+  const glows = [
+    glowMaterial(color, { opacity: 0.75, sharpness: 2.6, flow: 0.45, length }),
+    glowMaterial(color.clone().lerp(new THREE.Color('#ffffff'), 0.3), { opacity: 0.9, sharpness: 1.1, flow: 0.3, length }),
+  ];
   const layers = [
-    { radius: 0.15, color, opacity: 0.2 },
-    { radius: 0.075, color, opacity: 0.9 },
-    { radius: 0.032, color: new THREE.Color('#ffffff'), opacity: 1 },
+    { radius: 0.26, material: glows[0] },
+    { radius: 0.11, material: glows[1] },
+    { radius: 0.055, material: new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.95, depthWrite: false }) },
+    { radius: 0.026, material: new THREE.MeshBasicMaterial({ color: '#ffffff', depthWrite: false, transparent: true }) },
   ];
   for (const layer of layers) {
-    const mesh = new THREE.Mesh(
-      new THREE.CylinderGeometry(layer.radius, layer.radius, length, 16, 1, true),
-      new THREE.MeshBasicMaterial({ color: layer.color, transparent: true, opacity: layer.opacity, depthWrite: false }),
-    );
+    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(layer.radius, layer.radius, length, 20, 1, true), layer.material);
     mesh.rotation.z = Math.PI / 2;
     tube.add(mesh);
   }
@@ -88,7 +92,7 @@ function makeBeam(level, segment) {
     group.add(sprite);
     sparks.push({ sprite, phase: n / count });
   }
-  return { group, sparks, from, to, length };
+  return { group, sparks, from, to, length, glows, color };
 }
 
 /** A creeping shadow's trail to its gem: dark footprints that fade further along. */
@@ -238,7 +242,9 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
         const isDarkened = darkenedTile === i;
         piece.material.emissiveIntensity = isLit ? 0.55 : 0;
         piece.gemGlow.material.opacity = isLit ? 0.8 : 0;
-        piece.material.color.copy(isDarkened ? darkenedColor : isLit ? piece.color : piece.color.clone().lerp(new THREE.Color('#b9ab98'), 0.35));
+        // Unlit: the same color, paler and frosted, so it reads as a jewel waiting for light.
+        piece.material.color.copy(isDarkened ? darkenedColor : isLit ? piece.color : piece.color.clone().lerp(new THREE.Color('#ffffff'), 0.35));
+        piece.material.roughness = isLit ? 0.04 : 0.35;
       }
       if (piece.shadeMaterial) piece.shadeMaterial.emissiveIntensity = trace.litShades.has(i) ? 0.9 : 0;
       if (piece.switchMaterial) piece.switchMaterial.emissiveIntensity = trace.litSwitches?.has(i) ? 0.7 : 0;
@@ -260,10 +266,16 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
       // Where the light turns (a mirror, splitter, prism or portal) it flashes; where something stops it, it fades out.
       const endTile = tileAt(segment.x2, segment.y2);
       const turns = endTile && TURNING_TILES.has(endTile.type);
-      const flash = glowSprite(beam.group.children[0].children[1].material.color, turns ? 0.55 : 0.3, turns ? 0.9 : 0.35);
+      const flash = glowSprite(beam.color, turns ? 0.6 : 0.3, turns ? 0.9 : 0.35);
       flash.position.copy(beam.to);
       beams.add(flash);
-      return { ...beam, flash, turns };
+      // A star glint where the light bounces off a mirror.
+      const glint = turns ? starSprite('#fffbe8', 0.75, 1) : null;
+      if (glint) {
+        glint.position.copy(beam.to);
+        beams.add(glint);
+      }
+      return { ...beam, flash, glint, turns };
     });
     trails.clear();
     for (const gloom of glooms) if (!gloom.isBurned) trails.add(makeTrail(level, gloom.trail.slice(1)));
@@ -302,7 +314,12 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
         spark.sprite.position.copy(beam.from).lerp(beam.to, along);
         spark.sprite.material.opacity = calm ? 0.7 : Math.sin(along * Math.PI) * 0.95;
       });
-      if (beam.turns && !calm) beam.flash.scale.setScalar(0.55 + Math.sin(time * 6) * 0.08);
+      for (const glow of beam.glows) glow.uniforms.time.value = calm ? 0 : time;
+      if (beam.turns && !calm) {
+        beam.flash.scale.setScalar(0.6 + Math.sin(time * 6) * 0.08);
+        beam.glint.material.rotation = time * 0.6;
+        beam.glint.scale.setScalar(0.7 + Math.sin(time * 4) * 0.12);
+      }
     }
     pieces.forEach((piece, i) => {
       if (piece.lampGlow && !calm) piece.lampGlow.material.opacity = 0.7 + Math.sin(time * 3 + i) * 0.2;
@@ -311,6 +328,15 @@ export function createBoardScene(canvas, level, { tilt = 0.62, theme = DEFAULT_T
         const since = time - (piece.litAt ?? -10);
         const swell = since < 0.6 ? 1 + Math.sin((since / 0.6) * Math.PI) * 0.7 : 1;
         piece.gemGlow.scale.setScalar(0.9 * swell + Math.sin(time * 3 + i) * 0.04);
+      }
+      // Lit gems twinkle with star glints on their facets, one after another.
+      if (piece.twinkles) {
+        const isLit = litGems.has(i);
+        piece.twinkles.forEach((star, k) => {
+          const beat = calm ? 0.6 : Math.max(0, Math.sin(time * 2.2 + k * 2.1 + i));
+          star.scale.setScalar(isLit ? 0.32 * beat : 0);
+          star.material.rotation = time * 0.5 + k;
+        });
       }
     });
     for (let n = bursts.length - 1; n >= 0; n--) {

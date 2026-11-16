@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { BEAM_COLORS, TILE } from '../../game/constants.js';
+import { glowMaterial, starSprite } from './lightMaterials.js';
 
 export const BEAM_HEX = { sun: '#ffc61a', coral: '#ff5a4e', lime: '#7ccf3c', sky: '#45b4ea' };
 export const BEAM_HEIGHT = 0.28;
@@ -79,18 +80,26 @@ function addSticker(group, texture, radius, y) {
   return disc;
 }
 
-/** A color's own gem shape in 3D: diamond, round, triangle or square (BEAM_COLORS[color].shape). */
+/**
+ * A color's gem as a cut jewel: a pointed pavilion below the girdle and a crown with a flat table on top, with
+ * as many sides as its shape (BEAM_COLORS[color].shape), so each color keeps its own outline seen from above:
+ * diamond 8 (a brilliant), circle 12 (a round brilliant), triangle 3 (a trillion), square 4 (a princess cut).
+ */
+const GEM_SIDES = { diamond: 8, circle: 12, triangle: 3, square: 4 };
 function gemGeometry(color) {
-  switch (BEAM_COLORS[color]?.shape) {
-    case 'circle':
-      return new THREE.IcosahedronGeometry(0.3, 1);
-    case 'triangle':
-      return new THREE.ConeGeometry(0.32, 0.5, 3);
-    case 'square':
-      return new RoundedBoxGeometry(0.4, 0.4, 0.4, 2, 0.05);
-    default:
-      return new THREE.OctahedronGeometry(0.34, 0);
-  }
+  const shape = BEAM_COLORS[color]?.shape ?? 'diamond';
+  const sides = GEM_SIDES[shape] ?? 8;
+  // Fewer sides look smaller at the same radius, so they get a little more.
+  const r = sides <= 4 ? 0.36 : 0.31;
+  const outline = [
+    [0.001, -0.3],
+    [r, 0.0],
+    [r, 0.05],
+    [r * 0.62, 0.19],
+    [0.001, 0.19],
+  ].map(([x, y]) => new THREE.Vector2(x, y));
+  const geometry = new THREE.LatheGeometry(outline, sides, shape === 'square' ? Math.PI / 4 : 0);
+  return geometry;
 }
 
 /**
@@ -235,71 +244,118 @@ function makeMirror(tile, { environment, theme, isRotatable }) {
 }
 
 /**
- * The lamp: an orange lantern block with a short barrel pointing the way the light leaves, a glass lens with a
- * white-hot centre, and a soft glow that breathes (a turning lamp sits on a turntable).
+ * The lamp: a little stage spotlight on a brass stand. A cream housing with a honey band and a brass bezel points
+ * the way the light leaves; its lens glows white-hot in the beam's color and throws a soft cone of light, and
+ * the glow breathes (a turning lamp sits on a turntable).
  */
-function makeLamp(tile, { theme }) {
+function makeLamp(tile, { theme, environment }) {
   const group = new THREE.Group();
+  const brass = new THREE.MeshPhysicalMaterial({ color: '#d4a85a', metalness: 0.85, roughness: 0.3, envMap: environment, envMapIntensity: 1.3 });
   if (tile.turnable) {
     const plate = addShadowed(group, new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.47, 0.05, 40), mat(new THREE.Color(theme.pivot))));
     plate.position.y = 0.03;
   }
   const head = new THREE.Group();
   head.rotation.y = DIRECTION_ANGLE[tile.dir] ?? 0;
-  const body = addShadowed(head, new THREE.Mesh(new RoundedBoxGeometry(0.6, 0.46, 0.62, 5, 0.16), mat(COLORS.lamp, { roughness: 0.6 })));
-  body.position.set(-0.06, 0.27, 0);
-  const cap = new THREE.Mesh(new RoundedBoxGeometry(0.48, 0.06, 0.5, 3, 0.03), mat(COLORS.lampCap, { roughness: 0.6 }));
-  cap.position.set(-0.06, 0.5, 0);
-  head.add(cap);
-  // The barrel: light comes out of this end, so the way it points is plain to see.
-  const barrel = addShadowed(head, new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.2, 0.2, 32), mat(COLORS.lampDeep, { roughness: 0.5 })));
-  barrel.rotation.z = -Math.PI / 2;
-  barrel.position.set(0.3, BEAM_HEIGHT, 0);
+  // The stand: a round foot and a fork that holds the light.
+  addShadowed(head, new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.3, 0.07, 40), brass)).position.y = 0.06;
+  addShadowed(head, new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.12, 16), brass)).position.y = 0.14;
+  for (const side of [-1, 1]) {
+    const arm = addShadowed(head, new THREE.Mesh(new RoundedBoxGeometry(0.1, 0.2, 0.035, 2, 0.015), brass));
+    arm.position.set(-0.04, 0.24, side * 0.215);
+  }
+  // The housing, lying along the way the light leaves.
+  const housing = new THREE.Group();
+  housing.position.set(-0.04, BEAM_HEIGHT, 0);
+  const shell = addShadowed(housing, new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.17, 0.42, 40), mat('#fff4e2', { roughness: 0.45 })));
+  shell.rotation.z = -Math.PI / 2;
+  const band = new THREE.Mesh(new THREE.CylinderGeometry(0.205, 0.205, 0.09, 40), mat('#f0c14e', { roughness: 0.4 }));
+  band.rotation.z = -Math.PI / 2;
+  band.position.x = -0.06;
+  housing.add(band);
+  const back = addShadowed(
+    housing,
+    new THREE.Mesh(new THREE.SphereGeometry(0.17, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), mat('#fff4e2', { roughness: 0.45 })),
+  );
+  back.rotation.z = Math.PI / 2;
+  back.position.x = -0.21;
+  const bezel = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.035, 12, 40), brass);
+  bezel.rotation.y = Math.PI / 2;
+  bezel.position.x = 0.21;
+  housing.add(bezel);
+  head.add(housing);
+  // The lens: the beam's color with a white-hot centre, a breathing glow and a soft cone of light ahead of it.
   const beamColor = new THREE.Color(BEAM_HEX[tile.color] ?? BEAM_HEX.sun);
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.025, 10, 32), mat(COLORS.cream, { roughness: 0.35 }));
-  rim.rotation.y = Math.PI / 2;
-  rim.position.set(0.405, BEAM_HEIGHT, 0);
-  head.add(rim);
-  const lens = new THREE.Mesh(new THREE.CircleGeometry(0.15, 32), new THREE.MeshBasicMaterial({ color: beamColor }));
+  const lens = new THREE.Mesh(
+    new THREE.CircleGeometry(0.18, 40),
+    new THREE.MeshBasicMaterial({ color: beamColor.clone().lerp(new THREE.Color('#ffffff'), 0.25) }),
+  );
   lens.rotation.y = Math.PI / 2;
-  lens.position.set(0.402, BEAM_HEIGHT, 0);
+  lens.position.set(0.215, BEAM_HEIGHT, 0);
   head.add(lens);
-  const core = new THREE.Mesh(new THREE.CircleGeometry(0.075, 24), new THREE.MeshBasicMaterial({ color: '#fffbe6' }));
+  const core = new THREE.Mesh(new THREE.CircleGeometry(0.09, 32), new THREE.MeshBasicMaterial({ color: '#fffdf0' }));
   core.rotation.y = Math.PI / 2;
-  core.position.set(0.406, BEAM_HEIGHT, 0);
+  core.position.set(0.22, BEAM_HEIGHT, 0);
   head.add(core);
-  const glow = glowSprite(beamColor.clone().lerp(new THREE.Color('#ffffff'), 0.3), 0.75, 0.85);
-  glow.position.set(0.45, BEAM_HEIGHT, 0);
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(0.34, 0.6, 40, 1, true), glowMaterial(beamColor, { opacity: 0.45, sharpness: 1.2 }));
+  cone.rotation.z = Math.PI / 2;
+  cone.position.set(0.52, BEAM_HEIGHT, 0);
+  head.add(cone);
+  const glow = glowSprite(beamColor.clone().lerp(new THREE.Color('#ffffff'), 0.35), 0.9, 0.85);
+  glow.position.set(0.26, BEAM_HEIGHT, 0);
   head.add(glow);
   group.add(head);
   return { group, lampHead: head, baseAngle: head.rotation.y, lampGlow: glow };
 }
 
 /**
- * A gem: a faceted crystal in its color's own shape on a little stand. Dim until light reaches it; then it fills
- * with light from inside, glows and sparkles (the scene plays the sparkle burst).
+ * A gem: a glassy cut crystal in its color's own shape on a little gold-rimmed pedestal. Frosted and quiet until
+ * light reaches it; then it fills with light from inside, glows, and twinkles with star glints (the scene plays
+ * the sparkle burst).
  */
-function makeGem(tile) {
+function makeGem(tile, { environment }) {
   const group = new THREE.Group();
   const color = new THREE.Color(BEAM_HEX[tile.color] ?? BEAM_HEX.sun);
-  const stand = addShadowed(group, new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.26, 0.1, 6), mat(COLORS.stone)));
-  stand.position.y = 0.05;
+  addShadowed(group, new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.23, 0.12, 24), mat('#efe3cf', { roughness: 0.6 }))).position.y = 0.06;
+  const rim = new THREE.Mesh(
+    new THREE.TorusGeometry(0.175, 0.02, 8, 32),
+    new THREE.MeshPhysicalMaterial({ color: '#d4a85a', metalness: 0.85, roughness: 0.3, envMap: environment }),
+  );
+  rim.rotation.x = Math.PI / 2;
+  rim.position.y = 0.12;
+  group.add(rim);
   const material = new THREE.MeshPhysicalMaterial({
     color,
-    roughness: 0.12,
+    roughness: 0.04,
     metalness: 0,
+    transmission: 0.35,
+    thickness: 0.5,
+    ior: 2.1,
+    iridescence: 0.6,
+    iridescenceIOR: 1.6,
     clearcoat: 1,
     flatShading: true,
+    envMap: environment,
+    envMapIntensity: 1.6,
     emissive: color,
     emissiveIntensity: 0,
   });
   const gem = addShadowed(group, new THREE.Mesh(gemGeometry(tile.color), material));
-  gem.position.y = 0.42;
-  // The light it has caught, glowing from inside.
-  const inner = glowSprite(color.clone().lerp(new THREE.Color('#ffffff'), 0.4), 0.9, 0);
-  inner.position.y = 0.42;
+  gem.position.y = 0.45;
+  const inner = glowSprite(color.clone().lerp(new THREE.Color('#ffffff'), 0.45), 1.0, 0);
+  inner.position.y = 0.45;
   group.add(inner);
-  return { group, gem, material, color, gemGlow: inner };
+  const twinkles = [
+    [0.16, 0.6, 0.06],
+    [-0.14, 0.38, 0.12],
+    [0.05, 0.3, -0.16],
+  ].map(([x, y, z]) => {
+    const star = starSprite('#ffffff', 0, 1);
+    star.position.set(x, y, z);
+    group.add(star);
+    return star;
+  });
+  return { group, gem, material, color, gemGlow: inner, twinkles };
 }
 
 function makeWall() {
@@ -468,7 +524,7 @@ export function makePiece(tile, context) {
     case TILE.EMITTER:
       return makeLamp(tile, context);
     case TILE.GEM:
-      return makeGem(tile);
+      return makeGem(tile, context);
     case TILE.WALL:
       return makeWall();
     case TILE.FILTER:
