@@ -47,6 +47,7 @@ import { levelModifierFor } from '../../game/surprises.js';
 import { quipLines } from '../../game/quips.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { flavorText, levelTitle, pieceText, worldName } from '../../i18n/gameText.js';
+import { errorText } from '../../i18n/meText.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
 import { PIECE_FIRST_LEVEL, firstTileOf, newPiecesIn, pieceCellOf, piecesMetIn } from '../../game/pieces.js';
 import { findHint, tapsLeftFinder } from '../../game/solver.js';
@@ -64,6 +65,9 @@ import { glowbugCellOf, glowbugForLevel, rescuedGlowbugs } from '../../game/glow
 import { cellsOnBeams } from '../../game/beam.js';
 import PalBuddy from './PalBuddy.jsx';
 import { comboFor } from '../../game/combos.js';
+import { hasBonusGoal, isBonusGoalMet } from '../../game/bonusGoals.js';
+import { useBonusGoal } from '../../hooks/useBonusGoal.js';
+import BonusGoalBadge from '../../components/bonus/BonusGoalBadge.jsx';
 import styles from './PlayScreen.module.css';
 
 const WIN_DIALOG_DELAY_MS = 1300;
@@ -114,9 +118,12 @@ function piecesToIntroduce(level, mode, progress) {
  * | 'rush' (Light Rush: no helpers, the run's spare moves set the limit; `rush` is from RushRoute)
  */
 export default function PlayScreen({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey, challenge = null, rush = null }) {
-  const { progress, settings, finishLevel, finishDaily, finishEventLevel, consumeHelper, endWinStreak } = usePlayer();
+  const { progress, settings, finishLevel, finishBonusGoal, finishDaily, finishEventLevel, consumeHelper, endWinStreak } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
+  // The level's optional bonus goal on the main road (bonusGoals.js), tracked tap by tap.
+  const bonus = useBonusGoal({ level, enabled: mode === 'level' && hasBonusGoal(level.id), puzzle, progress });
+  const bonusGemColor = bonus.goal?.tile !== undefined ? level.tiles[bonus.goal.tile].color : null;
   // The partner Pal's power for this visit (palPowers.js), fixed once the level starts (the partner can be
   // switched on the level card); none in the first steps.
   const [palHelp, setPalHelp] = useState(() => (powersWorkIn(mode) && !isFirstStepsLevel(level, mode) ? partnerPower(progress) : null));
@@ -402,9 +409,18 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
 
       let outcome;
       if (mode === 'level') {
+        // The bonus goal is paid after the level's result is saved (the server checks the level was solved).
+        const isBonusMet = !isSkipped && isBonusGoalMet(bonus.goal, bonus.play);
         outcome = finishLevel(
           level,
           isSkipped ? { moves: null, forcedStars: 1, usedHelpers: true } : { moves, starCap, usedHelpers, combo: bestCombo.current },
+        ).then(async (finished) =>
+          bonus.goal && !isSkipped
+            ? {
+                ...finished,
+                bonus: { goal: bonus.goal, gemColor: bonusGemColor, isMet: isBonusMet, sparks: isBonusMet ? await finishBonusGoal(level.id) : 0 },
+              }
+            : finished,
         );
       } else if (mode === 'event') {
         outcome = finishEventLevel(level, { ...eventSpot, moves, starCap });
@@ -451,6 +467,10 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
       say,
       react,
       glowbug,
+      bonus.goal,
+      bonus.play,
+      bonusGemColor,
+      finishBonusGoal,
       playStats,
       moveLimit,
       trace.segments,
@@ -773,8 +793,21 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
         </span>
       </header>
 
-      <section className={styles.status} aria-label={t('play.status')} data-tour="meter">
+      <section className={`${styles.status} ${bonus.goal ? styles.withBonus : ''}`} aria-label={t('play.status')} data-tour="meter">
         {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} spent={finaleSpent} />}
+        {bonus.goal && (
+          // The bonus goal at a glance (a tick once it's done); a tap has Lumi say it.
+          <BonusGoalBadge
+            goal={bonus.goal}
+            gemColor={bonusGemColor}
+            state={bonus.state}
+            compact
+            onClick={() => {
+              setLumi({ mood: 'happy', line: t('bonus.label', { goal: t(`bonus.goal.${bonus.goal.kind}`) }) });
+              sfx.lumiTalk();
+            }}
+          />
+        )}
         <ul className={styles.gems} aria-label={t('play.gemsLit', { n: trace.litGems.size, total: gems.length })}>
           {gems.map(({ tile, i }) => (
             <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff} data-gem-slot={i}>
@@ -813,6 +846,7 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           isLocked={isOver}
           darkness={puzzle.darkness}
           darkMoves={puzzle.taps.length}
+          bonusMark={bonus.marked.length ? { kind: bonus.goal.kind, tiles: bonus.marked, state: bonus.state } : null}
           mood={modifier}
           label={t('play.boardLabel', { name: levelName })}
         />
@@ -858,6 +892,8 @@ export default function PlayScreen({ level, mode = 'level', title, backHref = '#
           flavor={flavor}
           waitsForTap={isFirstSteps}
           glowbugId={glowbug?.id}
+          best={mode === 'level' ? (progress.levels[level.id]?.bestMoves ?? null) : null}
+          bonus={bonus.goal ? { goal: bonus.goal, gemColor: bonusGemColor, isDone: bonus.wasDone } : null}
           boosters={boosters.picker}
           palHelp={palHelp}
           palWearing={progress.pal.wearing}

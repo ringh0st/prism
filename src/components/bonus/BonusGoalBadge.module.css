@@ -1,0 +1,130 @@
+/* A bonus goal: a honey disc with its picture, a few words, and a tick (done) or cross (missed) badge */
+.badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding-block: 4px;
+  padding-inline: 4px 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1.15;
+  text-align: start;
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--color-honey) 18%, var(--surface-raised));
+  transition:
+    opacity 300ms ease,
+    background-color 300ms ease;
+}
+
+button.badge {
+  cursor: pointer;
+}
+
+.art {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow: inset 0 -2px 0 var(--reward-ledge);
+}
+
+/* A gem goal shows the real gem with a little "1" or flag tag at its corner */
+.gemTag {
+  position: absolute;
+  inset-block-end: -3px;
+  inset-inline-end: -5px;
+  padding: 1px;
+  border-radius: 50%;
+  color: var(--reward-label);
+  background: var(--surface-raised);
+}
+
+.words {
+  min-width: 0;
+}
+
+.mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-inline-start: -2px;
+  border-radius: 50%;
+}
+
+.done {
+  background: color-mix(in srgb, var(--color-mint) 20%, var(--surface-raised));
+}
+
+.done .art {
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+  box-shadow: inset 0 -2px 0 var(--calm-ledge);
+  animation: tick 520ms var(--ease-pop);
+}
+
+.done .mark {
+  color: var(--calm-label);
+  background: var(--calm-top);
+  animation: tick 520ms var(--ease-pop) 120ms both;
+}
+
+.missed {
+  opacity: 0.62;
+}
+
+.missed .mark {
+  color: var(--text-soft);
+  background: var(--surface-tonal);
+}
+
+/* In a level: just the picture and the mark, small, next to the gem counter */
+.compact {
+  gap: 4px;
+  padding: 3px;
+}
+
+.compact .art {
+  width: 28px;
+  height: 28px;
+}
+
+.compact .mark {
+  position: absolute;
+  inset-block-start: -4px;
+  inset-inline-end: -4px;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  box-shadow: 0 0 0 2px var(--surface-raised);
+}
+
+@keyframes tick {
+  from {
+    transform: scale(0.4);
+  }
+  60% {
+    transform: scale(1.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge,
+  .done .art,
+  .done .mark {
+    animation: none;
+    transition: none;
+  }
+}

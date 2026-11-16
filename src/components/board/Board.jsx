@@ -12,6 +12,7 @@ import { cellsOnBeams, isRotatable as tileIsRotatable } from '../../game/beam.js
 import { TILE } from '../../game/constants.js';
 import { flyToCounter, gemBurst } from '../../lib/effects.js';
 import CoachHand from './CoachHand.jsx';
+import BonusGoalIcon from '../bonus/BonusGoalIcon.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './Board.module.css';
 
@@ -40,6 +41,7 @@ const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
  * @param coach        first-levels coaching: { tile: tile index the hand points at, or null; labels: show Lamp/Gem tags }
  * @param darkness     the darkness now (darkness.js): creeping shadows, countdowns on fading gems and dying lamps
  * @param darkMoves    moves that still stand (for the eclipse countdown)
+ * @param bonusMark    { kind, tiles, state }: the pieces or gem the bonus goal is about, tagged in a corner (bonusGoals.js)
  */
 export default function Board({
   level,
@@ -63,6 +65,7 @@ export default function Board({
   nudgedCell = null,
   darkness = null,
   darkMoves = 0,
+  bonusMark = null,
 }) {
   const { t, lang } = useI18n();
   const { width, height, tiles } = level;
@@ -178,14 +181,16 @@ export default function Board({
                       : undefined;
               const isDarkened = darkness?.lost?.tile === tileIndex && tile?.type === TILE.GEM;
               const gloom = gloomAt.get(cell);
-              const darkWords = [
+              const isBonusMarked = Boolean(bonusMark?.tiles.includes(tileIndex));
+              const cellNotes = [
                 darkCount != null && t(tile.fade ? 'ui.cell.fadeLeft' : 'ui.cell.powerLeft', { count: darkCount }),
                 isDarkened && t('ui.cell.darkened'),
                 gloom && t('ui.cell.gloom', { count: gloom.stepsLeft }),
+                isBonusMarked && t(`ui.cell.bonus.${bonusMark.kind}`),
               ].filter(Boolean);
               const description =
                 describeTile(tile, { orient: orients[tileIndex], isLit, isOpen, isRotatable: canRotate, isFogged, turnsLeft: left }, t) +
-                (darkWords.length ? `, ${darkWords.join(', ')}` : '');
+                (cellNotes.length ? `, ${cellNotes.join(', ')}` : '');
               return (
                 <div role="gridcell" key={col} className={styles.cellWrap}>
                   <button
@@ -212,6 +217,11 @@ export default function Board({
                       </span>
                     )}
                     {coach?.tile === tileIndex && tileIndex >= 0 && <CoachHand />}
+                    {isBonusMarked && (
+                      <span className={`${styles.bonusMark} ${bonusMark.state === 'missed' ? styles.bonusMissed : ''}`} aria-hidden="true">
+                        <BonusGoalIcon kind={bonusMark.kind === 'untouched' ? 'untouched' : `${bonusMark.kind}Tag`} size="100%" />
+                      </span>
+                    )}
                     {coach?.labels && COACH_LABELS[tile?.type] && (
                       <span className={styles.coachLabel} aria-hidden="true">
                         {t(COACH_LABELS[tile.type])}

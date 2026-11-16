@@ -66,6 +66,15 @@
   background: var(--calm-bottom);
 }
 
+.best svg {
+  color: inherit;
+}
+
+.oldBest {
+  opacity: 0.6;
+  font-size: 0.85em;
+}
+
 .shield {
   color: var(--action-label);
   background: var(--action-bottom);

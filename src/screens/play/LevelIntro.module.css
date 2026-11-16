@@ -238,6 +238,49 @@
   }
 }
 
+/* The player's best so far and the level's bonus goal, side by side under the goal */
+.extras {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.best {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-strong);
+  background: var(--surface-sunken);
+}
+
+.best svg:first-child {
+  color: var(--reward-ledge);
+}
+
+.night .best {
+  color: #fff4e8;
+  background: rgba(255, 244, 232, 0.1);
+}
+
+.night .best svg:first-child {
+  color: var(--color-honey);
+}
+
+.night .bonus {
+  --text-strong: #2b2118;
+}
+
+.bonus {
+  animation: gemIn 420ms var(--ease-pop);
+}
+
 /* A Glowbug napping on this level */
 .night .glowbug {
   --text-strong: #2b2118;
@@ -262,6 +305,7 @@
 @media (prefers-reduced-motion: reduce) {
   .medallion,
   .gem,
+  .bonus,
   .disco::before {
     animation: none;
   }

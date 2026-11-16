@@ -320,6 +320,20 @@ a.node:active {
   background: var(--warm-bottom);
 }
 
+.bonusPip {
+  position: absolute;
+  inset-inline-start: -4px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: var(--calm-label);
+  background: var(--calm-bottom);
+  box-shadow: var(--shadow-sm);
+}
+
 .crown {
   top: -26px;
   width: 38px;

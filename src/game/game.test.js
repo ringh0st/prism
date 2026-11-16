@@ -1241,3 +1241,71 @@ test('darkness levels can be won in a safe order and every new piece is introduc
     }
   }
 });
+
+test('bonus goals: every main-road level has one its board allows, and most are more than ★★★ already gives', async () => {
+  const { bonusGoalWithWitness, playTaps, isBonusGoalMet, hasBonusGoal, BONUS_GOAL_KINDS } = await import('./bonusGoals.js');
+  const kinds = new Map();
+  let extras = 0;
+  for (let world = 1; world <= WORLD_COUNT; world++) {
+    const levels = JSON.parse(readFileSync(new URL(`../data/worlds/world-${String(world).padStart(3, '0')}.json`, import.meta.url), 'utf8'));
+    for (const level of levels) {
+      const picked = bonusGoalWithWitness(level);
+      assert.equal(Boolean(picked), hasBonusGoal(level.id), `${level.id} has a bonus goal unless it's a first step`);
+      if (!picked) continue;
+      // The witness is a real solve within the move limit (the darkness included) that meets the goal.
+      const play = playTaps(level, picked.taps);
+      assert.ok(play.isSolved, `${level.id}: the witness solves the level`);
+      assert.ok(picked.taps.length <= moveLimitFor(level.par, level.difficulty), `${level.id}: within the move limit`);
+      assert.ok(isBonusGoalMet(picked.goal, play), `${level.id}: the witness meets "${picked.goal.kind}"`);
+      kinds.set(picked.goal.kind, (kinds.get(picked.goal.kind) ?? 0) + 1);
+      if (picked.isExtra) extras++;
+    }
+  }
+  for (const kind of BONUS_GOAL_KINDS.filter((k) => k !== 'noHelpers')) assert.ok(kinds.get(kind) > 10, `"${kind}" comes up`);
+  assert.ok(extras > 800, `most goals ask for more than ★★★ (${extras})`);
+});
+
+test('bonus goals: picked the same way every time, tracked tap by tap, paid once, and in sync with the database', async () => {
+  const bonus = await import('./bonusGoals.js');
+  const { createEmptyProgress, recordLevelResult, withServerState } = await import('./progress.js');
+  const level = JSON.parse(readFileSync(new URL('../data/worlds/world-002.json', import.meta.url), 'utf8'))[4];
+  assert.deepEqual(bonus.bonusGoalFor(level), bonus.bonusGoalFor(structuredClone(level)), 'seeded by the level');
+  assert.equal(bonus.hasBonusGoal('w1-03'), false);
+  assert.equal(bonus.hasBonusGoal('w1-04'), true);
+  assert.equal(bonus.hasBonusGoal('daily-2026-11-16'), false);
+
+  // Live states: gem order, combos, the marked piece, helpers and Smudge's shadows.
+  let play = bonus.freshPlay();
+  play = bonus.playAfterTap(play, 4, { litBefore: new Set(), litAfter: new Set([7]), wasInLight: true });
+  assert.equal(bonus.bonusGoalState({ kind: 'firstGem', tile: 7 }, play), 'done');
+  assert.equal(bonus.bonusGoalState({ kind: 'firstGem', tile: 8 }, play), 'missed');
+  assert.equal(bonus.bonusGoalState({ kind: 'untouched', tiles: [4] }, play), 'missed');
+  assert.equal(bonus.bonusGoalState({ kind: 'untouched', tiles: [5] }, play), 'open', 'done only once solved');
+  play = bonus.playAfterTap(play, 5, { litBefore: new Set([7]), litAfter: new Set([7, 8, 9]), wasInLight: false });
+  assert.equal(play.bestCombo, 2);
+  assert.equal(bonus.bonusGoalState({ kind: 'combo' }, play), 'done');
+  assert.equal(bonus.bonusGoalState({ kind: 'followLight' }, play), 'missed');
+  const solved = { ...play, isSolved: true, burned: 2 };
+  assert.equal(bonus.isBonusGoalMet({ kind: 'lastGem', tile: 8 }, solved), false, 'two gems at once is not "this one last"');
+  assert.equal(bonus.isBonusGoalMet({ kind: 'burnAll', count: 2 }, solved), true);
+  assert.equal(bonus.isBonusGoalMet({ kind: 'noHelpers' }, { ...solved, usedHelpers: ['hint'] }), false);
+  assert.equal(bonus.isBonusGoalMet({ kind: 'combo' }, play), false, 'only a win meets it');
+
+  // Guests: the first time pays sparks, a replay doesn't; accounts merge what the server sends.
+  let progress = createEmptyProgress();
+  const first = bonus.recordBonusGoalLocally(progress, 'w2-05');
+  assert.equal(first.sparksEarned, bonus.BONUS_GOAL_SPARKS);
+  assert.equal(first.progress.sparks, progress.sparks + bonus.BONUS_GOAL_SPARKS);
+  assert.equal(bonus.recordBonusGoalLocally(first.progress, 'w2-05').sparksEarned, 0);
+  progress = withServerState(first.progress, { sparks: 0, diamonds: 0, helpers: {}, bonusGoals: ['w3-01'] }, '2026-11-16');
+  assert.deepEqual(progress.bonusGoals.sort(), ['w2-05', 'w3-01']);
+
+  // Personal bests: a beaten best says what it was.
+  const before = { ...createEmptyProgress(), levels: { 'w2-05': { stars: 2, bestMoves: 9 } } };
+  const beaten = recordLevelResult(before, { id: 'w2-05', par: 6 }, { moves: 7 });
+  assert.deepEqual([beaten.isNewBest, beaten.previousBest, beaten.progress.levels['w2-05'].bestMoves], [true, 9, 7]);
+
+  const sql = readFileSync(new URL('../../supabase/bonus_goals.sql', import.meta.url), 'utf8');
+  assert.equal(Number(/_bonus_goal_sparks\(\)[\s\S]*?select (\d+);/.exec(sql)[1]), bonus.BONUS_GOAL_SPARKS, 'sparks match bonus_goals.sql');
+  assert.ok(sql.includes("'^w[0-9]+-[0-9]+$'") && sql.includes("'^w1-0[1-3]$'"), 'the same levels have bonus goals on the server');
+});

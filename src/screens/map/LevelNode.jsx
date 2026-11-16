@@ -11,8 +11,8 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 
 const DIFFICULTY_LABEL = { [DIFFICULTY.HARD]: 'map.node.hard', [DIFFICULTY.EXTRA]: 'map.node.boss' };
 
-/** One level bubble on the map. */
-export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef }) {
+/** One level bubble on the map; `isBonusDone` adds a small mint tick for a level whose bonus goal was met. */
+export default function LevelNode({ stop, stars, isUnlocked, isCurrent, isBonusDone = false, nodeRef }) {
   const { t } = useI18n();
   // A Glowbug still waiting to be rescued here (three stars frees it).
   const glowbug = isUnlocked && stars < 3 ? glowbugForLevel(stop.ref.id) : null;
@@ -23,6 +23,7 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef 
     kindLabel && t(kindLabel),
     isUnlocked ? t('map.node.stars', { count: stars, max: MAX_STARS }) : t('map.node.locked'),
     glowbug && t('map.node.glowbug'),
+    isBonusDone && t('map.node.bonus'),
   ]
     .filter(Boolean)
     .join(', ');
@@ -58,6 +59,11 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef 
         </span>
       )}
       {ref.difficulty === DIFFICULTY.EXTRA && <span className={`game-title on-color ${styles.bossPlate}`}>{t('map.boss')}</span>}
+      {isBonusDone && (
+        <span className={styles.bonusPip} aria-hidden="true">
+          <Icon name="check" size={12} strokeWidth={3.6} />
+        </span>
+      )}
       {glowbug && (
         <span className={styles.glowbugBadge} aria-hidden="true">
           <GlowbugArt id={glowbug.id} size={30} isAwake={false} />

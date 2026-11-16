@@ -10,6 +10,7 @@ import {
   recordRushRunOnServer,
   fetchMyQuests,
   claimQuestOnServer,
+  claimBonusGoalsOnServer,
   recordEventLevelOnServer,
   claimDailyGiftOnServer,
   claimPresentOnServer,
@@ -49,6 +50,7 @@ import {
 import { todayKey } from '../game/daily.js';
 import { claimEventPrizeLocally, EVENT_PRIZE_SPARKS, recordEventLevelLocally } from '../game/events.js';
 import { recordRushRunLocally, rushWeekOf } from '../game/rush.js';
+import { isBonusGoalDone, recordBonusGoalLocally } from '../game/bonusGoals.js';
 import { starsForMoves } from '../game/scoring.js';
 import { claimQuestLocally, questWeekOf, questsForWeek, recordQuestProgress } from '../game/quests.js';
 import { chestId, chestRewardFor } from '../game/surprises.js';
@@ -173,6 +175,9 @@ export function PlayerProvider({ children }) {
       if (quests?.quests) setProgress({ ...progressRef.current, quests: quests.quests });
       const rush = await fetchMyRush().catch(() => null);
       if (rush?.rush) setProgress({ ...progressRef.current, rush: rush.rush });
+      // Bonus goals met on this device (as a guest or offline) are paid to the account; the account's come back.
+      const bonus = await claimBonusGoalsOnServer(progressRef.current.bonusGoals).catch(() => null);
+      if (bonus) applyServerState(bonus);
       // Finished last week in the top 10? Collect the reward (the server pays it only once).
       const claimed = await claimWeeklyRewardOnServer().catch(() => null);
       if (claimed?.reward) {
@@ -253,6 +258,29 @@ export function PlayerProvider({ children }) {
           // Stars are kept on the device and sent again on the next sync.
           setSyncStatus('error');
           return { ...local, diamondsEarned: 0 };
+        }
+      },
+
+      /**
+       * A level's bonus goal was met (bonusGoals.js): remembered, and the first time pays sparks (the server pays
+       * accounts, after the level's result is saved there). @returns Promise<sparks earned>
+       */
+      async finishBonusGoal(levelId) {
+        if (!userId) {
+          const outcome = recordBonusGoalLocally(progressRef.current, levelId);
+          setProgress(outcome.progress);
+          return outcome.sparksEarned;
+        }
+        if (isBonusGoalDone(progressRef.current, levelId)) return 0;
+        // Kept on the device right away; if the server can't be reached it's paid on the next sync.
+        setProgress({ ...progressRef.current, bonusGoals: [...progressRef.current.bonusGoals, levelId] });
+        try {
+          const state = await claimBonusGoalsOnServer([levelId]);
+          applyServerState(state);
+          return state.sparksEarned ?? 0;
+        } catch {
+          setSyncStatus('error');
+          return 0;
         }
       },
 

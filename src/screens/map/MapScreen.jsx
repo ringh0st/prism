@@ -21,6 +21,7 @@ import PalHello from '../../components/pals/PalHello.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
+import { isBonusGoalDone } from '../../game/bonusGoals.js';
 import { chestId } from '../../game/surprises.js';
 import { areAllLevelsOpen } from '../../lib/openAllLevels.js';
 import { MAX_STARS } from '../../game/scoring.js';
@@ -65,6 +66,7 @@ function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeR
                 <LevelNode
                   stop={stop}
                   stars={starsFor(progress, stop.ref.id)}
+                  isBonusDone={isBonusGoalDone(progress, stop.ref.id)}
                   isUnlocked={isLevelUnlocked(position)}
                   isCurrent={isCurrent}
                   nodeRef={isCurrent ? currentNodeRef : undefined}
