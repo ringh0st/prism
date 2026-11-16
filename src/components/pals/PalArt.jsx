@@ -158,14 +158,22 @@ export function Accessory({ id, hat, neck }) {
  * it scales around the floor together with the outfit, which is drawn for the shared stage.
  */
 /**
- * Worn items cast a soft shadow on the Pal, as if really worn, so a peach beanie still stands out on an orange tiger
- * and a white scarf on a snowy yeti (no outline: an outline made them look like stickers).
+ * Worn items are drawn like the Pals: a thin line in a deeper shade of each part's own color (not one outline color,
+ * which made them look like stickers), and a soft shadow on the Pal, so a peach beanie still stands out on an orange
+ * tiger and a white scarf on a snowy yeti.
  */
 function ItemOutline({ id }) {
   return (
     <defs>
       <filter id={id} x="-25%" y="-25%" width="150%" height="150%">
-        <feDropShadow dx="0" dy="1.4" stdDeviation="1.1" floodColor="#3b2a1e" floodOpacity="0.45" />
+        {/* A thin line in a deeper shade of each part's own color, then a soft shadow on the Pal. */}
+        <feMorphology in="SourceGraphic" operator="dilate" radius="1.1" result="grown" />
+        <feColorMatrix in="grown" type="matrix" values="0.62 0 0 0 0  0 0.52 0 0 0  0 0 0.46 0 0  0 0 0 1 0" result="line" />
+        <feMerge result="drawn">
+          <feMergeNode in="line" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+        <feDropShadow in="drawn" dx="0" dy="1.2" stdDeviation="1" floodColor="#3b2a1e" floodOpacity="0.35" />
       </filter>
     </defs>
   );
@@ -173,6 +181,8 @@ function ItemOutline({ id }) {
 
 /** Where hats meet the head: their brim line sits about here on the shared stage (HAT is the head's top). */
 const BRIM = [HAT[0], HAT[1] + 6];
+/** Hats sit this much deeper than the head's top, brim on the forehead with the ears beside (owner's reference). */
+const HAT_DEPTH = 4;
 
 /**
  * A hat fitted to this drawing (palOutfitFit.json, measured by `npm run pals:fit`): widened to the forehead and
@@ -180,7 +190,7 @@ const BRIM = [HAT[0], HAT[1] + 6];
  */
 function hatFit(drawing) {
   const { drop = 0, scale = 1 } = OUTFIT_FIT[drawing] ?? {};
-  return `translate(${BRIM[0]} ${BRIM[1] + drop}) scale(${scale}) translate(${-BRIM[0]} ${-BRIM[1]})`;
+  return `translate(${BRIM[0]} ${BRIM[1] + drop + HAT_DEPTH}) scale(${scale}) translate(${-BRIM[0]} ${-BRIM[1]})`;
 }
 
 /** The square to show: the whole stage, or (as a portrait) just the Pal, for round avatars. */
