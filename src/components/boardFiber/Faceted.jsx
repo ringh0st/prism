@@ -11,17 +11,8 @@ import { BEAM_COLORS, BEAM_HEIGHT, LOOK, WARM, chamferedRect, facetedBlock, glow
 const matte = (color) => <meshStandardMaterial color={color} roughness={0.7} flatShading />;
 const DIRECTION_ANGLE = { right: 0, down: -Math.PI / 2, left: Math.PI, up: Math.PI / 2 };
 
-/** A chamfered frame (an octagon ring) around a pane of mirror glass. */
-function frameGeometry(size, border) {
-  const shape = chamferedRect(size, size, size * 0.24);
-  shape.holes.push(chamferedRect(size - border * 2, size - border * 2, (size - border * 2) * 0.24));
-  const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.08, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 1 });
-  geometry.center();
-  return geometry;
-}
-
 /**
- * Mirror: a square slab of very light blue mirror glass with just a thin pale-silver edge (no big frame), standing on
+ * Mirror: a thin square slab of very light blue mirror glass with no frame at all, standing on
  * a low faceted plinth; two white glints across the glass say "mirror". It swings a quarter turn with a springy GSAP
  * ease. A fixed one stands on a stone plinth; a splitter's glass is clearer, so light shows through it too.
  */
@@ -38,7 +29,6 @@ export function FacetedMirror({ tile, turn, isRotatable }) {
     geometry.center();
     return geometry;
   }, []);
-  const edge = useMemo(() => frameGeometry(0.62, 0.025), []);
   const plinth = useMemo(() => facetedBlock(0.5, 0.5, 0.08, 0.12, 0.02), []);
   const isSplitter = tile.type === 'splitter';
   const angle = -THREE.MathUtils.degToRad(-45 + turn * 90);
@@ -63,9 +53,6 @@ export function FacetedMirror({ tile, turn, isRotatable }) {
             transparent={isSplitter}
             opacity={isSplitter ? 0.6 : 1}
           />
-        </mesh>
-        <mesh geometry={edge} scale={[1, 1, 0.55]} castShadow>
-          <meshPhysicalMaterial color="#d6effa" metalness={0.3} roughness={0.25} clearcoat={0.8} emissive="#d6effa" emissiveIntensity={0.25} />
         </mesh>
         {[-0.07, 0.05].flatMap((x, n) =>
           [0.031, -0.031].map((z) => (
