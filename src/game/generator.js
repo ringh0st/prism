@@ -290,6 +290,8 @@ export function generateLevel(options, random, maxAttempts = 400) {
 
     const rotatable = level.tiles.filter(isRotatable);
     if (rotatable.length < minPar) continue;
+    // A budget of turning pieces keeps boards uncluttered: every piece matters or is a deliberate trap.
+    if (options.maxTurnable && rotatable.length > options.maxTurnable) continue;
     if ((options.twins ?? 0) > 0 && !level.tiles.some((t) => t.link)) continue;
     for (let scramble = 0; scramble < 12; scramble++) {
       const scrambled = { ...level, tiles: level.tiles.map((t) => ({ ...t })) };
