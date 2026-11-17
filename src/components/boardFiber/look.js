@@ -39,6 +39,13 @@ export const WARM = {
   ground: '#a8744a',
 };
 
+/** Floor options for the trial (the floor contrasts with the warm pieces and the golden light). */
+export const FLOORS = {
+  sage: { board: '#5f9f78', cell: '#d3e9d3', cellAlt: '#bcdcc1' },
+  stone: { board: '#b39a80', cell: '#f3eee6', cellAlt: '#e2d9cc' },
+  cocoa: { board: '#3f2d29', cell: '#6e5248', cellAlt: '#5d443b' },
+};
+
 export const BEAM_COLORS = { sun: '#ffd23f', coral: '#ff6a4e', lime: '#8ad64a', sky: '#5cc4f0' };
 export const BEAM_HEIGHT = 0.36;
 

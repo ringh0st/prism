@@ -6,7 +6,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import * as THREE from 'three';
 import { cellsOnBeams } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
-import { WARM, cellPosition } from './look.js';
+import { FLOORS, cellPosition } from './look.js';
 import Tray from './Tray.jsx';
 import Piece from './Piece.jsx';
 import Beam from './Beam.jsx';
@@ -98,8 +98,16 @@ export default function BoardFiber({ level, state, onLayout, onTapCell }) {
   const [theme, setTheme] = useState(null);
   const [resetKey, setResetKey] = useState(0);
   const calm = useMemo(prefersCalm, []);
-  // Trial: the warm faceted palette instead of the world's colors.
-  useEffect(() => setTheme({ board: WARM.tray, cell: WARM.tile, cellAlt: WARM.tileAlt }), []);
+  // Trial: a floor that contrasts with the warm pieces and the light (?floor=sage|stone|cocoa, sage by default).
+  useEffect(() => {
+    let floor = 'sage';
+    try {
+      floor = localStorage.getItem('prism.trialFloor') || floor;
+    } catch {
+      // Storage blocked: the default floor.
+    }
+    setTheme(FLOORS[floor] ?? FLOORS.sage);
+  }, []);
 
   const { turns, trace, revealedCells, darkenedTile } = state;
   const litCells = useMemo(() => cellsOnBeams(trace.segments, level.width, level.height), [trace, level]);
@@ -112,8 +120,8 @@ export default function BoardFiber({ level, state, onLayout, onTapCell }) {
     <div ref={wrapper} className={styles.stage}>
       {theme && (
         <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ fov: 28, near: 0.1, far: 200 }}>
-          <hemisphereLight args={[WARM.sky, WARM.ground, 0.75]} />
-          <directionalLight position={[-6, 7, 4]} intensity={1.7} color={WARM.sun} castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-0.0005}>
+          <hemisphereLight args={['#fff6e4', '#a8744a', 0.75]} />
+          <directionalLight position={[-6, 7, 4]} intensity={1.7} color="#ffe2b0" castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-0.0005}>
             <orthographicCamera attach="shadow-camera" args={[-8, 8, 8, -8, 0.1, 30]} />
           </directionalLight>
           <Studio />
