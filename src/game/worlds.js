@@ -176,19 +176,23 @@ export function generatorPresetFor(world, index) {
   const progress = (number - 1) / (WORLD_COUNT * LEVELS_PER_WORLD - 1); // 0 at level 1, 1 at level 1000
   const spike = difficulty === DIFFICULTY.EXTRA ? 2 : difficulty === DIFFICULTY.HARD ? 1 : 0;
   // Owner feedback: hard should mean tricky, not cluttered. Boards stay small and every piece matters: a budget of
-  // turning pieces (5 at the start, 12 at most) and modest taps (4 → 10); the level builder then keeps the trickiest
+  // turning pieces (6 at the start, 14 at most) and modest taps (4 → 6, Hard +2, boss +3); the level builder then keeps the trickiest
   // board it finds (trickScore in levelQuality.js), and Hard and boss levels are the trickiest, not the biggest.
-  const size = clamp(Math.round(5 + progress * 3) + (spike > 0 ? 1 : 0), 4, 8);
-  const basePar = Math.min(10, 4 + Math.floor((number - 1) / 110));
-  const minPar = Math.min(12, basePar + (spike > 0 ? spike + 1 : 0));
+  const size = clamp(Math.round(5 + progress * 3) + spike, 4, 9);
+  const basePar = Math.min(6, 4 + Math.floor((number - 1) / 110));
+  const minPar = basePar + (spike > 0 ? spike + 1 : 0);
+  const emitters = spike === 2 || (spike === 1 && world >= 10) ? 2 : 1;
+  const lightPaths = emitters + spike; // each lamp, plus the splitters Hard and boss levels bring
   const steps = Math.min(3, Math.floor(progress * 4));
-  const maxTurnable = clamp(6 + Math.floor(progress * 6) + spike, 6, 12);
+  // Enough turning pieces for the taps plus a few deliberate traps (fewer and no board can need that many taps).
+  const maxTurnable = clamp(Math.max(6 + Math.floor(progress * 6) + spike, minPar + 5), 6, 14 + spike);
 
   const preset = {
     width: size,
     height: size,
-    emitters: spike === 2 ? (world >= 20 ? 3 : 2) : spike === 1 && world >= 10 ? 2 : 1,
-    turns: [2 + Math.min(2, steps), Math.max(3 + steps, minPar)],
+    emitters,
+    // The light's turns are shared between its paths, so more lamps never mean more pieces.
+    turns: [Math.min(2 + Math.min(2, steps), Math.ceil(minPar / lightPaths)), Math.max(3, Math.ceil((minPar * 1.4) / lightPaths) + 1)],
     segment: [1, 3],
     // A couple of decoys at most: each one a deliberate trap, never clutter.
     decoys: Math.min(3, 2 + Math.floor(progress * 2)),
