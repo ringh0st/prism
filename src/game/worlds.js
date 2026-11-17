@@ -180,7 +180,7 @@ export function generatorPresetFor(world, index) {
   // board it finds (trickScore in levelQuality.js), and Hard and boss levels are the trickiest, not the biggest.
   const size = clamp(Math.round(5 + progress * 3) + (spike > 0 ? 1 : 0), 4, 8);
   const basePar = Math.min(10, 4 + Math.floor((number - 1) / 110));
-  const minPar = Math.min(11, basePar + (spike > 0 ? 1 : 0));
+  const minPar = Math.min(12, basePar + (spike > 0 ? spike + 1 : 0));
   const steps = Math.min(3, Math.floor(progress * 4));
   const maxTurnable = clamp(6 + Math.floor(progress * 6) + spike, 6, 12);
 
