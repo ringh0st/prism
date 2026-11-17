@@ -22,7 +22,7 @@ import { LEVEL_SCHEMA_VERSION } from '../src/game/constants.js';
 const OUTPUT_DIR = new URL('../src/data/worlds/', import.meta.url);
 const TIME_BUDGET_MS = 6000;
 /** Boards a darkness level tries the darkness on (checking the safe orders takes a moment). */
-const MAX_DARK_TRIES = 150;
+const MAX_DARK_TRIES = 400;
 
 export const worldFileName = (world) => `world-${String(world).padStart(3, '0')}.json`;
 
@@ -70,8 +70,8 @@ function bestLevelFor(world, index) {
   const required = preset.mustHave ?? Object.keys(PIECE_FIRST_LEVEL).find((piece) => PIECE_FIRST_LEVEL[piece] === levelId(world, index) && piece !== 'basics');
   let best = null;
   let fallback = null; // the least random-solvable board, if none passes the catch check
-  let darkTries = 0;
   for (const [attempt, variant] of simplifications(preset).entries()) {
+    let darkTries = 0; // each simpler version gets its own tries (small boards take the darkness less often)
     const deadline = Date.now() + TIME_BUDGET_MS;
     for (let seed = 0; seed < 4000 && Date.now() < deadline; seed++) {
       const random = createRandom(`prism-${levelId(world, index)}-${attempt}-${seed}`);
