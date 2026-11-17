@@ -63,7 +63,7 @@ export function FacetedMirror({ tile, turn, isRotatable }) {
         </mesh>
         {/* A very thin rose border around the glass. */}
         <mesh geometry={border} castShadow>
-          <meshPhysicalMaterial color="#ec8a8f" roughness={0.35} clearcoat={0.8} />
+          <meshPhysicalMaterial color="#ee8fb3" roughness={0.35} clearcoat={0.8} />
         </mesh>
         {[-0.07, 0.05].flatMap((x, n) =>
           [0.031, -0.031].map((z) => (
