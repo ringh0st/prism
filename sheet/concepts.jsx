@@ -953,15 +953,62 @@ function GemBellJar({ c, on }) {
     </group>
   );
 }
-/** D · Crystal bloom: the jewel rising out of a ring of crystal petals on a small stone. */
+/** A crystal point: a six-sided prism with a faceted tip, standing on its base. */
+function crystalPoint(r, h) {
+  return lath([[0.001, 0], [r * 0.85, 0], [r, h * 0.12], [r * 0.92, h], [0.001, h + r * 1.6]], 6);
+}
+/** A cut jewel for the bloom, faceted, with its color's silhouette from every side. */
+function bloomCut(shape, r) {
+  if (shape === 'square') {
+    // an Asscher cut: a square with clipped corners and stepped bevels
+    const s = new THREE.Shape(); const h = r * 0.72, c = r * 0.22;
+    s.moveTo(-h + c, -h); s.lineTo(h - c, -h); s.lineTo(h, -h + c); s.lineTo(h, h - c); s.lineTo(h - c, h); s.lineTo(-h + c, h); s.lineTo(-h, h - c); s.lineTo(-h, -h + c); s.closePath();
+    const g = new THREE.ExtrudeGeometry(s, { depth: r * 0.9, bevelEnabled: true, bevelThickness: r * 0.28, bevelSize: r * 0.22, bevelSegments: 2 });
+    g.center(); g.rotateY(Math.PI / 4); return g;
+  }
+  if (shape === 'triangle') {
+    const g = lath([[0.001, -r * 0.5], [r * 0.9, -r * 0.35], [r * 1.05, -r * 0.1], [r * 0.95, r * 0.7], [0.001, r * 1.7]], 3);
+    g.rotateY(Math.PI / 6); return g;
+  }
+  if (shape === 'round') return lath([[0.001, -r * 0.95], [r * 0.6, -r * 0.62], [r, -r * 0.1], [r, r * 0.08], [r * 0.82, r * 0.45], [r * 0.45, r * 0.66], [0.001, r * 0.7]], 16);
+  return lath([[0.001, -r * 1.05], [r * 0.5, -r * 0.55], [r, 0], [r, r * 0.1], [r * 0.82, r * 0.38], [r * 0.6, r * 0.55], [0.001, r * 0.57]], 8);
+}
+let glintTex = null;
+function Glint({ position, size = 0.22 }) {
+  if (!glintTex) {
+    const c = document.createElement('canvas'); c.width = c.height = 128; const d = c.getContext('2d'); d.translate(64, 64);
+    for (let k = 0; k < 4; k++) { d.rotate(Math.PI / 2); const g = d.createLinearGradient(0, 0, 60, 0); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(1, 'rgba(255,255,255,0)'); d.fillStyle = g; d.beginPath(); d.moveTo(0, -4); d.lineTo(60, 0); d.lineTo(0, 4); d.fill(); }
+    const r = d.createRadialGradient(0, 0, 0, 0, 0, 16); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(1, 'rgba(255,255,255,0)'); d.fillStyle = r; d.fillRect(-16, -16, 32, 32);
+    glintTex = new THREE.CanvasTexture(c);
+  }
+  return <sprite position={position} scale={[size, size, 1]}><spriteMaterial map={glintTex} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} /></sprite>;
+}
+/** D · Crystal bloom: the jewel rising out of two rings of crystal points that grow from a mossy stone. */
 function GemBloom({ c, on }) {
-  const geo = useMemo(() => cutGeometry(c.shape, 0.17), [c.shape]);
+  const gem = useMemo(() => bloomCut(c.shape, 0.16), [c.shape]);
+  const tall = useMemo(() => crystalPoint(0.035, 0.2), []);
+  const short = useMemo(() => crystalPoint(0.026, 0.11), []);
+  const petal = (k, ring) => (
+    <meshPhysicalMaterial color={on ? c.rich : c.pale} roughness={on ? 0.05 : 0.2} flatShading clearcoat={1} transmission={0.2} thickness={0.2} emissive={c.glow} emissiveIntensity={on ? (ring ? 0.35 : 0.55) : 0} />
+  );
   return (
     <group>
-      <mesh position={[0, 0.06, 0]} scale={[1, 0.45, 1]}><dodecahedronGeometry args={[0.24, 0]} /><meshStandardMaterial color="#b9ad9c" roughness={1} flatShading /></mesh>
-      {Array.from({ length: 6 }, (_, k) => <group key={k} rotation={[0, (k / 6) * Math.PI * 2, 0]}><mesh position={[0, 0.17, 0.13]} rotation={[0.6, 0, 0]}><cylinderGeometry args={[0.012, 0.045, 0.22, 5]} /><meshPhysicalMaterial color={on ? c.rich : c.pale} roughness={0.08} flatShading clearcoat={1} emissive={c.glow} emissiveIntensity={on ? 0.45 : 0} /></mesh></group>)}
-      <mesh geometry={geo} position={[0, 0.36, 0]} castShadow><GemMaterial c={c} on={on} /></mesh>
-      {on && <LitGlow c={c} y={0.36} />}
+      {/* the stone: a broad rough base, a smaller cap, pebbles and tufts of moss */}
+      <mesh position={[0, 0.05, 0]} scale={[1.15, 0.38, 1.1]} castShadow receiveShadow><dodecahedronGeometry args={[0.25, 1]} /><meshStandardMaterial color="#b3a796" roughness={1} flatShading /></mesh>
+      <mesh position={[0.02, 0.12, -0.01]} scale={[0.85, 0.3, 0.8]} castShadow><dodecahedronGeometry args={[0.2, 0]} /><meshStandardMaterial color="#c4b8a6" roughness={1} flatShading /></mesh>
+      {[[0.25, 0.03, 0.1, 0.045], [-0.22, 0.03, 0.14, 0.035], [0.1, 0.03, -0.25, 0.04]].map(([x, y, z, r], k) => <mesh key={k} position={[x, y, z]} castShadow><dodecahedronGeometry args={[r, 0]} /><meshStandardMaterial color="#a69a88" roughness={1} flatShading /></mesh>)}
+      {[[-0.18, 0.1, -0.12], [0.2, 0.09, -0.06], [-0.05, 0.11, 0.2]].map(([x, y, z], k) => <mesh key={k} position={[x, y, z]} scale={[1, 0.5, 1]}><sphereGeometry args={[0.05, 10, 8]} /><meshStandardMaterial color="#7fa86a" roughness={1} /></mesh>)}
+      {/* two rings of crystal points, tipped outwards */}
+      {Array.from({ length: 7 }, (_, k) => <group key={`a${k}`} rotation={[0, (k / 7) * Math.PI * 2, 0]}><mesh geometry={tall} position={[0, 0.14, 0.09]} rotation={[0.55, 0, 0]} castShadow>{petal(k, 0)}</mesh></group>)}
+      {Array.from({ length: 7 }, (_, k) => <group key={`b${k}`} rotation={[0, ((k + 0.5) / 7) * Math.PI * 2, 0]}><mesh geometry={short} position={[0, 0.12, 0.16]} rotation={[0.9, 0, 0]} castShadow>{petal(k, 1)}</mesh></group>)}
+      <mesh geometry={gem} position={[0, 0.4, 0]} castShadow><GemMaterial c={c} on={on} /></mesh>
+      {on && (
+        <>
+          <LitGlow c={c} y={0.4} />
+          <Glint position={[0.07, 0.5, 0.12]} size={0.26} />
+          <Glint position={[-0.12, 0.32, 0.1]} size={0.16} />
+        </>
+      )}
     </group>
   );
 }
@@ -982,16 +1029,95 @@ function GemStudio({ design, color, on }) {
   );
 }
 
+/* ---------------- Lumi's family: the ones we save ---------------- */
+const FAMILY_TINT = {
+  sun: { body: '#f9c46b', glow: '#ffc21a' },
+  coral: { body: '#f6a08f', glow: '#ff6a55' },
+  lime: { body: '#a8d98c', glow: '#58c94a' },
+  sky: { body: '#9fd0ee', glow: '#3aaeea' },
+};
+const OUTLINE = '#3b1a08';
+const grey = (hex, k = 0.65) => new THREE.Color(hex).lerp(new THREE.Color('#8a8580'), k);
+function AntennaTip({ shape, color, on }) {
+  const m = <meshPhysicalMaterial color={on ? color : grey(color, 0.5)} roughness={0.2} clearcoat={1} emissive={color} emissiveIntensity={on ? 0.8 : 0} flatShading={shape !== 'round'} />;
+  if (shape === 'round') return <mesh><sphereGeometry args={[0.03, 16, 12]} />{m}</mesh>;
+  if (shape === 'triangle') return <mesh rotation={[0, Math.PI / 6, 0]}><coneGeometry args={[0.034, 0.06, 3]} />{m}</mesh>;
+  if (shape === 'square') return <mesh rotation={[0, Math.PI / 4, 0]}><boxGeometry args={[0.045, 0.045, 0.045]} />{m}</mesh>;
+  return <mesh scale={[1, 1.3, 1]}><octahedronGeometry args={[0.032, 0]} />{m}</mesh>;
+}
+/** One of Lumi's family. age: baby | kid | girl | mom | dad | grandma; color: the light it needs. */
+function LumiKin({ color = 'sun', age = 'kid', on }) {
+  const tint = FAMILY_TINT[color];
+  const shape = GEM_COLORS[color].shape;
+  const size = { baby: 0.62, kid: 0.8, girl: 0.8, mom: 1, dad: 1.05, grandma: 0.95 }[age];
+  const body = on ? tint.body : grey(tint.body, 0.55);
+  const R = 0.18;
+  const eye = (x) => on
+    ? <group key={x} position={[x, 0.03, R * 0.9]}><mesh><sphereGeometry args={[0.026, 14, 10]} /><meshStandardMaterial color={OUTLINE} roughness={0.3} /></mesh><mesh position={[0.008, 0.01, 0.02]}><sphereGeometry args={[0.009, 8, 6]} /><meshBasicMaterial color="#fff" /></mesh></group>
+    : <mesh key={x} position={[x, 0.02, R * 0.93]} rotation={[0, 0, Math.PI]}><torusGeometry args={[0.02, 0.006, 6, 12, Math.PI]} /><meshStandardMaterial color={OUTLINE} /></mesh>;
+  return (
+    <group scale={size}>
+      <group position={[0, 0.32, 0]}>
+        {/* wings */}
+        {[-1, 1].map((sx) => <mesh key={sx} position={[sx * 0.15, 0.06, -0.08]} rotation={[0.2, sx * 0.5, sx * 0.4]} scale={[1, 0.6, 0.2]}><sphereGeometry args={[0.13, 16, 10]} /><meshPhysicalMaterial color="#e4f5ef" transparent opacity={on ? 0.75 : 0.4} roughness={0.2} /></mesh>)}
+        {/* glowing tail bulb */}
+        <mesh position={[0, -0.2, -0.02]} scale={[1, 0.9, 1]}><sphereGeometry args={[0.1, 20, 14]} /><meshPhysicalMaterial color={on ? tint.glow : grey(tint.glow, 0.7)} roughness={0.2} clearcoat={1} emissive={tint.glow} emissiveIntensity={on ? 1.4 : 0} /></mesh>
+        {/* round head-body */}
+        <mesh castShadow><sphereGeometry args={[R, 32, 24]} /><meshPhysicalMaterial color={body} roughness={0.45} clearcoat={0.6} /></mesh>
+        <mesh position={[-0.05, 0.08, 0.13]}><sphereGeometry args={[0.03, 10, 8]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.6} /></mesh>
+        {eye(-0.06)}{eye(0.06)}
+        {/* cheeks and mouth */}
+        {[-0.1, 0.1].map((x) => <mesh key={x} position={[x, -0.02, R * 0.84]} rotation={[0, x * 4, 0]}><circleGeometry args={[0.025, 16]} /><meshBasicMaterial color="#ff8a7a" transparent opacity={on ? 0.8 : 0.35} /></mesh>)}
+        {on
+          ? <mesh position={[0, -0.04, R * 0.95]} rotation={[0, 0, Math.PI]}><torusGeometry args={[0.03, 0.008, 6, 14, Math.PI]} /><meshStandardMaterial color={OUTLINE} /></mesh>
+          : <mesh position={[0, -0.055, R * 0.95]}><torusGeometry args={[0.018, 0.006, 6, 12, Math.PI]} /><meshStandardMaterial color={OUTLINE} /></mesh>}
+        {/* antennae with the color's shape on the tips */}
+        {(age === 'baby' ? [0] : [-1, 1]).map((sx) => (
+          <group key={sx} position={[sx * 0.07, R * 0.85, 0]} rotation={[0, 0, -sx * 0.35]}>
+            <mesh position={[0, 0.06, 0]}><cylinderGeometry args={[0.008, 0.009, 0.12, 6]} /><meshStandardMaterial color={OUTLINE} /></mesh>
+            <group position={[0, 0.13, 0]}><AntennaTip shape={shape} color={tint.glow} on={on} /></group>
+          </group>
+        ))}
+        {/* who they are */}
+        {age === 'baby' && <><mesh position={[0, -0.05, R * 0.98]}><torusGeometry args={[0.02, 0.008, 8, 16]} /><meshStandardMaterial color="#9fd8cf" /></mesh><mesh position={[0, -0.05, R * 0.94]}><sphereGeometry args={[0.022, 10, 8]} /><meshStandardMaterial color="#f6d8e4" /></mesh></>}
+        {(age === 'girl' || age === 'mom') && <group position={[0.11, 0.13, 0.05]} rotation={[0, 0, -0.5]}>{[-1, 1].map((sx) => <mesh key={sx} position={[sx * 0.035, 0, 0]} rotation={[0, 0, sx * Math.PI / 2]}><coneGeometry args={[0.03, 0.06, 12]} /><meshStandardMaterial color="#ee6f9a" /></mesh>)}<mesh><sphereGeometry args={[0.018, 10, 8]} /><meshStandardMaterial color="#d9547e" /></mesh></group>}
+        {age === 'mom' && [-0.06, -0.03, 0, 0.03, 0.06].map((x, k) => <mesh key={k} position={[x, -0.13 - Math.cos(x * 12) * -0.012, 0.115 + Math.cos(x * 8) * 0.01]}><sphereGeometry args={[0.012, 8, 6]} /><meshStandardMaterial color="#fff7ec" roughness={0.2} /></mesh>)}
+        {age === 'dad' && <group position={[0, -0.16, 0.12]}>{[-1, 1].map((sx) => <mesh key={sx} position={[sx * 0.03, 0, 0]} rotation={[0, 0, sx * Math.PI / 2]}><coneGeometry args={[0.025, 0.05, 4]} /><meshStandardMaterial color="#3f6b8c" /></mesh>)}<mesh><sphereGeometry args={[0.014, 8, 6]} /><meshStandardMaterial color="#2f5470" /></mesh></group>}
+        {age === 'dad' && <mesh position={[0, -0.025, R * 0.97]} scale={[1.8, 0.5, 0.6]}><sphereGeometry args={[0.02, 10, 8]} /><meshStandardMaterial color="#7a5232" /></mesh>}
+        {age === 'kid' && <group position={[0, R * 0.78, 0.02]} rotation={[-0.25, 0, 0]}><mesh scale={[1, 0.55, 1]}><sphereGeometry args={[0.14, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2]} /><meshStandardMaterial color="#e86f5a" /></mesh><mesh position={[0, 0, 0.12]} rotation={[-0.15, 0, 0]} scale={[1, 0.15, 0.7]}><cylinderGeometry args={[0.1, 0.1, 0.05, 20, 1, false, -Math.PI / 2, Math.PI]} /><meshStandardMaterial color="#e86f5a" /></mesh></group>}
+        {age === 'grandma' && <><mesh position={[0, R * 0.95, -0.04]}><sphereGeometry args={[0.07, 16, 12]} /><meshStandardMaterial color="#e9e4dc" /></mesh>{[-0.06, 0.06].map((x) => <mesh key={x} position={[x, 0.03, R * 0.98]}><torusGeometry args={[0.035, 0.006, 6, 20]} />{brassM()}</mesh>)}<mesh position={[0, 0.03, R * 0.99]}><boxGeometry args={[0.04, 0.008, 0.008]} />{brassM()}</mesh></>}
+      </group>
+      {/* trapped: a smoky shadow bubble; saved: free, glowing, with sparkles */}
+      {!on && <mesh position={[0, 0.3, 0]}><sphereGeometry args={[0.36, 32, 24]} /><meshPhysicalMaterial color="#2b2430" roughness={0.3} clearcoat={1} transparent opacity={0.5} depthWrite={false} /></mesh>}
+      {!on && [0, 1, 2].map((k) => <mesh key={k} position={[0, 0.3, 0]} rotation={[k * 0.9, k * 1.3, 0]}><torusGeometry args={[0.33, 0.012, 6, 40, Math.PI * 0.8]} /><meshBasicMaterial color="#4a3f4e" transparent opacity={0.7} /></mesh>)}
+      {on && <><pointLight position={[0, 0.15, 0.1]} color={tint.glow} intensity={2.2} distance={1.6} /><Flare position={[0, 0.14, -0.02]} size={0.7} /><Glint position={[0.24, 0.55, 0.1]} size={0.18} /><Glint position={[-0.22, 0.42, 0.12]} size={0.12} /><mesh position={[0, -0.28, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.5, 32]} /><meshBasicMaterial map={POOL} color={tint.glow} transparent opacity={0.45} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh></>}
+    </group>
+  );
+}
+function KinStudio({ color, age, on }) {
+  return (
+    <>
+      <color attach="background" args={['#3b2a22']} />
+      <hemisphereLight args={['#ffe6c4', '#3a2418', 0.9]} />
+      <directionalLight position={[-2, 5, 5]} intensity={1.4} color="#ffe4bd" castShadow />
+      <mesh position={[0, -0.04, 0]} receiveShadow><boxGeometry args={[1.3, 0.08, 1.3]} /><meshStandardMaterial color="#8a3530" roughness={1} /></mesh>
+      <ParquetTile position={[0, 0.05, 0]} x={0} y={0} />
+      <group position={[0, 0.09, 0]} rotation={[0, 0.3, 0]}><LumiKin color={color} age={age} on={on} /></group>
+    </>
+  );
+}
+
 const which = Number(new URLSearchParams(location.search).get('c') || 1);
 const pieceIndex = new URLSearchParams(location.search).get('piece');
 const gemQ = new URLSearchParams(location.search).get('gem');
-const Scene = gemQ !== null ? () => { const [d, col, on] = gemQ.split(','); return <GemStudio design={Number(d)} color={col} on={on === '1'} />; } : pieceIndex !== null ? () => <LibPiece index={Number(pieceIndex)} /> : [ToyIsland, PaperCraft, GoldenGarden, AmberGrotto, LilyPond, Workshop, Library, LibraryAll][which - 1];
+const kinQ = new URLSearchParams(location.search).get('kin');
+const Scene = kinQ !== null ? () => { const [age, col, on] = kinQ.split(','); return <KinStudio age={age} color={col} on={on === '1'} />; } : gemQ !== null ? () => { const [d, col, on] = gemQ.split(','); return <GemStudio design={Number(d)} color={col} on={on === '1'} />; } : pieceIndex !== null ? () => <LibPiece index={Number(pieceIndex)} /> : [ToyIsland, PaperCraft, GoldenGarden, AmberGrotto, LilyPond, Workshop, Library, LibraryAll][which - 1];
 const camMode = new URLSearchParams(location.search).get('cam');
 const close = camMode === 'close';
 const pair = camMode === 'mirrors';
 createRoot(document.getElementById('root')).render(
   <div style={{ width: '100vw', height: '100vh' }}>
-    <Canvas shadows dpr={2} frameloop={new URLSearchParams(location.search).get('still') ? 'demand' : 'always'} camera={{ fov: 30, position: gemQ !== null ? [0.95, 0.95, 1.25] : pieceIndex !== null ? [1.3, 1.25, 1.6] : which === 8 && close ? [-1.2, 2.6, 4.6] : which === 8 ? [7.2, 9.8, 10.6] : pair ? [1.2, 1.5, 3.2] : close ? [0.6, 2.5, 3.9] : [6.2, 8.4, 9.2] }} onCreated={({ camera }) => (gemQ !== null ? camera.lookAt(0, 0.38, 0) : pieceIndex !== null ? camera.lookAt(0, 0.38, 0) : which === 8 && close ? camera.lookAt(-1.4, 0.2, 1.2) : pair ? camera.lookAt(1, 0.4, 0.5) : close ? camera.lookAt(-0.8, 0.35, 0.3) : camera.lookAt(0, -0.2, 0))}>
+    <Canvas shadows dpr={2} frameloop={new URLSearchParams(location.search).get('still') ? 'demand' : 'always'} camera={{ fov: 30, position: kinQ !== null ? [0.5, 0.75, 1.5] : gemQ !== null ? [0.95, 0.95, 1.25] : pieceIndex !== null ? [1.3, 1.25, 1.6] : which === 8 && close ? [-1.2, 2.6, 4.6] : which === 8 ? [7.2, 9.8, 10.6] : pair ? [1.2, 1.5, 3.2] : close ? [0.6, 2.5, 3.9] : [6.2, 8.4, 9.2] }} onCreated={({ camera }) => (kinQ !== null ? camera.lookAt(0, 0.4, 0) : gemQ !== null ? camera.lookAt(0, 0.38, 0) : pieceIndex !== null ? camera.lookAt(0, 0.38, 0) : which === 8 && close ? camera.lookAt(-1.4, 0.2, 1.2) : pair ? camera.lookAt(1, 0.4, 0.5) : close ? camera.lookAt(-0.8, 0.35, 0.3) : camera.lookAt(0, -0.2, 0))}>
       <Env intensity={which === 2 ? 0.25 : 0.4} />
       <Scene />
       <EffectComposer multisampling={4}><Bloom mipmapBlur luminanceThreshold={1.2} intensity={0.8} radius={0.75} /><Vignette offset={0.3} darkness={0.35} /></EffectComposer>
