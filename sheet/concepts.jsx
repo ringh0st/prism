@@ -1079,12 +1079,6 @@ function LumiKin({ color = 'sun', age = 'kid', on }) {
         </group>
         {/* feet */}
         {[-1, 1].map((sx) => <mesh key={sx} position={[sx * 0.07, -0.17, 0.08]} scale={[1, 0.6, 1.3]}><sphereGeometry args={[0.035, 12, 8]} />{limb}</mesh>)}
-        {/* arms: down and sleepy when trapped, up and waving when saved */}
-        {[-1, 1].map((sx) => (
-          <group key={sx} position={[sx * 0.16, -0.03, 0.05]} rotation={[0, 0, sx * (on ? -2.3 : -0.35)]}>
-            <mesh position={[0, -0.05, 0]}><capsuleGeometry args={[0.025, 0.06, 4, 10]} />{limb}</mesh>
-          </group>
-        ))}
         {/* round head-body with a lighter belly */}
         <mesh castShadow><sphereGeometry args={[R, 40, 28]} /><meshPhysicalMaterial color={body} roughness={0.4} clearcoat={0.7} clearcoatRoughness={0.3} sheen={0.6} sheenColor="#ffffff" /></mesh>
         <mesh position={[0, -0.07, 0.11]} scale={[1, 0.75, 0.5]}><sphereGeometry args={[0.1, 20, 14]} /><meshPhysicalMaterial color={belly} roughness={0.5} /></mesh>
