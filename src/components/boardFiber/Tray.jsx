@@ -24,7 +24,8 @@ export default function Tray({ level, theme, litCells, onTileClick }) {
         const x = cell % level.width;
         const y = Math.floor(cell / level.width);
         const base = new THREE.Color((x + y) % 2 ? theme.cellAlt : theme.cell);
-        const color = litCells.has(cell) ? base.clone().lerp(honey, 0.4) : base;
+        // Where light passes the tile glows honey-gold (the floor's own lit color if it has one).
+        const color = litCells.has(cell) ? (theme.lit ? new THREE.Color(theme.lit) : base.clone().lerp(honey, 0.4)) : base;
         return (
           <mesh
             key={cell}

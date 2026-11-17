@@ -41,7 +41,7 @@ export const WARM = {
 
 /** Floor options for the trial (the floor contrasts with the warm pieces and the golden light). */
 export const FLOORS = {
-  sage: { board: '#5f9f78', cell: '#d3e9d3', cellAlt: '#bcdcc1' },
+  sage: { board: '#4f8a66', cell: '#a6c9ad', cellAlt: '#9bc1a3', lit: '#f7d47a' },
   stone: { board: '#b39a80', cell: '#f3eee6', cellAlt: '#e2d9cc' },
   cocoa: { board: '#3f2d29', cell: '#6e5248', cellAlt: '#5d443b' },
   denim: { board: '#5e7fa3', cell: '#cbd8e5', cellAlt: '#b7c9db' },

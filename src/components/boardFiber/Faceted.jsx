@@ -12,7 +12,7 @@ const matte = (color) => <meshStandardMaterial color={color} roughness={0.7} fla
 const DIRECTION_ANGLE = { right: 0, down: -Math.PI / 2, left: Math.PI, up: Math.PI / 2 };
 
 /**
- * Mirror: a thin square slab of very light blue mirror glass with no frame at all, standing on
+ * Mirror: a thin square slab of light blue mirror glass with a very thin rose border, standing on
  * a low faceted plinth; two white glints across the glass say "mirror". It swings a quarter turn with a springy GSAP
  * ease. A fixed one stands on a stone plinth; a splitter's glass is clearer, so light shows through it too.
  */
@@ -30,6 +30,13 @@ export function FacetedMirror({ tile, turn, isRotatable }) {
     return geometry;
   }, []);
   const plinth = useMemo(() => facetedBlock(0.5, 0.5, 0.08, 0.12, 0.02), []);
+  const border = useMemo(() => {
+    const shape = chamferedRect(0.62, 0.62, 0.11);
+    shape.holes.push(chamferedRect(0.575, 0.575, 0.1));
+    const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.05, bevelEnabled: false });
+    geometry.center();
+    return geometry;
+  }, []);
   const isSplitter = tile.type === 'splitter';
   const angle = -THREE.MathUtils.degToRad(-45 + turn * 90);
   useEffect(() => {
@@ -38,7 +45,7 @@ export function FacetedMirror({ tile, turn, isRotatable }) {
   return (
     <group>
       <mesh geometry={plinth} position={[0, 0.17, 0]} castShadow receiveShadow>
-        {matte(isRotatable ? '#f4f8fb' : LOOK.stone)}
+        {matte(isRotatable ? '#f6c85a' : LOOK.stone)}
       </mesh>
       <group ref={rotor} rotation={[0, angle, 0]} position={[0, 0.25 + 0.31, 0]}>
         <mesh geometry={slab} castShadow>
@@ -53,6 +60,10 @@ export function FacetedMirror({ tile, turn, isRotatable }) {
             transparent={isSplitter}
             opacity={isSplitter ? 0.6 : 1}
           />
+        </mesh>
+        {/* A very thin rose border around the glass. */}
+        <mesh geometry={border} castShadow>
+          <meshPhysicalMaterial color="#ec8a8f" roughness={0.35} clearcoat={0.8} />
         </mesh>
         {[-0.07, 0.05].flatMap((x, n) =>
           [0.031, -0.031].map((z) => (
