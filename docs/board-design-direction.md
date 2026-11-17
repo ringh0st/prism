@@ -17,3 +17,13 @@ Decisions from the design rounds on the `r3f-level-160` branch (concept scenes i
   green ▲, blue ■) so color is never the only clue.
 - **Win message:** "All home safe!"
 - **Glowbugs stay a separate collection** (unchanged).
+
+## Built so far (branch `library-world`)
+
+- World 1 is the Library (`BOARD_THEMES` in `src/game/boardThemes.js`): drawn by `src/components/boardFiber/library/`
+  on the R3F board (room, parquet tiles, banker's lamp, gear/fixed mirrors, book stacks, natural beams, Lumi's family
+  as targets with the rescue faces). Pieces without a library design yet keep their current look.
+- Themed worlds' win headline is "All home safe!"; the first-steps tag says "Lumi".
+- Still to do: the gem icons in the meter and level card as Lumis, Lumi's lines that say "gem", the remaining pieces
+  in library style (splitter, glass, prism, portals, gates, fog, shadows), tests for the themed board, and the next
+  themes.

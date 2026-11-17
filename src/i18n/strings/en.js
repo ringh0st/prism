@@ -98,6 +98,7 @@ export const en = {
   'intro.sticker.night': 'NIGHT LEVEL',
 
   'board.lamp': 'Lamp',
+  'board.lumi': 'Lumi',
   'board.view.turnLeft': 'Turn the table left',
   'board.view.turnRight': 'Turn the table right',
   'board.view.zoomIn': 'Zoom in',
@@ -197,6 +198,7 @@ export const en = {
   'win.brilliant': 'Brilliant!',
   'win.great': 'Great job!',
   'win.solved': 'Solved!',
+  'win.allHomeSafe': 'All home safe!',
   'win.comeBack': 'Come back for ★★★',
   'win.solvedIn.one': 'Solved in {count} move',
   'win.solvedIn.other': 'Solved in {count} moves',

@@ -94,6 +94,7 @@ export const es = {
   'intro.sticker.night': 'NIVEL DE NOCHE',
 
   'board.lamp': 'Lámpara',
+  'board.lumi': 'Lumi',
   'board.view.turnLeft': 'Girar la mesa a la izquierda',
   'board.view.turnRight': 'Girar la mesa a la derecha',
   'board.view.zoomIn': 'Acercar',
@@ -198,6 +199,7 @@ export const es = {
   'win.brilliant': '¡Brillante!',
   'win.great': '¡Muy bien!',
   'win.solved': '¡Resuelto!',
+  'win.allHomeSafe': '¡Todos a salvo!',
   'win.comeBack': 'Vuelve por ★★★',
   'win.solvedIn.one': 'Resuelto en {count} movimiento',
   'win.solvedIn.other': 'Resuelto en {count} movimientos',

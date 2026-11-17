@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supportsWebGL } from '../../lib/webgl.js';
+import { boardThemeFor } from '../../game/boardThemes.js';
 import Board from '../../components/board/Board.jsx';
 import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
@@ -826,7 +827,7 @@ export default function PlayScreen({
           darkMoves={puzzle.taps.length}
           mood={modifier}
           label={t('play.boardLabel', { name: levelName })}
-          is3d={is3d || (settings.board3d !== false && supportsWebGL())}
+          is3d={is3d || ((Boolean(boardThemeFor(level)) || settings.board3d !== false) && supportsWebGL())}
         />
       </div>
 
@@ -976,6 +977,7 @@ export default function PlayScreen({
           result={result}
           par={level.par}
           difficulty={level.difficulty}
+          isRescue={Boolean(boardThemeFor(level))}
           cap={
             starCap < 3
               ? { stars: starCap, icon: bonusMoves > 0 && starCap === 1 ? 'plus' : (toolFor(puzzle.usedHelpers.at(-1))?.icon ?? 'hint') }

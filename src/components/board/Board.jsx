@@ -10,6 +10,7 @@ import { glowbugName } from '../../i18n/groveText.js';
 import { describeTile } from '../../game/describe.js';
 import { cellsOnBeams, isRotatable as tileIsRotatable } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
+import { boardThemeFor } from '../../game/boardThemes.js';
 import { flyToCounter, gemBurst } from '../../lib/effects.js';
 import CoachHand from './CoachHand.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
@@ -19,9 +20,8 @@ import styles from './Board.module.css';
 /** Name tags for the first levels, so new players know which piece is which (translation keys). */
 // The 3D board (three.js) loads only when it's used, so the flat board stays light.
 const Board3D = lazy(() => import('../board3d/Board3D.jsx'));
-// Trial: level 160 is drawn with React Three Fiber and GSAP instead, to compare the two ways.
+// Themed worlds (the Library…) are drawn with React Three Fiber, loaded only when one is played.
 const BoardFiber = lazy(() => import('../boardFiber/BoardFiber.jsx'));
-const FIBER_LEVELS = new Set(['w8-20']);
 
 const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
 
@@ -175,8 +175,14 @@ export default function Board({
       <TileDefs />
       {is3d && (
         <Suspense fallback={null}>
-          {FIBER_LEVELS.has(level.id) ? (
-            <BoardFiber level={level} state={state3d} onLayout={setCellRects} onTapCell={(cell) => cellRefs.current[cell]?.click()} />
+          {boardThemeFor(level) ? (
+            <BoardFiber
+              level={level}
+              theme={boardThemeFor(level)}
+              state={state3d}
+              onLayout={setCellRects}
+              onTapCell={(cell) => cellRefs.current[cell]?.click()}
+            />
           ) : (
             <Board3D
               level={level}
@@ -277,7 +283,7 @@ export default function Board({
                     {coach?.tile === tileIndex && tileIndex >= 0 && <CoachHand />}
                     {coach?.labels && COACH_LABELS[tile?.type] && (
                       <span className={styles.coachLabel} aria-hidden="true">
-                        {t(COACH_LABELS[tile.type])}
+                        {t(tile.type === TILE.GEM && boardThemeFor(level) ? 'board.lumi' : COACH_LABELS[tile.type])}
                       </span>
                     )}
                     {is3d && gloom && (

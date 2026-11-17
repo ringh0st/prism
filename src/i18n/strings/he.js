@@ -94,6 +94,7 @@ export const he = {
   'intro.sticker.night': 'שלב לילה',
 
   'board.lamp': 'מנורה',
+  'board.lumi': 'לומי',
   'board.view.turnLeft': 'לסובב את הלוח שמאלה',
   'board.view.turnRight': 'לסובב את הלוח ימינה',
   'board.view.zoomIn': 'להתקרב',
@@ -199,6 +200,7 @@ export const he = {
   'win.brilliant': 'מבריק!',
   'win.great': 'כל הכבוד!',
   'win.solved': 'עברתם את השלב!',
+  'win.allHomeSafe': 'כולם בבית בשלום!',
   'win.comeBack': 'חזרו בשביל ★★★',
   'win.solvedIn.one': 'עברתם במהלך אחד',
   'win.solvedIn.other': 'עברתם ב-{count} מהלכים',
