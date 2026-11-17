@@ -111,6 +111,14 @@ export const sfx = {
     tone(1400, 1100, 0.03, { volume: 0.035, delay: 0.01 });
     feel('light');
   },
+  /**
+   * A turn moves the light without lighting a gem: one soft note in the world's voice, higher the further the light
+   * now reaches (a step lower when it got shorter), so every tap sounds like progress you can hear.
+   */
+  lightReach(change, reach) {
+    const step = Math.min(voice.notes.length - 1, Math.floor(reach / 3));
+    play(voiceNote(change > 0 ? step : Math.max(0, step - 1)), { volume: change > 0 ? 0.06 : 0.04, duration: 0.35, delay: 0.05 });
+  },
   /** Another gem lights up: each one a step higher. */
   gemLit(count) {
     play(voiceNote(count + 1), { volume: 0.11, duration: 0.5 });

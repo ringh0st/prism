@@ -220,6 +220,7 @@ export const en = {
   'win.shieldsUsed.other': '{count} shields saved your streak',
   'win.shieldEarned': '+1 streak shield',
   'win.next': 'Next level',
+  'win.more': 'More: play again, share or the map',
   'win.again': 'Again',
   'win.playAgain': 'Play again',
   'win.grew': '{name} grew into a {stage}!',

@@ -38,6 +38,23 @@ export function gemBurst(element, color) {
   lightRing(element, color);
 }
 
+/** A small glint where the light has just reached: a few soft sparks (every turn that sends light further). */
+export function glint(element, color) {
+  if (!element) return;
+  fire({
+    origin: originOf(element),
+    particleCount: 6,
+    spread: 360,
+    startVelocity: 9,
+    gravity: 0.25,
+    decay: 0.86,
+    scalar: 0.55,
+    ticks: 45,
+    shapes: [STAR, 'circle'],
+    colors: color ? [color, '#FFF6E0'] : ['#F0C14E', '#FFF6E0'],
+  });
+}
+
 const centerOf = (element) => {
   const rect = element.getBoundingClientRect();
   return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2, size: Math.max(rect.width, rect.height) };

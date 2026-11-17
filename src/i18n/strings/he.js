@@ -223,6 +223,7 @@ export const he = {
   'win.shieldsUsed.other': '{count} מגנים שמרו על הרצף שלכם',
   'win.shieldEarned': '\u2066+1\u2069 מגן רצף',
   'win.next': 'לשלב הבא',
+  'win.more': 'עוד: שוב, שיתוף או המפה',
   'win.again': 'שוב',
   'win.playAgain': 'לשחק שוב',
   'win.grew': '{name} גדל ועכשיו הוא {stage}!',

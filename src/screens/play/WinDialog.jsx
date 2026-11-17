@@ -30,7 +30,7 @@ import { palName } from '../../i18n/palText.js';
 import { useCountUp } from '../../hooks/useCountUp.js';
 
 /** The headline's translation key. */
-function headlineFor({ stars, isSkipped, completesWorld, isFirstToday, milestone }, difficulty, isRescue) {
+export function headlineFor({ stars, isSkipped, completesWorld, isFirstToday, milestone }, difficulty, isRescue) {
   if (isSkipped) return 'win.skipped';
   if (isFirstToday) return 'win.dailyDone';
   if (milestone) return 'win.milestone';

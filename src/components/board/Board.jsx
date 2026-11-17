@@ -11,7 +11,7 @@ import { describeTile } from '../../game/describe.js';
 import { cellsOnBeams, isRotatable as tileIsRotatable } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
 import { boardThemeFor } from '../../game/boardThemes.js';
-import { flyToCounter, gemBurst } from '../../lib/effects.js';
+import { flyToCounter, gemBurst, glint } from '../../lib/effects.js';
 import CoachHand from './CoachHand.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { DarkCounter, SmudgeArt } from './darkTileArt.jsx';
@@ -23,6 +23,8 @@ const Board3D = lazy(() => import('../board3d/Board3D.jsx'));
 // Themed worlds (the Library…) are drawn with React Three Fiber, loaded only when one is played.
 const BoardFiber = lazy(() => import('../boardFiber/BoardFiber.jsx'));
 
+/** Glints per turn at most, so a long new stretch of light stays a quick sparkle. */
+const MAX_GLINTS = 6;
 const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
 
 /**
@@ -162,6 +164,17 @@ export default function Board({
   );
   const eclipseIn = is3d && darkness && level.eclipse ? level.eclipse - (darkMoves % level.eclipse) : null;
   const litPlates = useMemo(() => (isEditing ? new Set() : cellsOnBeams(trace.segments, width, height)), [trace.segments, width, height, isEditing]);
+  // Every turn that sends the light somewhere new sparkles along the new stretch, one cell after another, so a turn
+  // never feels dead even before a gem lights up (a few glints at most; nothing for reduced motion).
+  const platesBefore = useRef(null);
+  useEffect(() => {
+    const previous = platesBefore.current;
+    platesBefore.current = litPlates;
+    if (!previous || isEditing) return undefined;
+    const fresh = [...litPlates].filter((cell) => !previous.has(cell)).slice(0, MAX_GLINTS);
+    const timers = fresh.map((cell, n) => setTimeout(() => glint(cellRefs.current[cell], null), n * 55));
+    return () => timers.forEach(clearTimeout);
+  }, [litPlates, isEditing]);
 
   return (
     <div

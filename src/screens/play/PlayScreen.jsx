@@ -26,7 +26,12 @@ import { unseenTips } from '../../game/levelTips.js';
 import WorldBackdrop from './WorldBackdrop.jsx';
 import { WORLDS, levelNumber } from '../../game/worlds.js';
 import OutOfMovesDialog from './OutOfMovesDialog.jsx';
-import WinDialog from './WinDialog.jsx';
+import WinDialog, { headlineFor } from './WinDialog.jsx';
+import QuickWin from './QuickWin.jsx';
+import { isQuietWin, opensWithoutCard } from '../../game/quickWin.js';
+import { clearFlow, isFlowInto, markFlowInto } from '../../lib/levelFlow.js';
+import { presentsWaiting, readyWinGiftCount } from '../../game/gifts.js';
+import { todayKey } from '../../game/daily.js';
 import { usePuzzle } from '../../hooks/usePuzzle.js';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { useLevels } from '../../state/LevelsContext.jsx';
@@ -153,9 +158,20 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
   const [bonusMoves, setBonusMoves] = useState(0);
   const [isMeetingFriend, setIsMeetingFriend] = useState(false);
   const [rushOver, setRushOver] = useState(null);
-  const [showIntro, setShowIntro] = useState(true);
   // Pieces this player meets for the first time get a "New piece!" card before the level starts.
   const [newPieces, setNewPieces] = useState(() => piecesToIntroduce(level, mode, progress));
+  // Reached straight from a quiet win: a plain level opens right onto the board (no card), merge-game fast.
+  const [skipsCard] = useState(
+    () =>
+      mode === 'level' &&
+      isFlowInto(level.id) &&
+      opensWithoutCard({ difficulty: level.difficulty, isFirstSteps: isFirstStepsLevel(level, mode), newPieceCount: newPieces.length }),
+  );
+  const [showIntro, setShowIntro] = useState(!skipsCard);
+  // Gifts already waiting when the level opened; one this win brings in gets the full win screen.
+  const [giftsAtStart] = useState(() => ({ winGifts: readyWinGiftCount(progress, todayKey()), presents: presentsWaiting(progress) }));
+  // A quiet win shows a quick card; "More" swaps it for the full win screen.
+  const [wantsFullWin, setWantsFullWin] = useState(false);
   // The spotlight tour shown right after the intro: new pieces on the board, then one-time tips.
   const [tour, setTour] = useState({ steps: [], index: 0 });
   const [spotlightTile, setSpotlightTile] = useState(-1);
@@ -166,6 +182,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
   const [isHintAfterRetry, setIsHintAfterRetry] = useState(false);
   const lastLitCount = useRef(0);
   const lastShadeCount = useRef(0);
+  const lastReach = useRef(0); // how many cells the light covered after the last move
   const hasRecordedWin = useRef(false);
   const boardAreaRef = useRef(null);
   // The board grows to fill the free height between the meter and Lumi (big cells, easy to tap).
@@ -330,6 +347,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
     const litCount = trace.litGems.size;
     const shadeCount = trace.litShades.size;
     if (moves === 0) {
+      lastReach.current = litCells.size;
       lastLitCount.current = litCount;
       lastShadeCount.current = shadeCount;
       return;
@@ -357,11 +375,14 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
       setLumi({ mood: 'worried', line: '' });
       react('shiver');
     } else {
+      // No new gem yet: the light still answers with a soft note that rises the further it now reaches.
+      if (litCells.size !== lastReach.current) sfx.lightReach(litCells.size - lastReach.current, litCells.size);
       setLumi((current) => (current.mood === 'sleepy' ? { mood: 'happy', line: '' } : current));
     }
+    lastReach.current = litCells.size;
     lastLitCount.current = litCount;
     lastShadeCount.current = shadeCount;
-  }, [trace, moves, gems.length, playLimit, say, react]);
+  }, [trace, moves, gems.length, playLimit, say, react]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // First levels: Lumi explains what just happened after the first tap.
   useEffect(() => {
@@ -711,6 +732,13 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
       setLumi({ mood: 'excited', line });
     });
   }, [playStats, isFirstSteps, flavor, progress, newPieces, mode, palHelp, glowbugCell]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Without a card, the level starts on its own a moment after it appears (its Glowbug cell is found by then).
+  useEffect(() => {
+    clearFlow();
+    if (!skipsCard) return undefined;
+    const timer = setTimeout(dismissIntro, 150);
+    return () => clearTimeout(timer);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // First levels: a hand points at the next mirror to turn.
   const [isCoachDue, setIsCoachDue] = useState(level.index === 1);
@@ -740,6 +768,22 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
     () => (isFirstSteps && isCoachDue && !showIntro && !isOver ? findHint(level, puzzle.orients) : null),
     [isFirstSteps, isCoachDue, showIntro, isOver, level, puzzle.orients],
   );
+
+  // A plain win flows straight on: a quick card, then the next level opens by itself (no card in between).
+  const isQuiet =
+    mode === 'level' &&
+    !isFirstSteps &&
+    !isMeetingFriend &&
+    !isFriendDue(progress) &&
+    isQuietWin(result, {
+      difficulty: level.difficulty,
+      hasNext: Boolean(nextLevel),
+      hasWaitingGift: readyWinGiftCount(progress, todayKey()) > giftsAtStart.winGifts || presentsWaiting(progress) > giftsAtStart.presents,
+    });
+  const goToNextLevel = () => {
+    markFlowInto(nextLevel.split('/').pop());
+    navigate(nextLevel);
+  };
 
   return (
     <main
@@ -958,7 +1002,16 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
         />
       )}
       {isMeetingFriend && <FriendFoundDialog onDone={() => (nextLevel ? navigate(nextLevel) : navigate(backHref))} />}
-      {result && mode !== 'challenge' && mode !== 'rush' && !isMeetingFriend && (
+      {isQuiet && !wantsFullWin && (
+        <QuickWin
+          headline={t(headlineFor(result, level.difficulty, Boolean(boardThemeFor(level))))}
+          stars={result.stars}
+          sparksEarned={result.sparksEarned}
+          onNext={goToNextLevel}
+          onMore={() => setWantsFullWin(true)}
+        />
+      )}
+      {result && mode !== 'challenge' && mode !== 'rush' && !isMeetingFriend && (!isQuiet || wantsFullWin) && (
         <WinDialog
           showWinGifts={mode === 'level' && !isFirstSteps}
           challenge={mode === 'level' && !result.isSkipped && !isFirstSteps ? { levelId: level.id, levelLabel, moves: result.moves } : null}
