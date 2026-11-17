@@ -21,13 +21,24 @@ function frameGeometry(size, border) {
 }
 
 /**
- * Mirror: a square pane of pale mirror glass in a chamfered coral frame, standing straight on a low faceted plinth;
- * it swings a quarter turn with a springy GSAP ease. A fixed one stands on a stone plinth; a splitter's frame is mint.
+ * Mirror: a square slab of very light blue mirror glass with just a thin pale-silver edge (no big frame), standing on
+ * a low faceted plinth; two white glints across the glass say "mirror". It swings a quarter turn with a springy GSAP
+ * ease. A fixed one stands on a stone plinth; a splitter's glass is clearer, so light shows through it too.
  */
-export function FacetedMirror({ tile, turn, isRotatable, pieceColor = WARM.piece }) {
+export function FacetedMirror({ tile, turn, isRotatable }) {
   const rotor = useRef();
-  const frame = useMemo(() => frameGeometry(0.62, 0.09), []);
-  const pane = useMemo(() => new THREE.ShapeGeometry(chamferedRect(0.46, 0.46, 0.11)), []);
+  const slab = useMemo(() => {
+    const geometry = new THREE.ExtrudeGeometry(chamferedRect(0.58, 0.58, 0.1), {
+      depth: 0.04,
+      bevelEnabled: true,
+      bevelThickness: 0.012,
+      bevelSize: 0.012,
+      bevelSegments: 1,
+    });
+    geometry.center();
+    return geometry;
+  }, []);
+  const edge = useMemo(() => frameGeometry(0.62, 0.025), []);
   const plinth = useMemo(() => facetedBlock(0.5, 0.5, 0.08, 0.12, 0.02), []);
   const isSplitter = tile.type === 'splitter';
   const angle = -THREE.MathUtils.degToRad(-45 + turn * 90);
@@ -37,33 +48,33 @@ export function FacetedMirror({ tile, turn, isRotatable, pieceColor = WARM.piece
   return (
     <group>
       <mesh geometry={plinth} position={[0, 0.17, 0]} castShadow receiveShadow>
-        {matte(isRotatable ? WARM.standRotating : LOOK.stone)}
+        {matte(isRotatable ? '#f4f8fb' : LOOK.stone)}
       </mesh>
       <group ref={rotor} rotation={[0, angle, 0]} position={[0, 0.25 + 0.31, 0]}>
-        <mesh geometry={frame} castShadow receiveShadow>
-          {matte(isSplitter ? '#e9a99a' : pieceColor)}
+        <mesh geometry={slab} castShadow>
+          <meshPhysicalMaterial
+            color={isSplitter ? '#eef9ff' : '#b9e3f7'}
+            metalness={0.08}
+            roughness={0.04}
+            clearcoat={1}
+            clearcoatRoughness={0.03}
+            emissive="#c4ebfb"
+            emissiveIntensity={0.55}
+            transparent={isSplitter}
+            opacity={isSplitter ? 0.6 : 1}
+          />
         </mesh>
-        {[0.012, -0.012].map((z) => (
-          <mesh key={z} geometry={pane} position={[0, 0, z]} rotation={[0, z < 0 ? Math.PI : 0, 0]}>
-            <meshPhysicalMaterial
-              color={isSplitter ? '#dff6ef' : '#cfe7f1'}
-              metalness={0.3}
-              roughness={0.05}
-              clearcoat={1}
-              emissive="#eef8fb"
-              emissiveIntensity={0.4}
-              transparent={isSplitter}
-              opacity={isSplitter ? 0.7 : 1}
-            />
-          </mesh>
-        ))}
-        {/* Two diagonal glints across the glass: the classic "this is a mirror" mark. */}
-        {[-0.07, 0.05].map((x, n) => (
-          <mesh key={x} position={[x, 0.02, 0.016]} rotation={[0, 0, 0.75]}>
-            <planeGeometry args={[n ? 0.025 : 0.05, 0.36]} />
-            <meshBasicMaterial color="#ffffff" transparent opacity={0.85} depthWrite={false} />
-          </mesh>
-        ))}
+        <mesh geometry={edge} scale={[1, 1, 0.55]} castShadow>
+          <meshPhysicalMaterial color="#d6effa" metalness={0.3} roughness={0.25} clearcoat={0.8} emissive="#d6effa" emissiveIntensity={0.25} />
+        </mesh>
+        {[-0.07, 0.05].flatMap((x, n) =>
+          [0.031, -0.031].map((z) => (
+            <mesh key={`${x},${z}`} position={[x, 0.02, z]} rotation={[0, z < 0 ? Math.PI : 0, 0.75]}>
+              <planeGeometry args={[n ? 0.025 : 0.05, 0.4]} />
+              <meshBasicMaterial color="#ffffff" transparent opacity={0.9} depthWrite={false} />
+            </mesh>
+          )),
+        )}
       </group>
     </group>
   );

@@ -10,7 +10,7 @@ export default function Piece({ tile, turn, isLit, isDarkened, calm, theme }) {
       return <FacetedLamp tile={tile} turn={turn} calm={calm} pieceColor={theme?.piece} pieceDeep={theme?.pieceDeep} />;
     case TILE.MIRROR:
     case TILE.SPLITTER:
-      return <FacetedMirror tile={tile} turn={turn} isRotatable={isRotatable(tile)} pieceColor={theme?.piece} />;
+      return <FacetedMirror tile={tile} turn={turn} isRotatable={isRotatable(tile)} />;
     case TILE.GEM:
       return <FacetedGem tile={tile} isLit={isLit} isDarkened={isDarkened} calm={calm} />;
     case TILE.WALL:
