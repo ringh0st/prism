@@ -135,9 +135,10 @@ drop policy if exists "Update own profile" on public.profiles;
 create policy "Update own profile" on public.profiles
   for update using (id = auth.uid()) with check (id = auth.uid());
 
--- Players may update their own profile, but never their admin flag.
+-- Players may update their own name and beam look only: never the admin flag, and never currency or streaks
+-- (those change only through the server functions in economy.sql), even if this file is run again later.
 revoke update on public.profiles from authenticated;
-grant update (display_name, sparks, daily_streak, last_daily_date, beam_theme) on public.profiles to authenticated;
+grant update (display_name, beam_theme) on public.profiles to authenticated;
 
 drop policy if exists "Read own progress" on public.progress;
 create policy "Read own progress" on public.progress
