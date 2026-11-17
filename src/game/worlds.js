@@ -175,25 +175,27 @@ export function generatorPresetFor(world, index) {
   const number = (world - 1) * LEVELS_PER_WORLD + index;
   const progress = (number - 1) / (WORLD_COUNT * LEVELS_PER_WORLD - 1); // 0 at level 1, 1 at level 1000
   const spike = difficulty === DIFFICULTY.EXTRA ? 2 : difficulty === DIFFICULTY.HARD ? 1 : 0;
-  const size = clamp(Math.round(5 + progress * 4.6) + (spike > 0 ? 1 : 0), 4, 10);
-  // Moves needed rise steadily with the level number: 5 at the start, 8 by level 150, 16 by level 500 and 20
-  // from about level 700 (the light-following solver handles boards with up to 30 turning pieces).
-  const basePar = Math.min(20, 5 + Math.floor((number - 1) / 45));
-  const minPar = Math.min(22, basePar + spike * (world <= 2 ? 1 : 2));
+  // Owner feedback: hard should mean tricky, not cluttered. Boards stay small and every piece matters: a budget of
+  // turning pieces (5 at the start, 12 at most) and modest taps (4 → 10); the level builder then keeps the trickiest
+  // board it finds (trickScore in levelQuality.js), and Hard and boss levels are the trickiest, not the biggest.
+  const size = clamp(Math.round(5 + progress * 3) + (spike > 0 ? 1 : 0), 4, 8);
+  const basePar = Math.min(10, 4 + Math.floor((number - 1) / 110));
+  const minPar = Math.min(11, basePar + (spike > 0 ? 1 : 0));
   const steps = Math.min(3, Math.floor(progress * 4));
+  const maxTurnable = clamp(6 + Math.floor(progress * 6) + spike, 6, 12);
 
   const preset = {
     width: size,
     height: size,
     emitters: spike === 2 ? (world >= 20 ? 3 : 2) : spike === 1 && world >= 10 ? 2 : 1,
-    // Enough mirrors on the light's path and enough decoys to actually reach the moves needed: a sparse
-    // board can't (playtesters found level 151 with four mirrors and three moves).
-    turns: [2 + Math.min(2, steps), Math.max(3 + steps + spike, minPar)],
+    turns: [2 + Math.min(2, steps), Math.max(3 + steps, minPar)],
     segment: [1, 3],
-    decoys: Math.min(10, 2 + Math.floor(minPar / 2) + spike),
-    walls: 1 + steps + spike,
+    // A couple of decoys at most: each one a deliberate trap, never clutter.
+    decoys: Math.min(3, 2 + Math.floor(progress * 2)),
+    walls: 1 + Math.min(2, steps),
     minPar,
-    maxPar: minPar + 4,
+    maxPar: minPar + 3,
+    maxTurnable,
     lockedRatio: 0.1,
   };
 

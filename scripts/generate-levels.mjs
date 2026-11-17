@@ -2,8 +2,8 @@
 // Run: npm run levels            (all worlds, in parallel)
 //      npm run levels -- 5 6 7   (only these worlds)
 //
-// For each level the generator searches for a while and keeps the hardest valid puzzle
-// it finds (highest par), stopping early once the target is reached.
+// For each level the generator searches for a while within the level's piece budget and keeps the trickiest
+// valid puzzle it finds (trickScore in levelQuality.js), not the one needing the most taps.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { cpus } from 'node:os';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
@@ -12,7 +12,7 @@ import { generateLevel } from '../src/game/generator.js';
 import { analyzeLevel } from '../src/game/solver.js';
 import { validateLevel } from '../src/game/levelSchema.js';
 import { PIECE_FIRST_LEVEL, piecesIn } from '../src/game/pieces.js';
-import { MAX_RANDOM_SOLVE_RATE, randomSolveRate, solvesWithoutPlanning } from '../src/game/levelQuality.js';
+import { MAX_RANDOM_SOLVE_RATE, randomSolveRate, solvesWithoutPlanning, trickScore } from '../src/game/levelQuality.js';
 import { REST_RECIPES } from '../src/game/recipes.js';
 import { difficultyFor, generatorPresetFor, levelId, LEVELS_PER_WORLD, WORLD_COUNT } from '../src/game/worlds.js';
 import { createRandom } from '../src/lib/random.js';
@@ -20,7 +20,7 @@ import { addDarkness } from '../src/game/darknessBuilder.js';
 import { LEVEL_SCHEMA_VERSION } from '../src/game/constants.js';
 
 const OUTPUT_DIR = new URL('../src/data/worlds/', import.meta.url);
-const TIME_BUDGET_MS = 4000;
+const TIME_BUDGET_MS = 6000;
 /** Boards a darkness level tries the darkness on (checking the safe orders takes a moment). */
 const MAX_DARK_TRIES = 150;
 
@@ -66,38 +66,42 @@ const CATCH_WORLDS = 50;
 function bestLevelFor(world, index) {
   const preset = generatorPresetFor(world, index);
   const needsCatch = needsCatchFor(world, index, preset);
+  // A level that introduces a piece must show it (small boards don't always fit it by chance).
+  const required = preset.mustHave ?? Object.keys(PIECE_FIRST_LEVEL).find((piece) => PIECE_FIRST_LEVEL[piece] === levelId(world, index) && piece !== 'basics');
   let best = null;
   let fallback = null; // the least random-solvable board, if none passes the catch check
   let darkTries = 0;
   for (const [attempt, variant] of simplifications(preset).entries()) {
     const deadline = Date.now() + TIME_BUDGET_MS;
-    for (let seed = 0; seed < 400 && Date.now() < deadline; seed++) {
+    for (let seed = 0; seed < 4000 && Date.now() < deadline; seed++) {
       const random = createRandom(`prism-${levelId(world, index)}-${attempt}-${seed}`);
       let level = generateLevel({ ...variant, minPar: Math.min(variant.minPar, 2) }, random, 25);
       // The darkness goes on top of a finished board (darknessBuilder.js); a board that can't take it is skipped.
-      if (level && preset.darkness && level.par >= (best?.par ?? 0) && darkTries < MAX_DARK_TRIES) {
+      if (level && preset.darkness && darkTries < MAX_DARK_TRIES) {
         darkTries++;
         level = addDarkness(level, preset.darkness, random, preset.maxPar);
       } else if (preset.darkness) level = null;
       // A level that introduces a piece must actually contain it.
-      const hasRequired = !preset.mustHave || (level && piecesIn(level).includes(preset.mustHave));
+      const hasRequired = !required || (level && piecesIn(level).includes(required));
       // Every regular level needs a real "catch": random tapping mustn't solve it, and nor may a player who just
       // lights the most each move without planning (levelQuality.js). Such a board counts as fully guessable.
       const rated = level && { ...level, difficulty: difficultyFor(index) };
       const rate = level && hasRequired && needsCatch ? (solvesWithoutPlanning(rated) ? 1 : randomSolveRate(rated)) : 0;
-      if (level && hasRequired && level.par <= preset.maxPar && (!fallback || rate < fallback.rate)) fallback = { level, rate };
-      if (level && hasRequired && level.par <= preset.maxPar && (!best || level.par > best.par) && rate <= MAX_RANDOM_SOLVE_RATE) best = level;
-      if (best && best.par >= preset.minPar) return best;
+      const inRange = level && hasRequired && level.par <= preset.maxPar && level.par >= preset.minPar - (preset.mustHave ? 2 : 1);
+      if (inRange && (!fallback || rate < fallback.rate)) fallback = { level, rate };
+      if (inRange && rate <= MAX_RANDOM_SOLVE_RATE) {
+        // Plain levels (tutorials, introductions, breathers) just need to fit; the rest keep the trickiest board.
+        const trick = needsCatch ? trickScore(rated).score : -level.tiles.length;
+        if (!best || trick > best.trick) best = { level, trick };
+      }
     }
-    // Only settle for a board one move short of the target (two for piece introductions, which stay gentle).
-    if (best && best.par >= preset.minPar - (preset.mustHave ? 2 : 1)) return best;
+    if (best) return best.level;
   }
-  if (!best && fallback) {
+  if (fallback) {
     console.warn(`${levelId(world, index)}: no board with a clear catch; using the hardest to guess (${Math.round(fallback.rate * 100)}%)`);
-    best = fallback.level;
+    return fallback.level;
   }
-  if (!best) throw new Error(`Could not generate ${levelId(world, index)}`);
-  return best;
+  throw new Error(`Could not generate ${levelId(world, index)}`);
 }
 
 function generateWorld(world) {

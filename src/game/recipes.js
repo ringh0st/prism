@@ -119,21 +119,18 @@ export function recipeOf(level) {
  * Generator settings for a flavor, on top of the world's own (which keep its pieces: walls, fixed
  * mirrors, splitters, color glass). `spike` is 1 on Hard levels.
  */
-export function recipePreset(recipe, base, { world, index, spike }) {
+export function recipePreset(recipe, base, { world, spike }) {
   const preset = flavorPreset(recipe, base, { world, spike });
   if (REST_RECIPES.includes(recipe)) return preset;
-  // Playtesters found the early worlds far too easy: every regular flavor needs at least as many moves as the
-  // level's place on the difficulty curve (base.minPar), and two more than its own base, with the light path
-  // and decoys to match; the second half of each world one move more again.
-  const later = index > 10 ? 1 : 0;
-  const minPar = Math.max(preset.minPar + 2, base.minPar) + later;
+  // Every regular flavor needs at least the level's place on the difficulty curve (base.minPar). Its difficulty
+  // comes from being tricky (the level builder keeps the trickiest board), not from extra mirrors.
+  const minPar = Math.max(preset.minPar, base.minPar);
   const emitters = preset.emitters ?? 1;
   return {
     ...preset,
-    turns: [preset.turns[0] + 1, Math.max(preset.turns[1] + 1, Math.ceil(minPar / emitters) + 1)],
-    decoys: preset.decoys + 1 + Math.floor(minPar / 4),
+    turns: [preset.turns[0], Math.max(preset.turns[1], Math.ceil(minPar / emitters) + 1)],
     minPar,
-    maxPar: Math.max(preset.maxPar + 2, minPar + 3) + later,
+    maxPar: Math.max(preset.maxPar, minPar + 3),
   };
 }
 

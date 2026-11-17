@@ -1,4 +1,5 @@
 import { buildCellIndex, cellsOnBeams, isRotatable, rotationGroup, traceBeams } from './beam.js';
+import { analyzeLevel } from './solver.js';
 import { darknessStart, darknessStep, hasDarkness } from './darkness.js';
 import { moveLimitFor } from './scoring.js';
 import { createRandom } from '../lib/random.js';
@@ -29,7 +30,7 @@ export function randomSolveRate(level, { moveLimit = moveLimitFor(level.par, lev
 }
 
 /** Highest random-solve rate a regular level may have (quick "rest" flavors and tutorials are exempt). */
-export const MAX_RANDOM_SOLVE_RATE = 0.08;
+export const MAX_RANDOM_SOLVE_RATE = 0.05;
 
 /**
  * Can a player who doesn't plan solve it? Research on puzzle difficulty: what makes a puzzle feel hard is how many
@@ -62,3 +63,37 @@ export function solvesWithoutPlanning(level, moveLimit = moveLimitFor(level.par,
   }
   return state.trace.isSolved;
 }
+
+/**
+ * How tricky a level is (owner feedback: hard should mean tricky, not cluttered). Higher is trickier:
+ * - traps: taps that look like progress right now (they light more Lumis, or more of the board) but are in no best
+ *   solution, so the obvious move is wrong;
+ * - the greedy player (solvesWithoutPlanning) getting stuck;
+ * - how rarely random tapping solves it;
+ * - a little for the taps needed, and a penalty for every turning piece beyond the taps (clutter).
+ * @returns { score, traps, greedyFails, randomRate, idle } (idle: turning pieces no best solution touches)
+ */
+export function trickScore(level, analysis = analyzeLevel(level)) {
+  const cells = buildCellIndex(level);
+  const start = level.tiles.map((tile) => tile.orient ?? 0);
+  const before = traceBeams(level, start, cells);
+  const best = analysis.solutions.filter((solution) => popcount(solution.mask) === analysis.par);
+  const inBest = (g) => best.some((solution) => (solution.mask >> g) & 1);
+  let traps = 0;
+  analysis.groups.forEach((group, g) => {
+    if (inBest(g)) return;
+    const turned = start.slice();
+    for (const i of group) turned[i] ^= 1;
+    const after = traceBeams(level, turned, cells);
+    const lightsMore = after.litGems.size > before.litGems.size;
+    const reachesFurther = cellsOnBeams(after.segments, level.width, level.height).size > cellsOnBeams(before.segments, level.width, level.height).size;
+    if ((lightsMore || reachesFurther) && after.litShades.size === 0) traps++;
+  });
+  const idle = analysis.groups.filter((_, g) => !inBest(g)).length;
+  const greedyFails = !solvesWithoutPlanning(level);
+  const randomRate = randomSolveRate(level);
+  const score = traps * 4 + (greedyFails ? 6 : 0) + (1 - randomRate) * 12 + analysis.par * 0.6 - Math.max(0, idle - traps - 1) * 1.2;
+  return { score, traps, greedyFails, randomRate, idle };
+}
+
+const popcount = (n) => n.toString(2).replaceAll('0', '').length;
