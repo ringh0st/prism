@@ -1046,7 +1046,9 @@ function AntennaTip({ shape, color, on }) {
   return <mesh scale={[1, 1.3, 1]}><octahedronGeometry args={[0.032, 0]} />{m}</mesh>;
 }
 /** One of Lumi's family. age: baby | kid | girl | mom | dad | grandma; color: the light it needs. */
-function LumiKin({ color = 'sun', age = 'kid', on }) {
+function LumiKin({ color = 'sun', age = 'kid', on, mood }) {
+  // mood: sleepy | worried | surprised | joy | happy (defaults from on)
+  const face = mood ?? (on ? 'happy' : 'sleepy');
   const tint = FAMILY_TINT[color];
   const shape = GEM_COLORS[color].shape;
   const size = 1.3 * { baby: 0.62, kid: 0.8, girl: 0.8, mom: 1, dad: 1.05, grandma: 0.95 }[age];
@@ -1054,18 +1056,31 @@ function LumiKin({ color = 'sun', age = 'kid', on }) {
   const belly = new THREE.Color(body).lerp(new THREE.Color('#fff6e8'), 0.55);
   const R = 0.18;
   const lashes = age === 'girl' || age === 'mom' || age === 'grandma';
-  const lift = on ? 0.07 : 0; // a happy hop when saved
-  const eye = (x) =>
-    on ? (
-      <group key={x} position={[x, 0.035, R * 0.9]}>
-        <mesh scale={[1, 1.25, 0.6]}><sphereGeometry args={[0.032, 16, 12]} /><meshStandardMaterial color={OUTLINE} roughness={0.25} /></mesh>
-        <mesh position={[0.01, 0.014, 0.02]}><sphereGeometry args={[0.011, 8, 6]} /><meshBasicMaterial color="#fff" /></mesh>
+  const lift = face === 'joy' ? 0.12 : on ? 0.07 : 0; // a happy hop when saved
+  const ink = <meshStandardMaterial color={OUTLINE} />;
+  const eye = (x) => {
+    const at = [x, 0.035, R * 0.9];
+    if (face === 'sleepy') return <mesh key={x} position={[x, 0.025, R * 0.94]} rotation={[0, 0, Math.PI]}><torusGeometry args={[0.022, 0.006, 6, 14, Math.PI]} />{ink}</mesh>;
+    if (face === 'joy') return <mesh key={x} position={[x, 0.03, R * 0.94]}><torusGeometry args={[0.024, 0.007, 6, 14, Math.PI]} />{ink}</mesh>;
+    const big = face === 'surprised' ? 1.25 : face === 'worried' ? 0.85 : 1;
+    return (
+      <group key={x} position={at}>
+        <mesh scale={[big, 1.25 * big, 0.6]}><sphereGeometry args={[0.032, 16, 12]} /><meshStandardMaterial color={OUTLINE} roughness={0.25} /></mesh>
+        <mesh position={[0.01, 0.014, 0.02]}><sphereGeometry args={[0.011 * big, 8, 6]} /><meshBasicMaterial color="#fff" /></mesh>
         <mesh position={[-0.008, -0.012, 0.02]}><sphereGeometry args={[0.005, 6, 4]} /><meshBasicMaterial color="#fff" /></mesh>
-        {lashes && <mesh position={[x > 0 ? 0.03 : -0.03, 0.03, 0]} rotation={[0, 0, x > 0 ? -0.6 : 0.6]}><boxGeometry args={[0.022, 0.006, 0.006]} /><meshStandardMaterial color={OUTLINE} /></mesh>}
+        {lashes && <mesh position={[x > 0 ? 0.03 : -0.03, 0.03, 0]} rotation={[0, 0, x > 0 ? -0.6 : 0.6]}><boxGeometry args={[0.022, 0.006, 0.006]} />{ink}</mesh>}
+        {face === 'worried' && <mesh position={[0, 0.058, 0.004]} rotation={[0, 0, x > 0 ? 0.45 : -0.45]}><boxGeometry args={[0.04, 0.008, 0.008]} />{ink}</mesh>}
+        {face === 'surprised' && <mesh position={[0, 0.07, 0.004]} rotation={[0, 0, x > 0 ? -0.2 : 0.2]}><boxGeometry args={[0.035, 0.007, 0.007]} />{ink}</mesh>}
       </group>
-    ) : (
-      <mesh key={x} position={[x, 0.025, R * 0.94]} rotation={[0, 0, Math.PI]}><torusGeometry args={[0.022, 0.006, 6, 14, Math.PI]} /><meshStandardMaterial color={OUTLINE} /></mesh>
     );
+  };
+  const mouth = {
+    sleepy: <mesh position={[0, -0.06, R * 0.95]}><torusGeometry args={[0.018, 0.006, 6, 12, Math.PI]} />{ink}</mesh>,
+    worried: <group position={[0, -0.06, R * 0.95]}>{[-0.02, 0, 0.02].map((x, k) => <mesh key={k} position={[x, k % 2 ? 0.006 : -0.004, 0]} rotation={[0, 0, k % 2 ? 0.5 : -0.5]}><boxGeometry args={[0.022, 0.006, 0.006]} />{ink}</mesh>)}</group>,
+    surprised: <mesh position={[0, -0.055, R * 0.95]} scale={[0.85, 1.15, 1]}><circleGeometry args={[0.02, 18]} /><meshStandardMaterial color="#7a2a22" /></mesh>,
+    joy: <group position={[0, -0.035, R * 0.95]}><mesh rotation={[0, 0, Math.PI]}><circleGeometry args={[0.04, 20, 0, Math.PI]} /><meshStandardMaterial color="#7a2a22" side={THREE.DoubleSide} /></mesh><mesh position={[0, -0.022, 0.001]} scale={[1, 0.5, 1]}><circleGeometry args={[0.02, 14]} /><meshStandardMaterial color="#ff8f8f" /></mesh></group>,
+    happy: <group position={[0, -0.04, R * 0.95]}><mesh rotation={[0, 0, Math.PI]}><circleGeometry args={[0.032, 20, 0, Math.PI]} /><meshStandardMaterial color="#7a2a22" side={THREE.DoubleSide} /></mesh><mesh position={[0, -0.018, 0.001]} scale={[1, 0.5, 1]}><circleGeometry args={[0.016, 14]} /><meshStandardMaterial color="#ff8f8f" /></mesh></group>,
+  }[face];
   const limb = <meshPhysicalMaterial color={body} roughness={0.45} clearcoat={0.5} />;
   return (
     <group scale={size}>
@@ -1085,14 +1100,8 @@ function LumiKin({ color = 'sun', age = 'kid', on }) {
         <mesh position={[-0.06, 0.09, 0.13]}><sphereGeometry args={[0.032, 10, 8]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.55} /></mesh>
         {eye(-0.062)}{eye(0.062)}
         {[-0.105, 0.105].map((x) => <mesh key={x} position={[x, -0.015, R * 0.83]} rotation={[0, x * 4.5, 0]}><circleGeometry args={[0.03, 20]} /><meshBasicMaterial color="#ff8a8a" transparent opacity={on ? 0.75 : 0.3} /></mesh>)}
-        {on ? (
-          <group position={[0, -0.04, R * 0.95]}>
-            <mesh rotation={[0, 0, Math.PI]}><circleGeometry args={[0.032, 20, 0, Math.PI]} /><meshStandardMaterial color="#7a2a22" side={THREE.DoubleSide} /></mesh>
-            <mesh position={[0, -0.018, 0.001]} scale={[1, 0.5, 1]}><circleGeometry args={[0.016, 14]} /><meshStandardMaterial color="#ff8f8f" /></mesh>
-          </group>
-        ) : (
-          <mesh position={[0, -0.06, R * 0.95]}><torusGeometry args={[0.018, 0.006, 6, 12, Math.PI]} /><meshStandardMaterial color={OUTLINE} /></mesh>
-        )}
+        {mouth}
+        {face === 'worried' && <mesh position={[0.14, 0.1, 0.11]} scale={[0.7, 1, 0.5]}><sphereGeometry args={[0.018, 10, 8]} /><meshPhysicalMaterial color="#bfe6ff" transparent opacity={0.85} /></mesh>}
         {/* antennae with the color's shape on the tips */}
         {(age === 'baby' ? [0] : [-1, 1]).map((sx) => (
           <group key={sx} position={[sx * 0.07, R * 0.85, 0]} rotation={[0, 0, -sx * 0.35]}>
@@ -1117,7 +1126,7 @@ function LumiKin({ color = 'sun', age = 'kid', on }) {
     </group>
   );
 }
-function KinStudio({ color, age, on }) {
+function KinStudio({ color, age, on, mood }) {
   return (
     <>
       <color attach="background" args={['#3b2a22']} />
@@ -1125,7 +1134,7 @@ function KinStudio({ color, age, on }) {
       <directionalLight position={[-2, 5, 5]} intensity={1.4} color="#ffe4bd" castShadow />
       <mesh position={[0, -0.04, 0]} receiveShadow><boxGeometry args={[1.3, 0.08, 1.3]} /><meshStandardMaterial color="#8a3530" roughness={1} /></mesh>
       <ParquetTile position={[0, 0.05, 0]} x={0} y={0} />
-      <group position={[0, 0.09, 0]} rotation={[0, 0.3, 0]}><LumiKin color={color} age={age} on={on} /></group>
+      <group position={[0, 0.09, 0]} rotation={[0, 0.3, 0]}><LumiKin color={color} age={age} on={on} mood={mood} /></group>
     </>
   );
 }
@@ -1134,7 +1143,7 @@ const which = Number(new URLSearchParams(location.search).get('c') || 1);
 const pieceIndex = new URLSearchParams(location.search).get('piece');
 const gemQ = new URLSearchParams(location.search).get('gem');
 const kinQ = new URLSearchParams(location.search).get('kin');
-const Scene = kinQ !== null ? () => { const [age, col, on] = kinQ.split(','); return <KinStudio age={age} color={col} on={on === '1'} />; } : gemQ !== null ? () => { const [d, col, on] = gemQ.split(','); return <GemStudio design={Number(d)} color={col} on={on === '1'} />; } : pieceIndex !== null ? () => <LibPiece index={Number(pieceIndex)} /> : [ToyIsland, PaperCraft, GoldenGarden, AmberGrotto, LilyPond, Workshop, Library, LibraryAll][which - 1];
+const Scene = kinQ !== null ? () => { const [age, col, on, mood] = kinQ.split(','); return <KinStudio age={age} color={col} on={on === '1'} mood={mood} />; } : gemQ !== null ? () => { const [d, col, on] = gemQ.split(','); return <GemStudio design={Number(d)} color={col} on={on === '1'} />; } : pieceIndex !== null ? () => <LibPiece index={Number(pieceIndex)} /> : [ToyIsland, PaperCraft, GoldenGarden, AmberGrotto, LilyPond, Workshop, Library, LibraryAll][which - 1];
 const camMode = new URLSearchParams(location.search).get('cam');
 const close = camMode === 'close';
 const pair = camMode === 'mirrors';
