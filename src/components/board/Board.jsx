@@ -155,9 +155,10 @@ export default function Board({
             revealedCells,
             darkenedTile: darkness?.lost?.tile ?? null,
             glooms: darkness ? gloomsNow(level, darkness) : [],
+            lookHere,
           }
         : null,
-    [is3d, allTurns, trace, turnsLeft, revealedCells, darkness, level],
+    [is3d, allTurns, trace, turnsLeft, revealedCells, darkness, level, lookHere],
   );
   const eclipseIn = is3d && darkness && level.eclipse ? level.eclipse - (darkMoves % level.eclipse) : null;
   const litPlates = useMemo(() => (isEditing ? new Set() : cellsOnBeams(trace.segments, width, height)), [trace.segments, width, height, isEditing]);

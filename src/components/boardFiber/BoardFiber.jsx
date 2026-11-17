@@ -10,7 +10,7 @@ import { FLOORS, cellPosition } from './look.js';
 import Tray from './Tray.jsx';
 import Piece from './Piece.jsx';
 import Beam from './Beam.jsx';
-import { Fog } from './Blocks.jsx';
+import { Cloud } from './Detailed.jsx';
 import styles from './BoardFiber.module.css';
 
 const prefersCalm = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -109,7 +109,7 @@ export default function BoardFiber({ level, state, onLayout, onTapCell }) {
     setTheme(FLOORS[floor] ?? FLOORS.sage);
   }, []);
 
-  const { turns, trace, revealedCells, darkenedTile } = state;
+  const { turns, trace, revealedCells, darkenedTile, lookHere } = state;
   const litCells = useMemo(() => cellsOnBeams(trace.segments, level.width, level.height), [trace, level]);
   const tap = (event, cell) => {
     event.stopPropagation();
@@ -127,14 +127,14 @@ export default function BoardFiber({ level, state, onLayout, onTapCell }) {
           <Studio />
           <Controls level={level} resetKey={resetKey} />
           <Layout level={level} onLayout={onLayout} />
-          <Tray level={level} theme={theme} litCells={litCells} onTileClick={tap} />
+          <Tray level={level} theme={theme} litCells={litCells} hintCells={lookHere} calm={calm} onTileClick={tap} />
           {level.tiles.map((tile, i) => {
             const cell = tile.y * level.width + tile.x;
             const isHidden = tile.fog && revealedCells !== null && !revealedCells.has(cell);
             return (
               <group key={i} position={cellPosition(level, tile.x, tile.y)} onClick={(event) => tap(event, cell)}>
                 {isHidden ? (
-                  <Fog />
+                  <Cloud calm={calm} />
                 ) : (
                   <Piece
                     tile={tile}

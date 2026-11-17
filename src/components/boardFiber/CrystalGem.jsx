@@ -25,19 +25,24 @@ export default function CrystalGem({ tile, isLit, isDarkened, calm }) {
   const cluster = useRef();
   const materials = useRef([]);
   const sparks = useRef([]);
+  const heart = useRef();
   const color = CRYSTAL_TONES[tile.color] ?? BEAM_COLORS[tile.color] ?? BEAM_COLORS.sun;
   const big = useMemo(() => crystalGeometry(0.12, 0.34), []);
   const small = useMemo(() => crystalGeometry(0.07, 0.18), []);
+  const tiny = useMemo(() => crystalGeometry(0.045, 0.1), []);
   const rock = useMemo(() => facetedBlock(0.42, 0.42, 0.1, 0.12, 0.03), []);
-  const pale = useMemo(() => new THREE.Color(color).lerp(new THREE.Color('#ffffff'), 0.55), [color]);
+  // Waiting: clear frosted glass with only a whisper of its color.
+  const pale = useMemo(() => new THREE.Color('#eef3ff'), []);
 
   useEffect(() => {
     const target = isDarkened ? new THREE.Color('#8c8378') : isLit ? new THREE.Color(color) : pale;
     materials.current.forEach((m) => {
       if (!m) return;
       gsap.to(m.color, { r: target.r, g: target.g, b: target.b, duration: 0.35 });
-      gsap.to(m, { emissiveIntensity: isLit && !isDarkened ? 0.5 : 0.05, duration: 0.4 });
+      gsap.to(m, { emissiveIntensity: isLit && !isDarkened ? 0.5 : 0, duration: 0.4 });
+      gsap.to(m, { iridescence: isLit ? 0.6 : 0.2, duration: 0.4 });
     });
+    gsap.to(heart.current.scale, { x: isLit ? 1 : 0.001, y: isLit ? 1 : 0.001, z: isLit ? 1 : 0.001, duration: 0.4, ease: 'back.out(2)' });
     if (isLit && !calm) {
       gsap
         .timeline()
@@ -71,18 +76,20 @@ export default function CrystalGem({ tile, isLit, isDarkened, calm }) {
       transparent
       opacity={0.92}
       emissive={color}
-      emissiveIntensity={0.05}
+      emissiveIntensity={0}
     />
   );
   const parts = [
     { geometry: big, position: [0, 0, 0], rotation: [0, 0, 0] },
     { geometry: small, position: [0.11, 0, 0.04], rotation: [0.15, 0.4, -0.45] },
     { geometry: small, position: [-0.1, 0, -0.06], rotation: [-0.2, 1.2, 0.5] },
+    { geometry: tiny, position: [0.02, 0, 0.12], rotation: [0.55, 0.2, 0.05] },
+    { geometry: tiny, position: [-0.04, 0, -0.12], rotation: [-0.5, 2.2, -0.1] },
   ];
   return (
     <group>
       <mesh geometry={rock} position={[0, 0.17, 0]} castShadow receiveShadow>
-        <meshStandardMaterial color="#f6ead6" roughness={0.75} flatShading />
+        <meshStandardMaterial color="#efe6f0" roughness={0.85} flatShading />
       </mesh>
       <group ref={cluster} position={[0, 0.26, 0]} scale={1.35}>
         {parts.map((part, index) => (
@@ -95,6 +102,11 @@ export default function CrystalGem({ tile, isLit, isDarkened, calm }) {
           </group>
         ))}
       </group>
+      {/* A glowing heart inside the big crystal, seen through the glassy faces once it's lit. */}
+      <mesh ref={heart} position={[0, 0.5, 0]} scale={0.001}>
+        <sphereGeometry args={[0.09, 16, 12]} />
+        <meshBasicMaterial color={glowing(color, 2.2)} toneMapped={false} transparent opacity={0.8} />
+      </mesh>
       {Array.from({ length: 10 }, (_, n) => (
         <mesh key={n} ref={(mesh) => (sparks.current[n] = mesh)} position={[0, 0.55, 0]} scale={0.01}>
           <octahedronGeometry args={[0.04, 0]} />

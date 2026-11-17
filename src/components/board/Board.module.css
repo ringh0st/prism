@@ -372,6 +372,11 @@
   pointer-events: none;
 }
 
+/* In 3D the hint glow is drawn on the tiles themselves (a flat square would float over the pieces). */
+.cells3d .lookHere::before {
+  display: none;
+}
+
 @keyframes lookHere {
   50% {
     background: rgb(240 193 78 / 0.5);
