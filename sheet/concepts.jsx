@@ -842,10 +842,10 @@ function LibraryAll() {
       {/* the puzzle: lamp → splitter; straight on to a gold gem, down to a mirror, left through coral glass to a coral gem */}
       {P([0, 1], <BankerLamp />)}
       {P([3, 1], <GearMirrorVariant kind="splitter" />, -Math.PI / 4)}
-      {P([5, 1], <TintGem on />)}
+      {P([5, 1], <LumiKin age="kid" color="sun" on />, -Math.PI / 2)}
       {P([3, 4], <GimbalMirror />, Math.PI / 4)}
       {P([2, 4], <ColorGlass />, Math.PI / 2)}
-      {P([0, 4], <TintGem on tint="#ff8f7a" glowC="#ff6a4e" />)}
+      {P([0, 4], <LumiKin age="grandma" color="coral" on />, Math.PI / 2)}
       {/* the rest of the pieces, waiting */}
       {P([5, 5], <TurningBankerLamp />, Math.PI / 2)}
       {P([5, 3], <BookcaseGate />, 0)}
@@ -861,7 +861,7 @@ function LibraryAll() {
       {P([2, 0], <InkPot />)}
       {P([5, 0], <DustSheet />)}
       {P([4, 4], <BookStack />)}
-      {P([1, 0], <TintGem />)}
+      {P([1, 0], <LumiKin age="baby" color="sky" />, Math.PI)}
       {[[3, 1], [3, 4]].map((c, n) => <Flare key={n} position={at6(...c, 0.47)} size={0.55} />)}
       <LibBeam a={[0, 1]} b={[3, 1]} />
       <LibBeam a={[3, 1]} b={[5, 1]} />
