@@ -24,7 +24,7 @@ function frameGeometry(size, border) {
  * Mirror: a square pane of pale mirror glass in a chamfered coral frame, standing straight on a low faceted plinth;
  * it swings a quarter turn with a springy GSAP ease. A fixed one stands on a stone plinth; a splitter's frame is mint.
  */
-export function FacetedMirror({ tile, turn, isRotatable }) {
+export function FacetedMirror({ tile, turn, isRotatable, pieceColor = WARM.piece }) {
   const rotor = useRef();
   const frame = useMemo(() => frameGeometry(0.62, 0.09), []);
   const pane = useMemo(() => new THREE.ShapeGeometry(chamferedRect(0.46, 0.46, 0.11)), []);
@@ -41,7 +41,7 @@ export function FacetedMirror({ tile, turn, isRotatable }) {
       </mesh>
       <group ref={rotor} rotation={[0, angle, 0]} position={[0, 0.25 + 0.31, 0]}>
         <mesh geometry={frame} castShadow receiveShadow>
-          {matte(isSplitter ? '#e9a99a' : WARM.piece)}
+          {matte(isSplitter ? '#e9a99a' : pieceColor)}
         </mesh>
         {[0.012, -0.012].map((z) => (
           <mesh key={z} geometry={pane} position={[0, 0, z]} rotation={[0, z < 0 ? Math.PI : 0, 0]}>
@@ -73,7 +73,7 @@ export function FacetedMirror({ tile, turn, isRotatable }) {
  * Lamp: a faceted coral crystal sitting on a chamfered cream pedestal, with a glowing white port on the side the light
  * leaves from; it breathes gently (GSAP). A turning lamp's pedestal is sage.
  */
-export function FacetedLamp({ tile, turn, calm }) {
+export function FacetedLamp({ tile, turn, calm, pieceColor = WARM.piece, pieceDeep = WARM.pieceDeep }) {
   const head = useRef();
   const port = useRef();
   const pedestal = useMemo(() => facetedBlock(0.62, 0.62, 0.22, 0.16, 0.03), []);
@@ -96,10 +96,10 @@ export function FacetedLamp({ tile, turn, calm }) {
       </mesh>
       <group ref={head} rotation={[0, angle, 0]}>
         <mesh geometry={crystal} position={[0, 0.59, 0]} castShadow>
-          {matte(WARM.piece)}
+          {matte(pieceColor)}
         </mesh>
         <mesh geometry={tip} position={[0, 0.89, 0]} castShadow>
-          {matte(WARM.pieceDeep)}
+          {matte(pieceDeep)}
         </mesh>
         <group position={[0.25, BEAM_HEIGHT, 0]} rotation={[0, Math.PI / 2, 0]}>
           <mesh>

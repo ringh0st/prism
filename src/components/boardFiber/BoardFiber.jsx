@@ -142,6 +142,7 @@ export default function BoardFiber({ level, state, onLayout, onTapCell }) {
                     isLit={trace.litGems.has(i) || trace.litShades.has(i)}
                     isDarkened={darkenedTile === i && tile.type === TILE.GEM}
                     calm={calm}
+                    theme={theme}
                   />
                 )}
               </group>

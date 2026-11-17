@@ -4,13 +4,13 @@ import { FacetedGem, FacetedLamp, FacetedMirror } from './Faceted.jsx';
 import { Marker, ShadeCrystal, Wall } from './Blocks.jsx';
 
 /** Each tile type's element; add a new piece here. Types without their own design get a plain marker. */
-export default function Piece({ tile, turn, isLit, isDarkened, calm }) {
+export default function Piece({ tile, turn, isLit, isDarkened, calm, theme }) {
   switch (tile.type) {
     case TILE.EMITTER:
-      return <FacetedLamp tile={tile} turn={turn} calm={calm} />;
+      return <FacetedLamp tile={tile} turn={turn} calm={calm} pieceColor={theme?.piece} pieceDeep={theme?.pieceDeep} />;
     case TILE.MIRROR:
     case TILE.SPLITTER:
-      return <FacetedMirror tile={tile} turn={turn} isRotatable={isRotatable(tile)} />;
+      return <FacetedMirror tile={tile} turn={turn} isRotatable={isRotatable(tile)} pieceColor={theme?.piece} />;
     case TILE.GEM:
       return <FacetedGem tile={tile} isLit={isLit} isDarkened={isDarkened} calm={calm} />;
     case TILE.WALL:

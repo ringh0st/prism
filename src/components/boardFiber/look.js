@@ -44,6 +44,9 @@ export const FLOORS = {
   sage: { board: '#5f9f78', cell: '#d3e9d3', cellAlt: '#bcdcc1' },
   stone: { board: '#b39a80', cell: '#f3eee6', cellAlt: '#e2d9cc' },
   cocoa: { board: '#3f2d29', cell: '#6e5248', cellAlt: '#5d443b' },
+  denim: { board: '#5e7fa3', cell: '#cbd8e5', cellAlt: '#b7c9db' },
+  teal: { board: '#3f8e8a', cell: '#cfe9e6', cellAlt: '#b6dcd8' },
+  twilight: { board: '#2e3f5c', cell: '#4c6080', cellAlt: '#42546f', piece: '#f2a67e', pieceDeep: '#d9845e' },
 };
 
 export const BEAM_COLORS = { sun: '#ffd23f', coral: '#ff6a4e', lime: '#8ad64a', sky: '#5cc4f0' };
