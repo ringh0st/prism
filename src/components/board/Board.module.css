@@ -7,6 +7,16 @@
   margin: 0 auto;
   padding: var(--pad);
   border-radius: var(--radius-xl);
+  /* The board's own palette (owner's pick): a teal tray, lavender tiles that turn honey-gold where light passes,
+     light blue mirror glass with a thin pink rim on honey turntables. Strong contrast so the light reads at once. */
+  --surface-board: #3a8c88;
+  --surface-cell: #b3b5e4;
+  --surface-cell-alt: #a6a9dc;
+  --plate-lit: #f7d47a;
+  --mirror-top: #e6f6fd;
+  --mirror-bottom: #9fd3ec;
+  --mirror-rim: #e8869f;
+  --pivot-fill: #eeae3e;
   /* A soft pool of sunlight on matte paper: light is shown as color, not bloom */
   --pool: rgba(255, 210, 63, 0.14);
   background: radial-gradient(80% 70% at 50% 40%, var(--pool), transparent 75%), var(--surface-board);
@@ -89,7 +99,7 @@
 
 /* Where the light passes, the tile catches its warm glow */
 .plateLit {
-  background: color-mix(in srgb, var(--color-honey) 26%, var(--surface-cell));
+  background: var(--plate-lit, color-mix(in srgb, var(--color-honey) 26%, var(--surface-cell)));
   box-shadow:
     var(--shadow-sm),
     0 0 10px rgba(255, 213, 74, 0.45);

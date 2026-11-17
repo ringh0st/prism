@@ -826,7 +826,7 @@ export default function PlayScreen({
           darkMoves={puzzle.taps.length}
           mood={modifier}
           label={t('play.boardLabel', { name: levelName })}
-          is3d={is3d || (settings.board3d !== false && supportsWebGL())}
+          is3d={is3d || (settings.board3dOn && supportsWebGL())}
         />
       </div>
 

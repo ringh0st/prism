@@ -25,7 +25,7 @@ const ART = {
       <path d="M3.5 8v8M20.5 8v8" />
     </>
   ),
-  board3d: (
+  board3dOn: (
     <>
       <path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z" />
       <path d="M4 7.5 12 12l8-4.5M12 12v9" />
@@ -51,7 +51,7 @@ export default function FeelToggles({ className = '' }) {
     { id: 'music', label: t('settings.music'), isOn: settings.music && settings.sound, isDisabled: !settings.sound },
     { id: 'haptics', label: t('settings.vibration'), isOn: settings.haptics },
     { id: 'calmBoard', label: t('settings.calm'), isOn: settings.calmBoard },
-    { id: 'board3d', label: t('settings.board3d'), isOn: settings.board3d !== false },
+    { id: 'board3dOn', label: t('settings.board3d'), isOn: Boolean(settings.board3dOn) },
   ];
   const flip = (id, isOn) => {
     updateSettings({ [id]: isOn });
