@@ -887,15 +887,111 @@ function LibPiece({ index }) {
   );
 }
 
+/* ---------------- Gem designs (the stones we light up) ---------------- */
+const GEM_COLORS = {
+  sun: { rich: '#ffb81f', pale: '#f3d98a', glow: '#ff9f10', shape: 'diamond' },
+  coral: { rich: '#ff6f61', pale: '#f2b2a8', glow: '#ff4f3f', shape: 'round' },
+  lime: { rich: '#5fcf5a', pale: '#b6dfab', glow: '#3fb83a', shape: 'triangle' },
+  sky: { rich: '#3fb2ec', pale: '#a9d6ef', glow: '#1f9be0', shape: 'square' },
+};
+/** A cut jewel whose outline from above is its color's shape: brilliant (8), round (16), trillion (3), princess (4). */
+function cutGeometry(shape, r = 0.2) {
+  // Each color has its own silhouette from every side, not just from above.
+  if (shape === 'round') { const g = new THREE.IcosahedronGeometry(r * 1.05, 1); g.scale(1, 0.92, 1); return g; }
+  if (shape === 'triangle') { const g = new THREE.ConeGeometry(r * 1.05, r * 2.3, 3); g.translate(0, r * 0.15, 0); g.rotateY(Math.PI / 6); return g; }
+  if (shape === 'square') { const g = new RoundedBoxGeometry(r * 1.55, r * 1.55, r * 1.55, 1, r * 0.22); g.rotateY(Math.PI / 4); return g; }
+  return lath([[0.001, -r * 1.05], [r, 0], [r, r * 0.1], [r * 0.62, r * 0.55], [0.001, r * 0.55]], 8);
+}
+function GemMaterial({ c, on }) {
+  return <meshPhysicalMaterial color={on ? c.rich : c.pale} roughness={on ? 0.03 : 0.25} clearcoat={1} clearcoatRoughness={0.05} flatShading iridescence={on ? 0.35 : 0.3} transmission={on ? 0.15 : 0.1} thickness={0.4} ior={2} emissive={c.glow} emissiveIntensity={on ? 0.75 : 0} />;
+}
+function LitGlow({ c, y, size = 1 }) {
+  return <><pointLight position={[0, y, 0]} color={c.rich} intensity={2.4} distance={1.7} /><Flare position={[0, y, 0]} size={0.95 * size} /><mesh position={[0, 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.6, 32]} /><meshBasicMaterial map={POOL} color={c.rich} transparent opacity={0.5} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh></>;
+}
+/** A · Crown setting: the jewel held in four brass claws on a small turned-wood pedestal. */
+function GemCrown({ c, on }) {
+  const geo = useMemo(() => cutGeometry(c.shape, 0.2), [c.shape]);
+  return (
+    <group>
+      <mesh geometry={lath([[0.001, 0], [0.24, 0], [0.25, 0.04], [0.17, 0.07], [0.12, 0.16], [0.14, 0.2], [0.001, 0.2]], 32)} castShadow><meshPhysicalMaterial color="#6b4430" roughness={0.4} clearcoat={0.8} /></mesh>
+      <mesh position={[0, 0.215, 0]}><cylinderGeometry args={[0.11, 0.13, 0.03, 24]} />{brassM()}</mesh>
+      {[0, 1, 2, 3].map((k) => { const a = k * Math.PI / 2 + Math.PI / 4; return <mesh key={k} position={[Math.cos(a) * 0.12, 0.31, Math.sin(a) * 0.12]} rotation={[Math.sin(a) * 0.35, 0, -Math.cos(a) * 0.35]}><cylinderGeometry args={[0.012, 0.016, 0.18, 6]} />{brassM()}</mesh>; })}
+      <mesh geometry={geo} position={[0, 0.44, 0]} castShadow><GemMaterial c={c} on={on} /></mesh>
+      {on && <LitGlow c={c} y={0.44} />}
+    </group>
+  );
+}
+/** B · Geode: a split-open stone with tiny crystals lining it and the jewel resting inside. */
+function GemGeode({ c, on }) {
+  const geo = useMemo(() => cutGeometry(c.shape, 0.17), [c.shape]);
+  const shell = useMemo(() => { const g = new THREE.SphereGeometry(0.3, 12, 8, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2); g.scale(1, 0.75, 1); return g; }, []);
+  return (
+    <group position={[0, 0.24, 0]}>
+      <mesh geometry={shell} castShadow><meshStandardMaterial color="#8d8478" roughness={1} flatShading side={THREE.DoubleSide} /></mesh>
+      <mesh position={[0, -0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.24, 0.3, 24]} /><meshStandardMaterial color="#c9bfb0" roughness={0.9} /></mesh>
+      {Array.from({ length: 14 }, (_, k) => { const a = (k / 14) * Math.PI * 2, rr = 0.2; return <mesh key={k} position={[Math.cos(a) * rr, -0.06, Math.sin(a) * rr]} rotation={[Math.sin(a) * -0.8, 0, Math.cos(a) * 0.8]}><coneGeometry args={[0.03, 0.12, 5]} /><meshPhysicalMaterial color={on ? c.rich : c.pale} roughness={0.1} flatShading emissive={c.glow} emissiveIntensity={on ? 0.25 : 0} /></mesh>; })}
+      <mesh geometry={geo} position={[0, 0.1, 0]} castShadow><GemMaterial c={c} on={on} /></mesh>
+      {on && <LitGlow c={c} y={0.12} />}
+    </group>
+  );
+}
+/** C · Bell jar: the jewel on a velvet cushion under a glass dome, on a stack of books. */
+function GemBellJar({ c, on }) {
+  const geo = useMemo(() => cutGeometry(c.shape, 0.14), [c.shape]);
+  const dome = useMemo(() => lath([[0.2, 0], [0.2, 0.3], [0.18, 0.38], [0.12, 0.44], [0.001, 0.46]], 40), []);
+  return (
+    <group>
+      <Book w={0.6} d={0.44} h={0.07} color="#7a3b33" rot={0.15} />
+      <group position={[0, 0.07, 0]}>
+        <mesh position={[0, 0.02, 0]}><cylinderGeometry args={[0.24, 0.25, 0.04, 32]} /><meshPhysicalMaterial color="#6b4430" roughness={0.35} clearcoat={0.8} /></mesh>
+        <mesh position={[0, 0.07, 0]} scale={[1, 0.45, 1]}><sphereGeometry args={[0.13, 20, 12]} /><meshStandardMaterial color="#5a2a3a" roughness={0.9} /></mesh>
+        <mesh geometry={geo} position={[0, 0.26, 0]}><GemMaterial c={c} on={on} /></mesh>
+        <mesh geometry={dome} position={[0, 0.04, 0]}><meshPhysicalMaterial color="#ffffff" roughness={0.02} transmission={0.95} thickness={0.02} transparent opacity={0.25} clearcoat={1} side={THREE.DoubleSide} depthWrite={false} /></mesh>
+        <mesh position={[0, 0.52, 0]}><sphereGeometry args={[0.025, 12, 8]} />{brassM()}</mesh>
+        {on && <LitGlow c={c} y={0.26} size={1.1} />}
+      </group>
+    </group>
+  );
+}
+/** D · Crystal bloom: the jewel rising out of a ring of crystal petals on a small stone. */
+function GemBloom({ c, on }) {
+  const geo = useMemo(() => cutGeometry(c.shape, 0.17), [c.shape]);
+  return (
+    <group>
+      <mesh position={[0, 0.06, 0]} scale={[1, 0.45, 1]}><dodecahedronGeometry args={[0.24, 0]} /><meshStandardMaterial color="#b9ad9c" roughness={1} flatShading /></mesh>
+      {Array.from({ length: 6 }, (_, k) => <group key={k} rotation={[0, (k / 6) * Math.PI * 2, 0]}><mesh position={[0, 0.17, 0.13]} rotation={[0.6, 0, 0]}><cylinderGeometry args={[0.012, 0.045, 0.22, 5]} /><meshPhysicalMaterial color={on ? c.rich : c.pale} roughness={0.08} flatShading clearcoat={1} emissive={c.glow} emissiveIntensity={on ? 0.45 : 0} /></mesh></group>)}
+      <mesh geometry={geo} position={[0, 0.36, 0]} castShadow><GemMaterial c={c} on={on} /></mesh>
+      {on && <LitGlow c={c} y={0.36} />}
+    </group>
+  );
+}
+const GEM_DESIGNS = [GemCrown, GemGeode, GemBellJar, GemBloom];
+function GemStudio({ design, color, on }) {
+  const Design = GEM_DESIGNS[design];
+  const ref = useRef();
+  useFrame((_, dt) => ref.current && (ref.current.rotation.y += dt * 0.0));
+  return (
+    <>
+      <color attach="background" args={['#3b2a22']} />
+      <hemisphereLight args={['#ffe6c4', '#3a2418', on ? 0.6 : 0.8]} />
+      <directionalLight position={[-3, 6, 4]} intensity={on ? 1.0 : 1.4} color="#ffe4bd" castShadow />
+      <mesh position={[0, -0.04, 0]} receiveShadow><boxGeometry args={[1.3, 0.08, 1.3]} /><meshStandardMaterial color="#8a3530" roughness={1} /></mesh>
+      <ParquetTile position={[0, 0.05, 0]} x={0} y={0} />
+      <group ref={ref} position={[0, 0.09, 0]} rotation={[0, 0.3, 0]}><Design c={GEM_COLORS[color]} on={on} /></group>
+    </>
+  );
+}
+
 const which = Number(new URLSearchParams(location.search).get('c') || 1);
 const pieceIndex = new URLSearchParams(location.search).get('piece');
-const Scene = pieceIndex !== null ? () => <LibPiece index={Number(pieceIndex)} /> : [ToyIsland, PaperCraft, GoldenGarden, AmberGrotto, LilyPond, Workshop, Library, LibraryAll][which - 1];
+const gemQ = new URLSearchParams(location.search).get('gem');
+const Scene = gemQ !== null ? () => { const [d, col, on] = gemQ.split(','); return <GemStudio design={Number(d)} color={col} on={on === '1'} />; } : pieceIndex !== null ? () => <LibPiece index={Number(pieceIndex)} /> : [ToyIsland, PaperCraft, GoldenGarden, AmberGrotto, LilyPond, Workshop, Library, LibraryAll][which - 1];
 const camMode = new URLSearchParams(location.search).get('cam');
 const close = camMode === 'close';
 const pair = camMode === 'mirrors';
 createRoot(document.getElementById('root')).render(
   <div style={{ width: '100vw', height: '100vh' }}>
-    <Canvas shadows dpr={2} frameloop={new URLSearchParams(location.search).get('still') ? 'demand' : 'always'} camera={{ fov: 30, position: pieceIndex !== null ? [1.3, 1.25, 1.6] : which === 8 && close ? [-1.2, 2.6, 4.6] : which === 8 ? [7.2, 9.8, 10.6] : pair ? [1.2, 1.5, 3.2] : close ? [0.6, 2.5, 3.9] : [6.2, 8.4, 9.2] }} onCreated={({ camera }) => (pieceIndex !== null ? camera.lookAt(0, 0.38, 0) : which === 8 && close ? camera.lookAt(-1.4, 0.2, 1.2) : pair ? camera.lookAt(1, 0.4, 0.5) : close ? camera.lookAt(-0.8, 0.35, 0.3) : camera.lookAt(0, -0.2, 0))}>
+    <Canvas shadows dpr={2} frameloop={new URLSearchParams(location.search).get('still') ? 'demand' : 'always'} camera={{ fov: 30, position: gemQ !== null ? [0.95, 0.95, 1.25] : pieceIndex !== null ? [1.3, 1.25, 1.6] : which === 8 && close ? [-1.2, 2.6, 4.6] : which === 8 ? [7.2, 9.8, 10.6] : pair ? [1.2, 1.5, 3.2] : close ? [0.6, 2.5, 3.9] : [6.2, 8.4, 9.2] }} onCreated={({ camera }) => (gemQ !== null ? camera.lookAt(0, 0.38, 0) : pieceIndex !== null ? camera.lookAt(0, 0.38, 0) : which === 8 && close ? camera.lookAt(-1.4, 0.2, 1.2) : pair ? camera.lookAt(1, 0.4, 0.5) : close ? camera.lookAt(-0.8, 0.35, 0.3) : camera.lookAt(0, -0.2, 0))}>
       <Env intensity={which === 2 ? 0.25 : 0.4} />
       <Scene />
       <EffectComposer multisampling={4}><Bloom mipmapBlur luminanceThreshold={1.2} intensity={0.8} radius={0.75} /><Vignette offset={0.3} darkness={0.35} /></EffectComposer>
