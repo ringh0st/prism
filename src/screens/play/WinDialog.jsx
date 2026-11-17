@@ -30,7 +30,7 @@ import { palName } from '../../i18n/palText.js';
 import { useCountUp } from '../../hooks/useCountUp.js';
 
 /** The headline's translation key. */
-function headlineFor({ stars, isSkipped, completesWorld, isFirstToday, milestone }, difficulty) {
+function headlineFor({ stars, isSkipped, completesWorld, isFirstToday, milestone }, difficulty, isRescue) {
   if (isSkipped) return 'win.skipped';
   if (isFirstToday) return 'win.dailyDone';
   if (milestone) return 'win.milestone';
@@ -38,6 +38,8 @@ function headlineFor({ stars, isSkipped, completesWorld, isFirstToday, milestone
   if (stars === 3 && difficulty === DIFFICULTY.EXTRA) return 'win.legendary';
   if (difficulty === DIFFICULTY.EXTRA) return 'win.bossBeaten';
   if (difficulty === DIFFICULTY.HARD) return 'win.hardBeaten';
+  // Themed worlds save Lumi's family instead of lighting gems.
+  if (isRescue) return 'win.allHomeSafe';
   if (stars === 3) return 'win.brilliant';
   if (stars === 2) return 'win.great';
   return 'win.solved';
@@ -71,6 +73,7 @@ export default function WinDialog({
   result,
   par,
   difficulty,
+  isRescue = false,
   cap = null,
   showWinGifts = false,
   hotStreak = 0,
@@ -118,7 +121,7 @@ export default function WinDialog({
   }, [stars, sparksEarned, diamondsEarned, completesWorld, milestone, palGrewTo, isFirstToday]);
 
   return (
-    <Dialog title={t(headlineFor(result, difficulty), { count: milestone })} tone="celebrate" onClose={onMap} closesOnBackdrop={false}>
+    <Dialog title={t(headlineFor(result, difficulty, isRescue), { count: milestone })} tone="celebrate" onClose={onMap} closesOnBackdrop={false}>
       {milestone && (
         // A milestone on the whole road: a trophy with the number of levels solved.
         <p className={`game-title ${styles.milestone}`} aria-hidden="true">

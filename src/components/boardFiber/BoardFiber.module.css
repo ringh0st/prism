@@ -1,0 +1,21 @@
+.stage {
+  position: absolute;
+  inset: 0;
+}
+
+.reset {
+  position: absolute;
+  z-index: 4;
+  bottom: -6px;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  font-size: 20px;
+  color: var(--text-strong);
+  background: var(--surface-card, #fffdf8);
+  box-shadow: 0 2px 0 rgba(43, 33, 24, 0.18);
+  transform: translateX(-50%);
+  cursor: pointer;
+}

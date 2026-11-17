@@ -187,6 +187,8 @@
 
 /* In 3D each cell's button is placed over its piece (Board3D measures where), so the grid is just a frame. */
 .cells3d {
+  /* Touches go to the 3D scene underneath; the buttons are for the keyboard and screen readers. */
+  pointer-events: none;
   position: absolute;
   inset: 0;
   display: block;
@@ -368,6 +370,11 @@
   background: rgb(240 193 78 / 0.32);
   animation: lookHere 1.8s ease-in-out infinite;
   pointer-events: none;
+}
+
+/* In 3D the hint glow is drawn on the tiles themselves (a flat square would float over the pieces). */
+.cells3d .lookHere::before {
+  display: none;
 }
 
 @keyframes lookHere {

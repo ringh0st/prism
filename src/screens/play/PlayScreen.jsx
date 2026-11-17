@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supportsWebGL } from '../../lib/webgl.js';
+import { boardThemeFor } from '../../game/boardThemes.js';
 import Board from '../../components/board/Board.jsx';
 import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
@@ -7,7 +8,7 @@ import ScreenTitle from '../../components/game/ScreenTitle.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
 import SpeechBox from '../../components/game/SpeechBox.jsx';
 import { celebrate } from '../../lib/effects.js';
-import GemShape from '../../components/GemShape.jsx';
+import TargetIcon from '../../components/game/TargetIcon.jsx';
 import Stars from '../../components/Stars.jsx';
 import HelperBar from '../../components/HelperBar.jsx';
 import QuickBuyDialog from '../../components/QuickBuyDialog.jsx';
@@ -46,7 +47,7 @@ import { dailyShareText } from '../../game/share.js';
 import { PUBLIC_GAME_URL } from '../../lib/config.js';
 import { levelModifierFor } from '../../game/surprises.js';
 import { quipLines } from '../../game/quips.js';
-import { useI18n } from '../../i18n/I18nContext.jsx';
+import { RescueWording, useI18n } from '../../i18n/I18nContext.jsx';
 import { flavorText, levelTitle, pieceText, worldName } from '../../i18n/gameText.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
 import { PIECE_FIRST_LEVEL, firstTileOf, newPiecesIn, pieceCellOf, piecesMetIn } from '../../game/pieces.js';
@@ -114,17 +115,7 @@ function piecesToIntroduce(level, mode, progress) {
  * | 'challenge' (a friend's "beat my score" link: no helpers, records nothing; `challenge` is { levelId, moves, name })
  * | 'rush' (Light Rush: no helpers, the run's spare moves set the limit; `rush` is from RushRoute)
  */
-export default function PlayScreen({
-  level,
-  mode = 'level',
-  title,
-  backHref = '#/',
-  nextLevel = null,
-  dateKey,
-  challenge = null,
-  rush = null,
-  is3d = false,
-}) {
+function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey, challenge = null, rush = null, is3d = false }) {
   const { progress, settings, finishLevel, finishDaily, finishEventLevel, consumeHelper, endWinStreak } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
@@ -789,7 +780,7 @@ export default function PlayScreen({
         <ul className={styles.gems} aria-label={t('play.gemsLit', { n: trace.litGems.size, total: gems.length })}>
           {gems.map(({ tile, i }) => (
             <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff} data-gem-slot={i}>
-              <GemShape color={tile.color} size={24} />
+              <TargetIcon color={tile.color} size={24} />
             </li>
           ))}
         </ul>
@@ -826,7 +817,7 @@ export default function PlayScreen({
           darkMoves={puzzle.taps.length}
           mood={modifier}
           label={t('play.boardLabel', { name: levelName })}
-          is3d={is3d || (settings.board3d !== false && supportsWebGL())}
+          is3d={is3d || ((Boolean(boardThemeFor(level)) || settings.board3d !== false) && supportsWebGL())}
         />
       </div>
 
@@ -976,6 +967,7 @@ export default function PlayScreen({
           result={result}
           par={level.par}
           difficulty={level.difficulty}
+          isRescue={Boolean(boardThemeFor(level))}
           cap={
             starCap < 3
               ? { stars: starCap, icon: bonusMoves > 0 && starCap === 1 ? 'plus' : (toolFor(puzzle.usedHelpers.at(-1))?.icon ?? 'hint') }
@@ -1003,5 +995,14 @@ export default function PlayScreen({
         />
       )}
     </main>
+  );
+}
+
+/** A level; in themed worlds every line and icon talks about saving Lumis instead of lighting gems. */
+export default function PlayScreen(props) {
+  return (
+    <RescueWording isOn={Boolean(boardThemeFor(props.level))}>
+      <PlayScreenBody {...props} />
+    </RescueWording>
   );
 }
