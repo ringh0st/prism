@@ -5,7 +5,7 @@ import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
 import LumiSays from '../../components/game/LumiSays.jsx';
-import GemShape from '../../components/GemShape.jsx';
+import TargetIcon from '../../components/game/TargetIcon.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import TapIcon from './TapIcon.jsx';
 import { SmudgeArt } from '../../components/board/darkTileArt.jsx';
@@ -121,7 +121,7 @@ export default function LevelIntro({
           <span className={styles.gems}>
             {gems.map((gem, i) => (
               <span key={i} className={styles.gem} style={{ '--i': i }}>
-                <GemShape color={gem.color} size={40} />
+                <TargetIcon color={gem.color} size={40} />
               </span>
             ))}
           </span>
