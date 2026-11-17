@@ -1049,28 +1049,56 @@ function AntennaTip({ shape, color, on }) {
 function LumiKin({ color = 'sun', age = 'kid', on }) {
   const tint = FAMILY_TINT[color];
   const shape = GEM_COLORS[color].shape;
-  const size = { baby: 0.62, kid: 0.8, girl: 0.8, mom: 1, dad: 1.05, grandma: 0.95 }[age];
+  const size = 1.3 * { baby: 0.62, kid: 0.8, girl: 0.8, mom: 1, dad: 1.05, grandma: 0.95 }[age];
   const body = on ? tint.body : grey(tint.body, 0.55);
+  const belly = new THREE.Color(body).lerp(new THREE.Color('#fff6e8'), 0.55);
   const R = 0.18;
-  const eye = (x) => on
-    ? <group key={x} position={[x, 0.03, R * 0.9]}><mesh><sphereGeometry args={[0.026, 14, 10]} /><meshStandardMaterial color={OUTLINE} roughness={0.3} /></mesh><mesh position={[0.008, 0.01, 0.02]}><sphereGeometry args={[0.009, 8, 6]} /><meshBasicMaterial color="#fff" /></mesh></group>
-    : <mesh key={x} position={[x, 0.02, R * 0.93]} rotation={[0, 0, Math.PI]}><torusGeometry args={[0.02, 0.006, 6, 12, Math.PI]} /><meshStandardMaterial color={OUTLINE} /></mesh>;
+  const lashes = age === 'girl' || age === 'mom' || age === 'grandma';
+  const lift = on ? 0.07 : 0; // a happy hop when saved
+  const eye = (x) =>
+    on ? (
+      <group key={x} position={[x, 0.035, R * 0.9]}>
+        <mesh scale={[1, 1.25, 0.6]}><sphereGeometry args={[0.032, 16, 12]} /><meshStandardMaterial color={OUTLINE} roughness={0.25} /></mesh>
+        <mesh position={[0.01, 0.014, 0.02]}><sphereGeometry args={[0.011, 8, 6]} /><meshBasicMaterial color="#fff" /></mesh>
+        <mesh position={[-0.008, -0.012, 0.02]}><sphereGeometry args={[0.005, 6, 4]} /><meshBasicMaterial color="#fff" /></mesh>
+        {lashes && <mesh position={[x > 0 ? 0.03 : -0.03, 0.03, 0]} rotation={[0, 0, x > 0 ? -0.6 : 0.6]}><boxGeometry args={[0.022, 0.006, 0.006]} /><meshStandardMaterial color={OUTLINE} /></mesh>}
+      </group>
+    ) : (
+      <mesh key={x} position={[x, 0.025, R * 0.94]} rotation={[0, 0, Math.PI]}><torusGeometry args={[0.022, 0.006, 6, 14, Math.PI]} /><meshStandardMaterial color={OUTLINE} /></mesh>
+    );
+  const limb = <meshPhysicalMaterial color={body} roughness={0.45} clearcoat={0.5} />;
   return (
     <group scale={size}>
-      <group position={[0, 0.32, 0]}>
+      <group position={[0, 0.32 + lift, 0]}>
         {/* wings */}
-        {[-1, 1].map((sx) => <mesh key={sx} position={[sx * 0.15, 0.06, -0.08]} rotation={[0.2, sx * 0.5, sx * 0.4]} scale={[1, 0.6, 0.2]}><sphereGeometry args={[0.13, 16, 10]} /><meshPhysicalMaterial color="#e4f5ef" transparent opacity={on ? 0.75 : 0.4} roughness={0.2} /></mesh>)}
-        {/* glowing tail bulb */}
-        <mesh position={[0, -0.2, -0.02]} scale={[1, 0.9, 1]}><sphereGeometry args={[0.1, 20, 14]} /><meshPhysicalMaterial color={on ? tint.glow : grey(tint.glow, 0.7)} roughness={0.2} clearcoat={1} emissive={tint.glow} emissiveIntensity={on ? 1.4 : 0} /></mesh>
-        {/* round head-body */}
-        <mesh castShadow><sphereGeometry args={[R, 32, 24]} /><meshPhysicalMaterial color={body} roughness={0.45} clearcoat={0.6} /></mesh>
-        <mesh position={[-0.05, 0.08, 0.13]}><sphereGeometry args={[0.03, 10, 8]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.6} /></mesh>
-        {eye(-0.06)}{eye(0.06)}
-        {/* cheeks and mouth */}
-        {[-0.1, 0.1].map((x) => <mesh key={x} position={[x, -0.02, R * 0.84]} rotation={[0, x * 4, 0]}><circleGeometry args={[0.025, 16]} /><meshBasicMaterial color="#ff8a7a" transparent opacity={on ? 0.8 : 0.35} /></mesh>)}
-        {on
-          ? <mesh position={[0, -0.04, R * 0.95]} rotation={[0, 0, Math.PI]}><torusGeometry args={[0.03, 0.008, 6, 14, Math.PI]} /><meshStandardMaterial color={OUTLINE} /></mesh>
-          : <mesh position={[0, -0.055, R * 0.95]}><torusGeometry args={[0.018, 0.006, 6, 12, Math.PI]} /><meshStandardMaterial color={OUTLINE} /></mesh>}
+        {[-1, 1].map((sx) => <mesh key={sx} position={[sx * 0.15, 0.07, -0.09]} rotation={[0.2, sx * 0.5, sx * (on ? 0.7 : 0.3)]} scale={[1, 0.6, 0.18]}><sphereGeometry args={[0.13, 18, 12]} /><meshPhysicalMaterial color="#e4f5ef" transparent opacity={on ? 0.8 : 0.4} roughness={0.15} iridescence={0.6} /></mesh>)}
+        {/* striped firefly tail that glows */}
+        <group position={[0, -0.19, -0.03]}>
+          <mesh scale={[1, 0.9, 1]}><sphereGeometry args={[0.1, 24, 16]} /><meshPhysicalMaterial color={on ? tint.glow : grey(tint.glow, 0.7)} roughness={0.2} clearcoat={1} emissive={tint.glow} emissiveIntensity={on ? 1.4 : 0} /></mesh>
+          {[0.03, -0.02].map((y) => <mesh key={y} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[Math.sqrt(0.01 - y * y) * 1.0, 0.007, 6, 28]} /><meshStandardMaterial color={on ? '#fff6dc' : '#9a948c'} /></mesh>)}
+        </group>
+        {/* feet */}
+        {[-1, 1].map((sx) => <mesh key={sx} position={[sx * 0.07, -0.17, 0.08]} scale={[1, 0.6, 1.3]}><sphereGeometry args={[0.035, 12, 8]} />{limb}</mesh>)}
+        {/* arms: down and sleepy when trapped, up and waving when saved */}
+        {[-1, 1].map((sx) => (
+          <group key={sx} position={[sx * 0.16, -0.03, 0.05]} rotation={[0, 0, sx * (on ? -2.3 : -0.35)]}>
+            <mesh position={[0, -0.05, 0]}><capsuleGeometry args={[0.025, 0.06, 4, 10]} />{limb}</mesh>
+          </group>
+        ))}
+        {/* round head-body with a lighter belly */}
+        <mesh castShadow><sphereGeometry args={[R, 40, 28]} /><meshPhysicalMaterial color={body} roughness={0.4} clearcoat={0.7} clearcoatRoughness={0.3} sheen={0.6} sheenColor="#ffffff" /></mesh>
+        <mesh position={[0, -0.07, 0.11]} scale={[1, 0.75, 0.5]}><sphereGeometry args={[0.1, 20, 14]} /><meshPhysicalMaterial color={belly} roughness={0.5} /></mesh>
+        <mesh position={[-0.06, 0.09, 0.13]}><sphereGeometry args={[0.032, 10, 8]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.55} /></mesh>
+        {eye(-0.062)}{eye(0.062)}
+        {[-0.105, 0.105].map((x) => <mesh key={x} position={[x, -0.015, R * 0.83]} rotation={[0, x * 4.5, 0]}><circleGeometry args={[0.03, 20]} /><meshBasicMaterial color="#ff8a8a" transparent opacity={on ? 0.75 : 0.3} /></mesh>)}
+        {on ? (
+          <group position={[0, -0.04, R * 0.95]}>
+            <mesh rotation={[0, 0, Math.PI]}><circleGeometry args={[0.032, 20, 0, Math.PI]} /><meshStandardMaterial color="#7a2a22" side={THREE.DoubleSide} /></mesh>
+            <mesh position={[0, -0.018, 0.001]} scale={[1, 0.5, 1]}><circleGeometry args={[0.016, 14]} /><meshStandardMaterial color="#ff8f8f" /></mesh>
+          </group>
+        ) : (
+          <mesh position={[0, -0.06, R * 0.95]}><torusGeometry args={[0.018, 0.006, 6, 12, Math.PI]} /><meshStandardMaterial color={OUTLINE} /></mesh>
+        )}
         {/* antennae with the color's shape on the tips */}
         {(age === 'baby' ? [0] : [-1, 1]).map((sx) => (
           <group key={sx} position={[sx * 0.07, R * 0.85, 0]} rotation={[0, 0, -sx * 0.35]}>
@@ -1079,18 +1107,19 @@ function LumiKin({ color = 'sun', age = 'kid', on }) {
           </group>
         ))}
         {/* who they are */}
-        {age === 'baby' && <><mesh position={[0, -0.05, R * 0.98]}><torusGeometry args={[0.02, 0.008, 8, 16]} /><meshStandardMaterial color="#9fd8cf" /></mesh><mesh position={[0, -0.05, R * 0.94]}><sphereGeometry args={[0.022, 10, 8]} /><meshStandardMaterial color="#f6d8e4" /></mesh></>}
+        {age === 'baby' && <><mesh position={[0, -0.05, R * 0.98]}><torusGeometry args={[0.02, 0.008, 8, 16]} /><meshStandardMaterial color="#9fd8cf" /></mesh><mesh position={[0, -0.05, R * 0.94]}><sphereGeometry args={[0.022, 10, 8]} /><meshStandardMaterial color="#f6d8e4" /></mesh><mesh position={[0.02, R * 0.97, 0.03]} rotation={[0, 0, -0.6]}><torusGeometry args={[0.025, 0.007, 6, 14, Math.PI * 1.4]} /><meshPhysicalMaterial color={body} /></mesh></>}
         {(age === 'girl' || age === 'mom') && <group position={[0.11, 0.13, 0.05]} rotation={[0, 0, -0.5]}>{[-1, 1].map((sx) => <mesh key={sx} position={[sx * 0.035, 0, 0]} rotation={[0, 0, sx * Math.PI / 2]}><coneGeometry args={[0.03, 0.06, 12]} /><meshStandardMaterial color="#ee6f9a" /></mesh>)}<mesh><sphereGeometry args={[0.018, 10, 8]} /><meshStandardMaterial color="#d9547e" /></mesh></group>}
-        {age === 'mom' && [-0.06, -0.03, 0, 0.03, 0.06].map((x, k) => <mesh key={k} position={[x, -0.13 - Math.cos(x * 12) * -0.012, 0.115 + Math.cos(x * 8) * 0.01]}><sphereGeometry args={[0.012, 8, 6]} /><meshStandardMaterial color="#fff7ec" roughness={0.2} /></mesh>)}
-        {age === 'dad' && <group position={[0, -0.16, 0.12]}>{[-1, 1].map((sx) => <mesh key={sx} position={[sx * 0.03, 0, 0]} rotation={[0, 0, sx * Math.PI / 2]}><coneGeometry args={[0.025, 0.05, 4]} /><meshStandardMaterial color="#3f6b8c" /></mesh>)}<mesh><sphereGeometry args={[0.014, 8, 6]} /><meshStandardMaterial color="#2f5470" /></mesh></group>}
-        {age === 'dad' && <mesh position={[0, -0.025, R * 0.97]} scale={[1.8, 0.5, 0.6]}><sphereGeometry args={[0.02, 10, 8]} /><meshStandardMaterial color="#7a5232" /></mesh>}
+        {age === 'mom' && [-0.06, -0.03, 0, 0.03, 0.06].map((x, k) => <mesh key={k} position={[x, -0.128 + Math.abs(x) * 0.25, 0.12 - Math.abs(x) * 0.3]}><sphereGeometry args={[0.012, 8, 6]} /><meshStandardMaterial color="#fff7ec" roughness={0.2} /></mesh>)}
+        {age === 'dad' && <group position={[0, -0.15, 0.12]}>{[-1, 1].map((sx) => <mesh key={sx} position={[sx * 0.03, 0, 0]} rotation={[0, 0, sx * Math.PI / 2]}><coneGeometry args={[0.025, 0.05, 4]} /><meshStandardMaterial color="#3f6b8c" /></mesh>)}<mesh><sphereGeometry args={[0.014, 8, 6]} /><meshStandardMaterial color="#2f5470" /></mesh></group>}
+        {age === 'dad' && <mesh position={[0, -0.022, R * 0.97]} scale={[1.8, 0.5, 0.6]}><sphereGeometry args={[0.02, 10, 8]} /><meshStandardMaterial color="#7a5232" /></mesh>}
         {age === 'kid' && <group position={[0, R * 0.78, 0.02]} rotation={[-0.25, 0, 0]}><mesh scale={[1, 0.55, 1]}><sphereGeometry args={[0.14, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2]} /><meshStandardMaterial color="#e86f5a" /></mesh><mesh position={[0, 0, 0.12]} rotation={[-0.15, 0, 0]} scale={[1, 0.15, 0.7]}><cylinderGeometry args={[0.1, 0.1, 0.05, 20, 1, false, -Math.PI / 2, Math.PI]} /><meshStandardMaterial color="#e86f5a" /></mesh></group>}
-        {age === 'grandma' && <><mesh position={[0, R * 0.95, -0.04]}><sphereGeometry args={[0.07, 16, 12]} /><meshStandardMaterial color="#e9e4dc" /></mesh>{[-0.06, 0.06].map((x) => <mesh key={x} position={[x, 0.03, R * 0.98]}><torusGeometry args={[0.035, 0.006, 6, 20]} />{brassM()}</mesh>)}<mesh position={[0, 0.03, R * 0.99]}><boxGeometry args={[0.04, 0.008, 0.008]} />{brassM()}</mesh></>}
+        {age === 'grandma' && <><mesh position={[0, R * 0.95, -0.04]}><sphereGeometry args={[0.07, 16, 12]} /><meshStandardMaterial color="#e9e4dc" /></mesh>{[-0.062, 0.062].map((x) => <mesh key={x} position={[x, 0.035, R * 0.99]}><torusGeometry args={[0.038, 0.006, 6, 20]} />{brassM()}</mesh>)}<mesh position={[0, 0.035, R * 0.99]}><boxGeometry args={[0.04, 0.008, 0.008]} />{brassM()}</mesh></>}
       </group>
-      {/* trapped: a smoky shadow bubble; saved: free, glowing, with sparkles */}
-      {!on && <mesh position={[0, 0.3, 0]}><sphereGeometry args={[0.36, 32, 24]} /><meshPhysicalMaterial color="#2b2430" roughness={0.3} clearcoat={1} transparent opacity={0.5} depthWrite={false} /></mesh>}
-      {!on && [0, 1, 2].map((k) => <mesh key={k} position={[0, 0.3, 0]} rotation={[k * 0.9, k * 1.3, 0]}><torusGeometry args={[0.33, 0.012, 6, 40, Math.PI * 0.8]} /><meshBasicMaterial color="#4a3f4e" transparent opacity={0.7} /></mesh>)}
-      {on && <><pointLight position={[0, 0.15, 0.1]} color={tint.glow} intensity={2.2} distance={1.6} /><Flare position={[0, 0.14, -0.02]} size={0.7} /><Glint position={[0.24, 0.55, 0.1]} size={0.18} /><Glint position={[-0.22, 0.42, 0.12]} size={0.12} /><mesh position={[0, -0.28, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.5, 32]} /><meshBasicMaterial map={POOL} color={tint.glow} transparent opacity={0.45} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh></>}
+      {/* trapped: a soft swirling shadow bubble */}
+      {!on && <mesh position={[0, 0.31, 0]}><sphereGeometry args={[0.38, 40, 28]} /><meshPhysicalMaterial color="#2e2833" roughness={0.25} clearcoat={1} iridescence={0.4} transparent opacity={0.42} depthWrite={false} /></mesh>}
+      {!on && [0, 1, 2, 3].map((k) => <mesh key={k} position={[0, 0.31, 0]} rotation={[k * 0.8, k * 1.4, k * 0.3]}><torusGeometry args={[0.35 - k * 0.02, 0.01, 6, 48, Math.PI * (0.5 + k * 0.15)]} /><meshBasicMaterial color="#5a4d5e" transparent opacity={0.55} /></mesh>)}
+      {!on && <mesh position={[0.2, 0.62, 0.1]}><sphereGeometry args={[0.035, 10, 8]} /><meshBasicMaterial color="#5a4d5e" transparent opacity={0.5} /></mesh>}
+      {on && <><pointLight position={[0, 0.2, 0.1]} color={tint.glow} intensity={2.2} distance={1.6} /><Flare position={[0, 0.2, -0.02]} size={0.75} /><Glint position={[0.26, 0.6, 0.1]} size={0.18} /><Glint position={[-0.24, 0.48, 0.12]} size={0.12} /><mesh position={[0, -0.28, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.5, 32]} /><meshBasicMaterial map={POOL} color={tint.glow} transparent opacity={0.45} blending={THREE.AdditiveBlending} depthWrite={false} /></mesh></>}
     </group>
   );
 }
@@ -1117,7 +1146,7 @@ const close = camMode === 'close';
 const pair = camMode === 'mirrors';
 createRoot(document.getElementById('root')).render(
   <div style={{ width: '100vw', height: '100vh' }}>
-    <Canvas shadows dpr={2} frameloop={new URLSearchParams(location.search).get('still') ? 'demand' : 'always'} camera={{ fov: 30, position: kinQ !== null ? [0.5, 0.75, 1.5] : gemQ !== null ? [0.95, 0.95, 1.25] : pieceIndex !== null ? [1.3, 1.25, 1.6] : which === 8 && close ? [-1.2, 2.6, 4.6] : which === 8 ? [7.2, 9.8, 10.6] : pair ? [1.2, 1.5, 3.2] : close ? [0.6, 2.5, 3.9] : [6.2, 8.4, 9.2] }} onCreated={({ camera }) => (kinQ !== null ? camera.lookAt(0, 0.4, 0) : gemQ !== null ? camera.lookAt(0, 0.38, 0) : pieceIndex !== null ? camera.lookAt(0, 0.38, 0) : which === 8 && close ? camera.lookAt(-1.4, 0.2, 1.2) : pair ? camera.lookAt(1, 0.4, 0.5) : close ? camera.lookAt(-0.8, 0.35, 0.3) : camera.lookAt(0, -0.2, 0))}>
+    <Canvas shadows dpr={2} frameloop={new URLSearchParams(location.search).get('still') ? 'demand' : 'always'} camera={{ fov: 30, position: kinQ !== null ? [0.55, 0.95, 1.95] : gemQ !== null ? [0.95, 0.95, 1.25] : pieceIndex !== null ? [1.3, 1.25, 1.6] : which === 8 && close ? [-1.2, 2.6, 4.6] : which === 8 ? [7.2, 9.8, 10.6] : pair ? [1.2, 1.5, 3.2] : close ? [0.6, 2.5, 3.9] : [6.2, 8.4, 9.2] }} onCreated={({ camera }) => (kinQ !== null ? camera.lookAt(0, 0.5, 0) : gemQ !== null ? camera.lookAt(0, 0.38, 0) : pieceIndex !== null ? camera.lookAt(0, 0.38, 0) : which === 8 && close ? camera.lookAt(-1.4, 0.2, 1.2) : pair ? camera.lookAt(1, 0.4, 0.5) : close ? camera.lookAt(-0.8, 0.35, 0.3) : camera.lookAt(0, -0.2, 0))}>
       <Env intensity={which === 2 ? 0.25 : 0.4} />
       <Scene />
       <EffectComposer multisampling={4}><Bloom mipmapBlur luminanceThreshold={1.2} intensity={0.8} radius={0.75} /><Vignette offset={0.3} darkness={0.35} /></EffectComposer>
