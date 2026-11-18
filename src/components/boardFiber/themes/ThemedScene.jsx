@@ -24,6 +24,8 @@ function themedPiece(pieces, tile) {
       return isRotatable(tile) ? pieces.mirror : pieces.fixedMirror;
     case TILE.SPLITTER:
       return isRotatable(tile) ? pieces.splitter : pieces.fixedSplitter;
+    case TILE.FILTER:
+      return pieces.filter;
     case TILE.WALL:
       return pieces.wall;
     default:

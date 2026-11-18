@@ -2,6 +2,8 @@
  * The looks of the themed boards: for each theme its room, the tile you tap, its pieces and its light. A piece a
  * theme hasn't drawn yet falls back to the plain board's piece (ThemedScene).
  */
+import { CrystalSplitter, PillarCrystal, PillarShield, ShieldMirror, StainedGlassTower, StoneBlocks, Torch } from '../castle/CastlePieces.jsx';
+import { CASTLE_HEIGHT, CASTLE_PAD, CastleRoom, Flagstone } from '../castle/CastleRoom.jsx';
 import { BankerLamp, BookStack, FixedMirror, GearMirror } from '../library/LibraryPieces.jsx';
 import { LibraryRoom, ParquetTile, ROOM_HEIGHT, ROOM_PAD } from '../library/LibraryRoom.jsx';
 import { CandleLantern, LogPile, PondFixedMirror, PondFixedSplitter, PondMirror, PondSplitter } from '../pond/PondPieces.jsx';
@@ -28,5 +30,24 @@ export const THEME_LOOKS = {
     light: { sky: '#fff6e0', ground: '#5f8a66', fill: 0.8, sun: 1.35 },
     // The window's wall behind the pond: a soft meadow morning.
     wall: 'linear-gradient(180deg, #f3f1df, #dfead0)',
+  },
+  castle: {
+    Room: CastleRoom,
+    Tile: Flagstone,
+    tileY: 0.05,
+    tileTop: 0.09,
+    pieces: {
+      lamp: Torch,
+      mirror: ShieldMirror,
+      fixedMirror: PillarShield,
+      splitter: CrystalSplitter,
+      fixedSplitter: PillarCrystal,
+      filter: StainedGlassTower,
+      wall: StoneBlocks,
+    },
+    room: { pad: CASTLE_PAD, height: CASTLE_HEIGHT },
+    light: { sky: '#fff1dc', ground: '#6b6258', fill: 0.75, sun: 1.3 },
+    // The window's wall behind the castle: a warm evening sky.
+    wall: 'linear-gradient(180deg, #fdf0e6, #f9dcd6)',
   },
 };
