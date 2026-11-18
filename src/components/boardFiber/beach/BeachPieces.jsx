@@ -1,5 +1,5 @@
 /*
- * The Beach theme's pieces (in preview): a lighthouse for the light, mirrors in white frames that turn on a
+ * The Beach theme's pieces: a lighthouse for the light, mirrors in white frames that turn on a
  * life ring (or stand on a sandcastle in a teal frame when they can't), amber glass in coral frames for splitters,
  * glass fishing floats on a coil of rope for color glass, and rows of striped beach huts that join up as walls.
  */

@@ -1,5 +1,5 @@
 /*
- * The Beach the board sits on (in preview), as a little model: a sandbar in a turquoise sea, sand tiles with
+ * The Beach the board sits on, as a little model: a sandbar in a turquoise sea, sand tiles with
  * ripples, shells and pebbles (light warms them), and a palm, a parasol, a starfish and a beach ball around it.
  */
 import { useMemo } from 'react';

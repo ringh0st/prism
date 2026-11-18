@@ -14,7 +14,7 @@ const pondLevels = themedLevels.filter((level) => boardThemeFor(level) === 'pond
 
 test('the themes take turns: every one is used, never the same twice in a row, and only in the themed worlds', () => {
   const themes = themedLevels.map(boardThemeFor);
-  THEMES_IN_PLAY.forEach((theme) => assert.ok(themes.filter((used) => used === theme).length >= 12, theme));
+  THEMES_IN_PLAY.forEach((theme) => assert.ok(themes.filter((used) => used === theme).length >= 60 / THEMES_IN_PLAY.length - 6, theme));
   themes.forEach((theme, n) => assert.notEqual(theme, themes[n - 1]));
   assert.equal(boardThemeFor({ id: 'w4-01', world: 4, index: 1, tiles: [] }), null);
   assert.equal(boardThemeFor({ id: 'daily', tiles: [] }), null);
