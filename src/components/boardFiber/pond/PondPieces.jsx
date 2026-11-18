@@ -1,17 +1,17 @@
 /*
  * The Pond theme's pieces: a candle lantern for the light (a real little flame), mirrors framed in green reeds that
  * turn on a water-lily flower (or stand on a mossy stone when they can't), clear amber glass in the same frame for
- * splitters, and piles of logs as walls. Turning pieces swing a quarter turn with a springy GSAP ease, their flower
+ * splitters, and stacks of logs that join up as walls. Turning pieces swing a quarter turn with a springy GSAP ease, their flower
  * with them.
  */
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import * as THREE from 'three';
+import { TILE } from '../../../game/constants.js';
 import { DIRECTION_ANGLE, RoundMirror, mirrorAngle } from '../library/LibraryPieces.jsx';
 import Flame from '../themes/Flame.jsx';
 import { brassM, mirrorM } from '../themes/shared.jsx';
 
-const BARK = '#6b4a32';
 const WOOD = '#a8774a';
 /** The mirror's frame: green reed stems, with cattail-brown beads for the knobs. */
 const reedM = (color = '#5f8f4e') => <meshStandardMaterial color={color === '#e8c06a' ? '#6b4630' : color} roughness={0.7} />;
@@ -119,41 +119,76 @@ export const PondFixedSplitter = ({ turn }) => (
   </OnStone>
 );
 
-/** One log lying on its side: bark, with pale cut ends. */
-function Log({ position, length = 0.72, radius = 0.13, turn = 0 }) {
+const LOG_RADIUS = 0.166;
+const BARKS = ['#6b4a32', '#7a5638', '#5f4029'];
+
+/** One log lying along x, a full square long; a pale cut end shows only where the wall ends (`ends`: [-1, 1]). */
+function Log({ position, bark, ends }) {
   return (
-    <group position={position} rotation={[0, turn, 0]}>
+    <group position={position}>
       <mesh rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow>
-        <cylinderGeometry args={[radius, radius, length, 14]} />
-        <meshStandardMaterial color={BARK} roughness={0.9} />
+        <cylinderGeometry args={[LOG_RADIUS, LOG_RADIUS, 1, 14]} />
+        <meshStandardMaterial color={bark} roughness={0.9} />
       </mesh>
-      {[-1, 1].map((side) => (
-        <mesh key={side} position={[(side * length) / 2 + side * 0.002, 0, 0]} rotation={[0, (side * Math.PI) / 2, 0]}>
-          <circleGeometry args={[radius * 0.86, 14]} />
-          <meshStandardMaterial color="#e2c08f" roughness={0.8} />
-        </mesh>
+      {ends.map((side) => (
+        <group key={side} position={[side * 0.502, 0, 0]} rotation={[0, (side * Math.PI) / 2, 0]}>
+          <mesh>
+            <circleGeometry args={[LOG_RADIUS * 0.9, 14]} />
+            <meshStandardMaterial color="#e2c08f" roughness={0.8} />
+          </mesh>
+          <mesh position={[0, 0, 0.001]}>
+            <ringGeometry args={[LOG_RADIUS * 0.35, LOG_RADIUS * 0.45, 14]} />
+            <meshStandardMaterial color="#c79f6a" roughness={0.8} />
+          </mesh>
+        </group>
       ))}
     </group>
   );
 }
 
-/** A wall: a little pile of logs, with a mushroom growing on top. */
-export function LogPile() {
+/**
+ * A wall: a stack of logs that fills its whole square, so log walls on neighboring squares join into one long wall
+ * (like a beaver's dam). The logs run along the wall, cut ends show only where it stops, and moss grows on top.
+ */
+export function LogWall({ tile, level }) {
+  const isWall = (dx, dy) => level.tiles.some((other) => other.type === TILE.WALL && other.x === tile.x + dx && other.y === tile.y + dy);
+  // Logs follow the wall's run: along x when it continues left or right, else along z when it continues up or down.
+  const alongZ = !isWall(-1, 0) && !isWall(1, 0) && (isWall(0, -1) || isWall(0, 1));
+  const ends = [-1, 1].filter((side) => !(alongZ ? isWall(0, -side) : isWall(side, 0)));
+  const seed = tile.x * 3 + tile.y * 5;
   return (
     <group>
-      <Log position={[0, 0.13, -0.15]} turn={0.06} />
-      <Log position={[0, 0.13, 0.15]} turn={-0.05} />
-      <Log position={[0, 0.36, 0]} length={0.64} turn={0.1} />
-      <group position={[0.14, 0.49, 0.02]}>
-        <mesh position={[0, 0.04, 0]}>
-          <cylinderGeometry args={[0.02, 0.025, 0.08, 8]} />
-          <meshStandardMaterial color="#f4ead6" roughness={0.9} />
-        </mesh>
-        <mesh position={[0, 0.08, 0]} scale={[1, 0.6, 1]}>
-          <sphereGeometry args={[0.07, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
-          <meshStandardMaterial color="#d96a4f" roughness={0.6} />
-        </mesh>
+      <group rotation={[0, alongZ ? Math.PI / 2 : 0, 0]}>
+        {[0, 1].flatMap((row) =>
+          [-1, 0, 1].map((across) => (
+            <Log
+              key={`${row}${across}`}
+              position={[0, LOG_RADIUS + row * LOG_RADIUS * 1.9, across * LOG_RADIUS * 2]}
+              bark={BARKS[(seed + row * 2 + across + 3) % BARKS.length]}
+              ends={ends}
+            />
+          )),
+        )}
       </group>
+      {/* Moss on top, and now and then a mushroom. */}
+      {[0, 1, 2].map((k) => (
+        <mesh key={k} position={[((seed + k * 2) % 5) * 0.16 - 0.32, 0.64, ((seed + k * 3) % 4) * 0.2 - 0.3]} scale={[1, 0.22, 0.8]}>
+          <sphereGeometry args={[0.14 + (k % 2) * 0.05, 10, 8]} />
+          <meshStandardMaterial color="#6f9a5a" roughness={1} />
+        </mesh>
+      ))}
+      {seed % 3 === 0 && (
+        <group position={[0.18, 0.66, 0.1]}>
+          <mesh position={[0, 0.04, 0]}>
+            <cylinderGeometry args={[0.02, 0.025, 0.08, 8]} />
+            <meshStandardMaterial color="#f4ead6" roughness={0.9} />
+          </mesh>
+          <mesh position={[0, 0.08, 0]} scale={[1, 0.6, 1]}>
+            <sphereGeometry args={[0.07, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+            <meshStandardMaterial color="#d96a4f" roughness={0.6} />
+          </mesh>
+        </group>
+      )}
     </group>
   );
 }
