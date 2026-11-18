@@ -38,7 +38,7 @@ function ThemedPiece({ look, level, tile, index, turn, isLit, calm }) {
     const order = level.tiles.slice(0, index).filter((other) => other.type === TILE.GEM).length;
     return (
       <group scale={1.25}>
-        <RescuedLumi color={color} age={lumiAgeFor(level.id, index)} coat={lumiCoatFor(level.id, order, color)} isLit={isLit} calm={calm} />
+        <RescuedLumi color={color} age={lumiAgeFor(level.id, index)} coat={lumiCoatFor(level, order, color)} isLit={isLit} calm={calm} />
       </group>
     );
   }

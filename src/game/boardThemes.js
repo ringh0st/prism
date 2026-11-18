@@ -16,15 +16,23 @@ export function boardThemeFor(level) {
  */
 export const LUMI_COATS = ['#ffb7d2', '#aecffa', '#ff9d9d', '#b2e6b4', '#d0b8f7', '#a5e6d8', '#f6add6', '#b9c0f9'];
 
+/** Coats a theme leaves out because they'd vanish on its tiles (a green Lumi on a green lily pad). */
+const HIDDEN_COATS = { pond: ['#b2e6b4', '#a5e6d8'] };
+
+/** The coats Lumis can wear in a theme: every coat that stands out on its tiles. */
+export const coatsFor = (theme) => LUMI_COATS.filter((coat) => !(HIDDEN_COATS[theme] ?? []).includes(coat));
+
 /**
- * A Lumi's coat: different for every Lumi on a board (`order` is its place among the level's Lumis) and fixed for
- * the level. One that needs a colored light wears that light's color instead (null: the light's own tint).
+ * A Lumi's coat: different for every Lumi on a board (`order` is its place among the level's Lumis), fixed for the
+ * level, and never the color of the theme's tiles. One that needs a colored light wears that light's color instead
+ * (null: the light's own tint).
  */
-export function lumiCoatFor(levelId, order, color = 'sun') {
+export function lumiCoatFor(level, order, color = 'sun') {
   if (color !== 'sun') return null;
+  const coats = coatsFor(boardThemeFor(level));
   let hash = 7;
-  for (const char of levelId) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return LUMI_COATS[(hash + order) % LUMI_COATS.length];
+  for (const char of level.id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return coats[(hash + order) % coats.length];
 }
 
 /** The level's Lumis in board order, each with its coat: [{ tile, i, coat }]. */
@@ -32,5 +40,5 @@ export function lumisOf(level) {
   return level.tiles
     .map((tile, i) => ({ tile, i }))
     .filter(({ tile }) => tile.type === 'gem')
-    .map((lumi, order) => ({ ...lumi, coat: boardThemeFor(level) ? lumiCoatFor(level.id, order, lumi.tile.color ?? 'sun') : null }));
+    .map((lumi, order) => ({ ...lumi, coat: boardThemeFor(level) ? lumiCoatFor(level, order, lumi.tile.color ?? 'sun') : null }));
 }
