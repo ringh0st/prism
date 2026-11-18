@@ -2,6 +2,7 @@
  * The light beam: a white-hot core in golden light, soft glows with light flowing along them, a pool of light on
  * the tiles and sparks travelling the way the light goes (the scene moves the sparks and flows the glow).
  */
+import { chosenSunColor } from '../../../lib/beamStyle.js';
 import * as THREE from 'three';
 import { glowMaterial } from '../lightMaterials.js';
 import { BEAM_HEIGHT, BEAM_HEX, glowSprite } from './shared.js';
@@ -18,7 +19,8 @@ export function makeBeam(level, segment) {
   const to = place(level, segment.x2, segment.y2).setY(BEAM_HEIGHT);
   const length = from.distanceTo(to) + 0.06;
   const group = new THREE.Group();
-  const color = new THREE.Color(BEAM_HEX[segment.color] ?? BEAM_HEX.sun);
+  // Plain sunlight wears the player's chosen beam style.
+  const color = new THREE.Color((segment.color ?? 'sun') === 'sun' ? chosenSunColor() : (BEAM_HEX[segment.color] ?? BEAM_HEX.sun));
   const tube = new THREE.Group();
   // A wide soft glow and a nearer one (light flowing along both), a solid golden body and a white-hot core.
   const glows = [

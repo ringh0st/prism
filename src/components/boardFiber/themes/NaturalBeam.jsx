@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { cellPosition } from '../look.js';
+import { chosenSunColor, isDefaultSun } from '../../../lib/beamStyle.js';
 import { POOL, SHAFT, glow } from './shared.jsx';
 
 const TINT = { sun: '#ffe2a8', coral: '#ff9a86', lime: '#c4f0a0', sky: '#a8dcf6' };
@@ -39,7 +40,12 @@ export default function NaturalBeam({ level, segment, height, floorY, calm }) {
   const length = from.distanceTo(to);
   const middle = from.clone().lerp(to, 0.5);
   const angle = -Math.atan2(to.z - from.z, to.x - from.x);
-  const tint = TINT[segment.color] ?? TINT.sun;
+  // Plain sunlight wears the player's chosen beam style (softened, like the default lamplight).
+  const tint = useMemo(() => {
+    if ((segment.color ?? 'sun') !== 'sun') return TINT[segment.color] ?? TINT.sun;
+    const chosen = chosenSunColor();
+    return isDefaultSun(chosen) ? TINT.sun : `#${new THREE.Color(chosen).lerp(new THREE.Color('#ffffff'), 0.35).getHexString()}`;
+  }, [segment.color]);
   return (
     <group>
       <group position={middle} rotation={[0, angle, 0]}>
