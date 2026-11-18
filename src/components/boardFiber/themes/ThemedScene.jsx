@@ -7,7 +7,8 @@ import { TILE } from '../../../game/constants.js';
 import { cellPosition } from '../look.js';
 import Piece from '../Piece.jsx';
 import NaturalBeam from './NaturalBeam.jsx';
-import RescuedLumi, { lumiAgeFor, lumiCoatFor } from './RescuedLumi.jsx';
+import RescuedLumi, { lumiAgeFor } from './RescuedLumi.jsx';
+import { lumiCoatFor } from '../../../game/boardThemes.js';
 import { Flare } from './shared.jsx';
 
 const BEAM_ABOVE_TILE = 0.38;

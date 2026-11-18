@@ -67,23 +67,18 @@ function AntennaTip({ shape, color, on }) {
 }
 
 /**
- * The family's coats: each Lumi waiting for plain sunlight wears its own bright color, so a board of them is a
- * little rainbow (owner feedback: not all honey and brown). A Lumi that needs a colored light wears that color.
- */
-export const COATS = ['#ff8fb8', '#5fd9c2', '#ffae52', '#8fc2ff', '#a9e06a', '#c3a2f5', '#ff8f73', '#5cc9e6'];
-
-/**
  * One of Lumi's family. age: baby | kid | girl | mom | dad | grandma; color: the light it needs (shown by its glowing
- * tail and the shape on its antennae); coat: its own body color (defaults to the light's color).
+ * tail and the shape on its antennae); coat: its own pastel body color (`lumiCoatFor`; defaults to the light's color).
  */
 export function LumiKin({ color = 'sun', age = 'kid', coat = null, on, mood }) {
   // mood: sleepy | worried | surprised | joy | happy (defaults from on)
   const face = mood ?? (on ? 'happy' : 'sleepy');
-  const tint = FAMILY_TINT[color];
+  // A coat colors the whole Lumi: its body, and a deeper shade of it for the glowing tail and its light.
+  const tint = coat ? { body: coat, glow: `#${new THREE.Color(coat).offsetHSL(0, 0.25, -0.12).getHexString()}` } : FAMILY_TINT[color];
   const shape = SHAPES_BY_COLOR[color].shape;
   const size = 1.3 * { baby: 0.62, kid: 0.8, girl: 0.8, mom: 1, dad: 1.05, grandma: 0.95 }[age];
-  // Asleep it keeps most of its color (a little dusky), so the family reads as colorful before the rescue too.
-  const body = on ? (coat ?? tint.body) : grey(coat ?? tint.body, 0.22);
+  // Asleep it keeps its color (only a touch dusky), so the family reads as colorful before the rescue too.
+  const body = on ? tint.body : grey(tint.body, 0.12);
   const belly = new THREE.Color(body).lerp(new THREE.Color('#fff6e8'), 0.55);
   const R = 0.18;
   const lashes = age === 'girl' || age === 'mom' || age === 'grandma';

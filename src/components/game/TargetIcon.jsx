@@ -19,8 +19,9 @@ const TIP_PATHS = {
 const INK = '#3b1a08';
 
 /** A little Lumi face in a light's color, with that color's shape on its antennae. */
-function LumiFace({ color, size }) {
-  const [body, glow] = LUMI_TONES[color] ?? LUMI_TONES.sun;
+function LumiFace({ color, coat, size }) {
+  // Its own pastel coat when it has one (a deeper shade of it for the tail), else its light's tones.
+  const [body, glow] = coat ? [coat, `color-mix(in srgb, ${coat} 70%, #b0306a)`] : (LUMI_TONES[color] ?? LUMI_TONES.sun);
   const tip = TIP_PATHS[BEAM_COLORS[color]?.shape ?? 'diamond'];
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">
@@ -43,7 +44,7 @@ function LumiFace({ color, size }) {
   );
 }
 
-/** What a level asks you to light: a gem, or in themed worlds the Lumi waiting to be saved. */
-export default function TargetIcon({ color, size }) {
-  return useIsRescue() ? <LumiFace color={color} size={size} /> : <GemShape color={color} size={size} />;
+/** What a level asks you to light: a gem, or in themed worlds the Lumi waiting to be saved (in its coat). */
+export default function TargetIcon({ color, coat = null, size }) {
+  return useIsRescue() ? <LumiFace color={color} coat={coat} size={size} /> : <GemShape color={color} size={size} />;
 }

@@ -32,7 +32,7 @@ export default function OutOfMovesDialog({
       <ul className={styles.gems} aria-label={gemsLit === 0 ? t('out.noneLit') : t('out.gemsToGo', { count: gemsLeft })}>
         {gems.map((gem, i) => (
           <li key={i} className={gem.isLit ? styles.lit : styles.missing} style={{ '--i': i }}>
-            <TargetIcon color={gem.color} size={40} />
+            <TargetIcon color={gem.color} coat={gem.coat} size={40} />
             <span className={styles.mark} aria-hidden="true">
               {gem.isLit ? <Icon name="check" size={14} strokeWidth={3.4} /> : '?'}
             </span>

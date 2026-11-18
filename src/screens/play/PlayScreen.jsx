@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supportsWebGL } from '../../lib/webgl.js';
-import { boardThemeFor } from '../../game/boardThemes.js';
+import { boardThemeFor, lumisOf } from '../../game/boardThemes.js';
 import Board from '../../components/board/Board.jsx';
 import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
@@ -225,7 +225,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
   const isEarlyWorld = level.world <= KEEP_GOING_WORLDS;
   const keepGoingMoves = isEarlyWorld ? KEEP_GOING_MOVES : KEEP_GOING_MOVES_LATER;
   const canKeepGoing = mode === 'level' && (isEarlyWorld || bonusMoves === 0);
-  const gems = level.tiles.map((tile, i) => ({ tile, i })).filter(({ tile }) => tile.type === TILE.GEM);
+  const gems = useMemo(() => lumisOf(level), [level]);
   // Daily and event puzzles can't be skipped.
   // World 1 offers just Hint (fewer buttons to take in); the others join from World 2.
   const offeredHelpers =
@@ -826,9 +826,9 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
       <section className={styles.status} aria-label={t('play.status')} data-tour="meter">
         {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} spent={finaleSpent} />}
         <ul className={styles.gems} aria-label={t('play.gemsLit', { n: trace.litGems.size, total: gems.length })}>
-          {gems.map(({ tile, i }) => (
+          {gems.map(({ tile, i, coat }) => (
             <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff} data-gem-slot={i}>
-              <TargetIcon color={tile.color} size={24} />
+              <TargetIcon color={tile.color} coat={coat} size={24} />
             </li>
           ))}
         </ul>
@@ -971,7 +971,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
         <OutOfMovesDialog
           backName={backName}
           darkKind={darkLost?.kind ?? null}
-          gems={gems.map(({ tile, i }) => ({ color: tile.color, isLit: trace.litGems.has(i) }))}
+          gems={gems.map(({ tile, i, coat }) => ({ color: tile.color, coat, isLit: trace.litGems.has(i) }))}
           extraMoves={keepGoingMoves}
           onRetry={restart}
           onKeepGoing={

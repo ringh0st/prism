@@ -5,6 +5,7 @@ import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import Lumi from '../../components/game/Lumi.jsx';
 import LumiSays from '../../components/game/LumiSays.jsx';
+import { lumisOf } from '../../game/boardThemes.js';
 import TargetIcon from '../../components/game/TargetIcon.jsx';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import TapIcon from './TapIcon.jsx';
@@ -86,7 +87,7 @@ export default function LevelIntro({
   }, [onDone, isPicking]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { t, lang } = useI18n();
-  const gems = level.tiles.filter((tile) => tile.type === TILE.GEM);
+  const gems = lumisOf(level).map(({ tile, coat }) => ({ ...tile, coat }));
   const limit = moveLimit ?? moveLimitFor(level.par, level.difficulty);
   const moves = showsStarTarget ? level.par : limit;
   const goalLabel = [
@@ -121,7 +122,7 @@ export default function LevelIntro({
           <span className={styles.gems}>
             {gems.map((gem, i) => (
               <span key={i} className={styles.gem} style={{ '--i': i }}>
-                <TargetIcon color={gem.color} size={40} />
+                <TargetIcon color={gem.color} coat={gem.coat} size={40} />
               </span>
             ))}
           </span>
