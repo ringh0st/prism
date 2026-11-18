@@ -142,9 +142,7 @@ export default function BoardFiber({ level, theme: boardTheme, state, onLayout, 
   // The themed room's box, so the camera can frame all of it.
   const room = useMemo(
     () =>
-      boardTheme === 'library'
-        ? { width: level.width + ROOM_PAD * 2, length: level.height + ROOM_PAD * 2, height: ROOM_HEIGHT, depth: 0.5 }
-        : null,
+      boardTheme === 'library' ? { width: level.width + ROOM_PAD * 2, length: level.height + ROOM_PAD * 2, height: ROOM_HEIGHT, depth: 0.5 } : null,
     [boardTheme, level],
   );
   const { turns, trace, revealedCells, darkenedTile, lookHere } = state;
@@ -156,61 +154,64 @@ export default function BoardFiber({ level, theme: boardTheme, state, onLayout, 
 
   return (
     <div ref={wrapper} className={styles.stage}>
-      {theme && (
-        <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ fov: 28, near: 0.1, far: 200 }}>
-          <hemisphereLight args={boardTheme === 'library' ? ['#ffe6c4', '#3a2418', 0.65] : ['#fff6e4', '#a8744a', 0.75]} />
-          <directionalLight
-            position={[-6, 7, 4]}
-            intensity={boardTheme === 'library' ? 1.1 : 1.7}
-            color="#ffe2b0"
-            castShadow
-            shadow-mapSize={[1024, 1024]}
-            shadow-bias={-0.0005}
-          >
-            <orthographicCamera attach="shadow-camera" args={[-8, 8, 8, -8, 0.1, 30]} />
-          </directionalLight>
-          <Studio />
-          <Controls level={level} resetKey={resetKey} room={room} />
-          <Layout level={level} onLayout={onLayout} />
-          {boardTheme === 'library' ? (
-            <LibraryScene level={level} turns={turns} trace={trace} litCells={litCells} calm={calm} onTap={tap} />
-          ) : (
-            <>
-              <Tray level={level} theme={theme} litCells={litCells} hintCells={lookHere} calm={calm} onTileClick={tap} />
-              {level.tiles.map((tile, i) => {
-                const cell = tile.y * level.width + tile.x;
-                const isHidden = tile.fog && revealedCells !== null && !revealedCells.has(cell);
-                return (
-                  <group key={i} position={cellPosition(level, tile.x, tile.y)} onClick={(event) => tap(event, cell)}>
-                    {isHidden ? (
-                      <Cloud calm={calm} />
-                    ) : (
-                      <Piece
-                        tile={tile}
-                        turn={turns[i] ?? 0}
-                        isLit={trace.litGems.has(i) || trace.litShades.has(i)}
-                        isDarkened={darkenedTile === i && tile.type === TILE.GEM}
-                        calm={calm}
-                      />
-                    )}
-                  </group>
-                );
-              })}
-              {trace.segments.map((segment, i) => (
-                <Beam
-                  key={`${segment.x1},${segment.y1},${segment.x2},${segment.y2},${segment.color},${i}`}
-                  level={level}
-                  segment={segment}
-                  calm={calm}
-                />
-              ))}
-            </>
-          )}
-          <EffectComposer multisampling={4}>
-            <Bloom mipmapBlur luminanceThreshold={1.5} luminanceSmoothing={0.1} intensity={0.6} radius={0.7} />
-          </EffectComposer>
-        </Canvas>
-      )}
+      {/* A themed room shows through a rounded window, so zooming in never ends in a hard square edge. */}
+      <div className={boardTheme ? styles.window : styles.open}>
+        {theme && (
+          <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ fov: 28, near: 0.1, far: 200 }}>
+            <hemisphereLight args={boardTheme === 'library' ? ['#ffe6c4', '#3a2418', 0.65] : ['#fff6e4', '#a8744a', 0.75]} />
+            <directionalLight
+              position={[-6, 7, 4]}
+              intensity={boardTheme === 'library' ? 1.1 : 1.7}
+              color="#ffe2b0"
+              castShadow
+              shadow-mapSize={[1024, 1024]}
+              shadow-bias={-0.0005}
+            >
+              <orthographicCamera attach="shadow-camera" args={[-8, 8, 8, -8, 0.1, 30]} />
+            </directionalLight>
+            <Studio />
+            <Controls level={level} resetKey={resetKey} room={room} />
+            <Layout level={level} onLayout={onLayout} />
+            {boardTheme === 'library' ? (
+              <LibraryScene level={level} turns={turns} trace={trace} litCells={litCells} calm={calm} onTap={tap} />
+            ) : (
+              <>
+                <Tray level={level} theme={theme} litCells={litCells} hintCells={lookHere} calm={calm} onTileClick={tap} />
+                {level.tiles.map((tile, i) => {
+                  const cell = tile.y * level.width + tile.x;
+                  const isHidden = tile.fog && revealedCells !== null && !revealedCells.has(cell);
+                  return (
+                    <group key={i} position={cellPosition(level, tile.x, tile.y)} onClick={(event) => tap(event, cell)}>
+                      {isHidden ? (
+                        <Cloud calm={calm} />
+                      ) : (
+                        <Piece
+                          tile={tile}
+                          turn={turns[i] ?? 0}
+                          isLit={trace.litGems.has(i) || trace.litShades.has(i)}
+                          isDarkened={darkenedTile === i && tile.type === TILE.GEM}
+                          calm={calm}
+                        />
+                      )}
+                    </group>
+                  );
+                })}
+                {trace.segments.map((segment, i) => (
+                  <Beam
+                    key={`${segment.x1},${segment.y1},${segment.x2},${segment.y2},${segment.color},${i}`}
+                    level={level}
+                    segment={segment}
+                    calm={calm}
+                  />
+                ))}
+              </>
+            )}
+            <EffectComposer multisampling={4}>
+              <Bloom mipmapBlur luminanceThreshold={1.5} luminanceSmoothing={0.1} intensity={0.6} radius={0.7} />
+            </EffectComposer>
+          </Canvas>
+        )}
+      </div>
       <button type="button" className={styles.reset} onClick={() => setResetKey((n) => n + 1)} aria-label={t('board.view.reset')}>
         ⟲
       </button>
