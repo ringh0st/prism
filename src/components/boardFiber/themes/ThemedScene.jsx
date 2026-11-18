@@ -45,7 +45,7 @@ function ThemedPiece({ look, level, tile, index, turn, isLit, calm }) {
     );
   }
   const Themed = themedPiece(look.pieces, tile);
-  if (Themed) return <Themed tile={tile} turn={turn} calm={calm} />;
+  if (Themed) return <Themed tile={tile} turn={turn} level={level} calm={calm} />;
   // Pieces without a design in this theme yet keep the plain board's look.
   return (
     <group position={[0, -0.08, 0]}>

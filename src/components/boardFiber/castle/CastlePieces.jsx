@@ -1,12 +1,14 @@
 /*
  * The Castle theme's pieces: a burning torch for the light, polished knights' shields as mirrors (on a stone
  * turntable when they turn, on a stone pillar when they can't), a clear crystal pane in a gold stand for splitters,
- * little stained-glass towers that color the light passing through, and stacks of stone blocks as walls.
+ * little stained-glass towers that color the light passing through, and stretches of castle wall that join up as walls.
  */
 import { useEffect, useMemo, useRef } from 'react';
 import gsap from 'gsap';
 import * as THREE from 'three';
+import { TILE } from '../../../game/constants.js';
 import { DIRECTION_ANGLE, mirrorAngle } from '../library/LibraryPieces.jsx';
+import { useBricks } from './CastleRoom.jsx';
 import Flame from '../themes/Flame.jsx';
 import { Flare, Gear, Streaks, brassM, mirrorM } from '../themes/shared.jsx';
 
@@ -232,26 +234,46 @@ export function StainedGlassTower({ tile }) {
   );
 }
 
-/** A wall: stacked stone blocks with a small banner. */
-export function StoneBlocks() {
+const WALL_HEIGHT = 0.56;
+/** The four sides of a cell: [dx, dy] on the board, and where that side is in the piece's own space. */
+const SIDES = [
+  { step: [1, 0], at: [0.5, 0], along: 'z' },
+  { step: [-1, 0], at: [-0.5, 0], along: 'z' },
+  { step: [0, 1], at: [0, 0.5], along: 'x' },
+  { step: [0, -1], at: [0, -0.5], along: 'x' },
+];
+
+/**
+ * A wall: a stretch of castle wall that fills its whole square, so walls on neighboring squares join into one long
+ * wall. Battlements run only along the sides that face open ground (never between two joined pieces).
+ */
+export function CastleWall({ tile, level }) {
+  const masonry = useBricks(1, WALL_HEIGHT);
+  const isWall = (x, y) => level.tiles.some((other) => other.type === TILE.WALL && other.x === x && other.y === y);
+  const open = SIDES.filter(({ step }) => !isWall(tile.x + step[0], tile.y + step[1]));
   return (
     <group>
-      <mesh position={[0, 0.16, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.8, 0.32, 0.6]} />
-        {stoneM()}
+      <mesh position={[0, WALL_HEIGHT / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1, WALL_HEIGHT, 1]} />
+        <meshStandardMaterial map={masonry} roughness={0.95} />
       </mesh>
-      <mesh position={[-0.06, 0.45, 0.02]} rotation={[0, 0.12, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.6, 0.26, 0.5]} />
-        {stoneM(STONE_DARK)}
+      {/* The walkway on top, a little darker than the stone. */}
+      <mesh position={[0, WALL_HEIGHT + 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1, 1]} />
+        <meshStandardMaterial color="#b9a47c" roughness={1} />
       </mesh>
-      <mesh position={[0.22, 0.78, 0]}>
-        <cylinderGeometry args={[0.012, 0.012, 0.4, 6]} />
-        {ironM}
-      </mesh>
-      <mesh position={[0.31, 0.9, 0]}>
-        <planeGeometry args={[0.18, 0.13]} />
-        <meshStandardMaterial color="#c9553a" roughness={0.8} side={THREE.DoubleSide} />
-      </mesh>
+      {open.flatMap(({ at, along }) =>
+        [-0.36, 0, 0.36].map((slide) => (
+          <mesh
+            key={`${at}${slide}`}
+            position={[along === 'z' ? at[0] * 0.86 : slide, WALL_HEIGHT + 0.08, along === 'z' ? slide : at[1] * 0.86]}
+            castShadow
+          >
+            <boxGeometry args={along === 'z' ? [0.14, 0.16, 0.2] : [0.2, 0.16, 0.14]} />
+            {stoneM()}
+          </mesh>
+        )),
+      )}
     </group>
   );
 }

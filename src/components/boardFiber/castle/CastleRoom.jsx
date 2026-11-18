@@ -157,7 +157,7 @@ function brickTexture() {
 }
 
 /** The repeating brick map for a surface `across` by `up` (in board units). */
-function useBricks(across, up) {
+export function useBricks(across, up) {
   return useMemo(() => {
     const texture = brickTexture().clone();
     texture.needsUpdate = true;

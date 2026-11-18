@@ -2,7 +2,7 @@
  * The looks of the themed boards: for each theme its room, the tile you tap, its pieces and its light. A piece a
  * theme hasn't drawn yet falls back to the plain board's piece (ThemedScene).
  */
-import { CrystalSplitter, PillarCrystal, PillarShield, ShieldMirror, StainedGlassTower, StoneBlocks, Torch } from '../castle/CastlePieces.jsx';
+import { CastleWall, CrystalSplitter, PillarCrystal, PillarShield, ShieldMirror, StainedGlassTower, Torch } from '../castle/CastlePieces.jsx';
 import { CASTLE_HEIGHT, CASTLE_PAD, CastleRoom, Flagstone } from '../castle/CastleRoom.jsx';
 import { BankerLamp, BookStack, FixedMirror, GearMirror } from '../library/LibraryPieces.jsx';
 import { LibraryRoom, ParquetTile, ROOM_HEIGHT, ROOM_PAD } from '../library/LibraryRoom.jsx';
@@ -43,7 +43,7 @@ export const THEME_LOOKS = {
       splitter: CrystalSplitter,
       fixedSplitter: PillarCrystal,
       filter: StainedGlassTower,
-      wall: StoneBlocks,
+      wall: CastleWall,
     },
     room: { pad: CASTLE_PAD, height: CASTLE_HEIGHT },
     light: { sky: '#fff1dc', ground: '#6b6258', fill: 0.75, sun: 1.3 },
