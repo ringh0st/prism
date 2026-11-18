@@ -5,15 +5,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import * as THREE from 'three';
 import { cellsOnBeams } from '../../game/beam.js';
-import { TILE } from '../../game/constants.js';
-import { FLOORS, cellPosition } from './look.js';
-import Tray from './Tray.jsx';
+import { cellPosition } from './look.js';
 import ThemedScene from './themes/ThemedScene.jsx';
 import { THEME_LOOKS } from './themes/index.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
-import Piece from './Piece.jsx';
-import Beam from './Beam.jsx';
-import { Cloud } from './Detailed.jsx';
 import styles from './BoardFiber.module.css';
 
 const prefersCalm = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -23,7 +18,7 @@ const TAP_SLOP = 8;
 const START_TILT = 0.62;
 
 /** Turn, tilt and zoom with the finger or mouse (three's OrbitControls), the whole table always in reach. */
-function Controls({ level, resetKey, room = null }) {
+function Controls({ level, resetKey, room }) {
   const { camera, gl, size: frame } = useThree();
   const controls = useMemo(() => new OrbitControls(camera, gl.domElement), [camera, gl]);
   useEffect(() => {
@@ -117,100 +112,45 @@ function Layout({ level, onLayout }) {
 }
 
 /**
- * The board drawn with React Three Fiber (a trial on one level): the same level, taps and rules as the flat and
- * three.js boards, with the design guide's elements, GSAP animation and a bloom pass that only the light passes.
- * The board's buttons stay over the pieces for the keyboard and screen readers.
- * @param state { turns, trace, turnsLeft, revealedCells, darkenedTile, glooms } (as Board3D)
+ * The themed board, drawn with React Three Fiber: the same level, taps and rules as the flat board, dressed as one
+ * of the themes (ThemedScene), with GSAP animation and a bloom pass that only the light passes. The board's buttons
+ * stay over the pieces for the keyboard and screen readers.
+ * @param theme the level's theme (boardThemeFor)
+ * @param state { turns, trace, turnsLeft, revealedCells, darkenedTile, lookHere, ghost } (from Board)
  */
-export default function BoardFiber({ level, theme: boardTheme, state, onLayout, onTapCell }) {
+export default function BoardFiber({ level, theme, state, onLayout, onTapCell }) {
   const { t } = useI18n();
-  const wrapper = useRef(null);
-  const [theme, setTheme] = useState(null);
   const [resetKey, setResetKey] = useState(0);
   const calm = useMemo(prefersCalm, []);
-  // Trial: a floor that contrasts with the warm pieces and the light (?floor=sage|stone|cocoa, sage by default).
-  useEffect(() => {
-    let floor = 'sage';
-    try {
-      floor = localStorage.getItem('prism.trialFloor') || floor;
-    } catch {
-      // Storage blocked: the default floor.
-    }
-    setTheme(FLOORS[floor] ?? FLOORS.sage);
-  }, []);
-
   // The themed room's look, and its box so the camera can frame all of it.
-  const look = THEME_LOOKS[boardTheme] ?? null;
+  const look = THEME_LOOKS[theme] ?? THEME_LOOKS.library;
   const room = useMemo(
-    () => (look ? { width: level.width + look.room.pad * 2, length: level.height + look.room.pad * 2, height: look.room.height, depth: 0.5 } : null),
+    () => ({ width: level.width + look.room.pad * 2, length: level.height + look.room.pad * 2, height: look.room.height, depth: 0.5 }),
     [look, level],
   );
-  const { turns, trace, revealedCells, darkenedTile, lookHere } = state;
-  const litCells = useMemo(() => cellsOnBeams(trace.segments, level.width, level.height), [trace, level]);
+  const litCells = useMemo(() => cellsOnBeams(state.trace.segments, level.width, level.height), [state.trace, level]);
   const tap = (event, cell) => {
     event.stopPropagation();
     if (event.delta <= TAP_SLOP) onTapCell(cell);
   };
 
   return (
-    <div ref={wrapper} className={styles.stage}>
-      {/* A themed room shows through a rounded window, so zooming in never ends in a hard square edge. */}
-      <div className={look ? styles.window : styles.open} style={look?.wall ? { background: look.wall } : undefined}>
-        {theme && (
-          <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ fov: 28, near: 0.1, far: 200 }}>
-            <hemisphereLight args={look ? [look.light.sky, look.light.ground, look.light.fill] : ['#fff6e4', '#a8744a', 0.75]} />
-            <directionalLight
-              position={[-6, 7, 4]}
-              intensity={look ? look.light.sun : 1.7}
-              color="#ffe2b0"
-              castShadow
-              shadow-mapSize={[1024, 1024]}
-              shadow-bias={-0.0005}
-            >
-              <orthographicCamera attach="shadow-camera" args={[-8, 8, 8, -8, 0.1, 30]} />
-            </directionalLight>
-            <Studio />
-            <Controls level={level} resetKey={resetKey} room={room} />
-            <Layout level={level} onLayout={onLayout} />
-            {look ? (
-              <ThemedScene look={look} level={level} turns={turns} trace={trace} litCells={litCells} calm={calm} onTap={tap} />
-            ) : (
-              <>
-                <Tray level={level} theme={theme} litCells={litCells} hintCells={lookHere} calm={calm} onTileClick={tap} />
-                {level.tiles.map((tile, i) => {
-                  const cell = tile.y * level.width + tile.x;
-                  const isHidden = tile.fog && revealedCells !== null && !revealedCells.has(cell);
-                  return (
-                    <group key={i} position={cellPosition(level, tile.x, tile.y)} onClick={(event) => tap(event, cell)}>
-                      {isHidden ? (
-                        <Cloud calm={calm} />
-                      ) : (
-                        <Piece
-                          tile={tile}
-                          turn={turns[i] ?? 0}
-                          isLit={trace.litGems.has(i) || trace.litShades.has(i)}
-                          isDarkened={darkenedTile === i && tile.type === TILE.GEM}
-                          calm={calm}
-                        />
-                      )}
-                    </group>
-                  );
-                })}
-                {trace.segments.map((segment, i) => (
-                  <Beam
-                    key={`${segment.x1},${segment.y1},${segment.x2},${segment.y2},${segment.color},${i}`}
-                    level={level}
-                    segment={segment}
-                    calm={calm}
-                  />
-                ))}
-              </>
-            )}
-            <EffectComposer multisampling={4}>
-              <Bloom mipmapBlur luminanceThreshold={1.5} luminanceSmoothing={0.1} intensity={0.6} radius={0.7} />
-            </EffectComposer>
-          </Canvas>
-        )}
+    <div className={styles.stage}>
+      {/* The room shows through a rounded window, so zooming in never ends in a hard square edge. */}
+      <div className={styles.window} style={look.wall ? { background: look.wall } : undefined}>
+        <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ fov: 28, near: 0.1, far: 200 }}>
+          <hemisphereLight args={[look.light.sky, look.light.ground, look.light.fill]} />
+          <directionalLight position={[-6, 7, 4]} intensity={look.light.sun} color="#ffe2b0" castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-0.0005}>
+            <orthographicCamera attach="shadow-camera" args={[-8, 8, 8, -8, 0.1, 30]} />
+          </directionalLight>
+          <Studio />
+          <Controls level={level} resetKey={resetKey} room={room} />
+          <Layout level={level} onLayout={onLayout} />
+          <ThemedScene look={look} level={level} state={state} litCells={litCells} calm={calm} onTap={tap} />
+          <EffectComposer multisampling={4}>
+            <Bloom mipmapBlur luminanceThreshold={1.5} luminanceSmoothing={0.1} intensity={0.6} radius={0.7} />
+          </EffectComposer>
+        </Canvas>
       </div>
       <button type="button" className={styles.reset} onClick={() => setResetKey((n) => n + 1)} aria-label={t('board.view.reset')}>
         ⟲

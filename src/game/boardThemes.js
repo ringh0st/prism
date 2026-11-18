@@ -1,14 +1,12 @@
 /*
- * Themed boards: a level can be dressed as a place (its pieces, floor and light drawn to match) on the 3D board.
- * In the themed worlds every level gets one of the finished themes, so the scenery keeps changing as you play.
- * Pure data, no React.
+ * Themed boards: every level is dressed as a place (its pieces, floor and light drawn to match) on the 3D board, and
+ * the finished themes take turns, so the scenery keeps changing as you play. Pure data, no React.
  */
 /** The finished themes, which take turns. */
 export const THEMES_IN_PLAY = ['library', 'pond', 'castle', 'beach', 'forest'];
-/** Themes still being designed: seen only with the preview switch (`?theme=forest` on the game's address). */
+/** Themes still being designed: seen only with the preview switch (`?theme=<name>` on the game's address). */
 export const THEMES_IN_PREVIEW = [];
-/** The worlds whose pieces every theme can draw (mirrors, walls, splitters and color glass). */
-export const THEMED_WORLDS = [1, 2, 3];
+const LEVELS_PER_WORLD = 20;
 
 let previewTheme = null;
 /** The owner's preview switch: dress every themed level in one theme (null turns it off). */
@@ -28,11 +26,16 @@ function themeInTurn(number) {
   return turns[number - 1];
 }
 
-/** The board theme for a level, or null for the regular board. */
+/**
+ * The board theme for a level. Built-in levels follow the road (level 1, 2, 3… each a different look from the one
+ * before); any other level (daily, events, challenges, the editor's) gets a theme from its id, always the same one.
+ */
 export function boardThemeFor(level) {
-  const place = THEMED_WORLDS.indexOf(level?.world);
-  if (place < 0 || !level.index) return null;
-  return previewTheme ?? themeInTurn(place * 20 + level.index);
+  if (previewTheme) return previewTheme;
+  if (level?.world && level.index) return themeInTurn((level.world - 1) * LEVELS_PER_WORLD + level.index);
+  let hash = 7;
+  for (const char of String(level?.id ?? '')) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return THEMES_IN_PLAY[hash % THEMES_IN_PLAY.length];
 }
 
 /**
@@ -65,5 +68,5 @@ export function lumisOf(level) {
   return level.tiles
     .map((tile, i) => ({ tile, i }))
     .filter(({ tile }) => tile.type === 'gem')
-    .map((lumi, order) => ({ ...lumi, coat: boardThemeFor(level) ? lumiCoatFor(level, order, lumi.tile.color ?? 'sun') : null }));
+    .map((lumi, order) => ({ ...lumi, coat: lumiCoatFor(level, order, lumi.tile.color ?? 'sun') }));
 }

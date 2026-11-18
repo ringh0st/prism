@@ -12,12 +12,14 @@ const themedLevels = [1, 2, 3].flatMap((world) =>
 );
 const pondLevels = themedLevels.filter((level) => boardThemeFor(level) === 'pond');
 
-test('the themes take turns: every one is used, never the same twice in a row, and only in the themed worlds', () => {
+test('the themes take turns: every one is used, never the same twice in a row, and every level has one', () => {
   const themes = themedLevels.map(boardThemeFor);
   THEMES_IN_PLAY.forEach((theme) => assert.ok(themes.filter((used) => used === theme).length >= 60 / THEMES_IN_PLAY.length - 6, theme));
   themes.forEach((theme, n) => assert.notEqual(theme, themes[n - 1]));
-  assert.equal(boardThemeFor({ id: 'w4-01', world: 4, index: 1, tiles: [] }), null);
-  assert.equal(boardThemeFor({ id: 'daily', tiles: [] }), null);
+  // Every level has a theme: later worlds follow the road, other levels get one from their id.
+  assert.ok(THEMES_IN_PLAY.includes(boardThemeFor({ id: 'w40-07', world: 40, index: 7, tiles: [] })));
+  assert.equal(boardThemeFor({ id: 'daily-2026-11-18', tiles: [] }), boardThemeFor({ id: 'daily-2026-11-18', tiles: [] }));
+  assert.ok(THEMES_IN_PLAY.includes(boardThemeFor({ id: 'daily-2026-11-18', tiles: [] })));
 });
 
 test('no Lumi wears the color of its theme’s tiles, and no two on a board share a coat', () => {

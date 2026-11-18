@@ -80,7 +80,7 @@ function BackToMap() {
   return null;
 }
 
-function LevelRoute({ levelId, is3d = false }) {
+function LevelRoute({ levelId }) {
   const { level, isLoading, isFailed, retry } = useLevel(levelId);
   const { nextLevelIdAfter, previousLevelIdBefore } = useLevels();
   const { progress } = usePlayer();
@@ -91,7 +91,7 @@ function LevelRoute({ levelId, is3d = false }) {
   const previousId = previousLevelIdBefore(level.id);
   if (previousId && starsFor(progress, previousId) === 0 && !areAllLevelsOpen()) return <BackToMap />;
   const nextId = nextLevelIdAfter(level.id);
-  return <PlayScreen key={level.id} level={level} nextLevel={nextId ? `#/play/${nextId}` : null} is3d={is3d} />;
+  return <PlayScreen key={level.id} level={level} nextLevel={nextId ? `#/play/${nextId}` : null} />;
 }
 
 function Routes() {
@@ -103,9 +103,6 @@ function Routes() {
       return <MapScreen />;
     case 'play':
       return <LevelRoute levelId={route.params[0]} />;
-    case 'play3d':
-      // The 3D board prototype: level 1 only, at #/play3d/w1-01.
-      return route.params[0] === 'w1-01' ? <LevelRoute levelId="w1-01" is3d /> : <NotFoundScreen />;
     case 'rush':
       return route.params[0] === 'play' ? <RushRoute /> : <RushScreen />;
     case 'challenge':

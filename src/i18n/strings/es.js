@@ -95,10 +95,6 @@ export const es = {
 
   'board.lamp': 'Lámpara',
   'board.lumi': 'Lumi',
-  'board.view.turnLeft': 'Girar la mesa a la izquierda',
-  'board.view.turnRight': 'Girar la mesa a la derecha',
-  'board.view.zoomIn': 'Acercar',
-  'board.view.zoomOut': 'Alejar',
   'board.view.reset': 'Volver a la vista inicial',
   'board.gem': 'Gema',
 
@@ -285,8 +281,8 @@ export const es = {
   'settings.vibration': 'Vibración',
   'settings.vibrationHint': 'En los teléfonos compatibles',
   'settings.calm': 'Tablero tranquilo',
-  'settings.board3d': 'Tablero 3D',
-  'settings.board3dHint': 'El tablero 3D gira y se acerca: arrastra para girarlo y pellizca para acercarlo. Apágalo para el tablero plano.',
+  'settings.board3d': 'Tablero 3D con temas',
+  'settings.board3dHint': 'Cada nivel es un pequeño lugar (una biblioteca, un estanque, un castillo, una playa, un bosque) que puedes girar y acercar. Apágalo para usar el tablero plano.',
   'settings.calmHint': 'Nada se mueve alrededor del tablero mientras piensas',
 
   'howTo.title': 'Cómo jugar',

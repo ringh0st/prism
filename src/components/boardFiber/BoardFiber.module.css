@@ -3,15 +3,10 @@
   inset: 0;
 }
 
-/* Without a theme the board floats straight on the page. */
-.open,
+/* The room's window: a rounded card with a cream rim and a warm wall behind the room. */
 .window {
   position: absolute;
   inset: 0;
-}
-
-/* The themed room's window: a rounded card with a cream rim and a warm wall behind the room. */
-.window {
   overflow: hidden;
   border: 5px solid var(--surface-raised);
   border-radius: var(--radius-lg);

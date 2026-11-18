@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { supportsWebGL } from '../../lib/webgl.js';
-import { boardThemeFor, lumisOf } from '../../game/boardThemes.js';
+import { useThemedBoard } from '../../hooks/useThemedBoard.js';
+import { lumisOf } from '../../game/boardThemes.js';
 import Board from '../../components/board/Board.jsx';
 import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
@@ -121,7 +121,8 @@ function piecesToIntroduce(level, mode, progress) {
  * | 'challenge' (a friend's "beat my score" link: no helpers, records nothing; `challenge` is { levelId, moves, name })
  * | 'rush' (Light Rush: no helpers, the run's spare moves set the limit; `rush` is from RushRoute)
  */
-function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey, challenge = null, rush = null, is3d = false }) {
+function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLevel = null, dateKey, challenge = null, rush = null }) {
+  const isThemed = useThemedBoard();
   const { progress, settings, finishLevel, finishDaily, finishEventLevel, consumeHelper, endWinStreak } = usePlayer();
   const { levelRefsInWorld } = useLevels();
   const puzzle = usePuzzle(level);
@@ -865,7 +866,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
           darkMoves={puzzle.taps.length}
           mood={modifier}
           label={t('play.boardLabel', { name: levelName })}
-          is3d={is3d || ((Boolean(boardThemeFor(level)) || settings.board3d !== false) && supportsWebGL())}
+          is3d={isThemed}
         />
       </div>
 
@@ -1008,7 +1009,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
       {isMeetingFriend && <FriendFoundDialog onDone={() => (nextLevel ? navigate(nextLevel) : navigate(backHref))} />}
       {isQuiet && !wantsFullWin && (
         <QuickWin
-          headline={t(headlineFor(result, level.difficulty, Boolean(boardThemeFor(level))))}
+          headline={t(headlineFor(result, level.difficulty, isThemed))}
           stars={result.stars}
           sparksEarned={result.sparksEarned}
           onNext={goToNextLevel}
@@ -1024,7 +1025,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
           result={result}
           par={level.par}
           difficulty={level.difficulty}
-          isRescue={Boolean(boardThemeFor(level))}
+          isRescue={isThemed}
           cap={
             starCap < 3
               ? { stars: starCap, icon: bonusMoves > 0 && starCap === 1 ? 'plus' : (toolFor(puzzle.usedHelpers.at(-1))?.icon ?? 'hint') }
@@ -1055,10 +1056,11 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
   );
 }
 
-/** A level; in themed worlds every line and icon talks about saving Lumis instead of lighting gems. */
+/** A level; on the themed board every line and icon talks about saving Lumis instead of lighting gems. */
 export default function PlayScreen(props) {
+  const isThemed = useThemedBoard();
   return (
-    <RescueWording isOn={Boolean(boardThemeFor(props.level))}>
+    <RescueWording isOn={isThemed}>
       <PlayScreenBody {...props} />
     </RescueWording>
   );

@@ -18,7 +18,7 @@ export const lampDirection = (tile, orient = tile.orient ?? 0) => (tile.turnable
  * Face 0 is the face whose normal points up-left for "/" and up-right for "" (the top of the drawn bar);
  * face 1 is the other side. Turning the mirror turns its faces with it.
  */
-const FACE_NORMALS = [
+export const FACE_NORMALS = [
   [
     [-1, -1],
     [1, 1],

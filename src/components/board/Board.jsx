@@ -19,7 +19,6 @@ import styles from './Board.module.css';
 
 /** Name tags for the first levels, so new players know which piece is which (translation keys). */
 // The 3D board (three.js) loads only when it's used, so the flat board stays light.
-const Board3D = lazy(() => import('../board3d/Board3D.jsx'));
 // Themed worlds (the Library…) are drawn with React Three Fiber, loaded only when one is played.
 const BoardFiber = lazy(() => import('../boardFiber/BoardFiber.jsx'));
 
@@ -49,7 +48,7 @@ const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
  * @param coach        first-levels coaching: { tile: tile index the hand points at, or null; labels: show Lamp/Gem tags }
  * @param darkness     the darkness now (darkness.js): creeping shadows, countdowns on fading gems and dying lamps
  * @param darkMoves    moves that still stand (for the eclipse countdown)
- * @param is3d         draw the board as a 3D tabletop (prototype): the buttons stay, placed over the 3D pieces
+ * @param is3d         draw the board as a themed 3D room: the buttons stay, placed over the 3D pieces
  */
 export default function Board({
   level,
@@ -158,9 +157,10 @@ export default function Board({
             darkenedTile: darkness?.lost?.tile ?? null,
             glooms: darkness ? gloomsNow(level, darkness) : [],
             lookHere,
+            ghost: ghostSegments,
           }
         : null,
-    [is3d, allTurns, trace, turnsLeft, revealedCells, darkness, level, lookHere],
+    [is3d, allTurns, trace, turnsLeft, revealedCells, darkness, level, lookHere, ghostSegments],
   );
   const eclipseIn = is3d && darkness && level.eclipse ? level.eclipse - (darkMoves % level.eclipse) : null;
   const litPlates = useMemo(() => (isEditing ? new Set() : cellsOnBeams(trace.segments, width, height)), [trace.segments, width, height, isEditing]);
@@ -188,23 +188,13 @@ export default function Board({
       <TileDefs />
       {is3d && (
         <Suspense fallback={null}>
-          {boardThemeFor(level) ? (
-            <BoardFiber
-              level={level}
-              theme={boardThemeFor(level)}
-              state={state3d}
-              onLayout={setCellRects}
-              onTapCell={(cell) => cellRefs.current[cell]?.click()}
-            />
-          ) : (
-            <Board3D
-              level={level}
-              state={state3d}
-              onLayout={setCellRects}
-              onTapCell={(cell) => cellRefs.current[cell]?.click()}
-              surfaceRef={boardRef}
-            />
-          )}
+          <BoardFiber
+            level={level}
+            theme={boardThemeFor(level)}
+            state={state3d}
+            onLayout={setCellRects}
+            onTapCell={(cell) => cellRefs.current[cell]?.click()}
+          />
         </Suspense>
       )}
       {!is3d && (
@@ -296,7 +286,7 @@ export default function Board({
                     {coach?.tile === tileIndex && tileIndex >= 0 && <CoachHand />}
                     {coach?.labels && COACH_LABELS[tile?.type] && (
                       <span className={styles.coachLabel} aria-hidden="true">
-                        {t(tile.type === TILE.GEM && boardThemeFor(level) ? 'board.lumi' : COACH_LABELS[tile.type])}
+                        {t(tile.type === TILE.GEM && is3d ? 'board.lumi' : COACH_LABELS[tile.type])}
                       </span>
                     )}
                     {is3d && gloom && (

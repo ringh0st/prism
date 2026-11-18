@@ -95,10 +95,6 @@ export const he = {
 
   'board.lamp': 'מנורה',
   'board.lumi': 'לומי',
-  'board.view.turnLeft': 'לסובב את הלוח שמאלה',
-  'board.view.turnRight': 'לסובב את הלוח ימינה',
-  'board.view.zoomIn': 'להתקרב',
-  'board.view.zoomOut': 'להתרחק',
   'board.view.reset': 'לחזור לתצוגה הרגילה',
   'board.gem': 'אבן חן',
 
@@ -286,8 +282,8 @@ export const he = {
   'settings.vibration': 'רטט',
   'settings.vibrationHint': 'בטלפונים שתומכים בזה',
   'settings.calm': 'לוח רגוע',
-  'settings.board3d': 'לוח תלת־ממדי',
-  'settings.board3dHint': 'את הלוח התלת־ממדי אפשר לסובב ולהגדיל: גוררים כדי לסובב וצובטים כדי להתקרב. כבו אותו כדי לחזור ללוח השטוח.',
+  'settings.board3d': 'לוח תלת־ממדי עם נושאים',
+  'settings.board3dHint': 'כל שלב הוא מקום קטן (ספרייה, אגם, טירה, חוף, יער) שאפשר לסובב ולהגדיל. כבו כדי לשחק בלוח השטוח.',
   'settings.calmHint': 'שום דבר לא זז ליד הלוח בזמן שאתם חושבים',
 
   'howTo.title': 'איך משחקים',
