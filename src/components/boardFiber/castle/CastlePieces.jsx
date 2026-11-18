@@ -33,14 +33,17 @@ function shieldShape(scale = 1) {
   return shape;
 }
 
-/** The shield: a dark grey rim with a mirror-bright face on both sides. */
-function Shield({ glass = mirrorM, streaks = true }) {
+/** A fixed shield's rim: warm bronze, so it never reads as one of the dark grey shields that turn. */
+const bronzeM = <meshPhysicalMaterial color="#b0683c" metalness={0.75} roughness={0.35} clearcoat={0.4} />;
+
+/** The shield: a rim (dark grey when it turns, bronze when it can't) with a mirror-bright face on both sides. */
+function Shield({ rim: rimMaterial = darkGreyM, glass = mirrorM, streaks = true }) {
   const rim = useMemo(() => new THREE.ExtrudeGeometry(shieldShape(), { depth: 0.03, bevelEnabled: false }).translate(0, 0, -0.015), []);
   const face = useMemo(() => new THREE.ShapeGeometry(shieldShape(0.86)), []);
   return (
     <group>
       <mesh geometry={rim} castShadow>
-        {darkGreyM}
+        {rimMaterial}
       </mesh>
       {[1, -1].map((side) => (
         <mesh key={side} geometry={face} position={[0, 0, side * 0.017]} rotation={[0, side < 0 ? Math.PI : 0, 0]}>
@@ -96,7 +99,7 @@ export const ShieldMirror = ({ turn }) => (
 
 export const PillarShield = ({ turn }) => (
   <OnPillar turn={turn}>
-    <Shield />
+    <Shield rim={bronzeM} />
   </OnPillar>
 );
 

@@ -66,6 +66,9 @@ export function GearMirror({ turn }) {
   );
 }
 
+/** A fixed mirror's frame: dark iron, so it never reads as one of the brass mirrors that turn. */
+const ironFrame = () => <meshStandardMaterial color="#3d3836" metalness={0.6} roughness={0.4} />;
+
 /** A mirror that can't turn: the same brass mirror bolted to a heavy wooden plinth with brass corners (no gear). */
 export function FixedMirror({ turn }) {
   return (
@@ -90,10 +93,10 @@ export function FixedMirror({ turn }) {
         </mesh>
       ))}
       <group position={[0, 0.42, 0]}>
-        <RoundMirror knob={false} postsFrom={-0.14} />
+        <RoundMirror knob={false} postsFrom={-0.14} frame={ironFrame} />
         <mesh position={[0, 0.31, 0]}>
           <sphereGeometry args={[0.03, 12, 10]} />
-          {brassM('#e8c06a')}
+          {ironFrame()}
         </mesh>
       </group>
     </group>

@@ -15,6 +15,10 @@ const BARK = '#6b4a32';
 const WOOD = '#a8774a';
 /** The mirror's frame: green reed stems, with cattail-brown beads for the knobs. */
 const reedM = (color = '#5f8f4e') => <meshStandardMaterial color={color === '#e8c06a' ? '#6b4630' : color} roughness={0.7} />;
+/** A fixed mirror's frame: grey river stone, like the stone it stands on (the ones that turn are green reed). */
+const stoneFrame = () => <meshStandardMaterial color="#6f6d68" roughness={0.85} />;
+/** A splitter's frame: honey brass, to match its amber glass. */
+const honeyFrame = () => brassM('#e0a23a');
 const PETALS = 9;
 /** A splitter's pane: clear amber glass you can see through (light passes and bounces). */
 const amberGlass = (
@@ -86,7 +90,7 @@ export const PondMirror = ({ turn }) => (
 
 export const PondFixedMirror = ({ turn }) => (
   <OnStone turn={turn}>
-    <RoundMirror frame={reedM} glass={mirrorM} knob={false} postsFrom={-0.14} />
+    <RoundMirror frame={stoneFrame} glass={mirrorM} knob={false} postsFrom={-0.14} />
   </OnStone>
 );
 
@@ -94,7 +98,7 @@ export const PondFixedMirror = ({ turn }) => (
 function SplitterPane(props) {
   return (
     <group>
-      <RoundMirror frame={reedM} glass={amberGlass} streaks={false} {...props} />
+      <RoundMirror frame={honeyFrame} glass={amberGlass} streaks={false} {...props} />
       <mesh position={[0, 0.33, 0]} rotation={[0, 0, Math.PI / 4]}>
         <boxGeometry args={[0.07, 0.07, 0.03]} />
         {brassM('#e8c06a')}
