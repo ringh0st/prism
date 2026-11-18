@@ -120,35 +120,109 @@ export const PondFixedSplitter = ({ turn }) => (
 );
 
 const LOG_RADIUS = 0.166;
-const BARKS = ['#6b4a32', '#7a5638', '#5f4029'];
+const BARKS = ['#9a6b45', '#b07d52', '#84583a'];
 
-/** One log lying along x, a full square long; a pale cut end shows only where the wall ends (`ends`: [-1, 1]). */
-function Log({ position, bark, ends }) {
+let barkMap = null;
+
+/** Bark painted on a canvas (in greys, tinted by each log's own brown): long ragged furrows along the log and knots. */
+function barkTexture() {
+  if (barkMap) return barkMap;
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const d = canvas.getContext('2d');
+  let r = 71;
+  const rnd = () => (r = (r * 9301 + 49297) % 233280) / 233280;
+  d.fillStyle = '#d8d8d8';
+  d.fillRect(0, 0, 256, 256);
+  // Furrows run along the log (down the canvas), wandering a little and breaking off.
+  for (let n = 0; n < 46; n++) {
+    let x = rnd() * 256;
+    let y = rnd() * 256 - 60;
+    d.strokeStyle = `rgba(40,26,16,${0.35 + rnd() * 0.4})`;
+    d.lineWidth = 1.5 + rnd() * 3.5;
+    d.beginPath();
+    d.moveTo(x, y);
+    for (let step = 0; step < 6; step++) {
+      x += (rnd() - 0.5) * 9;
+      y += 18 + rnd() * 26;
+      d.lineTo(x, y);
+    }
+    d.stroke();
+  }
+  for (let n = 0; n < 30; n++) {
+    d.fillStyle = `rgba(255,255,255,${0.12 + rnd() * 0.2})`;
+    d.fillRect(rnd() * 256, rnd() * 256, 2 + rnd() * 3, 10 + rnd() * 26);
+  }
+  for (let n = 0; n < 3; n++) {
+    const [x, y] = [rnd() * 256, rnd() * 256];
+    d.strokeStyle = 'rgba(40,26,16,0.7)';
+    d.lineWidth = 3;
+    d.beginPath();
+    d.ellipse(x, y, 9, 14, 0, 0, Math.PI * 2);
+    d.stroke();
+    d.fillStyle = 'rgba(40,26,16,0.45)';
+    d.beginPath();
+    d.ellipse(x, y, 4, 7, 0, 0, Math.PI * 2);
+    d.fill();
+  }
+  barkMap = new THREE.CanvasTexture(canvas);
+  barkMap.colorSpace = THREE.SRGBColorSpace;
+  barkMap.wrapS = barkMap.wrapT = THREE.RepeatWrapping;
+  return barkMap;
+}
+
+/**
+ * One log lying along x, a full square long, in furrowed bark; a pale cut end with growth rings shows only where
+ * the wall ends (`ends`: [-1, 1]). `turn` rolls the bark so no two logs look alike.
+ */
+function Log({ position, bark, radius = LOG_RADIUS, turn = 0, ends }) {
   return (
     <group position={position}>
-      <mesh rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow>
-        <cylinderGeometry args={[LOG_RADIUS, LOG_RADIUS, 1, 14]} />
-        <meshStandardMaterial color={bark} roughness={0.9} />
+      <mesh rotation={[turn, 0, Math.PI / 2]} castShadow receiveShadow>
+        <cylinderGeometry args={[radius, radius, 1, 16]} />
+        <meshStandardMaterial map={barkTexture()} bumpMap={barkTexture()} bumpScale={1.2} color={bark} roughness={0.95} />
       </mesh>
       {ends.map((side) => (
         <group key={side} position={[side * 0.502, 0, 0]} rotation={[0, (side * Math.PI) / 2, 0]}>
           <mesh>
-            <circleGeometry args={[LOG_RADIUS * 0.9, 14]} />
-            <meshStandardMaterial color="#e2c08f" roughness={0.8} />
+            <circleGeometry args={[radius * 0.9, 16]} />
+            <meshStandardMaterial color="#e6c794" roughness={0.8} />
           </mesh>
-          <mesh position={[0, 0, 0.001]}>
-            <ringGeometry args={[LOG_RADIUS * 0.35, LOG_RADIUS * 0.45, 14]} />
-            <meshStandardMaterial color="#c79f6a" roughness={0.8} />
-          </mesh>
+          {[0.68, 0.42, 0.18].map((ring) => (
+            <mesh key={ring} position={[0, 0, 0.001]}>
+              <ringGeometry args={[radius * ring, radius * (ring + 0.06), 16]} />
+              <meshStandardMaterial color="#b98d58" roughness={0.8} />
+            </mesh>
+          ))}
         </group>
       ))}
     </group>
   );
 }
 
+const TWIG_COLORS = ['#8a6a4a', '#c2a27a', '#5c4433', '#a8563c', '#9a9a82', '#d9b98a'];
+
+/** A tiny branch lying on the logs: a thin stick with a little side shoot, in its own color. */
+function Twig({ position, turn, length, color }) {
+  return (
+    <group position={position} rotation={[0, turn, 0]}>
+      <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+        <cylinderGeometry args={[0.014, 0.02, length, 6]} />
+        <meshStandardMaterial color={color} roughness={0.9} />
+      </mesh>
+      <mesh position={[length * 0.18, 0.012, 0.05]} rotation={[0.3, 0.9, Math.PI / 2]}>
+        <cylinderGeometry args={[0.008, 0.012, length * 0.42, 5]} />
+        <meshStandardMaterial color={color} roughness={0.9} />
+      </mesh>
+    </group>
+  );
+}
+
 /**
  * A wall: a stack of logs that fills its whole square, so log walls on neighboring squares join into one long wall
- * (like a beaver's dam). The logs run along the wall, cut ends show only where it stops, and moss grows on top.
+ * (like a beaver's dam). The logs run along the wall in furrowed bark, each a little thicker or thinner than the
+ * next, cut ends show only where the wall stops, and a few tiny branches in different colors lie on top.
  */
 export function LogWall({ tile, level }) {
   const isWall = (dx, dy) => level.tiles.some((other) => other.type === TILE.WALL && other.x === tile.x + dx && other.y === tile.y + dy);
@@ -160,35 +234,31 @@ export function LogWall({ tile, level }) {
     <group>
       <group rotation={[0, alongZ ? Math.PI / 2 : 0, 0]}>
         {[0, 1].flatMap((row) =>
-          [-1, 0, 1].map((across) => (
-            <Log
-              key={`${row}${across}`}
-              position={[0, LOG_RADIUS + row * LOG_RADIUS * 1.9, across * LOG_RADIUS * 2]}
-              bark={BARKS[(seed + row * 2 + across + 3) % BARKS.length]}
-              ends={ends}
-            />
-          )),
+          [-1, 0, 1].map((across) => {
+            // The same row keeps its thickness along a wall (so joined logs line up); rows and columns differ.
+            const radius = LOG_RADIUS * (1 + (((row * 3 + across + 4) % 3) - 1) * 0.06);
+            return (
+              <Log
+                key={`${row}${across}`}
+                position={[0, LOG_RADIUS + row * LOG_RADIUS * 1.86, across * LOG_RADIUS * 2]}
+                radius={radius}
+                turn={(row * 3 + across + 2) * 1.3}
+                bark={BARKS[(row * 2 + across + 3) % BARKS.length]}
+                ends={ends}
+              />
+            );
+          }),
         )}
       </group>
-      {/* Moss on top, and now and then a mushroom. */}
-      {[0, 1, 2].map((k) => (
-        <mesh key={k} position={[((seed + k * 2) % 5) * 0.16 - 0.32, 0.64, ((seed + k * 3) % 4) * 0.2 - 0.3]} scale={[1, 0.22, 0.8]}>
-          <sphereGeometry args={[0.14 + (k % 2) * 0.05, 10, 8]} />
-          <meshStandardMaterial color="#6f9a5a" roughness={1} />
-        </mesh>
+      {[0, 1, 2, 3].map((k) => (
+        <Twig
+          key={k}
+          position={[((seed * 3 + k * 7) % 9) * 0.07 - 0.28, 0.655 + k * 0.012, ((seed + k * 5) % 7) * 0.08 - 0.24]}
+          turn={(seed + k * 2) * 1.1}
+          length={0.26 + ((seed + k) % 4) * 0.06}
+          color={TWIG_COLORS[(seed + k * 2) % TWIG_COLORS.length]}
+        />
       ))}
-      {seed % 3 === 0 && (
-        <group position={[0.18, 0.66, 0.1]}>
-          <mesh position={[0, 0.04, 0]}>
-            <cylinderGeometry args={[0.02, 0.025, 0.08, 8]} />
-            <meshStandardMaterial color="#f4ead6" roughness={0.9} />
-          </mesh>
-          <mesh position={[0, 0.08, 0]} scale={[1, 0.6, 1]}>
-            <sphereGeometry args={[0.07, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
-            <meshStandardMaterial color="#d96a4f" roughness={0.6} />
-          </mesh>
-        </group>
-      )}
     </group>
   );
 }
