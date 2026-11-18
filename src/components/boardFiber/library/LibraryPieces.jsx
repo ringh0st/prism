@@ -11,15 +11,20 @@ import { Gear, Streaks, amberGlass, brassM, glow, lath, mirrorM, wallBeside } fr
 
 export const DIRECTION_ANGLE = { right: 0, down: -Math.PI / 2, left: Math.PI, up: Math.PI / 2 };
 /** The game's mirror angle for a turn count (the pane faces along local z). */
+/** A one-legged mirror stands this much higher, on a leg this long. */
+const ONE_LEG_LIFT = 0.12;
+const ONE_LEG = 0.2;
 export const mirrorAngle = (turn) => -THREE.MathUtils.degToRad(-45 + turn * 90);
 
 /**
- * The round mirror itself: glass in a ring, on two posts with knobs. `frame` paints the ring and posts (brass here,
- * dark wood at the pond) and `glass` the pane (a mirror, or clear amber glass for a splitter).
+ * The round mirror itself: glass in a ring on its legs. A mirror that turns stands on one leg in the middle
+ * (`legs={1}`), a fixed one on two legs with a knob each (owner's rule, so the two kinds read apart at a glance).
+ * `frame` paints the ring and legs (brass here, reed at the pond…) and `glass` the pane (a mirror, or clear amber
+ * glass for a splitter).
  */
-export function RoundMirror({ postsFrom = -0.16, knob = true, frame = brassM, glass = mirrorM, streaks = true }) {
+export function RoundMirror({ legs = 2, postsFrom = -0.16, knob = true, frame = brassM, glass = mirrorM, streaks = true }) {
   return (
-    <group>
+    <group position={[0, legs === 1 ? ONE_LEG_LIFT : 0, 0]}>
       <mesh>
         <torusGeometry args={[0.29, 0.02, 10, 40]} />
         {frame()}
@@ -28,13 +33,21 @@ export function RoundMirror({ postsFrom = -0.16, knob = true, frame = brassM, gl
         <circleGeometry args={[0.26, 40]} />
         {glass}
       </mesh>
-      {[-0.3, 0.3].map((x) => (
-        <mesh key={x} position={[x, postsFrom, 0]}>
-          <cylinderGeometry args={[0.015, 0.015, 0.36, 8]} />
+      {legs === 1 ? (
+        <mesh position={[0, -0.29 - ONE_LEG / 2, 0]}>
+          <cylinderGeometry args={[0.022, 0.03, ONE_LEG, 10]} />
           {frame()}
         </mesh>
-      ))}
-      {knob &&
+      ) : (
+        [-0.3, 0.3].map((x) => (
+          <mesh key={x} position={[x, postsFrom, 0]}>
+            <cylinderGeometry args={[0.015, 0.015, 0.36, 8]} />
+            {frame()}
+          </mesh>
+        ))
+      )}
+      {legs === 2 &&
+        knob &&
         [-0.3, 0.3].map((x) => (
           <mesh key={x} position={[x, 0, 0]}>
             <sphereGeometry args={[0.03, 12, 10]} />
@@ -46,7 +59,7 @@ export function RoundMirror({ postsFrom = -0.16, knob = true, frame = brassM, gl
   );
 }
 
-/** A mirror that turns: the brass mirror on a gear wheel; mirror and gear swing together. */
+/** A mirror that turns: the brass mirror on one leg on a gear wheel; mirror and gear swing together. */
 export function GearMirror({ turn, frame, glass, streaks }) {
   const rotor = useRef();
   const angle = mirrorAngle(turn);
@@ -61,7 +74,7 @@ export function GearMirror({ turn, frame, glass, streaks }) {
         <meshBasicMaterial color="#5a3f22" />
       </mesh>
       <group position={[0, 0.38, 0]}>
-        <RoundMirror frame={frame} glass={glass} streaks={streaks} />
+        <RoundMirror legs={1} frame={frame} glass={glass} streaks={streaks} />
       </group>
     </group>
   );

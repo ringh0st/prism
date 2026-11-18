@@ -79,7 +79,7 @@ function OnStone({ turn, children }) {
 
 export const PondMirror = ({ turn }) => (
   <OnLily turn={turn}>
-    <RoundMirror frame={reedM} glass={mirrorM} />
+    <RoundMirror legs={1} frame={reedM} glass={mirrorM} />
   </OnLily>
 );
 
@@ -94,7 +94,7 @@ function SplitterPane(props) {
   return (
     <group>
       <RoundMirror frame={honeyFrame} glass={amberGlass} streaks={false} {...props} />
-      <mesh position={[0, 0.33, 0]} rotation={[0, 0, Math.PI / 4]}>
+      <mesh position={[0, props.legs === 1 ? 0.45 : 0.33, 0]} rotation={[0, 0, Math.PI / 4]}>
         <boxGeometry args={[0.07, 0.07, 0.03]} />
         {brassM('#e8c06a')}
       </mesh>
@@ -104,7 +104,7 @@ function SplitterPane(props) {
 
 export const PondSplitter = ({ turn }) => (
   <OnLily turn={turn}>
-    <SplitterPane />
+    <SplitterPane legs={1} />
   </OnLily>
 );
 

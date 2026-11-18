@@ -6,7 +6,7 @@ import { CastleWall, CrystalSplitter, PillarCrystal, PillarShield, ShieldMirror,
 import { CASTLE_HEIGHT, CASTLE_PAD, CastleRoom, Flagstone } from '../castle/CastleRoom.jsx';
 import { BeachHut, GlassFloat, Lighthouse, RingMirror, RingSplitter, SandcastleMirror, SandcastleSplitter } from '../beach/BeachPieces.jsx';
 import { BEACH_HEIGHT, BEACH_PAD, BeachRoom, SandTile } from '../beach/BeachRoom.jsx';
-import { BoulderMirror, BoulderSplitter, Campfire, GlassMushroom, Palisade, StumpMirror, StumpSplitter } from '../forest/ForestPieces.jsx';
+import { BoulderMirror, BoulderSplitter, Campfire, GlassMushroom, StumpMirror, StumpSplitter, TreeClump } from '../forest/ForestPieces.jsx';
 import { FOREST_HEIGHT, FOREST_PAD, ForestFloor, ForestRoom } from '../forest/ForestRoom.jsx';
 import { BankerLamp, BookcaseWall, DeskGlass, FixedMirror, FixedSplitter, GearMirror, GearSplitter } from '../library/LibraryPieces.jsx';
 import { LibraryRoom, ParquetTile, ROOM_HEIGHT, ROOM_PAD } from '../library/LibraryRoom.jsx';
@@ -74,7 +74,7 @@ export const THEME_LOOKS = {
       splitter: StumpSplitter,
       fixedSplitter: BoulderSplitter,
       filter: GlassMushroom,
-      wall: Palisade,
+      wall: TreeClump,
     },
     room: { pad: FOREST_PAD, height: FOREST_HEIGHT },
     light: { sky: '#fff3da', ground: '#3f5a40', fill: 0.8, sun: 1.3 },

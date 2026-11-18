@@ -21,15 +21,15 @@ function floorTexture(seed, tone) {
   const d = canvas.getContext('2d');
   let r = seed * 9301 + 49297;
   const rnd = () => (r = (r * 9301 + 49297) % 233280) / 233280;
-  d.fillStyle = `rgb(${tone - 34},${tone + 8},${tone - 50})`;
+  d.fillStyle = `rgb(${tone - 30},${tone + 22},${tone - 46})`;
   d.fillRect(0, 0, 256, 256);
-  for (let n = 0; n < 150; n++) {
+  for (let n = 0; n < 70; n++) {
     d.fillStyle = n % 2 ? `rgba(190,225,150,${0.1 + rnd() * 0.14})` : `rgba(30,60,30,${0.08 + rnd() * 0.12})`;
     d.beginPath();
     d.ellipse(rnd() * 256, rnd() * 256, 4 + rnd() * 12, 3 + rnd() * 8, rnd() * 3, 0, Math.PI * 2);
     d.fill();
   }
-  for (let n = 0; n < 4; n++) {
+  for (let n = 0; n < 2; n++) {
     const [x, y, turn] = [30 + rnd() * 196, 30 + rnd() * 196, rnd() * Math.PI];
     d.save();
     d.translate(x, y);
@@ -61,7 +61,7 @@ function floorTexture(seed, tone) {
 
 export function ForestFloor({ position, x, y, isLit, onClick, cell }) {
   const texture = useMemo(() => {
-    const floor = floorTexture(1 + ((x * 3 + y * 7) % 6), (x + y) % 2 ? 150 : 132).clone();
+    const floor = floorTexture(1 + ((x * 3 + y * 7) % 6), (x + y) % 2 ? 172 : 156).clone();
     floor.needsUpdate = true;
     floor.center.set(0.5, 0.5);
     floor.rotation = ((x + y * 3) % 4) * (Math.PI / 2);

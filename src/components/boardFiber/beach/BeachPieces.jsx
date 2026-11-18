@@ -72,9 +72,9 @@ const onSandcastle = (pane) =>
     );
   };
 
-export const RingMirror = onRing(<RoundMirror frame={whiteFrame} glass={mirrorM} />);
+export const RingMirror = onRing(<RoundMirror legs={1} frame={whiteFrame} glass={mirrorM} />);
 export const SandcastleMirror = onSandcastle(<RoundMirror frame={tealFrame} glass={mirrorM} knob={false} postsFrom={-0.14} />);
-export const RingSplitter = onRing(<RoundMirror frame={coralFrame} glass={amberGlass} streaks={false} />);
+export const RingSplitter = onRing(<RoundMirror legs={1} frame={coralFrame} glass={amberGlass} streaks={false} />);
 export const SandcastleSplitter = onSandcastle(<RoundMirror frame={coralFrame} glass={amberGlass} streaks={false} knob={false} postsFrom={-0.14} />);
 
 /** Color glass: a glass fishing float on a coil of rope. */

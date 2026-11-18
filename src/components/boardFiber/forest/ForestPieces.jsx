@@ -1,7 +1,7 @@
 /*
  * The Forest theme's pieces (in preview): a campfire for the light, mirrors in pale birch frames that turn on a
  * slice of tree stump (or stand on a boulder in a dark bark frame when they can't), amber glass for splitters,
- * glowing glass mushrooms for color glass, and palisades of upright logs that join up as walls.
+ * glowing glass mushrooms for color glass, and clumps of trees that join up into thick forest as walls.
  */
 import * as THREE from 'three';
 import { RoundMirror } from '../library/LibraryPieces.jsx';
@@ -69,9 +69,9 @@ const onBoulder = (pane) =>
     );
   };
 
-export const StumpMirror = onStump(<RoundMirror frame={birchFrame} glass={mirrorM} />);
+export const StumpMirror = onStump(<RoundMirror legs={1} frame={birchFrame} glass={mirrorM} />);
 export const BoulderMirror = onBoulder(<RoundMirror frame={barkFrame} glass={mirrorM} knob={false} postsFrom={-0.14} />);
-export const StumpSplitter = onStump(<RoundMirror frame={sapFrame} glass={amberGlass} streaks={false} />);
+export const StumpSplitter = onStump(<RoundMirror legs={1} frame={sapFrame} glass={amberGlass} streaks={false} />);
 export const BoulderSplitter = onBoulder(<RoundMirror frame={sapFrame} glass={amberGlass} streaks={false} knob={false} postsFrom={-0.14} />);
 
 /** Color glass: a glowing glass mushroom, its cap in the light's color with that color's shape on top. */
@@ -85,7 +85,16 @@ export function GlassMushroom({ tile }) {
       </mesh>
       <mesh position={[0, 0.38, 0]} scale={[1, 0.75, 1]}>
         <sphereGeometry args={[0.34, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        <meshPhysicalMaterial color={color} roughness={0.1} clearcoat={1} transparent opacity={0.7} emissive={color} emissiveIntensity={0.5} side={THREE.DoubleSide} />
+        <meshPhysicalMaterial
+          color={color}
+          roughness={0.1}
+          clearcoat={1}
+          transparent
+          opacity={0.7}
+          emissive={color}
+          emissiveIntensity={0.5}
+          side={THREE.DoubleSide}
+        />
       </mesh>
       {[0, 1.3, 2.6, 3.9, 5.2].map((turn) => (
         <mesh key={turn} position={[Math.cos(turn) * 0.2, 0.52, Math.sin(turn) * 0.2]}>
@@ -100,34 +109,78 @@ export function GlassMushroom({ tile }) {
   );
 }
 
-const STAKE = 0.166;
-const STAKE_BARKS = ['#9a6b45', '#b07d52', '#84583a'];
+const PINE_GREENS = ['#2f6b4f', '#3a7d5c', '#28604a'];
+const LEAF_COLORS = ['#e8964a', '#d9553f', '#f0c14e', '#c9703a'];
 
-/**
- * A wall: a palisade of nine upright logs with pointed tips that fills its whole square, so palisades on
- * neighboring squares join into one long fence.
- */
-export function Palisade({ tile }) {
+/** A little pine: a short trunk and three tiers of needles. */
+function SmallPine({ height, green }) {
   return (
     <group>
-      {[-1, 0, 1].flatMap((x) =>
-        [-1, 0, 1].map((z) => {
-          const height = 0.5 + (((tile.x + x) * 3 + (tile.y + z) * 5 + 9) % 3) * 0.05;
-          const bark = STAKE_BARKS[((tile.x + x) * 2 + (tile.y + z) + 9) % STAKE_BARKS.length];
+      <mesh position={[0, 0.09, 0]} castShadow>
+        <cylinderGeometry args={[0.05, 0.065, 0.18, 8]} />
+        <meshStandardMaterial color="#6b4630" roughness={0.9} />
+      </mesh>
+      {[0, 1, 2].map((tier) => (
+        <mesh key={tier} position={[0, 0.26 + tier * height * 0.24, 0]} castShadow receiveShadow>
+          <coneGeometry args={[0.29 - tier * 0.07, height * 0.42, 10]} />
+          <meshStandardMaterial color={green} roughness={0.9} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** A little leafy tree in autumn colors: a trunk and a round crown made of three puffs. */
+function LeafyTree({ height, color }) {
+  return (
+    <group>
+      <mesh position={[0, height * 0.25, 0]} castShadow>
+        <cylinderGeometry args={[0.045, 0.06, height * 0.5, 8]} />
+        <meshStandardMaterial color="#7a5232" roughness={0.9} />
+      </mesh>
+      {[
+        [0, height * 0.72, 0, 0.27],
+        [0.12, height * 0.6, 0.08, 0.19],
+        [-0.11, height * 0.62, -0.07, 0.2],
+      ].map(([x, y, z, radius], k) => (
+        <mesh key={k} position={[x, y, z]} castShadow receiveShadow>
+          <icosahedronGeometry args={[radius, 1]} />
+          <meshStandardMaterial color={color} roughness={0.85} flatShading />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/**
+ * A wall: a clump of four trees that fills its whole square (owner's pick: real trees, not trunks), so clumps on
+ * neighboring squares join into one thick stretch of forest. Dark pines mix with leafy trees in autumn colors, so
+ * the wall never blends into the green floor.
+ */
+export function TreeClump({ tile }) {
+  return (
+    <group>
+      {[-1, 1].flatMap((x) =>
+        [-1, 1].map((z) => {
+          // Seeded by where the tree stands on the board, so a joined wall looks like one wood, never a repeat.
+          const seed = (tile.x * 2 + (x + 1) / 2) * 7 + (tile.y * 2 + (z + 1) / 2) * 13;
+          const height = 0.78 + (seed % 4) * 0.07;
           return (
-            <group key={`${x}${z}`} position={[x * STAKE * 2, 0, z * STAKE * 2]}>
-              <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
-                <cylinderGeometry args={[STAKE, STAKE, height, 12]} />
-                <meshStandardMaterial map={barkTexture()} color={bark} roughness={0.95} />
-              </mesh>
-              <mesh position={[0, height + 0.08, 0]} castShadow>
-                <coneGeometry args={[STAKE, 0.16, 12]} />
-                <meshStandardMaterial color="#e6c794" roughness={0.85} />
-              </mesh>
+            <group key={`${x}${z}`} position={[x * 0.25 + ((seed % 3) - 1) * 0.02, 0, z * 0.25 + ((seed % 5) - 2) * 0.012]}>
+              {seed % 3 === 0 ? (
+                <LeafyTree height={height} color={LEAF_COLORS[seed % LEAF_COLORS.length]} />
+              ) : (
+                <SmallPine height={height} green={PINE_GREENS[seed % PINE_GREENS.length]} />
+              )}
             </group>
           );
         }),
       )}
+      {/* Undergrowth, so no light slips between the trunks. */}
+      <mesh position={[0, 0.11, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.98, 0.22, 0.98]} />
+        <meshStandardMaterial color="#3f7d57" roughness={1} />
+      </mesh>
     </group>
   );
 }
@@ -136,28 +189,35 @@ export function Palisade({ tile }) {
 export function Campfire({ tile, turn, calm }) {
   return (
     <Facing tile={tile} turn={turn}>
-      {Array.from({ length: 8 }, (_, k) => (
-        <mesh key={k} position={[Math.cos((k / 8) * Math.PI * 2) * 0.27, 0.05, Math.sin((k / 8) * Math.PI * 2) * 0.27]} scale={[1, 0.7, 1]} castShadow>
-          <icosahedronGeometry args={[0.075, 0]} />
-          <meshStandardMaterial color={k % 2 ? '#8f8f96' : '#a9a8ae'} roughness={0.9} flatShading />
+      <group scale={1.25}>
+        {Array.from({ length: 8 }, (_, k) => (
+          <mesh
+            key={k}
+            position={[Math.cos((k / 8) * Math.PI * 2) * 0.27, 0.05, Math.sin((k / 8) * Math.PI * 2) * 0.27]}
+            scale={[1, 0.7, 1]}
+            castShadow
+          >
+            <icosahedronGeometry args={[0.075, 0]} />
+            <meshStandardMaterial color={k % 2 ? '#8f8f96' : '#a9a8ae'} roughness={0.9} flatShading />
+          </mesh>
+        ))}
+        {[0.5, -0.5, 1.6].map((spin) => (
+          <mesh key={spin} position={[0, 0.07, 0]} rotation={[0, spin, Math.PI / 2 - 0.25]} castShadow>
+            <cylinderGeometry args={[0.035, 0.035, 0.36, 8]} />
+            <meshStandardMaterial color="#6b4630" roughness={0.9} />
+          </mesh>
+        ))}
+        {/* The reflector: a curved slab of bark behind the fire, open towards the way the light goes. */}
+        <mesh position={[-0.05, 0.3, 0]} rotation={[0, Math.PI, 0]} castShadow>
+          <cylinderGeometry args={[0.34, 0.34, 0.6, 16, 1, true, Math.PI / 2 - 0.9, 1.8]} />
+          <meshStandardMaterial map={barkTexture()} color="#9a6b45" roughness={0.95} side={THREE.DoubleSide} />
         </mesh>
-      ))}
-      {[0.5, -0.5, 1.6].map((spin) => (
-        <mesh key={spin} position={[0, 0.07, 0]} rotation={[0, spin, Math.PI / 2 - 0.25]} castShadow>
-          <cylinderGeometry args={[0.035, 0.035, 0.36, 8]} />
-          <meshStandardMaterial color="#6b4630" roughness={0.9} />
-        </mesh>
-      ))}
-      {/* The reflector: a curved slab of bark behind the fire, open towards the way the light goes. */}
-      <mesh position={[-0.05, 0.3, 0]} rotation={[0, Math.PI, 0]} castShadow>
-        <cylinderGeometry args={[0.34, 0.34, 0.6, 16, 1, true, Math.PI / 2 - 0.9, 1.8]} />
-        <meshStandardMaterial map={barkTexture()} color="#9a6b45" roughness={0.95} side={THREE.DoubleSide} />
-      </mesh>
-      <group position={[0, 0.14, 0]} scale={3.6}>
-        <Flame calm={calm} />
+        <group position={[0, 0.14, 0]} scale={3.6}>
+          <Flame calm={calm} />
+        </group>
+        <Flare position={[0.05, 0.42, 0]} size={1} />
       </group>
-      <Flare position={[0.05, 0.42, 0]} size={1} />
-      <pointLight position={[0.1, 0.45, 0]} color="#ffb866" intensity={4} distance={3.2} />
+      <pointLight position={[0.1, 0.5, 0]} color="#ffb866" intensity={4} distance={3.2} />
     </Facing>
   );
 }

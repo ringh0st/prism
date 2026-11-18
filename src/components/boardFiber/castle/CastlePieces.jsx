@@ -88,7 +88,14 @@ function OnPillar({ turn, children }) {
         <boxGeometry args={[0.36, 0.22, 0.28]} />
         {stoneM('#62606a')}
       </mesh>
-      <group position={[0, 0.6, 0]}>{children}</group>
+      {/* Two iron legs hold a fixed piece (one that turns stands on a single post). */}
+      {[-0.2, 0.2].map((x) => (
+        <mesh key={x} position={[x, 0.36, 0]}>
+          <cylinderGeometry args={[0.02, 0.02, 0.2, 8]} />
+          {ironM}
+        </mesh>
+      ))}
+      <group position={[0, 0.64, 0]}>{children}</group>
     </group>
   );
 }
