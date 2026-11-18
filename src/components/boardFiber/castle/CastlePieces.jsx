@@ -13,6 +13,9 @@ import { Flare, Gear, Streaks, brassM, mirrorM } from '../themes/shared.jsx';
 const STONE = '#d9c8a4';
 const STONE_DARK = '#8f7a5e';
 const IRON = '#4a4038';
+/** Mirror stands and shield rims: dark grey iron-stone (owner's pick), so the bright glass stands out. */
+const DARK_GREY = '#4d4b54';
+const darkGreyM = <meshStandardMaterial color={DARK_GREY} roughness={0.55} metalness={0.35} />;
 const stoneM = (color = STONE) => <meshStandardMaterial color={color} roughness={0.9} />;
 const ironM = <meshStandardMaterial color={IRON} roughness={0.5} metalness={0.5} />;
 
@@ -30,14 +33,14 @@ function shieldShape(scale = 1) {
   return shape;
 }
 
-/** The shield: a gold rim with a mirror-bright face on both sides. */
+/** The shield: a dark grey rim with a mirror-bright face on both sides. */
 function Shield({ glass = mirrorM, streaks = true }) {
   const rim = useMemo(() => new THREE.ExtrudeGeometry(shieldShape(), { depth: 0.03, bevelEnabled: false }).translate(0, 0, -0.015), []);
   const face = useMemo(() => new THREE.ShapeGeometry(shieldShape(0.86)), []);
   return (
     <group>
       <mesh geometry={rim} castShadow>
-        {brassM()}
+        {darkGreyM}
       </mesh>
       {[1, -1].map((side) => (
         <mesh key={side} geometry={face} position={[0, 0, side * 0.017]} rotation={[0, side < 0 ? Math.PI : 0, 0]}>
@@ -58,7 +61,7 @@ function OnTurntable({ turn, children }) {
   }, [angle]);
   return (
     <group ref={rotor} rotation={[0, angle, 0]}>
-      <Gear r={0.34} teeth={8} h={0.07} color={STONE_DARK} metalness={0} roughness={0.9} />
+      <Gear r={0.34} teeth={8} h={0.07} color={DARK_GREY} metalness={0.2} roughness={0.7} />
       <mesh position={[0, 0.16, 0]}>
         <cylinderGeometry args={[0.03, 0.04, 0.2, 10]} />
         {ironM}
@@ -74,11 +77,11 @@ function OnPillar({ turn, children }) {
     <group rotation={[0, mirrorAngle(turn), 0]}>
       <mesh position={[0, 0.03, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.5, 0.06, 0.4]} />
-        {stoneM(STONE_DARK)}
+        {darkGreyM}
       </mesh>
       <mesh position={[0, 0.16, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.36, 0.22, 0.28]} />
-        {stoneM()}
+        {stoneM('#62606a')}
       </mesh>
       <group position={[0, 0.6, 0]}>{children}</group>
     </group>
