@@ -110,7 +110,8 @@ export function GlassMushroom({ tile }) {
 }
 
 const PINE_GREENS = ['#2f6b4f', '#3a7d5c', '#28604a'];
-const LEAF_COLORS = ['#e8964a', '#d9553f', '#f0c14e', '#c9703a'];
+/** Leafy crowns in greens only (owner's pick): orange and gold read too close to the mirrors' stumps and frames. */
+const LEAF_COLORS = ['#8fca62', '#4fa88a', '#6fb24a', '#3f9a6a'];
 
 /** A little pine: a short trunk and three tiers of needles. */
 function SmallPine({ height, green }) {
@@ -130,7 +131,7 @@ function SmallPine({ height, green }) {
   );
 }
 
-/** A little leafy tree in autumn colors: a trunk and a round crown made of three puffs. */
+/** A little leafy tree: a trunk and a round crown made of three puffs. */
 function LeafyTree({ height, color }) {
   return (
     <group>
@@ -154,8 +155,8 @@ function LeafyTree({ height, color }) {
 
 /**
  * A wall: a clump of four trees that fills its whole square (owner's pick: real trees, not trunks), so clumps on
- * neighboring squares join into one thick stretch of forest. Dark pines mix with leafy trees in autumn colors, so
- * the wall never blends into the green floor.
+ * neighboring squares join into one thick stretch of forest. Dark pines mix with leafy trees in lighter greens,
+ * over dark undergrowth, so the wall still stands out from the floor.
  */
 export function TreeClump({ tile }) {
   return (
