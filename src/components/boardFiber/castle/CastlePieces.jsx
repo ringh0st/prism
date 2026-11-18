@@ -6,11 +6,11 @@
 import { useEffect, useMemo, useRef } from 'react';
 import gsap from 'gsap';
 import * as THREE from 'three';
-import { TILE } from '../../../game/constants.js';
 import { DIRECTION_ANGLE, mirrorAngle } from '../library/LibraryPieces.jsx';
 import { useBricks } from './CastleRoom.jsx';
+import { GLASS, ShapeMark } from '../themes/ColorGlass.jsx';
 import Flame from '../themes/Flame.jsx';
-import { Flare, Gear, Streaks, brassM, mirrorM } from '../themes/shared.jsx';
+import { Flare, Gear, Streaks, brassM, mirrorM, wallBeside } from '../themes/shared.jsx';
 
 const STONE = '#d9c8a4';
 const STONE_DARK = '#8f7a5e';
@@ -156,45 +156,6 @@ export const PillarCrystal = ({ turn }) => (
   </OnPillar>
 );
 
-/** Each light's stained glass, and the shape that names it (so color is never the only clue). */
-const GLASS = {
-  sun: { color: '#ffcf4a', shape: 'diamond' },
-  coral: { color: '#ff7a68', shape: 'round' },
-  lime: { color: '#7bd464', shape: 'triangle' },
-  sky: { color: '#63b6ee', shape: 'square' },
-};
-
-function ShapeMark({ shape, color }) {
-  const material = <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.5} roughness={0.4} />;
-  if (shape === 'round')
-    return (
-      <mesh>
-        <sphereGeometry args={[0.07, 14, 10]} />
-        {material}
-      </mesh>
-    );
-  if (shape === 'triangle')
-    return (
-      <mesh>
-        <coneGeometry args={[0.08, 0.13, 3]} />
-        {material}
-      </mesh>
-    );
-  if (shape === 'square')
-    return (
-      <mesh>
-        <boxGeometry args={[0.11, 0.11, 0.11]} />
-        {material}
-      </mesh>
-    );
-  return (
-    <mesh scale={[1, 1.3, 1]}>
-      <octahedronGeometry args={[0.07, 0]} />
-      {material}
-    </mesh>
-  );
-}
-
 /** Color glass: a little stained-glass tower. Light passing through from any side leaves in its color. */
 export function StainedGlassTower({ tile }) {
   const { color, shape } = GLASS[tile.color] ?? GLASS.sun;
@@ -249,8 +210,8 @@ const SIDES = [
  */
 export function CastleWall({ tile, level }) {
   const masonry = useBricks(1, WALL_HEIGHT);
-  const isWall = (x, y) => level.tiles.some((other) => other.type === TILE.WALL && other.x === x && other.y === y);
-  const open = SIDES.filter(({ step }) => !isWall(tile.x + step[0], tile.y + step[1]));
+  const isWall = wallBeside(level, tile);
+  const open = SIDES.filter(({ step }) => !isWall(step[0], step[1]));
   return (
     <group>
       <mesh position={[0, WALL_HEIGHT / 2, 0]} castShadow receiveShadow>

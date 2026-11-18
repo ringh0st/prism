@@ -193,3 +193,12 @@ export function GroundShadow({ width, depth, y }) {
     </mesh>
   );
 }
+
+/** A splitter's pane: clear amber glass you can see through (light passes and bounces). */
+export const amberGlass = (
+  <meshPhysicalMaterial color="#ffd98a" roughness={0.05} clearcoat={1} transparent opacity={0.42} emissive="#ffc35a" emissiveIntensity={0.25} side={THREE.DoubleSide} />
+);
+
+/** For walls that join up: is there a wall on the square `dx`, `dy` away from this tile? */
+export const wallBeside = (level, tile) => (dx, dy) =>
+  level.tiles.some((other) => other.type === 'wall' && other.x === tile.x + dx && other.y === tile.y + dy);

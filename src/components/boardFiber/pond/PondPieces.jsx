@@ -7,10 +7,10 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import * as THREE from 'three';
-import { TILE } from '../../../game/constants.js';
 import { DIRECTION_ANGLE, RoundMirror, mirrorAngle } from '../library/LibraryPieces.jsx';
 import Flame from '../themes/Flame.jsx';
-import { brassM, mirrorM } from '../themes/shared.jsx';
+import { GlassBell } from '../themes/ColorGlass.jsx';
+import { amberGlass, brassM, mirrorM, wallBeside } from '../themes/shared.jsx';
 
 const WOOD = '#a8774a';
 /** The mirror's frame: green reed stems, with cattail-brown beads for the knobs. */
@@ -20,11 +20,6 @@ const stoneFrame = () => <meshStandardMaterial color="#6f6d68" roughness={0.85} 
 /** A splitter's frame: honey brass, to match its amber glass. */
 const honeyFrame = () => brassM('#e0a23a');
 const PETALS = 9;
-/** A splitter's pane: clear amber glass you can see through (light passes and bounces). */
-const amberGlass = (
-  <meshPhysicalMaterial color="#ffd98a" roughness={0.05} clearcoat={1} transparent opacity={0.42} emissive="#ffc35a" emissiveIntensity={0.25} side={THREE.DoubleSide} />
-);
-
 /** A water-lily flower lying open on the pond: a ring of pink petals round a golden heart. */
 function LilyFlower() {
   return (
@@ -121,6 +116,13 @@ export const PondFixedSplitter = ({ turn }) => (
 
 const LOG_RADIUS = 0.166;
 const BARKS = ['#9a6b45', '#b07d52', '#84583a'];
+
+/** Color glass at the pond: a glass bell resting in a water-lily flower. */
+export const LilyGlass = ({ tile }) => (
+  <GlassBell tile={tile}>
+    <LilyFlower />
+  </GlassBell>
+);
 
 let barkMap = null;
 
@@ -225,7 +227,7 @@ function Twig({ position, turn, length, color }) {
  * next, cut ends show only where the wall stops, and a few tiny branches in different colors lie on top.
  */
 export function LogWall({ tile, level }) {
-  const isWall = (dx, dy) => level.tiles.some((other) => other.type === TILE.WALL && other.x === tile.x + dx && other.y === tile.y + dy);
+  const isWall = wallBeside(level, tile);
   // Logs follow the wall's run: along x when it continues left or right, else along z when it continues up or down.
   const alongZ = !isWall(-1, 0) && !isWall(1, 0) && (isWall(0, -1) || isWall(0, 1));
   const ends = [-1, 1].filter((side) => !(alongZ ? isWall(0, -side) : isWall(side, 0)));

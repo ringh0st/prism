@@ -1,13 +1,38 @@
 /*
- * Themed worlds: a world can be dressed as a place (its pieces, floor and light drawn to match) on the 3D board.
- * The Library comes first; more themes (pond, sea, space…) take more worlds. Pure data, no React.
+ * Themed boards: a level can be dressed as a place (its pieces, floor and light drawn to match) on the 3D board.
+ * In the themed worlds every level gets one of the finished themes, so the scenery keeps changing as you play.
+ * Pure data, no React.
  */
-export const BOARD_THEMES = { library: [1], pond: [2], castle: [3] };
+/** The finished themes, which take turns. */
+export const THEMES_IN_PLAY = ['library', 'pond', 'castle'];
+/** Themes still being designed: seen only with the preview switch (`?theme=forest` on the game's address). */
+export const THEMES_IN_PREVIEW = ['forest', 'beach'];
+/** The worlds whose pieces every theme can draw (mirrors, walls, splitters and color glass). */
+export const THEMED_WORLDS = [1, 2, 3];
+
+let previewTheme = null;
+/** The owner's preview switch: dress every themed level in one theme (null turns it off). */
+export function setPreviewTheme(theme) {
+  previewTheme = [...THEMES_IN_PLAY, ...THEMES_IN_PREVIEW].includes(theme) ? theme : null;
+}
+
+const turns = [];
+/** The theme of the n-th themed level (1-based): a seeded pick that never repeats the level before it. */
+function themeInTurn(number) {
+  for (let n = turns.length + 1; n <= number; n++) {
+    let pick = (n * 2654435761) % 4294967296;
+    pick = Math.floor((pick / 4294967296) * THEMES_IN_PLAY.length);
+    if (n > 1 && THEMES_IN_PLAY[pick] === turns[n - 2]) pick = (pick + 1) % THEMES_IN_PLAY.length;
+    turns.push(THEMES_IN_PLAY[pick]);
+  }
+  return turns[number - 1];
+}
 
 /** The board theme for a level, or null for the regular board. */
 export function boardThemeFor(level) {
-  for (const [theme, worlds] of Object.entries(BOARD_THEMES)) if (worlds.includes(level?.world)) return theme;
-  return null;
+  const place = THEMED_WORLDS.indexOf(level?.world);
+  if (place < 0 || !level.index) return null;
+  return previewTheme ?? themeInTurn(place * 20 + level.index);
 }
 
 /**
@@ -17,7 +42,7 @@ export function boardThemeFor(level) {
 export const LUMI_COATS = ['#ffb7d2', '#aecffa', '#ff9d9d', '#b2e6b4', '#d0b8f7', '#a5e6d8', '#f6add6', '#b9c0f9'];
 
 /** Coats a theme leaves out because they'd vanish on its tiles (a green Lumi on a green lily pad). */
-const HIDDEN_COATS = { pond: ['#b2e6b4', '#a5e6d8'] };
+const HIDDEN_COATS = { pond: ['#b2e6b4', '#a5e6d8'], forest: ['#b2e6b4', '#a5e6d8'] };
 
 /** The coats Lumis can wear in a theme: every coat that stands out on its tiles. */
 export const coatsFor = (theme) => LUMI_COATS.filter((coat) => !(HIDDEN_COATS[theme] ?? []).includes(coat));

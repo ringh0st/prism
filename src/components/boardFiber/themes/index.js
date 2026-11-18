@@ -4,9 +4,9 @@
  */
 import { CastleWall, CrystalSplitter, PillarCrystal, PillarShield, ShieldMirror, StainedGlassTower, Torch } from '../castle/CastlePieces.jsx';
 import { CASTLE_HEIGHT, CASTLE_PAD, CastleRoom, Flagstone } from '../castle/CastleRoom.jsx';
-import { BankerLamp, BookcaseWall, FixedMirror, GearMirror } from '../library/LibraryPieces.jsx';
+import { BankerLamp, BookcaseWall, DeskGlass, FixedMirror, FixedSplitter, GearMirror, GearSplitter } from '../library/LibraryPieces.jsx';
 import { LibraryRoom, ParquetTile, ROOM_HEIGHT, ROOM_PAD } from '../library/LibraryRoom.jsx';
-import { CandleLantern, LogWall, PondFixedMirror, PondFixedSplitter, PondMirror, PondSplitter } from '../pond/PondPieces.jsx';
+import { CandleLantern, LilyGlass, LogWall, PondFixedMirror, PondFixedSplitter, PondMirror, PondSplitter } from '../pond/PondPieces.jsx';
 import { LilyPad, POND_HEIGHT, POND_PAD, PondRoom } from '../pond/PondRoom.jsx';
 
 export const THEME_LOOKS = {
@@ -15,7 +15,15 @@ export const THEME_LOOKS = {
     Tile: ParquetTile,
     tileY: 0.05,
     tileTop: 0.09,
-    pieces: { lamp: BankerLamp, mirror: GearMirror, fixedMirror: FixedMirror, wall: BookcaseWall },
+    pieces: {
+      lamp: BankerLamp,
+      mirror: GearMirror,
+      fixedMirror: FixedMirror,
+      splitter: GearSplitter,
+      fixedSplitter: FixedSplitter,
+      filter: DeskGlass,
+      wall: BookcaseWall,
+    },
     room: { pad: ROOM_PAD, height: ROOM_HEIGHT },
     light: { sky: '#ffe6c4', ground: '#3a2418', fill: 0.65, sun: 1.1 },
     wall: null,
@@ -25,7 +33,7 @@ export const THEME_LOOKS = {
     Tile: LilyPad,
     tileY: 0.05,
     tileTop: 0.1,
-    pieces: { lamp: CandleLantern, mirror: PondMirror, fixedMirror: PondFixedMirror, splitter: PondSplitter, fixedSplitter: PondFixedSplitter, wall: LogWall },
+    pieces: { lamp: CandleLantern, mirror: PondMirror, fixedMirror: PondFixedMirror, splitter: PondSplitter, fixedSplitter: PondFixedSplitter, filter: LilyGlass, wall: LogWall },
     room: { pad: POND_PAD, height: POND_HEIGHT },
     light: { sky: '#fff6e0', ground: '#5f8a66', fill: 0.8, sun: 1.35 },
     // The window's wall behind the pond: a soft meadow morning.

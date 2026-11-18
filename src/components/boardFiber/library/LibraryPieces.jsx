@@ -6,8 +6,8 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import * as THREE from 'three';
-import { TILE } from '../../../game/constants.js';
-import { Gear, Streaks, brassM, glow, lath, mirrorM } from '../themes/shared.jsx';
+import { GlassBell } from '../themes/ColorGlass.jsx';
+import { Gear, Streaks, amberGlass, brassM, glow, lath, mirrorM, wallBeside } from '../themes/shared.jsx';
 
 export const DIRECTION_ANGLE = { right: 0, down: -Math.PI / 2, left: Math.PI, up: Math.PI / 2 };
 /** The game's mirror angle for a turn count (the pane faces along local z). */
@@ -47,7 +47,7 @@ export function RoundMirror({ postsFrom = -0.16, knob = true, frame = brassM, gl
 }
 
 /** A mirror that turns: the brass mirror on a gear wheel; mirror and gear swing together. */
-export function GearMirror({ turn }) {
+export function GearMirror({ turn, frame, glass, streaks }) {
   const rotor = useRef();
   const angle = mirrorAngle(turn);
   useEffect(() => {
@@ -61,7 +61,7 @@ export function GearMirror({ turn }) {
         <meshBasicMaterial color="#5a3f22" />
       </mesh>
       <group position={[0, 0.38, 0]}>
-        <RoundMirror />
+        <RoundMirror frame={frame} glass={glass} streaks={streaks} />
       </group>
     </group>
   );
@@ -71,7 +71,7 @@ export function GearMirror({ turn }) {
 const ironFrame = () => <meshStandardMaterial color="#3d3836" metalness={0.6} roughness={0.4} />;
 
 /** A mirror that can't turn: the same brass mirror bolted to a heavy wooden plinth with brass corners (no gear). */
-export function FixedMirror({ turn }) {
+export function FixedMirror({ turn, frame = ironFrame, glass, streaks }) {
   return (
     <group rotation={[0, mirrorAngle(turn), 0]}>
       <mesh position={[0, 0.06, 0]} castShadow receiveShadow>
@@ -94,15 +94,31 @@ export function FixedMirror({ turn }) {
         </mesh>
       ))}
       <group position={[0, 0.42, 0]}>
-        <RoundMirror knob={false} postsFrom={-0.14} frame={ironFrame} />
+        <RoundMirror knob={false} postsFrom={-0.14} frame={frame} glass={glass} streaks={streaks} />
         <mesh position={[0, 0.31, 0]}>
           <sphereGeometry args={[0.03, 12, 10]} />
-          {ironFrame()}
+          {frame()}
         </mesh>
       </group>
     </group>
   );
 }
+
+/** A splitter's frame: warm copper, with clear amber glass in it (never one of the mirrors). */
+const copperFrame = (color = '#c9824a') => <meshPhysicalMaterial color={color === '#e8c06a' ? '#e0a070' : color} metalness={0.75} roughness={0.3} clearcoat={0.5} />;
+
+export const GearSplitter = ({ turn }) => <GearMirror turn={turn} frame={copperFrame} glass={amberGlass} streaks={false} />;
+export const FixedSplitter = ({ turn }) => <FixedMirror turn={turn} frame={copperFrame} glass={amberGlass} streaks={false} />;
+
+/** Color glass in the library: a glass bell on a round brass stand. */
+export const DeskGlass = ({ tile }) => (
+  <GlassBell tile={tile}>
+    <mesh position={[0, 0.07, 0]} castShadow receiveShadow>
+      <cylinderGeometry args={[0.3, 0.33, 0.14, 24]} />
+      {brassM()}
+    </mesh>
+  </GlassBell>
+);
 
 function BankerLampBody() {
   return (
@@ -233,11 +249,11 @@ const SIDES = [
 
 /**
  * A wall: a bookcase that fills its whole square, so bookcases on neighboring squares join into one long run of
- * shelves. Books show on every side that faces the open floor (never between two joined cases).
+ * shelves. Books show on every side that faces the open floor (never between two joined cases); the top is plain.
  */
 export function BookcaseWall({ tile, level }) {
-  const isWall = (x, y) => level.tiles.some((other) => other.type === TILE.WALL && other.x === x && other.y === y);
-  const open = SIDES.filter(({ step }) => !isWall(tile.x + step[0], tile.y + step[1]));
+  const isWall = wallBeside(level, tile);
+  const open = SIDES.filter(({ step }) => !isWall(step[0], step[1]));
   return (
     <group>
       <mesh position={[0, CASE_HEIGHT / 2, 0]} castShadow receiveShadow>
@@ -250,14 +266,10 @@ export function BookcaseWall({ tile, level }) {
           <meshStandardMaterial map={spinesTexture(1 + ((tile.x * 3 + tile.y * 5 + side) % 5))} roughness={0.7} />
         </mesh>
       ))}
-      {/* A lighter top board with a book left lying on it. */}
+      {/* A lighter top board. */}
       <mesh position={[0, CASE_HEIGHT + 0.015, 0]} castShadow>
         <boxGeometry args={[1, 0.03, 1]} />
         <meshStandardMaterial color="#7d5136" roughness={0.7} />
-      </mesh>
-      <mesh position={[0.12, CASE_HEIGHT + 0.065, -0.08]} rotation={[0, ((tile.x + tile.y) % 5) * 0.4, 0]} castShadow>
-        <boxGeometry args={[0.42, 0.07, 0.3]} />
-        <meshStandardMaterial color={['#b5503f', '#3d5a80', '#3f6b4c'][(tile.x + tile.y * 2) % 3]} roughness={0.75} />
       </mesh>
     </group>
   );
