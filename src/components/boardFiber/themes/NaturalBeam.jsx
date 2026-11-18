@@ -11,7 +11,8 @@ const ADD = { transparent: true, depthWrite: false, blending: THREE.AdditiveBlen
 /** Dust specks drifting slowly through the shaft, the way the light goes (still for reduced motion). */
 function Motes({ from, to, calm }) {
   const ref = useRef([]);
-  const count = Math.max(2, Math.round(from.distanceTo(to) * 10));
+  // A few specks per beam: each one is a draw, and a phone feels hundreds of them.
+  const count = Math.max(2, Math.round(from.distanceTo(to) * 2));
   const seeds = useMemo(() => Array.from({ length: count }, (_, k) => [k / count, Math.sin(k * 9.1) * 0.06, Math.cos(k * 5.3) * 0.06]), [count]);
   useFrame(({ clock }) =>
     ref.current.forEach((mesh, k) => {

@@ -12,7 +12,7 @@ export default function Flame({ calm }) {
     flame.current.rotation.z = Math.sin(t * 5) * 0.07;
   });
   return (
-    <group ref={flame}>
+    <group ref={flame} userData={{ live: true }}>
       <mesh position={[0, 0.075, 0]}>
         <coneGeometry args={[0.04, 0.13, 12]} />
         <meshBasicMaterial color={glow('#ff8a3a', 1.8)} toneMapped={false} />

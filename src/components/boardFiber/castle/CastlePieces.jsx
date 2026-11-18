@@ -9,6 +9,7 @@ import * as THREE from 'three';
 import { DIRECTION_ANGLE, mirrorAngle } from '../library/LibraryPieces.jsx';
 import { useBricks } from './CastleRoom.jsx';
 import { GLASS, ShapeMark } from '../themes/ColorGlass.jsx';
+import Bake from '../themes/Bake.jsx';
 import Flame from '../themes/Flame.jsx';
 import { Flare, Gear, Streaks, brassM, mirrorM, wallBeside } from '../themes/shared.jsx';
 
@@ -66,12 +67,14 @@ function OnTurntable({ turn, children }) {
   }, [angle]);
   return (
     <group ref={rotor} rotation={[0, angle, 0]}>
-      <Gear r={0.34} teeth={8} h={0.07} color={DARK_GREY} metalness={0.2} roughness={0.7} />
-      <mesh position={[0, 0.16, 0]}>
-        <cylinderGeometry args={[0.03, 0.04, 0.2, 10]} />
-        {ironM}
-      </mesh>
-      <group position={[0, 0.56, 0]}>{children}</group>
+      <Bake>
+        <Gear r={0.34} teeth={8} h={0.07} color={DARK_GREY} metalness={0.2} roughness={0.7} />
+        <mesh position={[0, 0.16, 0]}>
+          <cylinderGeometry args={[0.03, 0.04, 0.2, 10]} />
+          {ironM}
+        </mesh>
+        <group position={[0, 0.56, 0]}>{children}</group>
+      </Bake>
     </group>
   );
 }
@@ -80,22 +83,24 @@ function OnTurntable({ turn, children }) {
 function OnPillar({ turn, children }) {
   return (
     <group rotation={[0, mirrorAngle(turn), 0]}>
-      <mesh position={[0, 0.03, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.5, 0.06, 0.4]} />
-        {darkGreyM}
-      </mesh>
-      <mesh position={[0, 0.16, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.36, 0.22, 0.28]} />
-        {stoneM('#62606a')}
-      </mesh>
-      {/* Two iron legs hold a fixed piece (one that turns stands on a single post). */}
-      {[-0.2, 0.2].map((x) => (
-        <mesh key={x} position={[x, 0.36, 0]}>
-          <cylinderGeometry args={[0.02, 0.02, 0.2, 8]} />
-          {ironM}
+      <Bake>
+        <mesh position={[0, 0.03, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.5, 0.06, 0.4]} />
+          {darkGreyM}
         </mesh>
-      ))}
-      <group position={[0, 0.64, 0]}>{children}</group>
+        <mesh position={[0, 0.16, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.36, 0.22, 0.28]} />
+          {stoneM('#62606a')}
+        </mesh>
+        {/* Two iron legs hold a fixed piece (one that turns stands on a single post). */}
+        {[-0.2, 0.2].map((x) => (
+          <mesh key={x} position={[x, 0.36, 0]}>
+            <cylinderGeometry args={[0.02, 0.02, 0.2, 8]} />
+            {ironM}
+          </mesh>
+        ))}
+        <group position={[0, 0.64, 0]}>{children}</group>
+      </Bake>
     </group>
   );
 }
@@ -145,7 +150,16 @@ function CrystalPane() {
         {brassM()}
       </mesh>
       <mesh geometry={pane}>
-        <meshPhysicalMaterial color="#eaf6ff" roughness={0.04} clearcoat={1} transparent opacity={0.4} emissive="#cfe9ff" emissiveIntensity={0.3} side={THREE.DoubleSide} />
+        <meshPhysicalMaterial
+          color="#eaf6ff"
+          roughness={0.04}
+          clearcoat={1}
+          transparent
+          opacity={0.4}
+          emissive="#cfe9ff"
+          emissiveIntensity={0.3}
+          side={THREE.DoubleSide}
+        />
       </mesh>
     </group>
   );
@@ -292,7 +306,6 @@ function TorchBody({ calm }) {
         </group>
       </group>
       <Flare position={[0.33, 0.92, 0]} size={0.95} />
-      <pointLight position={[0.33, 0.9, 0]} color="#ffb866" intensity={4} distance={3.2} />
     </group>
   );
 }
@@ -307,9 +320,11 @@ export function Torch({ tile, turn, calm }) {
   return (
     <group ref={head} rotation={[0, angle, 0]}>
       {tile.turnable && <Gear r={0.36} teeth={8} h={0.07} color={STONE_DARK} metalness={0} roughness={0.9} />}
-      <group position={[0, tile.turnable ? 0.07 : 0, 0]}>
-        <TorchBody calm={calm} />
-      </group>
+      <Bake>
+        <group position={[0, tile.turnable ? 0.07 : 0, 0]}>
+          <TorchBody calm={calm} />
+        </group>
+      </Bake>
     </group>
   );
 }

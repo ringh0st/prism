@@ -218,7 +218,6 @@ export function Campfire({ tile, turn, calm }) {
         </group>
         <Flare position={[0.05, 0.42, 0]} size={1} />
       </group>
-      <pointLight position={[0.1, 0.5, 0]} color="#ffb866" intensity={4} distance={3.2} />
     </Facing>
   );
 }

@@ -111,6 +111,34 @@ function Layout({ level, onLayout }) {
   return null;
 }
 
+/** How long a tap's animation can still be moving a piece (ms), so its shadow keeps up. */
+const SHADOW_SETTLE_MS = 1400;
+
+/**
+ * Shadows are drawn once and kept: drawing them means drawing the whole room a second time, every frame. They're
+ * drawn again only for a moment after something on the board changes (a turn, a rescue, a new level).
+ */
+function StillShadows({ stamp }) {
+  const gl = useThree((three) => three.gl);
+  const until = useRef(0);
+  useEffect(() => {
+    gl.shadowMap.autoUpdate = false;
+    return () => {
+      gl.shadowMap.autoUpdate = true;
+    };
+  }, [gl]);
+  useEffect(() => {
+    until.current = performance.now() + SHADOW_SETTLE_MS;
+  }, [stamp]);
+  useFrame(() => {
+    if (performance.now() < until.current) gl.shadowMap.needsUpdate = true;
+  });
+  return null;
+}
+
+/** Phones and tablets: fewer pixels and no extra smoothing pass, which is most of what a small graphics chip pays for. */
+const isTouchDevice = () => typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+
 /**
  * The themed board, drawn with React Three Fiber: the same level, taps and rules as the flat board, dressed as one
  * of the themes (ThemedScene), with GSAP animation and a bloom pass that only the light passes. The board's buttons
@@ -122,6 +150,7 @@ export default function BoardFiber({ level, theme, state, onLayout, onTapCell })
   const { t } = useI18n();
   const [resetKey, setResetKey] = useState(0);
   const calm = useMemo(prefersCalm, []);
+  const light = useMemo(isTouchDevice, []);
   // The themed room's look, and its box so the camera can frame all of it.
   const look = THEME_LOOKS[theme] ?? THEME_LOOKS.library;
   const room = useMemo(
@@ -138,16 +167,24 @@ export default function BoardFiber({ level, theme, state, onLayout, onTapCell })
     <div className={styles.stage}>
       {/* The room shows through a rounded window, so zooming in never ends in a hard square edge. */}
       <div className={styles.window} style={look.wall ? { background: look.wall } : undefined}>
-        <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ fov: 28, near: 0.1, far: 200 }}>
+        <Canvas shadows dpr={[1, light ? 1.5 : 2]} gl={{ antialias: true, alpha: true }} camera={{ fov: 28, near: 0.1, far: 200 }}>
           <hemisphereLight args={[look.light.sky, look.light.ground, look.light.fill]} />
-          <directionalLight position={[-6, 7, 4]} intensity={look.light.sun} color="#ffe2b0" castShadow shadow-mapSize={[1024, 1024]} shadow-bias={-0.0005}>
+          <directionalLight
+            position={[-6, 7, 4]}
+            intensity={look.light.sun}
+            color="#ffe2b0"
+            castShadow
+            shadow-mapSize={[1024, 1024]}
+            shadow-bias={-0.0005}
+          >
             <orthographicCamera attach="shadow-camera" args={[-8, 8, 8, -8, 0.1, 30]} />
           </directionalLight>
           <Studio />
+          <StillShadows stamp={state} />
           <Controls level={level} resetKey={resetKey} room={room} />
           <Layout level={level} onLayout={onLayout} />
           <ThemedScene look={look} level={level} state={state} litCells={litCells} calm={calm} onTap={tap} />
-          <EffectComposer multisampling={4}>
+          <EffectComposer multisampling={light ? 0 : 4}>
             <Bloom mipmapBlur luminanceThreshold={1.5} luminanceSmoothing={0.1} intensity={0.6} radius={0.7} />
           </EffectComposer>
         </Canvas>

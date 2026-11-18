@@ -8,6 +8,7 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import * as THREE from 'three';
 import { DIRECTION_ANGLE, RoundMirror, mirrorAngle } from '../library/LibraryPieces.jsx';
+import Bake from '../themes/Bake.jsx';
 import Flame from '../themes/Flame.jsx';
 import { GlassBell } from '../themes/ColorGlass.jsx';
 import { amberGlass, brassM, mirrorM, wallBeside } from '../themes/shared.jsx';
@@ -54,8 +55,10 @@ function OnLily({ turn, children }) {
   }, [angle]);
   return (
     <group ref={rotor} rotation={[0, angle, 0]}>
-      <LilyFlower />
-      <group position={[0, 0.42, 0]}>{children}</group>
+      <Bake>
+        <LilyFlower />
+        <group position={[0, 0.42, 0]}>{children}</group>
+      </Bake>
     </group>
   );
 }
@@ -64,15 +67,17 @@ function OnLily({ turn, children }) {
 function OnStone({ turn, children }) {
   return (
     <group rotation={[0, mirrorAngle(turn), 0]}>
-      <mesh position={[0, 0.07, 0]} scale={[1, 0.42, 0.8]} castShadow receiveShadow>
-        <icosahedronGeometry args={[0.3, 1]} />
-        <meshStandardMaterial color="#9a9a8c" roughness={0.9} flatShading />
-      </mesh>
-      <mesh position={[-0.04, 0.16, 0.02]} scale={[1, 0.25, 0.75]}>
-        <icosahedronGeometry args={[0.2, 1]} />
-        <meshStandardMaterial color="#6f9a5a" roughness={1} flatShading />
-      </mesh>
-      <group position={[0, 0.44, 0]}>{children}</group>
+      <Bake>
+        <mesh position={[0, 0.07, 0]} scale={[1, 0.42, 0.8]} castShadow receiveShadow>
+          <icosahedronGeometry args={[0.3, 1]} />
+          <meshStandardMaterial color="#9a9a8c" roughness={0.9} flatShading />
+        </mesh>
+        <mesh position={[-0.04, 0.16, 0.02]} scale={[1, 0.25, 0.75]}>
+          <icosahedronGeometry args={[0.2, 1]} />
+          <meshStandardMaterial color="#6f9a5a" roughness={1} flatShading />
+        </mesh>
+        <group position={[0, 0.44, 0]}>{children}</group>
+      </Bake>
     </group>
   );
 }
@@ -290,7 +295,15 @@ function LanternBody({ calm }) {
       {/* The copper back throws the light forward; the other sides are glass. */}
       <mesh position={[-POST, 0.26, 0]} rotation={[0, Math.PI / 2, 0]}>
         <planeGeometry args={[POST * 2, 0.4]} />
-        <meshPhysicalMaterial color="#d9955a" metalness={0.8} roughness={0.22} clearcoat={0.6} emissive="#ffb866" emissiveIntensity={0.35} side={THREE.DoubleSide} />
+        <meshPhysicalMaterial
+          color="#d9955a"
+          metalness={0.8}
+          roughness={0.22}
+          clearcoat={0.6}
+          emissive="#ffb866"
+          emissiveIntensity={0.35}
+          side={THREE.DoubleSide}
+        />
       </mesh>
       {[-1, 1].map((z) => (
         <mesh key={z} position={[0, 0.26, z * POST]}>
@@ -313,7 +326,6 @@ function LanternBody({ calm }) {
       <group position={[0, 0.21, 0]}>
         <Flame calm={calm} />
       </group>
-      <pointLight position={[0.1, 0.3, 0]} color="#ffb866" intensity={2.4} distance={2.4} />
     </group>
   );
 }
@@ -328,9 +340,11 @@ export function CandleLantern({ tile, turn, calm }) {
   return (
     <group ref={head} rotation={[0, angle, 0]}>
       {tile.turnable && <LilyFlower />}
-      <group position={[0, tile.turnable ? 0.06 : 0, 0]}>
-        <LanternBody calm={calm} />
-      </group>
+      <Bake>
+        <group position={[0, tile.turnable ? 0.06 : 0, 0]}>
+          <LanternBody calm={calm} />
+        </group>
+      </Bake>
     </group>
   );
 }

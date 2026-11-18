@@ -173,7 +173,6 @@ export function Lighthouse({ tile, turn }) {
         {paint('#e8604a')}
       </mesh>
       <Flare position={[0.12, 0.86, 0]} size={0.8} />
-      <pointLight position={[0.25, 0.86, 0]} color="#ffe2a8" intensity={3.4} distance={3} />
     </Facing>
   );
 }

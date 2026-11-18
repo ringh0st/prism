@@ -89,7 +89,16 @@ export function PrismCrystal() {
       </mesh>
       <mesh position={[0, 0.38, 0]} castShadow>
         <cylinderGeometry args={[0.26, 0.26, 0.58, 3]} />
-        <meshPhysicalMaterial color="#f2fbff" roughness={0.03} clearcoat={1} transparent opacity={0.55} iridescence={1} emissive="#cfe9ff" emissiveIntensity={0.35} />
+        <meshPhysicalMaterial
+          color="#f2fbff"
+          roughness={0.03}
+          clearcoat={1}
+          transparent
+          opacity={0.55}
+          iridescence={1}
+          emissive="#cfe9ff"
+          emissiveIntensity={0.35}
+        />
       </mesh>
       {['#ff7a68', '#ffcf4a', '#63b6ee'].map((color, k) => (
         <mesh key={color} position={[0, 0.2 + k * 0.18, 0]}>

@@ -5,6 +5,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { mirrorAngle } from '../library/LibraryPieces.jsx';
+import Bake from './Bake.jsx';
 
 export function Turning({ turn, children }) {
   const rotor = useRef();
@@ -14,12 +15,16 @@ export function Turning({ turn, children }) {
   }, [angle]);
   return (
     <group ref={rotor} rotation={[0, angle, 0]}>
-      {children}
+      <Bake>{children}</Bake>
     </group>
   );
 }
 
-export const Standing = ({ turn, children }) => <group rotation={[0, mirrorAngle(turn), 0]}>{children}</group>;
+export const Standing = ({ turn, children }) => (
+  <group rotation={[0, mirrorAngle(turn), 0]}>
+    <Bake>{children}</Bake>
+  </group>
+);
 
 const DIRECTION_ANGLE = { right: 0, down: -Math.PI / 2, left: Math.PI, up: Math.PI / 2 };
 
@@ -32,7 +37,7 @@ export function Facing({ tile, turn, children }) {
   }, [angle]);
   return (
     <group ref={head} rotation={[0, angle, 0]}>
-      {children}
+      <Bake>{children}</Bake>
     </group>
   );
 }

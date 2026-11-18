@@ -6,6 +6,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import * as THREE from 'three';
+import Bake from '../themes/Bake.jsx';
 import { GlassBell } from '../themes/ColorGlass.jsx';
 import { Gear, Streaks, amberGlass, brassM, glow, lath, mirrorM, wallBeside } from '../themes/shared.jsx';
 
@@ -68,14 +69,16 @@ export function GearMirror({ turn, frame, glass, streaks }) {
   }, [angle]);
   return (
     <group ref={rotor} rotation={[0, angle, 0]}>
-      <Gear r={0.32} teeth={14} h={0.05} />
-      <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.1, 0.13, 24]} />
-        <meshBasicMaterial color="#5a3f22" />
-      </mesh>
-      <group position={[0, 0.38, 0]}>
-        <RoundMirror legs={1} frame={frame} glass={glass} streaks={streaks} />
-      </group>
+      <Bake>
+        <Gear r={0.32} teeth={14} h={0.05} />
+        <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.1, 0.13, 24]} />
+          <meshBasicMaterial color="#5a3f22" />
+        </mesh>
+        <group position={[0, 0.38, 0]}>
+          <RoundMirror legs={1} frame={frame} glass={glass} streaks={streaks} />
+        </group>
+      </Bake>
     </group>
   );
 }
@@ -87,38 +90,42 @@ const ironFrame = () => <meshStandardMaterial color="#3d3836" metalness={0.6} ro
 export function FixedMirror({ turn, frame = ironFrame, glass, streaks }) {
   return (
     <group rotation={[0, mirrorAngle(turn), 0]}>
-      <mesh position={[0, 0.06, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.56, 0.12, 0.42]} />
-        <meshStandardMaterial color="#5e3a26" roughness={0.6} />
-      </mesh>
-      <mesh position={[0, 0.135, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.48, 0.03, 0.34]} />
-        <meshStandardMaterial color="#6f4630" roughness={0.55} />
-      </mesh>
-      {[
-        [-0.25, -0.18],
-        [0.25, -0.18],
-        [-0.25, 0.18],
-        [0.25, 0.18],
-      ].map(([x, z]) => (
-        <mesh key={`${x}${z}`} position={[x, 0.06, z]}>
-          <boxGeometry args={[0.07, 0.13, 0.07]} />
-          {brassM()}
+      <Bake>
+        <mesh position={[0, 0.06, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.56, 0.12, 0.42]} />
+          <meshStandardMaterial color="#5e3a26" roughness={0.6} />
         </mesh>
-      ))}
-      <group position={[0, 0.42, 0]}>
-        <RoundMirror knob={false} postsFrom={-0.14} frame={frame} glass={glass} streaks={streaks} />
-        <mesh position={[0, 0.31, 0]}>
-          <sphereGeometry args={[0.03, 12, 10]} />
-          {frame()}
+        <mesh position={[0, 0.135, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.48, 0.03, 0.34]} />
+          <meshStandardMaterial color="#6f4630" roughness={0.55} />
         </mesh>
-      </group>
+        {[
+          [-0.25, -0.18],
+          [0.25, -0.18],
+          [-0.25, 0.18],
+          [0.25, 0.18],
+        ].map(([x, z]) => (
+          <mesh key={`${x}${z}`} position={[x, 0.06, z]}>
+            <boxGeometry args={[0.07, 0.13, 0.07]} />
+            {brassM()}
+          </mesh>
+        ))}
+        <group position={[0, 0.42, 0]}>
+          <RoundMirror knob={false} postsFrom={-0.14} frame={frame} glass={glass} streaks={streaks} />
+          <mesh position={[0, 0.31, 0]}>
+            <sphereGeometry args={[0.03, 12, 10]} />
+            {frame()}
+          </mesh>
+        </group>
+      </Bake>
     </group>
   );
 }
 
 /** A splitter's frame: warm copper, with clear amber glass in it (never one of the mirrors). */
-const copperFrame = (color = '#c9824a') => <meshPhysicalMaterial color={color === '#e8c06a' ? '#e0a070' : color} metalness={0.75} roughness={0.3} clearcoat={0.5} />;
+const copperFrame = (color = '#c9824a') => (
+  <meshPhysicalMaterial color={color === '#e8c06a' ? '#e0a070' : color} metalness={0.75} roughness={0.3} clearcoat={0.5} />
+);
 
 export const GearSplitter = ({ turn }) => <GearMirror turn={turn} frame={copperFrame} glass={amberGlass} streaks={false} />;
 export const FixedSplitter = ({ turn }) => <FixedMirror turn={turn} frame={copperFrame} glass={amberGlass} streaks={false} />;
@@ -188,7 +195,6 @@ function BankerLampBody() {
         <sphereGeometry args={[0.018, 10, 8]} />
         {brassM('#e8c06a')}
       </mesh>
-      <pointLight position={[0.3, 0.44, 0]} color="#ffcf8a" intensity={2.4} distance={2.4} />
     </group>
   );
 }
@@ -203,9 +209,11 @@ export function BankerLamp({ tile, turn }) {
   return (
     <group ref={head} rotation={[0, angle, 0]}>
       {tile.turnable && <Gear r={0.34} teeth={16} h={0.05} color="#b98a3c" />}
-      <group position={[0, tile.turnable ? 0.05 : 0, 0]}>
-        <BankerLampBody />
-      </group>
+      <Bake>
+        <group position={[0, tile.turnable ? 0.05 : 0, 0]}>
+          <BankerLampBody />
+        </group>
+      </Bake>
     </group>
   );
 }

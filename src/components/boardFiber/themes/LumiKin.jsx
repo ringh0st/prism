@@ -372,7 +372,6 @@ export function LumiKin({ color = 'sun', age = 'kid', coat = null, on, mood }) {
       )}
       {on && (
         <>
-          <pointLight position={[0, 0.2, 0.1]} color={tint.glow} intensity={2.2} distance={1.6} />
           <Flare position={[0, 0.2, -0.02]} size={0.75} />
           <Glint position={[0.26, 0.6, 0.1]} size={0.18} />
           <Glint position={[-0.24, 0.48, 0.12]} size={0.12} />

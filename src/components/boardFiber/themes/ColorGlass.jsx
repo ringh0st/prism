@@ -46,7 +46,9 @@ export function ShapeMark({ shape, color }) {
  */
 export function GlassBell({ tile, children }) {
   const { color, shape } = GLASS[tile.color] ?? GLASS.sun;
-  const glass = <meshPhysicalMaterial color={color} roughness={0.06} clearcoat={1} transparent opacity={0.6} emissive={color} emissiveIntensity={0.45} />;
+  const glass = (
+    <meshPhysicalMaterial color={color} roughness={0.06} clearcoat={1} transparent opacity={0.6} emissive={color} emissiveIntensity={0.45} />
+  );
   return (
     <group>
       {children}

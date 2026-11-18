@@ -163,7 +163,14 @@ export function roundedSlab(width, depth, height, radius) {
   shape.quadraticCurveTo(-w, d, -w, d - radius);
   shape.lineTo(-w, -d + radius);
   shape.quadraticCurveTo(-w, -d, -w + radius, -d);
-  const geometry = new THREE.ExtrudeGeometry(shape, { depth: height, bevelEnabled: true, bevelSize: 0.04, bevelThickness: 0.04, bevelSegments: 3, curveSegments: 10 });
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth: height,
+    bevelEnabled: true,
+    bevelSize: 0.04,
+    bevelThickness: 0.04,
+    bevelSegments: 3,
+    curveSegments: 10,
+  });
   geometry.rotateX(Math.PI / 2);
   const uv = geometry.attributes.uv;
   for (let n = 0; n < uv.count; n++) uv.setXY(n, uv.getX(n) / 4, uv.getY(n) / 4);
@@ -196,7 +203,16 @@ export function GroundShadow({ width, depth, y }) {
 
 /** A splitter's pane: clear amber glass you can see through (light passes and bounces). */
 export const amberGlass = (
-  <meshPhysicalMaterial color="#ffd98a" roughness={0.05} clearcoat={1} transparent opacity={0.42} emissive="#ffc35a" emissiveIntensity={0.25} side={THREE.DoubleSide} />
+  <meshPhysicalMaterial
+    color="#ffd98a"
+    roughness={0.05}
+    clearcoat={1}
+    transparent
+    opacity={0.42}
+    emissive="#ffc35a"
+    emissiveIntensity={0.25}
+    side={THREE.DoubleSide}
+  />
 );
 
 /** For walls that join up: is there a wall on the square `dx`, `dy` away from this tile? */

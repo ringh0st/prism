@@ -10,14 +10,30 @@ import { TILE } from '../../../game/constants.js';
 import { lumiCoatFor } from '../../../game/boardThemes.js';
 import { floorGlowColor } from '../../../lib/beamStyle.js';
 import { cellPosition } from '../look.js';
+import Bake from './Bake.jsx';
 import NaturalBeam from './NaturalBeam.jsx';
 import RescuedLumi, { lumiAgeFor } from './RescuedLumi.jsx';
 import { Flare } from './shared.jsx';
-import { CrackPips, DarkBack, FogCloud, GhostPath, HintGlow, LightGate, LightSwitch, Portal, PrismCrystal, ShadowCrystal, TwinMark, VoidHole } from './TwistPieces.jsx';
+import {
+  CrackPips,
+  DarkBack,
+  FogCloud,
+  GhostPath,
+  HintGlow,
+  LightGate,
+  LightSwitch,
+  Portal,
+  PrismCrystal,
+  ShadowCrystal,
+  TwinMark,
+  VoidHole,
+} from './TwistPieces.jsx';
 
 const BEAM_ABOVE_TILE = 0.38;
 /** Pieces that turn the light: a soft glow where a beam meets one. */
 const TURNERS = new Set([TILE.MIRROR, TILE.SPLITTER, TILE.PRISM, TILE.PORTAL]);
+/** Pieces that never move or change: drawn as one baked mesh per material (Bake.jsx). Mirrors and lamps bake inside their own stands. */
+const STANDS_STILL = new Set([TILE.WALL, TILE.FILTER]);
 
 /** Which of the theme's own pieces draws this tile (undefined for the pieces every theme shares). */
 function themedPiece(pieces, tile, isCracked) {
@@ -62,7 +78,11 @@ function ScenePiece({ look, level, tile, index, turn, turnsLeft, trace, isDarken
     case TILE.PORTAL:
       return <Portal tile={tile} calm={calm} />;
     case TILE.PRISM:
-      return <PrismCrystal />;
+      return (
+        <Bake>
+          <PrismCrystal />
+        </Bake>
+      );
     case TILE.GATE:
       return <LightGate tile={tile} isOpen={trace.openGates.has(tile.pair)} />;
     case TILE.SWITCH:
@@ -74,7 +94,13 @@ function ScenePiece({ look, level, tile, index, turn, turnsLeft, trace, isDarken
       const Themed = themedPiece(look.pieces, tile, isCracked);
       return (
         <>
-          <Themed tile={tile} turn={turn} level={level} calm={calm} />
+          {STANDS_STILL.has(tile.type) ? (
+            <Bake>
+              <Themed tile={tile} turn={turn} level={level} calm={calm} />
+            </Bake>
+          ) : (
+            <Themed tile={tile} turn={turn} level={level} calm={calm} />
+          )}
           {tile.link && <TwinMark link={tile.link} />}
           {tile.fragile && <CrackPips turnsLeft={turnsLeft} />}
           {tile.oneSided !== undefined && <DarkBack tile={tile} orient={turn} />}
@@ -97,7 +123,9 @@ export default function ThemedScene({ look, level, state, litCells, calm, onTap 
   const at = (x, y, height) => new THREE.Vector3(...cellPosition(level, x, y)).setY(height);
   return (
     <>
-      <Room level={level} />
+      <Bake>
+        <Room level={level} />
+      </Bake>
       {Array.from({ length: level.width * level.height }, (_, cell) => {
         const x = cell % level.width;
         const y = Math.floor(cell / level.width);

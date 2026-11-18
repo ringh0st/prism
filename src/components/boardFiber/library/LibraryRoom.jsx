@@ -11,8 +11,8 @@ const woodCache = new Map();
 export function woodTexture({ base = [148, 98, 62], planksAcross = 6, length = 4, seed = 1, varied = 18 } = {}) {
   const key = JSON.stringify([base, planksAcross, length, seed, varied]);
   if (woodCache.has(key)) return woodCache.get(key);
-  const W = 1024,
-    H = 1024,
+  const W = 512,
+    H = 512,
     c = document.createElement('canvas');
   c.width = W;
   c.height = H;
