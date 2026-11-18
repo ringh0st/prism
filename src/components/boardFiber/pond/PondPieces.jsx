@@ -127,7 +127,7 @@ export const LilyGlass = ({ tile }) => (
 let barkMap = null;
 
 /** Bark painted on a canvas (in greys, tinted by each log's own brown): long ragged furrows along the log and knots. */
-function barkTexture() {
+export function barkTexture() {
   if (barkMap) return barkMap;
   const canvas = document.createElement('canvas');
   canvas.width = 256;

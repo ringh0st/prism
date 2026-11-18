@@ -4,6 +4,10 @@
  */
 import { CastleWall, CrystalSplitter, PillarCrystal, PillarShield, ShieldMirror, StainedGlassTower, Torch } from '../castle/CastlePieces.jsx';
 import { CASTLE_HEIGHT, CASTLE_PAD, CastleRoom, Flagstone } from '../castle/CastleRoom.jsx';
+import { BeachHut, GlassFloat, Lighthouse, RingMirror, RingSplitter, SandcastleMirror, SandcastleSplitter } from '../beach/BeachPieces.jsx';
+import { BEACH_HEIGHT, BEACH_PAD, BeachRoom, SandTile } from '../beach/BeachRoom.jsx';
+import { BoulderMirror, BoulderSplitter, Campfire, GlassMushroom, Palisade, StumpMirror, StumpSplitter } from '../forest/ForestPieces.jsx';
+import { FOREST_HEIGHT, FOREST_PAD, ForestFloor, ForestRoom } from '../forest/ForestRoom.jsx';
 import { BankerLamp, BookcaseWall, DeskGlass, FixedMirror, FixedSplitter, GearMirror, GearSplitter } from '../library/LibraryPieces.jsx';
 import { LibraryRoom, ParquetTile, ROOM_HEIGHT, ROOM_PAD } from '../library/LibraryRoom.jsx';
 import { CandleLantern, LilyGlass, LogWall, PondFixedMirror, PondFixedSplitter, PondMirror, PondSplitter } from '../pond/PondPieces.jsx';
@@ -57,5 +61,41 @@ export const THEME_LOOKS = {
     light: { sky: '#fff1dc', ground: '#6b6258', fill: 0.75, sun: 1.3 },
     // The window's wall behind the castle: a warm evening sky.
     wall: 'linear-gradient(180deg, #fdf0e6, #f9dcd6)',
+  },
+  forest: {
+    Room: ForestRoom,
+    Tile: ForestFloor,
+    tileY: 0.05,
+    tileTop: 0.09,
+    pieces: {
+      lamp: Campfire,
+      mirror: StumpMirror,
+      fixedMirror: BoulderMirror,
+      splitter: StumpSplitter,
+      fixedSplitter: BoulderSplitter,
+      filter: GlassMushroom,
+      wall: Palisade,
+    },
+    room: { pad: FOREST_PAD, height: FOREST_HEIGHT },
+    light: { sky: '#fff3da', ground: '#3f5a40', fill: 0.8, sun: 1.3 },
+    wall: 'linear-gradient(180deg, #eef3e2, #d9e8cf)',
+  },
+  beach: {
+    Room: BeachRoom,
+    Tile: SandTile,
+    tileY: 0.05,
+    tileTop: 0.09,
+    pieces: {
+      lamp: Lighthouse,
+      mirror: RingMirror,
+      fixedMirror: SandcastleMirror,
+      splitter: RingSplitter,
+      fixedSplitter: SandcastleSplitter,
+      filter: GlassFloat,
+      wall: BeachHut,
+    },
+    room: { pad: BEACH_PAD, height: BEACH_HEIGHT },
+    light: { sky: '#fffaf0', ground: '#8fc9c4', fill: 0.9, sun: 1.45 },
+    wall: 'linear-gradient(180deg, #e6f5f2, #fdf2de)',
   },
 };
