@@ -20,7 +20,7 @@ function sandTexture(seed, tone) {
   const d = canvas.getContext('2d');
   let r = seed * 9301 + 49297;
   const rnd = () => (r = (r * 9301 + 49297) % 233280) / 233280;
-  d.fillStyle = `rgb(${tone + 8},${tone - 12},${tone - 48})`;
+  d.fillStyle = `rgb(${tone + 14},${tone - 14},${tone - 62})`;
   d.fillRect(0, 0, 256, 256);
   for (let n = 0; n < 500; n++) {
     d.fillStyle = n % 2 ? `rgba(255,255,255,${0.12 + rnd() * 0.16})` : `rgba(150,110,60,${0.08 + rnd() * 0.12})`;
@@ -52,7 +52,7 @@ function sandTexture(seed, tone) {
 
 export function SandTile({ position, x, y, isLit, onClick, cell }) {
   const texture = useMemo(() => {
-    const sand = sandTexture(1 + ((x * 3 + y * 7) % 6), (x + y) % 2 ? 244 : 228).clone();
+    const sand = sandTexture(1 + ((x * 3 + y * 7) % 6), (x + y) % 2 ? 214 : 196).clone();
     sand.needsUpdate = true;
     sand.center.set(0.5, 0.5);
     sand.rotation = ((x + y * 3) % 4) * (Math.PI / 2);
@@ -61,7 +61,7 @@ export function SandTile({ position, x, y, isLit, onClick, cell }) {
   return (
     <mesh position={position} receiveShadow castShadow userData={{ cell }} onClick={onClick}>
       <boxGeometry args={[0.94, 0.08, 0.94]} />
-      <meshStandardMaterial map={texture} roughness={0.95} emissive="#ffb24a" emissiveIntensity={isLit ? 0.22 : 0} />
+      <meshStandardMaterial map={texture} roughness={0.95} emissive="#ffb24a" emissiveIntensity={isLit ? 0.3 : 0} />
     </mesh>
   );
 }
@@ -129,13 +129,13 @@ export function BeachRoom({ level }) {
     <group>
       <GroundShadow width={width} depth={depth} y={-BASE_DEPTH - 0.1} />
       <mesh geometry={sea} position={[0, -0.04, 0]} receiveShadow castShadow>
-        <meshPhysicalMaterial color="#63c7c4" roughness={0.1} clearcoat={1} clearcoatRoughness={0.08} />
+        <meshPhysicalMaterial color="#3fa9a8" roughness={0.12} clearcoat={1} clearcoatRoughness={0.1} />
       </mesh>
       <mesh geometry={sandbar} position={[0, 0.0, 0]} receiveShadow castShadow>
-        <meshStandardMaterial color="#f6e2b6" roughness={1} />
+        <meshStandardMaterial color="#e2c38a" roughness={1} />
       </mesh>
       <mesh geometry={wet} position={[0, 0.012, 0]} receiveShadow>
-        <meshStandardMaterial color="#cfa970" roughness={1} />
+        <meshStandardMaterial color="#a8824e" roughness={1} />
       </mesh>
       <Palm position={[side, 0, back]} />
       <Parasol position={[level.width / 2 + 0.34, 0, back + 0.1]} />

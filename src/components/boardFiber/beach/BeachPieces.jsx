@@ -11,7 +11,7 @@ import { Facing, Standing, Turning } from '../themes/Stands.jsx';
 import { Flare, amberGlass, glow, mirrorM, wallBeside } from '../themes/shared.jsx';
 
 const paint = (color) => <meshStandardMaterial color={color} roughness={0.55} />;
-const whiteFrame = (color = '#fbf7ee') => paint(color === '#e8c06a' ? '#e8604a' : color);
+const whiteFrame = (color = '#f1e9d8') => paint(color === '#e8c06a' ? '#e8604a' : color);
 const tealFrame = (color = '#2f8f8a') => paint(color === '#e8c06a' ? '#fbf7ee' : color);
 const coralFrame = (color = '#ff7f6e') => paint(color === '#e8c06a' ? '#fbf7ee' : color);
 
@@ -21,7 +21,7 @@ function LifeRing() {
     <group position={[0, 0.07, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <mesh castShadow receiveShadow>
         <torusGeometry args={[0.27, 0.085, 12, 32]} />
-        {paint('#fbf7ee')}
+        {paint('#f1e9d8')}
       </mesh>
       {[0, 1, 2, 3].map((k) => (
         <mesh key={k} rotation={[0, 0, (k * Math.PI) / 2 + Math.PI / 4]} position={[Math.cos((k * Math.PI) / 2 + Math.PI / 4) * 0.27, Math.sin((k * Math.PI) / 2 + Math.PI / 4) * 0.27, 0]}>
@@ -56,7 +56,7 @@ const onRing = (pane) =>
         <LifeRing />
         <mesh position={[0, 0.16, 0]}>
           <cylinderGeometry args={[0.03, 0.04, 0.2, 10]} />
-          {paint('#fbf7ee')}
+          {paint('#f1e9d8')}
         </mesh>
         <group position={[0, 0.5, 0]}>{pane}</group>
       </Turning>
@@ -89,7 +89,7 @@ export const GlassFloat = ({ tile }) => (
   </GlassBell>
 );
 
-const HUT_COLORS = ['#ff9d9d', '#7fd0c4', '#ffc46b', '#aecffa', '#f6add6'];
+const HUT_COLORS = ['#f27f7f', '#4fb5a6', '#f2a94a', '#7fb0ea', '#e88fc0'];
 const stripes = new Map();
 
 /** A beach hut's striped boards: white and one color, painted on a canvas. */
@@ -99,7 +99,7 @@ function stripeTexture(color) {
   canvas.width = canvas.height = 128;
   const d = canvas.getContext('2d');
   for (let k = 0; k < 6; k++) {
-    d.fillStyle = k % 2 ? '#fdf9f0' : color;
+    d.fillStyle = k % 2 ? '#f3ead8' : color;
     d.fillRect((k * 128) / 6, 0, 128 / 6 + 1, 128);
   }
   d.fillStyle = 'rgba(60,40,30,0.1)';

@@ -95,7 +95,8 @@ export const THEME_LOOKS = {
       wall: BeachHut,
     },
     room: { pad: BEACH_PAD, height: BEACH_HEIGHT },
-    light: { sky: '#fffaf0', ground: '#8fc9c4', fill: 0.9, sun: 1.45 },
-    wall: 'linear-gradient(180deg, #e6f5f2, #fdf2de)',
+    // A late-afternoon sun: softer light, so the sand doesn't glare and the beam still shows.
+    light: { sky: '#ffe9c9', ground: '#5f9d9a', fill: 0.55, sun: 0.95 },
+    wall: 'linear-gradient(180deg, #cfe9e4, #f6dcb8)',
   },
 };
