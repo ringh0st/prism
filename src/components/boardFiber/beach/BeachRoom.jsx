@@ -50,7 +50,7 @@ function sandTexture(seed, tone) {
   return texture;
 }
 
-export function SandTile({ position, x, y, isLit, onClick, cell }) {
+export function SandTile({ position, x, y, isLit, glow, onClick, cell }) {
   const texture = useMemo(() => {
     const sand = sandTexture(1 + ((x * 3 + y * 7) % 6), (x + y) % 2 ? 214 : 196).clone();
     sand.needsUpdate = true;
@@ -61,7 +61,7 @@ export function SandTile({ position, x, y, isLit, onClick, cell }) {
   return (
     <mesh position={position} receiveShadow castShadow userData={{ cell }} onClick={onClick}>
       <boxGeometry args={[0.94, 0.08, 0.94]} />
-      <meshStandardMaterial map={texture} roughness={0.95} emissive="#ffb24a" emissiveIntensity={isLit ? 0.3 : 0} />
+      <meshStandardMaterial map={texture} roughness={0.95} emissive={glow} emissiveIntensity={isLit ? 0.3 : 0} />
     </mesh>
   );
 }

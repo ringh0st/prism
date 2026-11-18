@@ -12,3 +12,9 @@ export function chosenSunColor() {
 
 /** True while the player keeps the default Sunbeam style. */
 export const isDefaultSun = (color) => color.toLowerCase() === DEFAULT_SUN;
+
+/** The warm glow of a floor tile under plain lamplight, or the chosen beam color once the player picks a style. */
+export function floorGlowColor() {
+  const chosen = chosenSunColor();
+  return isDefaultSun(chosen) ? '#ffb24a' : chosen;
+}

@@ -2,6 +2,7 @@
  * A themed world on the R3F board: the theme's room, the tiles you tap, every piece in the theme's style, Lumi's
  * family as the targets and natural light. It only draws: the rules, taps and solve are the game's own.
  */
+import { useMemo } from 'react';
 import { isRotatable } from '../../../game/beam.js';
 import { TILE } from '../../../game/constants.js';
 import { cellPosition } from '../look.js';
@@ -10,6 +11,7 @@ import NaturalBeam from './NaturalBeam.jsx';
 import RescuedLumi, { lumiAgeFor } from './RescuedLumi.jsx';
 import { lumiCoatFor } from '../../../game/boardThemes.js';
 import { Flare } from './shared.jsx';
+import { floorGlowColor } from '../../../lib/beamStyle.js';
 
 const BEAM_ABOVE_TILE = 0.38;
 /** Pieces that turn the light: a soft glow where a beam meets one. */
@@ -57,6 +59,8 @@ function ThemedPiece({ look, level, tile, index, turn, isLit, calm }) {
 export default function ThemedScene({ look, level, turns, trace, litCells, calm, onTap }) {
   const { Room, Tile, tileY, tileTop } = look;
   const beamY = tileTop + BEAM_ABOVE_TILE;
+  // Tiles under the light glow in the player's beam style (read once when the level opens).
+  const glow = useMemo(floorGlowColor, []);
   const tileAt = new Map(level.tiles.map((tile, i) => [tile.y * level.width + tile.x, i]));
   return (
     <>
@@ -73,6 +77,7 @@ export default function ThemedScene({ look, level, turns, trace, litCells, calm,
             y={y}
             position={[px, tileY, pz]}
             isLit={litCells.has(cell)}
+            glow={glow}
             onClick={(event) => onTap(event, cell)}
           />
         );

@@ -4,9 +4,9 @@
  * Pure data, no React.
  */
 /** The finished themes, which take turns. */
-export const THEMES_IN_PLAY = ['library', 'pond', 'castle', 'beach'];
+export const THEMES_IN_PLAY = ['library', 'pond', 'castle', 'beach', 'forest'];
 /** Themes still being designed: seen only with the preview switch (`?theme=forest` on the game's address). */
-export const THEMES_IN_PREVIEW = ['forest'];
+export const THEMES_IN_PREVIEW = [];
 /** The worlds whose pieces every theme can draw (mirrors, walls, splitters and color glass). */
 export const THEMED_WORLDS = [1, 2, 3];
 

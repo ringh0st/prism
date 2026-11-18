@@ -23,7 +23,7 @@ function padGeometry() {
 }
 let padShape = null;
 
-export function LilyPad({ position, x, y, isLit, onClick, cell }) {
+export function LilyPad({ position, x, y, isLit, glow, onClick, cell }) {
   padShape ??= padGeometry();
   return (
     <group position={position}>
@@ -33,7 +33,7 @@ export function LilyPad({ position, x, y, isLit, onClick, cell }) {
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
       <mesh geometry={padShape} rotation={[0, ((x * 7 + y * 13) % 12) * 0.52, 0]} receiveShadow castShadow onClick={onClick}>
-        <meshStandardMaterial color={PAD_GREENS[(x * 2 + y * 3) % PAD_GREENS.length]} roughness={0.65} emissive="#ffb24a" emissiveIntensity={isLit ? 0.2 : 0} />
+        <meshStandardMaterial color={PAD_GREENS[(x * 2 + y * 3) % PAD_GREENS.length]} roughness={0.65} emissive={glow} emissiveIntensity={isLit ? 0.2 : 0} />
       </mesh>
     </group>
   );

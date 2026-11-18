@@ -111,7 +111,7 @@ export function Shelf({ position, rotation, scale = 1, books = 9, seed = 0 }) {
 }
 
 /** Oak parquet on a tap tile, its grain turned every other tile; warmed by lamplight when light passes over it. */
-export function ParquetTile({ position, x, y, isLit, onClick, cell }) {
+export function ParquetTile({ position, x, y, isLit, glow, onClick, cell }) {
   const texture = useMemo(() => {
     const t = woodTexture({ base: [201, 152, 104], planksAcross: 4, length: 1.4, seed: 7 + ((x * 3 + y * 5) % 6), varied: 22 }).clone();
     t.needsUpdate = true;
@@ -127,7 +127,7 @@ export function ParquetTile({ position, x, y, isLit, onClick, cell }) {
         roughness={0.35}
         clearcoat={0.8}
         clearcoatRoughness={0.2}
-        emissive="#ffb24a"
+        emissive={glow}
         emissiveIntensity={isLit ? 0.18 : 0}
       />
     </mesh>

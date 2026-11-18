@@ -40,24 +40,26 @@ export default function NaturalBeam({ level, segment, height, floorY, calm }) {
   const length = from.distanceTo(to);
   const middle = from.clone().lerp(to, 0.5);
   const angle = -Math.atan2(to.z - from.z, to.x - from.x);
-  // Plain sunlight wears the player's chosen beam style (softened, like the default lamplight).
+  // Plain sunlight wears the player's chosen beam style, clearly (only a touch softened); the default stays lamplight.
   const tint = useMemo(() => {
     if ((segment.color ?? 'sun') !== 'sun') return TINT[segment.color] ?? TINT.sun;
     const chosen = chosenSunColor();
-    return isDefaultSun(chosen) ? TINT.sun : `#${new THREE.Color(chosen).lerp(new THREE.Color('#ffffff'), 0.35).getHexString()}`;
+    return isDefaultSun(chosen) ? TINT.sun : `#${new THREE.Color(chosen).lerp(new THREE.Color('#ffffff'), 0.12).getHexString()}`;
   }, [segment.color]);
+  // The bright core takes a little of the color too, so a colored beam never reads as plain white-yellow.
+  const core = useMemo(() => new THREE.Color(tint).lerp(new THREE.Color('#ffffff'), 0.55), [tint]);
   return (
     <group>
       <group position={middle} rotation={[0, angle, 0]}>
         {[0, Math.PI / 2].map((roll) => (
           <mesh key={roll} rotation={[roll, 0, 0]}>
             <planeGeometry args={[length, 0.34]} />
-            <meshBasicMaterial map={SHAFT} color={glow(tint, 1.25)} opacity={0.9} {...ADD} />
+            <meshBasicMaterial map={SHAFT} color={glow(tint, 1.45)} opacity={0.95} {...ADD} />
           </mesh>
         ))}
         <mesh rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.012, 0.012, length, 8]} />
-          <meshBasicMaterial color={glow('#fff8e8', 2.2)} toneMapped={false} />
+          <meshBasicMaterial color={core.clone().multiplyScalar(2.2)} toneMapped={false} />
         </mesh>
       </group>
       <mesh position={[middle.x, floorY, middle.z]} rotation={[-Math.PI / 2, 0, -angle]}>
