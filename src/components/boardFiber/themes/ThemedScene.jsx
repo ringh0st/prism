@@ -7,7 +7,7 @@ import { TILE } from '../../../game/constants.js';
 import { cellPosition } from '../look.js';
 import Piece from '../Piece.jsx';
 import NaturalBeam from './NaturalBeam.jsx';
-import RescuedLumi, { lumiAgeFor } from './RescuedLumi.jsx';
+import RescuedLumi, { lumiAgeFor, lumiCoatFor } from './RescuedLumi.jsx';
 import { Flare } from './shared.jsx';
 
 const BEAM_ABOVE_TILE = 0.38;
@@ -32,9 +32,12 @@ function themedPiece(pieces, tile) {
 
 function ThemedPiece({ look, level, tile, index, turn, isLit, calm }) {
   if (tile.type === TILE.GEM) {
+    const color = tile.color ?? 'sun';
+    // Its place among the level's Lumis, so no two on a board share a coat.
+    const order = level.tiles.slice(0, index).filter((other) => other.type === TILE.GEM).length;
     return (
       <group scale={1.25}>
-        <RescuedLumi color={tile.color ?? 'sun'} age={lumiAgeFor(level.id, index)} isLit={isLit} calm={calm} />
+        <RescuedLumi color={color} age={lumiAgeFor(level.id, index)} coat={lumiCoatFor(level.id, order, color)} isLit={isLit} calm={calm} />
       </group>
     );
   }

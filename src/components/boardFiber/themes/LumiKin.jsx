@@ -66,14 +66,24 @@ function AntennaTip({ shape, color, on }) {
   );
 }
 
-/** One of Lumi's family. age: baby | kid | girl | mom | dad | grandma; color: the light it needs. */
-export function LumiKin({ color = 'sun', age = 'kid', on, mood }) {
+/**
+ * The family's coats: each Lumi waiting for plain sunlight wears its own bright color, so a board of them is a
+ * little rainbow (owner feedback: not all honey and brown). A Lumi that needs a colored light wears that color.
+ */
+export const COATS = ['#ff8fb8', '#5fd9c2', '#ffae52', '#8fc2ff', '#a9e06a', '#c3a2f5', '#ff8f73', '#5cc9e6'];
+
+/**
+ * One of Lumi's family. age: baby | kid | girl | mom | dad | grandma; color: the light it needs (shown by its glowing
+ * tail and the shape on its antennae); coat: its own body color (defaults to the light's color).
+ */
+export function LumiKin({ color = 'sun', age = 'kid', coat = null, on, mood }) {
   // mood: sleepy | worried | surprised | joy | happy (defaults from on)
   const face = mood ?? (on ? 'happy' : 'sleepy');
   const tint = FAMILY_TINT[color];
   const shape = SHAPES_BY_COLOR[color].shape;
   const size = 1.3 * { baby: 0.62, kid: 0.8, girl: 0.8, mom: 1, dad: 1.05, grandma: 0.95 }[age];
-  const body = on ? tint.body : grey(tint.body, 0.55);
+  // Asleep it keeps most of its color (a little dusky), so the family reads as colorful before the rescue too.
+  const body = on ? (coat ?? tint.body) : grey(coat ?? tint.body, 0.22);
   const belly = new THREE.Color(body).lerp(new THREE.Color('#fff6e8'), 0.55);
   const R = 0.18;
   const lashes = age === 'girl' || age === 'mom' || age === 'grandma';
@@ -349,7 +359,7 @@ export function LumiKin({ color = 'sun', age = 'kid', on, mood }) {
       {!on && (
         <mesh position={[0, 0.31, 0]}>
           <sphereGeometry args={[0.38, 40, 28]} />
-          <meshPhysicalMaterial color="#2e2833" roughness={0.25} clearcoat={1} iridescence={0.4} transparent opacity={0.42} depthWrite={false} />
+          <meshPhysicalMaterial color="#4a4458" roughness={0.25} clearcoat={1} iridescence={0.4} transparent opacity={0.26} depthWrite={false} />
         </mesh>
       )}
       {!on &&
