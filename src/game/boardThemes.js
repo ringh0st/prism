@@ -17,7 +17,7 @@ export function boardThemeFor(level) {
 export const LUMI_COATS = ['#ffb7d2', '#aecffa', '#ff9d9d', '#b2e6b4', '#d0b8f7', '#a5e6d8', '#f6add6', '#b9c0f9'];
 
 /** Coats a theme leaves out because they'd vanish on its tiles (a green Lumi on a green lily pad). */
-const HIDDEN_COATS = { pond: ['#b2e6b4', '#a5e6d8'], castle: ['#d0b8f7', '#b9c0f9'] };
+const HIDDEN_COATS = { pond: ['#b2e6b4', '#a5e6d8'] };
 
 /** The coats Lumis can wear in a theme: every coat that stands out on its tiles. */
 export const coatsFor = (theme) => LUMI_COATS.filter((coat) => !(HIDDEN_COATS[theme] ?? []).includes(coat));

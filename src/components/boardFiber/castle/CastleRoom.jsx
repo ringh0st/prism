@@ -13,8 +13,8 @@ const BASE_DEPTH = 0.42;
 const LAWN = '#9ccb86';
 const STONE = '#ddd3e6';
 const WALL = '#c9bdd6';
-const MORTAR = '#6f6688';
-const SOFT_JOINT = '#b3a9c9';
+const MORTAR = '#56525c';
+const SOFT_JOINT = '#8c8890';
 
 const textures = new Map();
 const seeded = (seed) => {
@@ -22,51 +22,90 @@ const seeded = (seed) => {
   return () => (r = (r * 9301 + 49297) % 233280) / 233280;
 };
 
-/** Paving painted on a canvas: a few hand-cut stones with dark mortar between, a lit edge and a shaded one. */
-function pavingTexture(seed, [r, g, b]) {
-  const key = `paving${seed}${r}`;
+/**
+ * Stone paving painted on a canvas: a few rough-cut stones with uneven edges, each its own grey (some warmer, some
+ * cooler), grainy and pitted, with a hairline crack here and there and a little moss in the joints.
+ */
+function pavingTexture(seed, tone) {
+  const key = `paving${seed}${tone}`;
   if (textures.has(key)) return textures.get(key);
   const size = 256;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = size;
   const d = canvas.getContext('2d');
   const rnd = seeded(seed);
-  // Soft joints inside a tile, so the darker gaps between tiles still show where each cell is.
+  // Joints inside a tile are a mid grey, so the darker gaps between tiles still show where each cell is.
   d.fillStyle = SOFT_JOINT;
   d.fillRect(0, 0, size, size);
-  // Two rows; each row is cut into two or three stones at uneven places.
-  const rowAt = size * (0.42 + rnd() * 0.16);
+  const rowAt = size * (0.4 + rnd() * 0.2);
+  const stones = [];
   [
     [0, rowAt],
     [rowAt, size],
   ].forEach(([top, bottom]) => {
-    const cuts = rnd() < 0.5 ? [size * (0.4 + rnd() * 0.2)] : [size * (0.28 + rnd() * 0.1), size * (0.62 + rnd() * 0.1)];
-    [0, ...cuts, size].slice(0, -1).forEach((left, k, starts) => {
-      const right = k + 1 < starts.length ? starts[k + 1] : size;
-      const shade = (rnd() - 0.5) * 34;
-      const gap = 5;
-      const [x, y, w, h] = [left + gap, top + gap, right - left - gap * 2, bottom - top - gap * 2];
-      d.fillStyle = `rgb(${r + shade},${g + shade},${b + shade})`;
-      d.beginPath();
-      d.roundRect(x, y, w, h, 12);
-      d.fill();
-      d.strokeStyle = 'rgba(255,255,255,0.5)';
-      d.lineWidth = 3;
-      d.beginPath();
-      d.moveTo(x + 10, y + 3);
-      d.lineTo(x + w - 10, y + 3);
-      d.stroke();
-      d.strokeStyle = 'rgba(60,50,80,0.28)';
-      d.beginPath();
-      d.moveTo(x + 10, y + h - 3);
-      d.lineTo(x + w - 10, y + h - 3);
-      d.stroke();
-      for (let n = 0; n < 14; n++) {
-        d.fillStyle = `rgba(${n % 2 ? 255 : 70},${n % 2 ? 255 : 60},${n % 2 ? 255 : 90},0.16)`;
-        d.fillRect(x + 6 + rnd() * (w - 12), y + 6 + rnd() * (h - 12), 2 + rnd() * 3, 2 + rnd() * 3);
-      }
-    });
+    const cuts = rnd() < 0.5 ? [size * (0.38 + rnd() * 0.24)] : [size * (0.26 + rnd() * 0.12), size * (0.6 + rnd() * 0.14)];
+    [0, ...cuts].forEach((left, k, starts) => stones.push([left, top, (starts[k + 1] ?? size) - left, bottom - top]));
   });
+  stones.forEach(([left, top, width, height]) => {
+    const gap = 5;
+    const [x, y, w, h] = [left + gap, top + gap, width - gap * 2, height - gap * 2];
+    // Each stone: its own grey, leaning warm or cool, with rough corners instead of a neat rectangle.
+    const shade = tone + (rnd() - 0.5) * 38;
+    const warm = (rnd() - 0.5) * 16;
+    const jag = () => (rnd() - 0.5) * 9;
+    d.fillStyle = `rgb(${shade + warm},${shade},${shade - warm})`;
+    d.beginPath();
+    d.moveTo(x + 8 + jag(), y + jag());
+    d.lineTo(x + w - 8 + jag(), y + jag());
+    d.lineTo(x + w + jag(), y + 8 + jag());
+    d.lineTo(x + w + jag(), y + h - 8 + jag());
+    d.lineTo(x + w - 8 + jag(), y + h + jag());
+    d.lineTo(x + 8 + jag(), y + h + jag());
+    d.lineTo(x + jag(), y + h - 8 + jag());
+    d.lineTo(x + jag(), y + 8 + jag());
+    d.closePath();
+    d.fill();
+    d.save();
+    d.clip();
+    // Grain: many light and dark flecks, and a few shallow pits.
+    for (let n = 0; n < 90; n++) {
+      d.fillStyle = n % 2 ? `rgba(255,255,255,${0.05 + rnd() * 0.1})` : `rgba(40,38,44,${0.05 + rnd() * 0.12})`;
+      d.fillRect(x + rnd() * w, y + rnd() * h, 1 + rnd() * 3, 1 + rnd() * 3);
+    }
+    for (let n = 0; n < 3; n++) {
+      d.fillStyle = 'rgba(40,38,44,0.16)';
+      d.beginPath();
+      d.ellipse(x + rnd() * w, y + rnd() * h, 2 + rnd() * 4, 1.5 + rnd() * 2.5, rnd() * 3, 0, Math.PI * 2);
+      d.fill();
+    }
+    if (rnd() < 0.35) {
+      // A hairline crack wandering across the stone.
+      d.strokeStyle = 'rgba(40,38,44,0.4)';
+      d.lineWidth = 1.2;
+      d.beginPath();
+      let [cx, cy] = [x + rnd() * w * 0.3, y + rnd() * h];
+      d.moveTo(cx, cy);
+      for (let step = 0; step < 5; step++) {
+        cx += w * 0.16;
+        cy += (rnd() - 0.5) * h * 0.3;
+        d.lineTo(cx, cy);
+      }
+      d.stroke();
+    }
+    // A lit top edge and a shaded bottom edge give each stone a little thickness.
+    d.fillStyle = 'rgba(255,255,255,0.3)';
+    d.fillRect(x, y, w, 4);
+    d.fillStyle = 'rgba(30,28,34,0.28)';
+    d.fillRect(x, y + h - 5, w, 5);
+    d.restore();
+  });
+  // Moss in a few joints.
+  for (let n = 0; n < 5; n++) {
+    d.fillStyle = `rgba(104,150,88,${0.45 + rnd() * 0.3})`;
+    d.beginPath();
+    d.ellipse(rnd() * size, rnd() < 0.5 ? rowAt + (rnd() - 0.5) * 6 : rnd() * size, 5 + rnd() * 9, 3 + rnd() * 3, 0, 0, Math.PI * 2);
+    d.fill();
+  }
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = 8;
@@ -106,10 +145,10 @@ function useBricks(across, up) {
   }, [across, up]);
 }
 
-/** A courtyard paving tile: hand-cut stones in two tones (a checker), warmed by torchlight where light passes. */
+/** A courtyard paving tile: rough grey stones in two tones (a checker), warmed by torchlight where light passes. */
 export function Flagstone({ position, x, y, isLit, onClick, cell }) {
   const texture = useMemo(() => {
-    const paving = pavingTexture(1 + ((x * 3 + y * 7) % 6), (x + y) % 2 ? [226, 220, 236] : [202, 194, 218]).clone();
+    const paving = pavingTexture(1 + ((x * 3 + y * 7) % 6), (x + y) % 2 ? 196 : 168).clone();
     paving.needsUpdate = true;
     paving.center.set(0.5, 0.5);
     paving.rotation = ((x + y * 3) % 4) * (Math.PI / 2);
@@ -118,7 +157,7 @@ export function Flagstone({ position, x, y, isLit, onClick, cell }) {
   return (
     <mesh position={position} receiveShadow castShadow userData={{ cell }} onClick={onClick}>
       <boxGeometry args={[0.94, 0.08, 0.94]} />
-      <meshStandardMaterial map={texture} roughness={0.8} emissive="#ffb24a" emissiveIntensity={isLit ? 0.24 : 0} />
+      <meshStandardMaterial map={texture} bumpMap={texture} bumpScale={0.6} roughness={0.95} emissive="#ffb24a" emissiveIntensity={isLit ? 0.26 : 0} />
     </mesh>
   );
 }
