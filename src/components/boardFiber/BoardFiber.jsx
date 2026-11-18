@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -6,6 +6,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import * as THREE from 'three';
 import { cellsOnBeams } from '../../game/beam.js';
 import { cellPosition } from './look.js';
+import Pace, { BOARD_QUALITIES, settleQualityStep, startingQualityStep } from './Pace.jsx';
 import ThemedScene from './themes/ThemedScene.jsx';
 import { THEME_LOOKS } from './themes/index.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
@@ -111,34 +112,6 @@ function Layout({ level, onLayout }) {
   return null;
 }
 
-/** How long a tap's animation can still be moving a piece (ms), so its shadow keeps up. */
-const SHADOW_SETTLE_MS = 1400;
-
-/**
- * Shadows are drawn once and kept: drawing them means drawing the whole room a second time, every frame. They're
- * drawn again only for a moment after something on the board changes (a turn, a rescue, a new level).
- */
-function StillShadows({ stamp }) {
-  const gl = useThree((three) => three.gl);
-  const until = useRef(0);
-  useEffect(() => {
-    gl.shadowMap.autoUpdate = false;
-    return () => {
-      gl.shadowMap.autoUpdate = true;
-    };
-  }, [gl]);
-  useEffect(() => {
-    until.current = performance.now() + SHADOW_SETTLE_MS;
-  }, [stamp]);
-  useFrame(() => {
-    if (performance.now() < until.current) gl.shadowMap.needsUpdate = true;
-  });
-  return null;
-}
-
-/** Phones and tablets: fewer pixels and no extra smoothing pass, which is most of what a small graphics chip pays for. */
-const isTouchDevice = () => typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
-
 /**
  * The themed board, drawn with React Three Fiber: the same level, taps and rules as the flat board, dressed as one
  * of the themes (ThemedScene), with GSAP animation and a bloom pass that only the light passes. The board's buttons
@@ -150,7 +123,19 @@ export default function BoardFiber({ level, theme, state, onLayout, onTapCell })
   const { t } = useI18n();
   const [resetKey, setResetKey] = useState(0);
   const calm = useMemo(prefersCalm, []);
-  const light = useMemo(isTouchDevice, []);
+  const [step, setStep] = useState(startingQualityStep);
+  const quality = BOARD_QUALITIES[step];
+  const stepDown = useCallback(
+    () =>
+      setStep((now) => {
+        const next = Math.min(now + 1, BOARD_QUALITIES.length - 1);
+        settleQualityStep(next);
+        return next;
+      }),
+    [],
+  );
+  // Whatever should wake the drawing: the board's state, the level and a view reset.
+  const stamp = useMemo(() => ({}), [state, level, resetKey, step]);
   // The themed room's look, and its box so the camera can frame all of it.
   const look = THEME_LOOKS[theme] ?? THEME_LOOKS.library;
   const room = useMemo(
@@ -167,7 +152,15 @@ export default function BoardFiber({ level, theme, state, onLayout, onTapCell })
     <div className={styles.stage}>
       {/* The room shows through a rounded window, so zooming in never ends in a hard square edge. */}
       <div className={styles.window} style={look.wall ? { background: look.wall } : undefined}>
-        <Canvas shadows dpr={[1, light ? 1.5 : 2]} gl={{ antialias: true, alpha: true }} camera={{ fov: 28, near: 0.1, far: 200 }}>
+        {/* `flat`: no tone mapping, with or without the bloom pass, so a quality step never changes the colors. */}
+        <Canvas
+          shadows
+          frameloop="demand"
+          flat
+          dpr={[1, quality.dpr]}
+          gl={{ antialias: true, alpha: true }}
+          camera={{ fov: 28, near: 0.1, far: 200 }}
+        >
           <hemisphereLight args={[look.light.sky, look.light.ground, look.light.fill]} />
           <directionalLight
             position={[-6, 7, 4]}
@@ -180,13 +173,15 @@ export default function BoardFiber({ level, theme, state, onLayout, onTapCell })
             <orthographicCamera attach="shadow-camera" args={[-8, 8, 8, -8, 0.1, 30]} />
           </directionalLight>
           <Studio />
-          <StillShadows stamp={state} />
+          <Pace stamp={stamp} calm={calm} onSlow={stepDown} />
           <Controls level={level} resetKey={resetKey} room={room} />
           <Layout level={level} onLayout={onLayout} />
           <ThemedScene look={look} level={level} state={state} litCells={litCells} calm={calm} onTap={tap} />
-          <EffectComposer multisampling={light ? 0 : 4}>
-            <Bloom mipmapBlur luminanceThreshold={1.5} luminanceSmoothing={0.1} intensity={0.6} radius={0.7} />
-          </EffectComposer>
+          {quality.bloom && (
+            <EffectComposer multisampling={quality.smoothing}>
+              <Bloom mipmapBlur luminanceThreshold={1.5} luminanceSmoothing={0.1} intensity={0.6} radius={0.7} />
+            </EffectComposer>
+          )}
         </Canvas>
       </div>
       <button type="button" className={styles.reset} onClick={() => setResetKey((n) => n + 1)} aria-label={t('board.view.reset')}>
