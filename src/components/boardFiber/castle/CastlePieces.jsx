@@ -8,10 +8,10 @@ import gsap from 'gsap';
 import * as THREE from 'three';
 import { DIRECTION_ANGLE, mirrorAngle } from '../library/LibraryPieces.jsx';
 import Flame from '../themes/Flame.jsx';
-import { Gear, Streaks, brassM, mirrorM } from '../themes/shared.jsx';
+import { Flare, Gear, Streaks, brassM, mirrorM } from '../themes/shared.jsx';
 
-const STONE = '#cfc5dc';
-const STONE_DARK = '#b3a7c6';
+const STONE = '#c7bcd8';
+const STONE_DARK = '#8d82a8';
 const IRON = '#4a4038';
 const stoneM = (color = STONE) => <meshStandardMaterial color={color} roughness={0.9} />;
 const ironM = <meshStandardMaterial color={IRON} roughness={0.5} metalness={0.5} />;
@@ -250,32 +250,53 @@ export function StoneBlocks() {
   );
 }
 
-/** The torch: an iron stand holding a burning torch that leans the way its light leaves (local +x). */
+/**
+ * The torch, big and proud: a stone pedestal with an iron ring, a thick wooden shaft bound with iron bands, and an
+ * iron basket of fire that leans the way the light leaves (local +x), with a soft glow around the flame.
+ */
 function TorchBody({ calm }) {
   return (
     <group>
-      <mesh position={[0, 0.05, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.44, 0.1, 0.44]} />
+      <mesh position={[0, 0.06, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.3, 0.34, 0.12, 8]} />
         {stoneM(STONE_DARK)}
       </mesh>
-      <mesh position={[-0.06, 0.26, 0]}>
-        <cylinderGeometry args={[0.025, 0.03, 0.34, 8]} />
+      <mesh position={[0, 0.16, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.2, 0.26, 0.1, 8]} />
+        {stoneM()}
+      </mesh>
+      <mesh position={[0, 0.215, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.13, 0.022, 8, 20]} />
         {ironM}
       </mesh>
-      <group position={[-0.06, 0.42, 0]} rotation={[0, 0, -0.75]}>
-        <mesh position={[0, 0.1, 0]} castShadow>
-          <cylinderGeometry args={[0.05, 0.03, 0.34, 10]} />
-          <meshStandardMaterial color="#7a5232" roughness={0.8} />
+      <group position={[-0.03, 0.2, 0]} rotation={[0, 0, -0.5]}>
+        <mesh position={[0, 0.28, 0]} castShadow>
+          <cylinderGeometry args={[0.075, 0.05, 0.56, 12]} />
+          <meshStandardMaterial color="#8a5a34" roughness={0.75} />
         </mesh>
-        <mesh position={[0, 0.27, 0]}>
-          <cylinderGeometry args={[0.075, 0.055, 0.07, 12]} />
+        {[0.14, 0.34].map((y) => (
+          <mesh key={y} position={[0, y, 0]}>
+            <cylinderGeometry args={[0.078 - (0.5 - y) * 0.02, 0.074 - (0.5 - y) * 0.02, 0.04, 12]} />
+            {ironM}
+          </mesh>
+        ))}
+        {/* The fire basket: an iron cup and four prongs holding the flame. */}
+        <mesh position={[0, 0.6, 0]}>
+          <cylinderGeometry args={[0.15, 0.085, 0.12, 12]} />
           {ironM}
         </mesh>
+        {[0, 1, 2, 3].map((k) => (
+          <mesh key={k} position={[Math.cos((k * Math.PI) / 2 + 0.78) * 0.135, 0.71, Math.sin((k * Math.PI) / 2 + 0.78) * 0.135]}>
+            <boxGeometry args={[0.025, 0.14, 0.025]} />
+            {ironM}
+          </mesh>
+        ))}
+        <group position={[0, 0.66, 0]} rotation={[0, 0, 0.5]} scale={3.4}>
+          <Flame calm={calm} />
+        </group>
       </group>
-      <group position={[0.17, 0.62, 0]} scale={2.3}>
-        <Flame calm={calm} />
-      </group>
-      <pointLight position={[0.2, 0.6, 0]} color="#ffb866" intensity={2.6} distance={2.6} />
+      <Flare position={[0.33, 0.92, 0]} size={0.95} />
+      <pointLight position={[0.33, 0.9, 0]} color="#ffb866" intensity={4} distance={3.2} />
     </group>
   );
 }
