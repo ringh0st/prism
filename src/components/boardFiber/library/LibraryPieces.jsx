@@ -1,11 +1,12 @@
 /*
  * The Library theme's pieces (owner's pick): a green banker's lamp for the light, brass mirrors on a gear wheel
- * (they turn) or bolted to a wooden plinth (they don't), and stacks of old books as walls. Mirrors swing a quarter
+ * (they turn) or bolted to a wooden plinth (they don't), and bookcases that join up as walls. Mirrors swing a quarter
  * turn with a springy GSAP ease and their gear turns with them; a turning lamp sits on its own gear.
  */
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import * as THREE from 'three';
+import { TILE } from '../../../game/constants.js';
 import { Gear, Streaks, brassM, glow, lath, mirrorM } from '../themes/shared.jsx';
 
 export const DIRECTION_ANGLE = { right: 0, down: -Math.PI / 2, left: Math.PI, up: Math.PI / 2 };
@@ -180,32 +181,84 @@ export function BankerLamp({ tile, turn }) {
   );
 }
 
-export function Book({ w = 0.55, d = 0.4, h = 0.09, color, rot = 0, y = 0 }) {
-  return (
-    <group position={[0, y + h / 2, 0]} rotation={[0, rot, 0]}>
-      <mesh castShadow receiveShadow>
-        <boxGeometry args={[w, h, d]} />
-        <meshStandardMaterial color={color} roughness={0.75} />
-      </mesh>
-      <mesh position={[0.012, 0, 0]}>
-        <boxGeometry args={[w - 0.03, h - 0.025, d + 0.004]} />
-        <meshStandardMaterial color="#f6ecd6" roughness={0.9} />
-      </mesh>
-      <mesh position={[-w / 2 - 0.001, 0, 0]} rotation={[0, -Math.PI / 2, 0]}>
-        <planeGeometry args={[d * 0.7, h * 0.18]} />
-        <meshStandardMaterial color="#e5c06a" metalness={0.6} roughness={0.3} />
-      </mesh>
-    </group>
-  );
+const spineTextures = new Map();
+
+/** A bookcase front painted on a canvas: a dark wood frame and two shelves packed with colored book spines. */
+function spinesTexture(seed) {
+  if (spineTextures.has(seed)) return spineTextures.get(seed);
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 256;
+  const d = canvas.getContext('2d');
+  let r = seed * 9301 + 49297;
+  const rnd = () => (r = (r * 9301 + 49297) % 233280) / 233280;
+  const colors = ['#7a3b33', '#2f5f73', '#3f6b4c', '#a36b2a', '#5a3b5c', '#c49a4a', '#8a4a3a', '#2e4a3a', '#b5503f', '#3d5a80'];
+  d.fillStyle = '#5a3a26';
+  d.fillRect(0, 0, 256, 256);
+  [
+    [14, 118],
+    [138, 242],
+  ].forEach(([top, bottom]) => {
+    d.fillStyle = '#2e1c12';
+    d.fillRect(12, top, 232, bottom - top);
+    let x = 14;
+    while (x < 236) {
+      const width = 14 + rnd() * 16;
+      const height = (bottom - top) * (0.72 + rnd() * 0.26);
+      d.fillStyle = colors[Math.floor(rnd() * colors.length)];
+      d.fillRect(x, bottom - height, Math.min(width, 242 - x) - 2, height);
+      // A gold band and a lit edge on each spine.
+      d.fillStyle = 'rgba(232,192,106,0.9)';
+      d.fillRect(x + 2, bottom - height * 0.78, Math.min(width, 242 - x) - 6, 3);
+      d.fillStyle = 'rgba(255,255,255,0.18)';
+      d.fillRect(x, bottom - height, 2, height);
+      x += width;
+    }
+    d.fillStyle = '#7d5136';
+    d.fillRect(8, bottom, 240, 9);
+  });
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  spineTextures.set(seed, texture);
+  return texture;
 }
 
-/** A wall: a tall leaning stack of old books. */
-export function BookStack() {
+const CASE_HEIGHT = 0.62;
+/** The four sides of a cell: the step to the neighbor on the board, and how the side's face is placed and turned. */
+const SIDES = [
+  { step: [1, 0], position: [0.502, 0], turn: Math.PI / 2 },
+  { step: [-1, 0], position: [-0.502, 0], turn: -Math.PI / 2 },
+  { step: [0, 1], position: [0, 0.502], turn: 0 },
+  { step: [0, -1], position: [0, -0.502], turn: Math.PI },
+];
+
+/**
+ * A wall: a bookcase that fills its whole square, so bookcases on neighboring squares join into one long run of
+ * shelves. Books show on every side that faces the open floor (never between two joined cases).
+ */
+export function BookcaseWall({ tile, level }) {
+  const isWall = (x, y) => level.tiles.some((other) => other.type === TILE.WALL && other.x === x && other.y === y);
+  const open = SIDES.filter(({ step }) => !isWall(tile.x + step[0], tile.y + step[1]));
   return (
     <group>
-      {['#7a3b33', '#3f6b4c', '#a36b2a', '#2f5f73', '#5a3b5c'].map((c, k) => (
-        <Book key={k} w={0.7 - k * 0.04} d={0.52 - k * 0.02} h={0.1} color={c} rot={(k % 2 ? 1 : -1) * 0.12 * k} y={k * 0.1} />
+      <mesh position={[0, CASE_HEIGHT / 2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1, CASE_HEIGHT, 1]} />
+        <meshStandardMaterial color="#6b4430" roughness={0.75} />
+      </mesh>
+      {open.map(({ position, turn }, side) => (
+        <mesh key={turn} position={[position[0], CASE_HEIGHT / 2, position[1]]} rotation={[0, turn, 0]}>
+          <planeGeometry args={[1, CASE_HEIGHT]} />
+          <meshStandardMaterial map={spinesTexture(1 + ((tile.x * 3 + tile.y * 5 + side) % 5))} roughness={0.7} />
+        </mesh>
       ))}
+      {/* A lighter top board with a book left lying on it. */}
+      <mesh position={[0, CASE_HEIGHT + 0.015, 0]} castShadow>
+        <boxGeometry args={[1, 0.03, 1]} />
+        <meshStandardMaterial color="#7d5136" roughness={0.7} />
+      </mesh>
+      <mesh position={[0.12, CASE_HEIGHT + 0.065, -0.08]} rotation={[0, ((tile.x + tile.y) % 5) * 0.4, 0]} castShadow>
+        <boxGeometry args={[0.42, 0.07, 0.3]} />
+        <meshStandardMaterial color={['#b5503f', '#3d5a80', '#3f6b4c'][(tile.x + tile.y * 2) % 3]} roughness={0.75} />
+      </mesh>
     </group>
   );
 }
