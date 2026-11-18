@@ -4,7 +4,7 @@
  */
 import { BankerLamp, BookStack, FixedMirror, GearMirror } from '../library/LibraryPieces.jsx';
 import { LibraryRoom, ParquetTile, ROOM_HEIGHT, ROOM_PAD } from '../library/LibraryRoom.jsx';
-import { DockLantern, LogPile, PondFixedMirror, PondFixedSplitter, PondMirror, PondSplitter } from '../pond/PondPieces.jsx';
+import { CandleLantern, LogPile, PondFixedMirror, PondFixedSplitter, PondMirror, PondSplitter } from '../pond/PondPieces.jsx';
 import { LilyPad, POND_HEIGHT, POND_PAD, PondRoom } from '../pond/PondRoom.jsx';
 
 export const THEME_LOOKS = {
@@ -23,7 +23,7 @@ export const THEME_LOOKS = {
     Tile: LilyPad,
     tileY: 0.05,
     tileTop: 0.1,
-    pieces: { lamp: DockLantern, mirror: PondMirror, fixedMirror: PondFixedMirror, splitter: PondSplitter, fixedSplitter: PondFixedSplitter, wall: LogPile },
+    pieces: { lamp: CandleLantern, mirror: PondMirror, fixedMirror: PondFixedMirror, splitter: PondSplitter, fixedSplitter: PondFixedSplitter, wall: LogPile },
     room: { pad: POND_PAD, height: POND_HEIGHT },
     light: { sky: '#fff6e0', ground: '#5f8a66', fill: 0.8, sun: 1.35 },
     // The window's wall behind the pond: a soft meadow morning.

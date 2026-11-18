@@ -1,24 +1,53 @@
 /*
- * The Pond theme's pieces: a lantern on a dock post for the light, mirrors in dark-wood rings that turn on a wooden
- * cog wheel (or stand on a mossy stone when they can't), clear amber glass in the same ring for splitters, and piles
- * of logs as walls. Turning pieces swing a quarter turn with a springy GSAP ease, their cog with them.
+ * The Pond theme's pieces: a candle lantern for the light (a real little flame), mirrors framed in green reeds that
+ * turn on a water-lily flower (or stand on a mossy stone when they can't), clear amber glass in the same frame for
+ * splitters, and piles of logs as walls. Turning pieces swing a quarter turn with a springy GSAP ease, their flower
+ * with them.
  */
 import { useEffect, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
 import gsap from 'gsap';
 import * as THREE from 'three';
 import { DIRECTION_ANGLE, RoundMirror, mirrorAngle } from '../library/LibraryPieces.jsx';
-import { Gear, brassM, glow, lath, mirrorM } from '../themes/shared.jsx';
+import { brassM, glow, mirrorM } from '../themes/shared.jsx';
 
 const BARK = '#6b4a32';
 const WOOD = '#a8774a';
-const woodM = (color = '#5b3d28') => <meshStandardMaterial color={color} roughness={0.7} />;
+/** The mirror's frame: green reed stems, with cattail-brown beads for the knobs. */
+const reedM = (color = '#5f8f4e') => <meshStandardMaterial color={color === '#e8c06a' ? '#6b4630' : color} roughness={0.7} />;
+const PETALS = 9;
 /** A splitter's pane: clear amber glass you can see through (light passes and bounces). */
 const amberGlass = (
   <meshPhysicalMaterial color="#ffd98a" roughness={0.05} clearcoat={1} transparent opacity={0.42} emissive="#ffc35a" emissiveIntensity={0.25} side={THREE.DoubleSide} />
 );
 
-/** A piece that turns: on a floating wooden cog wheel, swinging with it. */
-function OnCog({ turn, children }) {
+/** A water-lily flower lying open on the pond: a ring of pink petals round a golden heart. */
+function LilyFlower() {
+  return (
+    <group>
+      {Array.from({ length: PETALS * 2 }, (_, k) => {
+        const outer = k < PETALS;
+        const angle = (k / PETALS) * Math.PI * 2 + (outer ? 0 : Math.PI / PETALS);
+        const reach = outer ? 0.25 : 0.16;
+        return (
+          <group key={k} rotation={[0, angle, 0]}>
+            <mesh position={[reach, outer ? 0.03 : 0.06, 0]} rotation={[0, 0, outer ? 0.18 : 0.5]} scale={[1, 0.22, 0.5]} castShadow>
+              <sphereGeometry args={[outer ? 0.13 : 0.1, 12, 8]} />
+              <meshStandardMaterial color={outer ? '#f3b3c0' : '#f8cdd5'} roughness={0.6} />
+            </mesh>
+          </group>
+        );
+      })}
+      <mesh position={[0, 0.07, 0]} scale={[1, 0.5, 1]}>
+        <sphereGeometry args={[0.08, 14, 10]} />
+        <meshStandardMaterial color="#f0c14e" roughness={0.6} />
+      </mesh>
+    </group>
+  );
+}
+
+/** A piece that turns: standing in a water-lily flower that swings round with it. */
+function OnLily({ turn, children }) {
   const rotor = useRef();
   const angle = mirrorAngle(turn);
   useEffect(() => {
@@ -26,17 +55,13 @@ function OnCog({ turn, children }) {
   }, [angle]);
   return (
     <group ref={rotor} rotation={[0, angle, 0]}>
-      <Gear r={0.33} teeth={12} h={0.06} color={WOOD} metalness={0} roughness={0.75} />
-      <mesh position={[0, 0.065, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.11, 0.14, 24]} />
-        <meshBasicMaterial color="#5a3f22" />
-      </mesh>
-      <group position={[0, 0.39, 0]}>{children}</group>
+      <LilyFlower />
+      <group position={[0, 0.42, 0]}>{children}</group>
     </group>
   );
 }
 
-/** A piece that can't turn: standing on a mossy stone (no cog). */
+/** A piece that can't turn: standing on a mossy stone (no flower). */
 function OnStone({ turn, children }) {
   return (
     <group rotation={[0, mirrorAngle(turn), 0]}>
@@ -54,14 +79,14 @@ function OnStone({ turn, children }) {
 }
 
 export const PondMirror = ({ turn }) => (
-  <OnCog turn={turn}>
-    <RoundMirror frame={woodM} glass={mirrorM} />
-  </OnCog>
+  <OnLily turn={turn}>
+    <RoundMirror frame={reedM} glass={mirrorM} />
+  </OnLily>
 );
 
 export const PondFixedMirror = ({ turn }) => (
   <OnStone turn={turn}>
-    <RoundMirror frame={woodM} glass={mirrorM} knob={false} postsFrom={-0.14} />
+    <RoundMirror frame={reedM} glass={mirrorM} knob={false} postsFrom={-0.14} />
   </OnStone>
 );
 
@@ -69,7 +94,7 @@ export const PondFixedMirror = ({ turn }) => (
 function SplitterPane(props) {
   return (
     <group>
-      <RoundMirror frame={woodM} glass={amberGlass} streaks={false} {...props} />
+      <RoundMirror frame={reedM} glass={amberGlass} streaks={false} {...props} />
       <mesh position={[0, 0.33, 0]} rotation={[0, 0, Math.PI / 4]}>
         <boxGeometry args={[0.07, 0.07, 0.03]} />
         {brassM('#e8c06a')}
@@ -79,9 +104,9 @@ function SplitterPane(props) {
 }
 
 export const PondSplitter = ({ turn }) => (
-  <OnCog turn={turn}>
+  <OnLily turn={turn}>
     <SplitterPane />
-  </OnCog>
+  </OnLily>
 );
 
 export const PondFixedSplitter = ({ turn }) => (
@@ -129,50 +154,88 @@ export function LogPile() {
   );
 }
 
-/** The lantern: a copper hood on an arm, shining the way the light leaves (local +x). */
-function LanternBody() {
+/** The candle's flame: an orange tongue with a yellow heart; it flickers gently (still for reduced motion). */
+function Flame({ calm }) {
+  const flame = useRef();
+  useFrame(({ clock }) => {
+    if (calm) return;
+    const t = clock.elapsedTime;
+    flame.current.scale.set(1 + Math.sin(t * 9) * 0.06, 1 + Math.sin(t * 13) * 0.08 + Math.sin(t * 7.3) * 0.05, 1 + Math.cos(t * 11) * 0.06);
+    flame.current.rotation.z = Math.sin(t * 5) * 0.07;
+  });
   return (
-    <group>
-      <mesh position={[0, 0.28, 0]} castShadow>
-        <cylinderGeometry args={[0.055, 0.07, 0.56, 10]} />
-        <meshStandardMaterial color={BARK} roughness={0.85} />
+    <group ref={flame}>
+      <mesh position={[0, 0.075, 0]}>
+        <coneGeometry args={[0.04, 0.13, 12]} />
+        <meshBasicMaterial color={glow('#ff8a3a', 1.8)} toneMapped={false} />
       </mesh>
-      <mesh position={[0, 0.02, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.16, 0.18, 0.05, 16]} />
-        <meshStandardMaterial color={WOOD} roughness={0.75} />
+      <mesh position={[0, 0.02, 0]}>
+        <sphereGeometry args={[0.04, 12, 10]} />
+        <meshBasicMaterial color={glow('#ff8a3a', 1.8)} toneMapped={false} />
       </mesh>
-      <mesh position={[0, 0.58, 0]}>
-        <sphereGeometry args={[0.065, 12, 10]} />
-        {brassM('#c98a4a')}
+      <mesh position={[0, 0.035, 0]} scale={[0.55, 1, 0.55]}>
+        <sphereGeometry args={[0.04, 10, 8]} />
+        <meshBasicMaterial color={glow('#fff3c0', 3.2)} toneMapped={false} />
       </mesh>
-      <group position={[0.1, 0.44, 0]} rotation={[0, 0, -Math.PI / 2]}>
-        <mesh
-          geometry={lath(
-            [
-              [0.05, -0.1],
-              [0.15, -0.06],
-              [0.18, 0.08],
-              [0.16, 0.12],
-              [0.05, 0.12],
-            ],
-            32,
-          )}
-          castShadow
-        >
-          <meshPhysicalMaterial color="#c9824a" metalness={0.7} roughness={0.3} clearcoat={0.6} side={THREE.DoubleSide} />
-        </mesh>
-        <mesh position={[0, 0.115, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[0.155, 32]} />
-          <meshBasicMaterial color={glow('#fff0c8', 3)} toneMapped={false} />
-        </mesh>
-      </group>
-      <pointLight position={[0.3, 0.44, 0]} color="#ffcf8a" intensity={2} distance={2.2} />
     </group>
   );
 }
 
-/** The light: a dock-post lantern facing the way its light leaves; a turning one stands on a cog and swings round. */
-export function DockLantern({ tile, turn }) {
+const IRON = '#4a3a30';
+const POST = 0.13;
+
+/**
+ * A hand lantern holding a candle: an iron frame with a copper roof and a carrying ring, glass on three sides and a
+ * shiny copper back, so the candlelight leaves through the open front (local +x).
+ */
+function LanternBody({ calm }) {
+  return (
+    <group>
+      <mesh position={[0, 0.025, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.21, 0.23, 0.05, 20]} />
+        <meshStandardMaterial color={WOOD} roughness={0.75} />
+      </mesh>
+      {[-1, 1].flatMap((x) =>
+        [-1, 1].map((z) => (
+          <mesh key={`${x}${z}`} position={[x * POST, 0.26, z * POST]} castShadow>
+            <boxGeometry args={[0.025, 0.42, 0.025]} />
+            <meshStandardMaterial color={IRON} roughness={0.5} metalness={0.4} />
+          </mesh>
+        )),
+      )}
+      {/* The copper back throws the light forward; the other sides are glass. */}
+      <mesh position={[-POST, 0.26, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[POST * 2, 0.4]} />
+        <meshPhysicalMaterial color="#d9955a" metalness={0.8} roughness={0.22} clearcoat={0.6} emissive="#ffb866" emissiveIntensity={0.35} side={THREE.DoubleSide} />
+      </mesh>
+      {[-1, 1].map((z) => (
+        <mesh key={z} position={[0, 0.26, z * POST]}>
+          <planeGeometry args={[POST * 2, 0.4]} />
+          <meshPhysicalMaterial color="#fff3d6" transparent opacity={0.22} roughness={0.05} side={THREE.DoubleSide} depthWrite={false} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.54, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
+        <coneGeometry args={[0.24, 0.16, 4]} />
+        <meshPhysicalMaterial color="#c9824a" metalness={0.7} roughness={0.3} clearcoat={0.6} />
+      </mesh>
+      <mesh position={[0, 0.66, 0]}>
+        <torusGeometry args={[0.055, 0.012, 8, 20]} />
+        {brassM('#c98a4a')}
+      </mesh>
+      <mesh position={[0, 0.12, 0]}>
+        <cylinderGeometry args={[0.05, 0.055, 0.15, 14]} />
+        <meshStandardMaterial color="#f6ecd6" roughness={0.85} />
+      </mesh>
+      <group position={[0, 0.21, 0]}>
+        <Flame calm={calm} />
+      </group>
+      <pointLight position={[0.1, 0.3, 0]} color="#ffb866" intensity={2.4} distance={2.4} />
+    </group>
+  );
+}
+
+/** The light: a candle lantern, its open side facing the way the light leaves; a turning one swings on a flower. */
+export function CandleLantern({ tile, turn, calm }) {
   const head = useRef();
   const angle = (DIRECTION_ANGLE[tile.dir] ?? 0) - (tile.turnable ? (turn % 2) * (Math.PI / 2) : 0);
   useEffect(() => {
@@ -180,9 +243,9 @@ export function DockLantern({ tile, turn }) {
   }, [angle]);
   return (
     <group ref={head} rotation={[0, angle, 0]}>
-      {tile.turnable && <Gear r={0.34} teeth={12} h={0.06} color={WOOD} metalness={0} roughness={0.75} />}
+      {tile.turnable && <LilyFlower />}
       <group position={[0, tile.turnable ? 0.06 : 0, 0]}>
-        <LanternBody />
+        <LanternBody calm={calm} />
       </group>
     </group>
   );
