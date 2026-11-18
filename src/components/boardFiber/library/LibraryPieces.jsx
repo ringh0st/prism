@@ -6,38 +6,41 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import * as THREE from 'three';
-import { Gear, Streaks, brassM, glow, lath, mirrorM } from './shared.jsx';
+import { Gear, Streaks, brassM, glow, lath, mirrorM } from '../themes/shared.jsx';
 
-const DIRECTION_ANGLE = { right: 0, down: -Math.PI / 2, left: Math.PI, up: Math.PI / 2 };
+export const DIRECTION_ANGLE = { right: 0, down: -Math.PI / 2, left: Math.PI, up: Math.PI / 2 };
 /** The game's mirror angle for a turn count (the pane faces along local z). */
 export const mirrorAngle = (turn) => -THREE.MathUtils.degToRad(-45 + turn * 90);
 
-/** The round brass mirror itself: glass in a brass ring, on two posts with brass knobs. */
-function BrassPane({ postsFrom = -0.16, knob = true }) {
+/**
+ * The round mirror itself: glass in a ring, on two posts with knobs. `frame` paints the ring and posts (brass here,
+ * dark wood at the pond) and `glass` the pane (a mirror, or clear amber glass for a splitter).
+ */
+export function RoundMirror({ postsFrom = -0.16, knob = true, frame = brassM, glass = mirrorM, streaks = true }) {
   return (
     <group>
       <mesh>
         <torusGeometry args={[0.29, 0.02, 10, 40]} />
-        {brassM()}
+        {frame()}
       </mesh>
       <mesh>
         <circleGeometry args={[0.26, 40]} />
-        {mirrorM}
+        {glass}
       </mesh>
       {[-0.3, 0.3].map((x) => (
         <mesh key={x} position={[x, postsFrom, 0]}>
           <cylinderGeometry args={[0.015, 0.015, 0.36, 8]} />
-          {brassM()}
+          {frame()}
         </mesh>
       ))}
       {knob &&
         [-0.3, 0.3].map((x) => (
           <mesh key={x} position={[x, 0, 0]}>
             <sphereGeometry args={[0.03, 12, 10]} />
-            {brassM('#e8c06a')}
+            {frame('#e8c06a')}
           </mesh>
         ))}
-      <Streaks w={0.45} h={0.38} />
+      {streaks && <Streaks w={0.45} h={0.38} />}
     </group>
   );
 }
@@ -57,7 +60,7 @@ export function GearMirror({ turn }) {
         <meshBasicMaterial color="#5a3f22" />
       </mesh>
       <group position={[0, 0.38, 0]}>
-        <BrassPane />
+        <RoundMirror />
       </group>
     </group>
   );
@@ -87,7 +90,7 @@ export function FixedMirror({ turn }) {
         </mesh>
       ))}
       <group position={[0, 0.42, 0]}>
-        <BrassPane knob={false} postsFrom={-0.14} />
+        <RoundMirror knob={false} postsFrom={-0.14} />
         <mesh position={[0, 0.31, 0]}>
           <sphereGeometry args={[0.03, 12, 10]} />
           {brassM('#e8c06a')}

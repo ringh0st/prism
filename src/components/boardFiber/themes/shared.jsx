@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 /*
- * Shared bits of the Library theme: materials, the lathe helper, and the soft lights (flare, glint, light strips).
+ * Shared bits of the themed boards: materials, the lathe helper, and the soft lights (flare, glint, light strips).
  */
 import * as THREE from 'three';
 
@@ -127,7 +127,7 @@ export function Glint({ position, size = 0.22 }) {
   );
 }
 
-export function Gear({ r = 0.4, teeth = 12, h = 0.06, color = '#c9973f' }) {
+export function Gear({ r = 0.4, teeth = 12, h = 0.06, color = '#c9973f', metalness = 0.75, roughness = 0.32 }) {
   const geo = useMemo(() => {
     const s = new THREE.Shape();
     for (let k = 0; k < teeth * 2; k++) {
@@ -144,7 +144,52 @@ export function Gear({ r = 0.4, teeth = 12, h = 0.06, color = '#c9973f' }) {
   }, [r, teeth, h]);
   return (
     <mesh geometry={geo} castShadow receiveShadow>
-      <meshPhysicalMaterial color={color} metalness={0.75} roughness={0.32} />
+      <meshPhysicalMaterial color={color} metalness={metalness} roughness={roughness} />
+    </mesh>
+  );
+}
+
+/** A slab with rounded corners, lying flat (its top at y = 0); texture coordinates in world units / 4. */
+export function roundedSlab(width, depth, height, radius) {
+  const shape = new THREE.Shape();
+  const w = width / 2;
+  const d = depth / 2;
+  shape.moveTo(-w + radius, -d);
+  shape.lineTo(w - radius, -d);
+  shape.quadraticCurveTo(w, -d, w, -d + radius);
+  shape.lineTo(w, d - radius);
+  shape.quadraticCurveTo(w, d, w - radius, d);
+  shape.lineTo(-w + radius, d);
+  shape.quadraticCurveTo(-w, d, -w, d - radius);
+  shape.lineTo(-w, -d + radius);
+  shape.quadraticCurveTo(-w, -d, -w + radius, -d);
+  const geometry = new THREE.ExtrudeGeometry(shape, { depth: height, bevelEnabled: true, bevelSize: 0.04, bevelThickness: 0.04, bevelSegments: 3, curveSegments: 10 });
+  geometry.rotateX(Math.PI / 2);
+  const uv = geometry.attributes.uv;
+  for (let n = 0; n < uv.count; n++) uv.setXY(n, uv.getX(n) / 4, uv.getY(n) / 4);
+  return geometry;
+}
+
+let groundShadow = null;
+
+/** A soft round shadow on the page under a room's base, so the room sits on the screen like a little model. */
+export function GroundShadow({ width, depth, y }) {
+  if (!groundShadow) {
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 256;
+    const context = canvas.getContext('2d');
+    const fade = context.createRadialGradient(128, 128, 40, 128, 128, 128);
+    fade.addColorStop(0, 'rgba(70, 42, 22, 0.42)');
+    fade.addColorStop(0.6, 'rgba(70, 42, 22, 0.16)');
+    fade.addColorStop(1, 'rgba(70, 42, 22, 0)');
+    context.fillStyle = fade;
+    context.fillRect(0, 0, 256, 256);
+    groundShadow = new THREE.CanvasTexture(canvas);
+  }
+  return (
+    <mesh position={[0, y, 0.25]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[width * 1.22, depth * 1.22]} />
+      <meshBasicMaterial map={groundShadow} transparent depthWrite={false} />
     </mesh>
   );
 }

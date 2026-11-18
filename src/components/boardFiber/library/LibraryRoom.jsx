@@ -4,6 +4,7 @@
  */
 import { useMemo } from 'react';
 import * as THREE from 'three';
+import { GroundShadow, roundedSlab } from '../themes/shared.jsx';
 
 const woodCache = new Map();
 
@@ -139,42 +140,6 @@ export const ROOM_PAD = 0.95;
 export const ROOM_HEIGHT = 1.5;
 const BASE_DEPTH = 0.42;
 
-/** A slab with rounded corners, lying flat (its top at y = 0). */
-function roundedSlab(width, depth, height, radius) {
-  const shape = new THREE.Shape();
-  const w = width / 2;
-  const d = depth / 2;
-  shape.moveTo(-w + radius, -d);
-  shape.lineTo(w - radius, -d);
-  shape.quadraticCurveTo(w, -d, w, -d + radius);
-  shape.lineTo(w, d - radius);
-  shape.quadraticCurveTo(w, d, w - radius, d);
-  shape.lineTo(-w + radius, d);
-  shape.quadraticCurveTo(-w, d, -w, d - radius);
-  shape.lineTo(-w, -d + radius);
-  shape.quadraticCurveTo(-w, -d, -w + radius, -d);
-  const geometry = new THREE.ExtrudeGeometry(shape, { depth: height, bevelEnabled: true, bevelSize: 0.04, bevelThickness: 0.04, bevelSegments: 3, curveSegments: 10 });
-  geometry.rotateX(Math.PI / 2);
-  // Plank texture across the top, in world units.
-  const uv = geometry.attributes.uv;
-  for (let n = 0; n < uv.count; n++) uv.setXY(n, uv.getX(n) / 4, uv.getY(n) / 4);
-  return geometry;
-}
-
-/** A soft round shadow on the page under the base, so the room sits on the screen like a little model. */
-function shadowTexture() {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 256;
-  const context = canvas.getContext('2d');
-  const fade = context.createRadialGradient(128, 128, 40, 128, 128, 128);
-  fade.addColorStop(0, 'rgba(70, 42, 22, 0.42)');
-  fade.addColorStop(0.6, 'rgba(70, 42, 22, 0.16)');
-  fade.addColorStop(1, 'rgba(70, 42, 22, 0)');
-  context.fillStyle = fade;
-  context.fillRect(0, 0, 256, 256);
-  return new THREE.CanvasTexture(canvas);
-}
-
 /**
  * The room around the board, as a little model that sits whole on the page: a wooden base with rounded corners and a
  * soft shadow under it, the rug, and two low bookshelves along its back and side edges.
@@ -184,7 +149,6 @@ export function LibraryRoom({ level }) {
   const depth = level.height + ROOM_PAD * 2;
   const floor = useMemo(() => woodTexture({ base: [150, 101, 64], planksAcross: 8, length: 3, seed: 3 }), []);
   const base = useMemo(() => roundedSlab(width, depth, BASE_DEPTH, 0.45), [width, depth]);
-  const shadow = useMemo(shadowTexture, []);
   const rug = (pad, color, y) => (
     <mesh position={[0, y, 0]} receiveShadow>
       <boxGeometry args={[level.width + pad, 0.03, level.height + pad]} />
@@ -195,10 +159,7 @@ export function LibraryRoom({ level }) {
   const side = -(level.width / 2 + 0.72);
   return (
     <group>
-      <mesh position={[0, -BASE_DEPTH - 0.1, 0.25]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[width * 1.22, depth * 1.22]} />
-        <meshBasicMaterial map={shadow} transparent depthWrite={false} />
-      </mesh>
+      <GroundShadow width={width} depth={depth} y={-BASE_DEPTH - 0.1} />
       <mesh geometry={base} position={[0, -0.02, 0]} receiveShadow castShadow>
         <meshPhysicalMaterial map={floor} roughness={0.45} clearcoat={0.5} clearcoatRoughness={0.35} />
       </mesh>

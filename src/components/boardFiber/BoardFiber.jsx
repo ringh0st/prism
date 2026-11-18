@@ -8,8 +8,8 @@ import { cellsOnBeams } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
 import { FLOORS, cellPosition } from './look.js';
 import Tray from './Tray.jsx';
-import LibraryScene from './library/LibraryScene.jsx';
-import { ROOM_HEIGHT, ROOM_PAD } from './library/LibraryRoom.jsx';
+import ThemedScene from './themes/ThemedScene.jsx';
+import { THEME_LOOKS } from './themes/index.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import Piece from './Piece.jsx';
 import Beam from './Beam.jsx';
@@ -139,11 +139,11 @@ export default function BoardFiber({ level, theme: boardTheme, state, onLayout, 
     setTheme(FLOORS[floor] ?? FLOORS.sage);
   }, []);
 
-  // The themed room's box, so the camera can frame all of it.
+  // The themed room's look, and its box so the camera can frame all of it.
+  const look = THEME_LOOKS[boardTheme] ?? null;
   const room = useMemo(
-    () =>
-      boardTheme === 'library' ? { width: level.width + ROOM_PAD * 2, length: level.height + ROOM_PAD * 2, height: ROOM_HEIGHT, depth: 0.5 } : null,
-    [boardTheme, level],
+    () => (look ? { width: level.width + look.room.pad * 2, length: level.height + look.room.pad * 2, height: look.room.height, depth: 0.5 } : null),
+    [look, level],
   );
   const { turns, trace, revealedCells, darkenedTile, lookHere } = state;
   const litCells = useMemo(() => cellsOnBeams(trace.segments, level.width, level.height), [trace, level]);
@@ -155,13 +155,13 @@ export default function BoardFiber({ level, theme: boardTheme, state, onLayout, 
   return (
     <div ref={wrapper} className={styles.stage}>
       {/* A themed room shows through a rounded window, so zooming in never ends in a hard square edge. */}
-      <div className={boardTheme ? styles.window : styles.open}>
+      <div className={look ? styles.window : styles.open} style={look?.wall ? { background: look.wall } : undefined}>
         {theme && (
           <Canvas shadows dpr={[1, 2]} gl={{ antialias: true, alpha: true }} camera={{ fov: 28, near: 0.1, far: 200 }}>
-            <hemisphereLight args={boardTheme === 'library' ? ['#ffe6c4', '#3a2418', 0.65] : ['#fff6e4', '#a8744a', 0.75]} />
+            <hemisphereLight args={look ? [look.light.sky, look.light.ground, look.light.fill] : ['#fff6e4', '#a8744a', 0.75]} />
             <directionalLight
               position={[-6, 7, 4]}
-              intensity={boardTheme === 'library' ? 1.1 : 1.7}
+              intensity={look ? look.light.sun : 1.7}
               color="#ffe2b0"
               castShadow
               shadow-mapSize={[1024, 1024]}
@@ -172,8 +172,8 @@ export default function BoardFiber({ level, theme: boardTheme, state, onLayout, 
             <Studio />
             <Controls level={level} resetKey={resetKey} room={room} />
             <Layout level={level} onLayout={onLayout} />
-            {boardTheme === 'library' ? (
-              <LibraryScene level={level} turns={turns} trace={trace} litCells={litCells} calm={calm} onTap={tap} />
+            {look ? (
+              <ThemedScene look={look} level={level} turns={turns} trace={trace} litCells={litCells} calm={calm} onTap={tap} />
             ) : (
               <>
                 <Tray level={level} theme={theme} litCells={litCells} hintCells={lookHere} calm={calm} onTileClick={tap} />

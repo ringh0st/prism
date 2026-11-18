@@ -52,7 +52,8 @@ import { dailyShareText } from '../../game/share.js';
 import { PUBLIC_GAME_URL } from '../../lib/config.js';
 import { levelModifierFor } from '../../game/surprises.js';
 import { quipLines } from '../../game/quips.js';
-import { RescueWording, useI18n } from '../../i18n/I18nContext.jsx';
+import { RescueWording, useI18n, useIsRescue } from '../../i18n/I18nContext.jsx';
+import { rescueWording } from '../../i18n/rescueWording.js';
 import { flavorText, levelTitle, pieceText, worldName } from '../../i18n/gameText.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
 import { PIECE_FIRST_LEVEL, firstTileOf, newPiecesIn, pieceCellOf, piecesMetIn } from '../../game/pieces.js';
@@ -207,7 +208,10 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
     puzzle,
     onNeedBuy: setBuyingHelper,
   });
-  const flavor = flavorText(lang, level);
+  // Game content is translated outside t(), so in themed worlds its gem words are swapped for Lumis here.
+  const isRescue = useIsRescue();
+  const inRescueWords = (texts) => (isRescue && texts ? Object.fromEntries(Object.entries(texts).map(([key, text]) => [key, rescueWording(text, lang)])) : texts);
+  const flavor = inRescueWords(flavorText(lang, level));
   // Spare Moves, a moves Pal and every Undo add to the limit (never to the stars); Keep going adds too, with 1★ at most.
   const moveLimit =
     (mode === 'rush' ? rushMoveLimit(rush.run, level.par) : moveLimitFor(level.par, level.difficulty)) +
@@ -644,7 +648,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
       return {
         id: `piece-${piece.id}`,
         target: cell !== null ? `[data-cell="${cell}"]` : '[data-tour="board"]',
-        ...pieceText(lang, piece),
+        ...inRescueWords(pieceText(lang, piece)),
         art: (
           <TileArt
             tile={piece.sample}
