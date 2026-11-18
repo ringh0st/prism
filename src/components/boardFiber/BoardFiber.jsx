@@ -9,6 +9,7 @@ import { TILE } from '../../game/constants.js';
 import { FLOORS, cellPosition } from './look.js';
 import Tray from './Tray.jsx';
 import LibraryScene from './library/LibraryScene.jsx';
+import { ROOM_HEIGHT, ROOM_PAD } from './library/LibraryRoom.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import Piece from './Piece.jsx';
 import Beam from './Beam.jsx';
@@ -18,10 +19,12 @@ import styles from './BoardFiber.module.css';
 const prefersCalm = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 /** A pointer that moved less than this (pixels) between press and release was a tap, not a drag. */
 const TAP_SLOP = 8;
+/** How far the camera starts tilted from straight above (radians). */
+const START_TILT = 0.62;
 
 /** Turn, tilt and zoom with the finger or mouse (three's OrbitControls), the whole table always in reach. */
-function Controls({ level, resetKey }) {
-  const { camera, gl } = useThree();
+function Controls({ level, resetKey, room = null }) {
+  const { camera, gl, size: frame } = useThree();
   const controls = useMemo(() => new OrbitControls(camera, gl.domElement), [camera, gl]);
   useEffect(() => {
     Object.assign(controls, {
@@ -40,11 +43,35 @@ function Controls({ level, resetKey }) {
   useEffect(() => {
     // Start (and reset) looking down at the table, tilted towards the player, far enough to see all of it.
     const size = Math.max(level.width, level.height);
-    const distance = size * 2.35;
-    camera.position.set(0, Math.cos(0.62) * distance, Math.sin(0.62) * distance);
+    let distance = size * 2.35;
+    const place = () => {
+      camera.position.set(0, Math.cos(START_TILT) * distance, Math.sin(START_TILT) * distance);
+      camera.lookAt(0, 0, 0);
+      camera.updateMatrixWorld();
+    };
+    place();
+    // A themed room is a little model that must sit whole inside the frame: step back until every corner fits.
+    if (room) {
+      const corner = new THREE.Vector3();
+      const fits = () =>
+        [-1, 1].every((sx) =>
+          [-1, 1].every((sz) =>
+            [-room.depth, room.height].every((y) => {
+              corner.set((sx * room.width) / 2, y, (sz * room.length) / 2).project(camera);
+              return Math.abs(corner.x) < 0.97 && Math.abs(corner.y) < 0.97;
+            }),
+          ),
+        );
+      camera.updateProjectionMatrix();
+      while (!fits() && distance < size * 6) {
+        distance += 0.25;
+        place();
+      }
+      controls.maxDistance = Math.max(controls.maxDistance, distance * 1.2);
+    }
     controls.target.set(0, 0, 0);
     controls.update();
-  }, [camera, controls, level, resetKey]);
+  }, [camera, controls, level, resetKey, room, frame.width, frame.height]);
   useFrame(() => controls.update());
   return null;
 }
@@ -112,6 +139,14 @@ export default function BoardFiber({ level, theme: boardTheme, state, onLayout, 
     setTheme(FLOORS[floor] ?? FLOORS.sage);
   }, []);
 
+  // The themed room's box, so the camera can frame all of it.
+  const room = useMemo(
+    () =>
+      boardTheme === 'library'
+        ? { width: level.width + ROOM_PAD * 2, length: level.height + ROOM_PAD * 2, height: ROOM_HEIGHT, depth: 0.5 }
+        : null,
+    [boardTheme, level],
+  );
   const { turns, trace, revealedCells, darkenedTile, lookHere } = state;
   const litCells = useMemo(() => cellsOnBeams(trace.segments, level.width, level.height), [trace, level]);
   const tap = (event, cell) => {
@@ -135,7 +170,7 @@ export default function BoardFiber({ level, theme: boardTheme, state, onLayout, 
             <orthographicCamera attach="shadow-camera" args={[-8, 8, 8, -8, 0.1, 30]} />
           </directionalLight>
           <Studio />
-          <Controls level={level} resetKey={resetKey} />
+          <Controls level={level} resetKey={resetKey} room={room} />
           <Layout level={level} onLayout={onLayout} />
           {boardTheme === 'library' ? (
             <LibraryScene level={level} turns={turns} trace={trace} litCells={litCells} calm={calm} onTap={tap} />
