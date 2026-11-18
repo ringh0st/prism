@@ -1,18 +1,19 @@
 /*
- * The Castle courtyard the board sits in, as a little model: a green lawn with rounded corners, pale lilac flagstones
- * as the tiles you tap (light warms them), and low battlements with two bright-roofed towers along the back and side
- * (a fairy-tale castle, not a grey one).
+ * The Castle courtyard the board sits in, as a little model: a green lawn with rounded corners, rough stone paving
+ * as the tiles you tap (light warms them), and sandstone battlements with two red-roofed towers along the back and
+ * side (owner's reference: a hand-drawn medieval castle).
  */
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { GroundShadow, roundedSlab } from '../themes/shared.jsx';
 
 export const CASTLE_PAD = 0.95;
-export const CASTLE_HEIGHT = 1.9;
+export const CASTLE_HEIGHT = 2.4;
 const BASE_DEPTH = 0.42;
 const LAWN = '#9ccb86';
-const STONE = '#ddd3e6';
-const WALL = '#c9bdd6';
+const WALL = '#d6c29a';
+const ROOF = '#c9553a';
+const TIMBER = '#6b4630';
 const MORTAR = '#56525c';
 const SOFT_JOINT = '#8c8890';
 
@@ -113,21 +114,41 @@ function pavingTexture(seed, tone) {
   return texture;
 }
 
-/** Brickwork for the walls and towers: staggered courses with mortar lines. */
+/**
+ * Medieval rubble masonry for the walls and towers (owner's reference: a hand-drawn medieval castle): rough
+ * sandstone blocks of uneven sizes in warm creams and tans, with a few grey ones, and deep mortar lines.
+ */
 function brickTexture() {
   if (textures.has('brick')) return textures.get('brick');
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 256;
   const d = canvas.getContext('2d');
   const rnd = seeded(5);
-  d.fillStyle = MORTAR;
+  d.fillStyle = '#7d6a54';
   d.fillRect(0, 0, 256, 256);
-  for (let row = 0; row < 4; row++)
-    for (let col = -1; col < 4; col++) {
-      const shade = (rnd() - 0.5) * 26;
-      d.fillStyle = `rgb(${214 + shade},${203 + shade},${226 + shade})`;
-      d.fillRect(col * 64 + (row % 2 ? 32 : 0) + 3, row * 64 + 3, 58, 58);
+  for (let row = 0; row < 5; row++) {
+    const top = row * 51.2;
+    let x = -rnd() * 40;
+    while (x < 256) {
+      const width = 34 + rnd() * 44;
+      const grey = rnd() < 0.22;
+      const shade = (rnd() - 0.5) * 30;
+      const [r, g, b] = grey ? [176 + shade, 170 + shade, 160 + shade] : [222 + shade, 200 + shade, 158 + shade];
+      d.fillStyle = `rgb(${r},${g},${b})`;
+      d.beginPath();
+      d.roundRect(x + 2.5, top + 2.5, width - 5, 46, 7);
+      d.fill();
+      d.fillStyle = 'rgba(255,255,255,0.28)';
+      d.fillRect(x + 6, top + 4, width - 12, 3);
+      d.fillStyle = 'rgba(70,50,30,0.22)';
+      d.fillRect(x + 6, top + 43, width - 12, 4);
+      for (let n = 0; n < 10; n++) {
+        d.fillStyle = n % 2 ? 'rgba(255,255,255,0.14)' : 'rgba(70,50,30,0.16)';
+        d.fillRect(x + 5 + rnd() * (width - 10), top + 6 + rnd() * 38, 2 + rnd() * 3, 2 + rnd() * 2);
+      }
+      x += width;
     }
+  }
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -140,7 +161,7 @@ function useBricks(across, up) {
   return useMemo(() => {
     const texture = brickTexture().clone();
     texture.needsUpdate = true;
-    texture.repeat.set(across * 1.6, up * 1.6);
+    texture.repeat.set(across * 1.1, up * 1.1);
     return texture;
   }, [across, up]);
 }
@@ -169,17 +190,17 @@ function Battlement({ position, rotation, length, banner }) {
   return (
     <group position={position} rotation={rotation}>
       <mesh position={[0, 0.25, 0]} castShadow receiveShadow>
-        <boxGeometry args={[length, 0.5, 0.24]} />
+        <boxGeometry args={[length, 0.5, 0.3]} />
         <meshStandardMaterial map={bricks} roughness={0.9} />
       </mesh>
       {Array.from({ length: merlons }, (_, k) => (
         <mesh key={k} position={[-length / 2 + (length / merlons) * (k + 0.5), 0.58, 0]} castShadow>
-          <boxGeometry args={[(length / merlons) * 0.5, 0.16, 0.24]} />
+          <boxGeometry args={[(length / merlons) * 0.5, 0.16, 0.3]} />
           <meshStandardMaterial color={WALL} roughness={0.9} />
         </mesh>
       ))}
       {[-0.25, 0.25].map((at, k) => (
-        <group key={at} position={[length * at, 0.3, 0.125]}>
+        <group key={at} position={[length * at, 0.3, 0.155]}>
           <mesh>
             <planeGeometry args={[0.26, 0.36]} />
             <meshStandardMaterial color={banner[k]} roughness={0.8} />
@@ -194,40 +215,54 @@ function Battlement({ position, rotation, length, banner }) {
   );
 }
 
-/** A round brick tower with a tiled roof, a lit window, a door and a little flag. */
-function Tower({ position, roof = '#e8839a', flag = '#f0c14e' }) {
-  const bricks = useBricks(1.2, 0.9);
+/**
+ * A round stone tower as in a medieval castle: rubble masonry, arrow slits and a door, a wooden gallery under a tall
+ * red-tiled roof with a wide eave, and a little flag.
+ */
+function Tower({ position, flag = '#f0c14e' }) {
+  const bricks = useBricks(1.9, 1.2);
   return (
     <group position={position}>
-      <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.3, 0.34, 1, 20]} />
-        <meshStandardMaterial map={bricks} roughness={0.9} />
+      <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.32, 0.38, 1.2, 20]} />
+        <meshStandardMaterial map={bricks} roughness={0.95} />
       </mesh>
       {[0.6, Math.PI / 2 + 0.3].map((turn) => (
         <group key={turn} rotation={[0, turn, 0]}>
-          <mesh position={[0, 0.66, 0.315]}>
-            <planeGeometry args={[0.1, 0.2]} />
-            <meshBasicMaterial color="#ffd98a" />
+          <mesh position={[0, 0.72, 0.345]}>
+            <planeGeometry args={[0.06, 0.22]} />
+            <meshBasicMaterial color="#3a2a1e" />
           </mesh>
-          <mesh position={[0, 0.16, 0.335]}>
-            <planeGeometry args={[0.16, 0.28]} />
-            <meshStandardMaterial color="#7a5232" roughness={0.8} />
+          <mesh position={[0, 0.17, 0.372]}>
+            <planeGeometry args={[0.17, 0.3]} />
+            <meshStandardMaterial color={TIMBER} roughness={0.8} />
           </mesh>
         </group>
       ))}
-      <mesh position={[0, 1.04, 0]} castShadow>
-        <cylinderGeometry args={[0.37, 0.34, 0.1, 20]} />
-        <meshStandardMaterial color={WALL} roughness={0.9} />
+      {/* The wooden gallery: a dark timber ring with small posts, wider than the tower. */}
+      <mesh position={[0, 1.27, 0]} castShadow>
+        <cylinderGeometry args={[0.43, 0.4, 0.2, 20]} />
+        <meshStandardMaterial color={TIMBER} roughness={0.85} />
       </mesh>
-      <mesh position={[0, 1.38, 0]} castShadow>
-        <coneGeometry args={[0.4, 0.6, 20]} />
-        <meshStandardMaterial color={roof} roughness={0.7} />
+      {Array.from({ length: 10 }, (_, k) => (
+        <mesh key={k} position={[Math.cos((k / 10) * Math.PI * 2) * 0.435, 1.27, Math.sin((k / 10) * Math.PI * 2) * 0.435]}>
+          <boxGeometry args={[0.035, 0.2, 0.035]} />
+          <meshStandardMaterial color="#8a5a34" roughness={0.8} />
+        </mesh>
+      ))}
+      <mesh position={[0, 1.42, 0]} castShadow>
+        <cylinderGeometry args={[0.4, 0.52, 0.1, 20]} />
+        <meshStandardMaterial color="#a8432c" roughness={0.8} />
       </mesh>
-      <mesh position={[0, 1.78, 0]}>
+      <mesh position={[0, 1.85, 0]} castShadow>
+        <coneGeometry args={[0.42, 0.8, 20]} />
+        <meshStandardMaterial color={ROOF} roughness={0.75} />
+      </mesh>
+      <mesh position={[0, 2.36, 0]}>
         <cylinderGeometry args={[0.012, 0.012, 0.26, 6]} />
         <meshStandardMaterial color="#4a4038" />
       </mesh>
-      <mesh position={[0.1, 1.85, 0]}>
+      <mesh position={[0.1, 2.43, 0]}>
         <planeGeometry args={[0.2, 0.12]} />
         <meshStandardMaterial color={flag} roughness={0.8} side={THREE.DoubleSide} />
       </mesh>
@@ -269,10 +304,10 @@ export function CastleRoom({ level }) {
       <mesh geometry={yard} position={[0, 0.01, 0]} receiveShadow>
         <meshStandardMaterial color={MORTAR} roughness={1} />
       </mesh>
-      <Battlement position={[0.2, 0, back]} length={level.width - 0.4} banner={['#e8839a', '#5fc4b0']} />
-      <Battlement position={[side, 0, 0.2]} rotation={[0, Math.PI / 2, 0]} length={level.height - 0.4} banner={['#8fc2ff', '#e8839a']} />
+      <Battlement position={[0.2, 0, back]} length={level.width - 0.4} banner={['#c9553a', '#3f7f6a']} />
+      <Battlement position={[side, 0, 0.2]} rotation={[0, Math.PI / 2, 0]} length={level.height - 0.4} banner={['#3f7f6a', '#c9553a']} />
       <Tower position={[side, 0, back]} />
-      <Tower position={[level.width / 2 + 0.5, 0, back]} roof="#5fc4b0" flag="#ff9d9d" />
+      <Tower position={[level.width / 2 + 0.5, 0, back]} flag="#ff9d9d" />
       <Bush position={[level.width / 2 + 0.6, 0, 0.3]} />
       <Bush position={[level.width / 2 + 0.62, 0, level.height / 2 - 0.5]} flower="#f0c14e" />
       <Bush position={[-0.8, 0, level.height / 2 + 0.62]} flower="#c3a2f5" />

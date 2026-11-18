@@ -10,8 +10,8 @@ import { DIRECTION_ANGLE, mirrorAngle } from '../library/LibraryPieces.jsx';
 import Flame from '../themes/Flame.jsx';
 import { Flare, Gear, Streaks, brassM, mirrorM } from '../themes/shared.jsx';
 
-const STONE = '#c7bcd8';
-const STONE_DARK = '#8d82a8';
+const STONE = '#d9c8a4';
+const STONE_DARK = '#8f7a5e';
 const IRON = '#4a4038';
 const stoneM = (color = STONE) => <meshStandardMaterial color={color} roughness={0.9} />;
 const ironM = <meshStandardMaterial color={IRON} roughness={0.5} metalness={0.5} />;
@@ -244,7 +244,7 @@ export function StoneBlocks() {
       </mesh>
       <mesh position={[0.31, 0.9, 0]}>
         <planeGeometry args={[0.18, 0.13]} />
-        <meshStandardMaterial color="#e8839a" roughness={0.8} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#c9553a" roughness={0.8} side={THREE.DoubleSide} />
       </mesh>
     </group>
   );
