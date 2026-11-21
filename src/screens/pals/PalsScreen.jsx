@@ -10,6 +10,7 @@ import DailyMissions from './DailyMissions.jsx';
 import GroveHome from '../grove/GroveHome.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { isQuestReady, questLogFor, questsForWeek, questWeekOf } from '../../game/quests.js';
+import { useFeature } from '../../hooks/useFeature.js';
 import { readyMissionCount } from '../../game/dailyMissions.js';
 import { todayKey } from '../../game/daily.js';
 import styles from './PalsScreen.module.css';
@@ -25,6 +26,8 @@ const TAB_IDS = ['team', 'wardrobe', 'grove', 'quests'];
 export default function PalsScreen({ initialTab }) {
   const { progress, isSignedIn } = usePlayer();
   const { t } = useI18n();
+  const hasMissions = useFeature('missions');
+  const hasQuests = useFeature('quests');
   const [tab, setTab] = useState(TAB_IDS.includes(initialTab) ? initialTab : 'team');
   const week = questWeekOf();
   const log = questLogFor(progress, week);
@@ -39,13 +42,18 @@ export default function PalsScreen({ initialTab }) {
     { id: 'team', label: t('pals.tab.team'), icon: 'paw' },
     { id: 'wardrobe', label: t('pals.tab.wardrobe'), icon: 'shirt' },
     { id: 'grove', label: t('pals.tab.grove'), icon: 'home' },
-    {
-      id: 'quests',
-      label: t('pals.tab.quests'),
-      icon: 'star',
-      count: questsReady || undefined,
-      countLabel: t('pals.tab.questsReady', { n: questsReady }),
-    },
+    // Goals come later: today's missions first, then the Pal's weekly quests (unlocks.js).
+    ...(hasMissions
+      ? [
+          {
+            id: 'quests',
+            label: t('pals.tab.quests'),
+            icon: 'star',
+            count: questsReady || undefined,
+            countLabel: t('pals.tab.questsReady', { n: questsReady }),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -61,7 +69,7 @@ export default function PalsScreen({ initialTab }) {
           {tab === 'quests' && (
             <>
               <DailyMissions />
-              <PalQuests />
+              {hasQuests && <PalQuests />}
             </>
           )}
         </div>

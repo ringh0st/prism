@@ -20,7 +20,8 @@ import PalPresent from '../../components/gifts/PalPresent.jsx';
 import { presentsWaiting } from '../../game/gifts.js';
 import PalHello from '../../components/pals/PalHello.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
-import { isExtraOpen } from '../../game/unlocks.js';
+import { isFeatureOpen } from '../../game/unlocks.js';
+import { nextGoalFor } from '../../game/nextGoal.js';
 import { useNewExtra } from '../../hooks/useNewExtra.js';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
@@ -104,6 +105,11 @@ function LockedWorld({ world, stars }) {
   );
 }
 
+/** The picture for each kind of next goal on the PLAY button. */
+const GOAL_ICONS = { friend: 'heart', present: 'gift', world: 'map' };
+/** The picture on each feature's "New!" note. */
+const NEW_ICONS = { gift: 'gift', daily: 'calendar', missions: 'check', treats: 'heart', quests: 'star', glowbugs: 'heart', stickers: 'star' };
+
 export default function MapScreen() {
   const { progress, claimChest } = usePlayer();
   const { worlds, levelRefsInWorld } = useLevels();
@@ -121,6 +127,9 @@ export default function MapScreen() {
     [unlockedWorlds.length, levelRefsInWorld], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const currentRef = [...refsByWorld.values()].flat().find((ref) => starsFor(progress, ref.id) === 0) ?? null;
+  // The closest prize to play for, shown on the PLAY button.
+  const levelsLeftInWorld = currentRef ? (refsByWorld.get(currentRef.world) ?? []).filter((ref) => starsFor(progress, ref.id) === 0).length : 0;
+  const goal = currentRef ? nextGoalFor(progress, levelsLeftInWorld) : null;
   const worldsLeft = worlds.length - unlockedWorlds.length - (nextLockedWorld ? 1 : 0);
 
   // The current level is always the main view: centered in the space between the HUD and the PLAY button
@@ -138,18 +147,18 @@ export default function MapScreen() {
         <CurrencyHud />
         {/* Things to do now, each with its name. They open one at a time as the player goes (unlocks.js). */}
         <div className={styles.hudStart}>
-          {isExtraOpen('gift', solvedCount) && <DailyGift />}
+          {isFeatureOpen('gift', solvedCount) && <DailyGift />}
           <PresentButton />
-          {isExtraOpen('daily', solvedCount) && <DailyButton />}
-          {isExtraOpen('missions', solvedCount) && <MissionsButton />}
+          {isFeatureOpen('daily', solvedCount) && <DailyButton />}
+          {isFeatureOpen('missions', solvedCount) && <MissionsButton />}
           <EventButton />
           <RushButton />
-          {isExtraOpen('install', solvedCount) && <InstallButton />}
+          {isFeatureOpen('install', solvedCount) && <InstallButton />}
         </div>
         {newExtra && (
           <button type="button" className={styles.newNote} onClick={() => markSeen(newExtra)}>
             <span className={styles.newIcon} aria-hidden="true">
-              <Icon name={newExtra === 'gift' ? 'gift' : 'calendar'} size={18} />
+              <Icon name={NEW_ICONS[newExtra] ?? 'star'} size={18} />
             </span>
             <span>{t(`map.new.${newExtra}`)}</span>
             <span className={styles.newOk}>{t('map.new.ok')}</span>
@@ -185,6 +194,7 @@ export default function MapScreen() {
               t('map.play'),
               t('level.title', { label: levelNumber(currentRef.world, currentRef.index) }),
               progress.hotStreak >= 2 && t('map.hotStreak', { count: progress.hotStreak }),
+              goal && t(`map.goal.${goal.kind}`, { count: goal.left }),
             ]
               .filter(Boolean)
               .join(', ')}
@@ -199,6 +209,15 @@ export default function MapScreen() {
             <span className={styles.playLevel} dir="ltr" aria-hidden="true">
               {levelNumber(currentRef.world, currentRef.index)}
             </span>
+            {/* The closest prize, as a picture: "3 ★ → present", "2 levels → new world" (nextGoal.js). */}
+            {goal && (
+              <span className={styles.nextGoal} dir="ltr" aria-hidden="true">
+                <Icon name={goal.unit === 'stars' ? 'star' : 'play'} size={12} />
+                <span className="game-title on-color">{goal.left}</span>
+                <span className={styles.goalArrow}>→</span>
+                <Icon name={GOAL_ICONS[goal.kind]} size={15} />
+              </span>
+            )}
           </a>
         )}
       </main>

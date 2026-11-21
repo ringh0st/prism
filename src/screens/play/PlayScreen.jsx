@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFeature } from '../../hooks/useFeature.js';
 import { useThemedBoard } from '../../hooks/useThemedBoard.js';
 import { boardThemeFor, lumisOf } from '../../game/boardThemes.js';
 import Board from '../../components/board/Board.jsx';
@@ -137,10 +138,15 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
   const [result, setResult] = useState(null);
   const [solvedStars, setSolvedStars] = useState(0);
 
+  // Extras that open later in the game (unlocks.js) leave no trace before that: no Glowbug, treat, sticker or medal.
+  const hasGlowbugs = useFeature('glowbugs');
+  const hasTreats = useFeature('treats');
+  const hasStickers = useFeature('stickers');
+  const hasMedals = useFeature('medals');
   // A Glowbug naps on some levels until you rescue it with three stars (glowbugs.js).
   const glowbug = useMemo(
-    () => (mode === 'level' && (progress.levels[level.id]?.stars ?? 0) < 3 ? glowbugForLevel(level.id) : null),
-    [mode, level.id],
+    () => (mode === 'level' && hasGlowbugs && (progress.levels[level.id]?.stars ?? 0) < 3 ? glowbugForLevel(level.id) : null),
+    [mode, level.id, hasGlowbugs],
   ); // eslint-disable-line react-hooks/exhaustive-deps
   const [glowbugCell, setGlowbugCell] = useState(null);
   useEffect(() => {
@@ -458,10 +464,20 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
         ...progress.levels,
         [level.id]: { ...progress.levels[level.id], stars: Math.max(stars, progress.levels[level.id]?.stars ?? 0) },
       };
-      const treat = mode === 'level' ? treatFoundBy(progress.levels, levelsAfter) : null;
-      const newStickers = mode === 'level' ? newStickersFor(level.world, progress.levels, levelsAfter) : [];
+      const treat = mode === 'level' && hasTreats ? treatFoundBy(progress.levels, levelsAfter) : null;
+      const newStickers = mode === 'level' && hasStickers ? newStickersFor(level.world, progress.levels, levelsAfter) : [];
       const climb = mode === 'level' ? climbFor(progress.levels, levelsAfter) : {};
-      setResult({ ...finished, moves: isSkipped ? null : moves, isSkipped, completesWorld, glowbug: glowbugResult, treat, newStickers, ...climb });
+      setResult({
+        ...finished,
+        ...(hasMedals ? null : { newRecords: [] }),
+        moves: isSkipped ? null : moves,
+        isSkipped,
+        completesWorld,
+        glowbug: glowbugResult,
+        treat,
+        newStickers,
+        ...climb,
+      });
     },
     [
       moves,

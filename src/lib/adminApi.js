@@ -77,3 +77,19 @@ export async function fetchPlayCounts(days = 30) {
   }
   return byLevel;
 }
+
+/** Do players come back? Totals over the last `days` first days: { newPlayers, nextDay, sameWeek, afterWeek }. */
+export async function fetchPlayerReturns(days = 30) {
+  const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+  const { data, error } = await supabase.from('player_returns').select('new_players, next_day, same_week, after_week').gte('first_day', since);
+  if (error) throw error;
+  return data.reduce(
+    (sum, row) => ({
+      newPlayers: sum.newPlayers + row.new_players,
+      nextDay: sum.nextDay + row.next_day,
+      sameWeek: sum.sameWeek + row.same_week,
+      afterWeek: sum.afterWeek + row.after_week,
+    }),
+    { newPlayers: 0, nextDay: 0, sameWeek: 0, afterWeek: 0 },
+  );
+}

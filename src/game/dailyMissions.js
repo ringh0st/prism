@@ -18,7 +18,7 @@ export const DAILY_MISSIONS = [
   { id: 'perfect2', kind: 'perfect', target: 2, sparks: 15, minSolved: 0 },
   { id: 'daily1', kind: 'daily', target: 1, sparks: 15, minSolved: 3 },
   { id: 'hard1', kind: 'hard', target: 1, sparks: 20, minSolved: 4 },
-  { id: 'glowbug1', kind: 'glowbug', target: 1, sparks: 15, minSolved: 6 },
+  { id: 'glowbug1', kind: 'glowbug', target: 1, sparks: 15, minSolved: 40 },
   { id: 'present1', kind: 'present', target: 1, sparks: 10, minSolved: 5, guestOnly: true },
   { id: 'combo1', kind: 'combo', target: 1, sparks: 15, minSolved: 10, guestOnly: true },
 ];

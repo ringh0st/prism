@@ -13,6 +13,7 @@ import Skeleton from '../../components/Skeleton.jsx';
 import NicknameDialog from './NicknameDialog.jsx';
 import TitleBadge from '../../components/game/TitleBadge.jsx';
 import TitleRoad from './TitleRoad.jsx';
+import { useFeature } from '../../hooks/useFeature.js';
 import styles from './PlayerCard.module.css';
 import { earnedStickers } from '../../game/stickers.js';
 import { rescuedGlowbugs } from '../../game/glowbugs.js';
@@ -37,6 +38,8 @@ export default function PlayerCard() {
   const { user, displayName, avatarUrl } = useAuth();
   const { progress } = usePlayer();
   const { t } = useI18n();
+  const hasStickers = useFeature('stickers');
+  const hasGlowbugs = useFeature('glowbugs');
   const [isEditingNickname, setIsEditingNickname] = useState(false);
   // The public nickname shown on the Top board (signed-in players only); the last one loaded shows at once.
   const { board, error: boardError } = useWeeklyBoard({ owner: user?.id ?? 'guest', isEnabled: Boolean(user) && !progress.nickname });
@@ -129,14 +132,20 @@ export default function PlayerCard() {
           }
         />
       </ul>
-      <div className={styles.collections}>
-        <a href="#/stickers" className={styles.collection}>
-          <Icon name="star" size={18} /> {t('me.stickers')} <strong>{earnedStickers(progress.levels).size}</strong>
-        </a>
-        <a href="#/glowbugs" className={styles.collection}>
-          <Icon name="heart" size={18} /> {t('me.glowbugs')} <strong>{rescuedGlowbugs(progress.levels).size}</strong>
-        </a>
-      </div>
+      {(hasStickers || hasGlowbugs) && (
+        <div className={styles.collections}>
+          {hasStickers && (
+            <a href="#/stickers" className={styles.collection}>
+              <Icon name="star" size={18} /> {t('me.stickers')} <strong>{earnedStickers(progress.levels).size}</strong>
+            </a>
+          )}
+          {hasGlowbugs && (
+            <a href="#/glowbugs" className={styles.collection}>
+              <Icon name="heart" size={18} /> {t('me.glowbugs')} <strong>{rescuedGlowbugs(progress.levels).size}</strong>
+            </a>
+          )}
+        </div>
+      )}
     </section>
   );
 }

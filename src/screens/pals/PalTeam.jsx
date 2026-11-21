@@ -5,6 +5,7 @@ import PalDetailDialog from './PalDetailDialog.jsx';
 import LuckyPalProgress from './LuckyPalProgress.jsx';
 import TeamSwitcher from './TeamSwitcher.jsx';
 import GlowbugGardenLink from './GlowbugGardenLink.jsx';
+import { useFeature } from '../../hooks/useFeature.js';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { PALS, isPalUnlocked, palStage, stageOf } from '../../game/pals.js';
 import { unlockText } from '../../i18n/palText.js';
@@ -83,12 +84,14 @@ function Collection({ onError }) {
 /** The Pals tab's Collection: switch partner, the next Lucky Pal gift, and every Pal (pick one, see their forms). */
 export default function PalTeam() {
   const [message, setMessage] = useState('');
+  const hasGlowbugs = useFeature('glowbugs');
+  const hasLuckyPal = useFeature('luckyPal');
   const { t } = useI18n();
   return (
     <>
       <TeamSwitcher />
-      <GlowbugGardenLink />
-      <LuckyPalProgress />
+      {hasGlowbugs && <GlowbugGardenLink />}
+      {hasLuckyPal && <LuckyPalProgress />}
       <section className={styles.section} aria-label={t('pals.team.label')}>
         <Collection onError={setMessage} />
         {message && (

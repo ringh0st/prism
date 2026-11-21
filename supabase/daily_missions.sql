@@ -33,7 +33,7 @@ as $$
     (4, 'perfect2', 'perfect', 2, 15, 0),
     (5, 'daily1', 'daily', 1, 15, 3),
     (6, 'hard1', 'hard', 1, 20, 4),
-    (7, 'glowbug1', 'glowbug', 1, 15, 6);
+    (7, 'glowbug1', 'glowbug', 1, 15, 40);
 $$;
 
 create or replace function public._daily_missions_bonus()

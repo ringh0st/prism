@@ -13,6 +13,7 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { palById, palStage, stageOf, unannouncedPals } from '../../game/pals.js';
 import { SEEN_PALS_KEY } from './PalUnlockNotice.jsx';
 import { nextTreat, treatsWaiting } from '../../game/treats.js';
+import { useFeature } from '../../hooks/useFeature.js';
 import { sfx } from '../../audio/sfx.js';
 import styles from './PartnerSwitcher.module.css';
 import { palName, treatName } from '../../i18n/palText.js';
@@ -67,7 +68,8 @@ export default function PartnerSwitcher() {
       key: Date.now(),
     });
   };
-  const waiting = treatsWaiting(progress);
+  const hasTreats = useFeature('treats');
+  const waiting = hasTreats ? treatsWaiting(progress) : 0;
 
   const pet = () => {
     sfx.hello();

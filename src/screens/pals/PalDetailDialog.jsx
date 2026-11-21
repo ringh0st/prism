@@ -5,6 +5,7 @@ import PalArt from '../../components/pals/PalArt.jsx';
 import PalFormsStrip from '../../components/pals/PalFormsStrip.jsx';
 import PalGrowthBar from '../../components/pals/PalGrowthBar.jsx';
 import PalRecords from '../../components/pals/PalRecords.jsx';
+import { useFeature } from '../../hooks/useFeature.js';
 import RarityBadge from '../../components/pals/RarityBadge.jsx';
 import StageBadge from '../../components/pals/StageBadge.jsx';
 import Icon from '../../components/Icon.jsx';
@@ -26,6 +27,7 @@ const levelsUntil = (owned, target) => (target - stageOf(owned)) * PAL_GROWTH_LE
 export default function PalDetailDialog({ pal, onClose }) {
   const { progress, choosePal } = usePlayer();
   const { t, lang } = useI18n();
+  const hasMedals = useFeature('medals');
   const name = palName(lang, pal);
   const formName = (index) => stageName(lang, palStage(index));
   const owned = progress.pal.owned[pal.id];
@@ -100,7 +102,7 @@ export default function PalDetailDialog({ pal, onClose }) {
           </Button>
         </div>
       )}
-      {owned && <PalRecords palId={pal.id} />}
+      {owned && hasMedals && <PalRecords palId={pal.id} />}
     </Dialog>
   );
 }

@@ -7,6 +7,7 @@ import { sfx } from '../../audio/sfx.js';
 import styles from './Map.module.css';
 import GlowbugArt from '../../components/glowbugs/GlowbugArt.jsx';
 import { glowbugForLevel } from '../../game/glowbugs.js';
+import { useFeature } from '../../hooks/useFeature.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 
 const DIFFICULTY_LABEL = { [DIFFICULTY.HARD]: 'map.node.hard', [DIFFICULTY.EXTRA]: 'map.node.boss' };
@@ -15,7 +16,8 @@ const DIFFICULTY_LABEL = { [DIFFICULTY.HARD]: 'map.node.hard', [DIFFICULTY.EXTRA
 export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef }) {
   const { t } = useI18n();
   // A Glowbug still waiting to be rescued here (three stars frees it).
-  const glowbug = isUnlocked && stars < 3 ? glowbugForLevel(stop.ref.id) : null;
+  const hasGlowbugs = useFeature('glowbugs');
+  const glowbug = hasGlowbugs && isUnlocked && stars < 3 ? glowbugForLevel(stop.ref.id) : null;
   const { ref, x, y } = stop;
   const kindLabel = DIFFICULTY_LABEL[ref.difficulty];
   const label = [

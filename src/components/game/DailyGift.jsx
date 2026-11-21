@@ -75,7 +75,7 @@ export default function DailyGift({ look = 'button', className = '' }) {
     );
   }
 
-  // On the map, the box leaves once today's gift is opened (its dialog stays until closed).
+  // On the map: a gold box while today's gift waits, then a quiet one that says "Tomorrow" (its dialog stays until closed).
   return (
     <>
       {isReady && (
@@ -85,6 +85,15 @@ export default function DailyGift({ look = 'button', className = '' }) {
             {t('map.extra.gift')}
           </span>
         </button>
+      )}
+      {/* Today's gift is opened: the box stays, quiet, with "Tomorrow" under it, as a reason to come back. */}
+      {!isReady && (
+        <span className={`${styles.button} ${className}`} role="img" aria-label={t('gift.tomorrow')}>
+          <Icon name="gift" size={24} />
+          <span className={styles.caption} aria-hidden="true">
+            {t('map.extra.tomorrow')}
+          </span>
+        </span>
       )}
       {dialog}
     </>

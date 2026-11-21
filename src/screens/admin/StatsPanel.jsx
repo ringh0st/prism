@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchLevelStats, fetchPlayCounts } from '../../lib/adminApi.js';
+import { fetchLevelStats, fetchPlayCounts, fetchPlayerReturns } from '../../lib/adminApi.js';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { WALL_MIN_STARTS, WALL_WIN_RATE, findWalls, winRateOf } from '../../game/playCounts.js';
 import DifficultyBadge from '../../components/DifficultyBadge.jsx';
@@ -14,11 +14,16 @@ export default function StatsPanel() {
   const { worlds, levelRefsInWorld } = useLevels();
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
+  // Do players come back? null until loaded; false when supabase/visits.sql hasn't been run yet.
+  const [returns, setReturns] = useState(null);
 
   useEffect(() => {
     Promise.all([fetchLevelStats(), fetchPlayCounts(DAYS)])
       .then(([progress, plays]) => setStats({ ...progress, plays }))
       .catch(() => setError('Could not load stats. Has supabase/play_stats.sql been run?'));
+    fetchPlayerReturns(DAYS)
+      .then(setReturns)
+      .catch(() => setReturns(false));
   }, []);
 
   if (error) return <p role="alert">{error}</p>;
@@ -35,6 +40,17 @@ export default function StatsPanel() {
       <p className={styles.statsSummary}>
         Last {DAYS} days: <strong>{totalStarts}</strong> level attempts by everyone (guests too, no personal data).{' '}
         <strong>{stats.playerCount}</strong> signed-in players have saved progress.
+      </p>
+      <p className={styles.statsSummary}>
+        {returns === false && 'Do players come back? Run supabase/visits.sql in Supabase to start counting.'}
+        {returns && (
+          <>
+            Do players come back? <strong>{returns.newPlayers}</strong> new players in the last {DAYS} days.{' '}
+            <strong>{percent(returns.newPlayers ? returns.nextDay / returns.newPlayers : null)}</strong> came back the next day,{' '}
+            <strong>{percent(returns.newPlayers ? returns.sameWeek / returns.newPlayers : null)}</strong> later in their first week,{' '}
+            <strong>{percent(returns.newPlayers ? returns.afterWeek / returns.newPlayers : null)}</strong> after a week.
+          </>
+        )}
       </p>
       <WallList walls={walls} />
       <div className={styles.tableWrap}>
