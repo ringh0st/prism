@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import TileArt, { TileDefs } from './TileArt.jsx';
+import TileArt, { GateWires, TileDefs } from './TileArt.jsx';
 import BeamLayer from './BeamLayer.jsx';
 import DarknessLayer from './DarknessLayer.jsx';
 import { fadeLeft, gloomsNow, isEclipseMove, powerLeft } from '../../game/darkness.js';
@@ -236,6 +236,7 @@ export default function Board({
           ))}
         </div>
       )}
+      {!is3d && <GateWires level={level} openGates={trace.openGates} className={styles.beams} />}
       {!is3d && <BeamLayer width={width} height={height} segments={trace.segments} />}
       {darkness && !is3d && <DarknessLayer level={level} darkness={darkness} moves={darkMoves} />}
       <div className={`${styles.cells} ${is3d ? styles.cells3d : ''}`} role="grid" aria-label={label} aria-rowcount={height} aria-colcount={width}>

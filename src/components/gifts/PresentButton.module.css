@@ -10,7 +10,7 @@
   border-radius: 16px;
   color: var(--calm-label);
   background: var(--calm-bottom);
-  box-shadow: var(--shadow-button);
+  box-shadow: 0 3px 0 var(--calm-ledge);
   cursor: pointer;
   transition: transform 220ms var(--ease-spring);
 }

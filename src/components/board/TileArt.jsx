@@ -266,39 +266,120 @@ function EmitterBody({ color }) {
   );
 }
 
-/** A light gate: a barred door while its switch is dark, open bars that let light through while it's lit. */
+/**
+ * A light gate: a wooden door with a padlock in its pair's color while its switch is dark; lit, the padlock is gone
+ * and the two leaves stand folded open at the sides, so light passes through the middle.
+ */
 function Gate({ pair, isOpen }) {
   const look = PAIR_LOOKS[pair] ?? PAIR_LOOKS.a;
+  if (isOpen) {
+    return (
+      <g className={styles.gateOpen}>
+        <rect x="10" y="10" width="80" height="80" rx="14" fill="none" stroke={look.color} strokeWidth="5" strokeDasharray="10 8" />
+        <rect x="8" y="12" width="13" height="76" rx="5" fill="#b98a5e" stroke="#6f4b2e" strokeWidth="3" />
+        <rect x="79" y="12" width="13" height="76" rx="5" fill="#b98a5e" stroke="#6f4b2e" strokeWidth="3" />
+        <circle cx="50" cy="16" r="10" fill="#fffaf2" stroke={look.color} strokeWidth="3" />
+        <path d={look.symbol} transform="translate(50 15.5) scale(.62)" fill={look.ink} />
+      </g>
+    );
+  }
   return (
-    <g className={isOpen ? styles.gateOpen : ''}>
-      <rect
-        x="10"
-        y="10"
-        width="80"
-        height="80"
-        rx="14"
-        fill={isOpen ? 'none' : 'url(#tile-wall)'}
-        stroke={look.color}
-        strokeWidth="6"
-        strokeDasharray={isOpen ? '10 8' : 'none'}
-      />
-      {!isOpen && <path d="M30 14v72M50 14v72M70 14v72" stroke="#7d5a3d" strokeWidth="5" opacity="0.45" />}
-      <circle cx="50" cy="50" r="13" fill="#fffaf2" stroke={look.color} strokeWidth="3" />
-      <path d={look.symbol} transform="translate(50 49) scale(.9)" fill={look.ink} />
+    <g>
+      <rect x="10" y="10" width="80" height="80" rx="14" fill="#b98a5e" stroke="#6f4b2e" strokeWidth="4" />
+      <path d="M50 12v76M30 12v76M70 12v76" stroke="#6f4b2e" strokeWidth="3" opacity="0.4" />
+      <path d="M12 28h76M12 72h76" stroke={look.color} strokeWidth="7" />
+      {/* The padlock: only its switch opens it */}
+      <path d="M40 48v-8a10 10 0 0 1 20 0v8" fill="none" stroke="#4a3526" strokeWidth="6" strokeLinecap="round" />
+      <rect x="32" y="46" width="36" height="28" rx="8" fill="#fffaf2" stroke={look.color} strokeWidth="4" />
+      <path d={look.symbol} transform="translate(50 59.5) scale(.8)" fill={look.ink} />
     </g>
   );
 }
 
-/** A light switch: a round button that glows when light hits it (and opens its gate). */
+/**
+ * A light switch: a toggle like the ones in a phone's settings, which everyone reads as on/off. Dark, the track is
+ * grey and the knob rests on the left; when light hits it the knob slides right and the track glows in its pair's
+ * color (and its gate opens). Its pair's shape sits on top, and a wire runs from it to its gate (`GateWires`).
+ */
 function Switch({ pair, isLit }) {
   const look = PAIR_LOOKS[pair] ?? PAIR_LOOKS.a;
   return (
     <g>
-      {isLit && <circle cx="50" cy="50" r="34" fill={look.color} filter="url(#tile-glow)" />}
-      <circle cx="50" cy="50" r="32" fill="#fffaf2" stroke={look.color} strokeWidth="7" />
-      <circle cx="50" cy="50" r="20" fill={isLit ? look.color : '#e9e1d4'} />
-      <path d={look.symbol} transform="translate(50 49) scale(1.05)" fill={isLit ? '#fff' : look.ink} />
+      {isLit && <rect x="8" y="16" width="84" height="72" rx="20" fill={look.color} filter="url(#tile-glow)" />}
+      <rect x="10" y="18" width="80" height="68" rx="18" fill="#fffaf2" stroke={look.color} strokeWidth="6" />
+      <rect
+        x="20"
+        y="42"
+        width="60"
+        height="32"
+        rx="16"
+        fill={isLit ? look.color : '#b9b0a3'}
+        stroke={isLit ? look.ink : '#8f8477'}
+        strokeWidth="3"
+      />
+      <circle
+        className={`${styles.lever} ${isLit ? styles.leverOn : ''}`}
+        cx="36"
+        cy="58"
+        r="11"
+        fill="#fff"
+        stroke={isLit ? look.ink : '#8f8477'}
+        strokeWidth="3"
+      />
+      <circle cx="50" cy="20" r="11" fill="#fffaf2" stroke={look.color} strokeWidth="3" />
+      <path d={look.symbol} transform="translate(50 19.5) scale(.66)" fill={look.ink} />
     </g>
+  );
+}
+
+/**
+ * The wires from each light switch to its gate (owner: "it's a bit hard to understand" which thing opens which):
+ * a dashed line in the pair's color, dark while the switch is dark, bright with running dashes once it's lit.
+ */
+const between = (value, a, b) => value >= Math.min(a, b) && value <= Math.max(a, b);
+
+export function GateWires({ level, openGates, className }) {
+  const center = (tile) => `${tile.x + 0.5} ${tile.y + 0.5}`;
+  const switches = level.tiles.filter((tile) => tile.type === TILE.SWITCH);
+  const gates = level.tiles.filter((tile) => tile.type === TILE.GATE);
+  if (!switches.length || !gates.length) return null;
+  return (
+    <svg className={className} viewBox={`0 0 ${level.width} ${level.height}`} aria-hidden="true">
+      {switches.flatMap((from) =>
+        gates
+          .filter((gate) => gate.pair === from.pair)
+          .map((gate) => {
+            const look = PAIR_LOOKS[from.pair] ?? PAIR_LOOKS.a;
+            const isOn = Boolean(openGates?.has(from.pair));
+            // Two ways round the corner: take the one that runs under fewer pieces
+            const busy = (corner) =>
+              level.tiles.filter(
+                (tile) =>
+                  tile !== from &&
+                  tile !== gate &&
+                  ((tile.y === corner.y && tile.y === from.y && between(tile.x, from.x, gate.x)) ||
+                    (tile.x === corner.x && tile.x === gate.x && between(tile.y, from.y, gate.y)) ||
+                    (tile.x === corner.x && tile.x === from.x && between(tile.y, from.y, gate.y)) ||
+                    (tile.y === corner.y && tile.y === gate.y && between(tile.x, from.x, gate.x))),
+              ).length;
+            const acrossFirst = busy({ x: gate.x, y: from.y }) <= busy({ x: from.x, y: gate.y });
+            const path = acrossFirst ? `M${center(from)} H${gate.x + 0.5} V${gate.y + 0.5}` : `M${center(from)} V${gate.y + 0.5} H${gate.x + 0.5}`;
+            return (
+              <g key={`${from.x},${from.y}-${gate.x},${gate.y}`} fill="none" strokeLinecap="round" strokeLinejoin="round">
+                <path d={path} stroke={look.ink} strokeWidth="0.13" opacity={isOn ? 0.9 : 0.45} />
+                <path
+                  d={path}
+                  stroke={isOn ? '#fff' : look.color}
+                  strokeWidth="0.07"
+                  strokeDasharray="0.12 0.14"
+                  className={isOn ? styles.wireOn : undefined}
+                  data-scenery
+                />
+              </g>
+            );
+          }),
+      )}
+    </svg>
   );
 }
 

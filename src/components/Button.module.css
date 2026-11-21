@@ -1,39 +1,43 @@
 /*
- * Buttons, 2026 style (owner: the 3D buttons looked "too 3D, in a not so nice way"; go back to modern and flat, like
- * her reference picture of button states): a smooth pill with a soft gradient running across it, a white label and a
- * soft shadow in its own color. No borders, ledges, gloss or bounce. Each state reads at a glance:
- *   default · hovered (a little lighter) · pressed (lighter still, and it sinks slightly) ·
- *   focused (a double ring, keyboard only) · disabled (plain grey).
+ * Buttons: "sticker with a slim edge" (owner's pick from the options sheet: the first and the third together, after
+ * finding chunky glossy buttons "too 3D" and plain flat ones not button-like enough). A pill with a flat face in one
+ * color, a border in a deeper shade of that same color (never black), a white bold label and a thin edge of the deep
+ * shade underneath. No gloss, gradients or bounce. States read at a glance:
+ *   default · hovered (a little brighter) · pressed (drops onto its edge, brighter) ·
+ *   focused (a ring, keyboard only) · disabled (plain grey).
+ * A variant sets --face, --deep and --label; never override a button's background or border.
  */
 .button {
-  --from: #3c9068;
-  --to: #3a9b8c;
+  --face: #4aa577;
+  --deep: #2c7350;
   --label: #ffffff;
-  --glow: 60 150 115;
+  --edge: 4px;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
   min-height: 52px;
+  margin-bottom: var(--edge);
   padding: 0 var(--space-5);
-  border: 0;
+  border: 3px solid var(--deep);
   border-radius: var(--radius-pill);
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 18px;
   line-height: 1;
   color: var(--label);
+  text-shadow: 0 1.5px 0 var(--deep);
   text-decoration: none;
-  background: linear-gradient(100deg, var(--from), var(--to));
-  box-shadow: 0 8px 18px -8px rgb(var(--glow) / 0.65);
+  background: var(--face);
+  box-shadow: 0 var(--edge) 0 var(--deep);
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   transition:
-    transform 220ms var(--ease-out),
-    filter 200ms ease,
-    box-shadow 220ms ease;
+    transform 140ms var(--ease-out),
+    box-shadow 140ms var(--ease-out),
+    filter 180ms ease;
 }
 
 .button > span {
@@ -44,75 +48,69 @@
 
 @media (hover: hover) {
   .button:hover:not(:disabled) {
-    filter: brightness(1.08);
+    filter: brightness(1.06);
   }
 }
 
 .button:active:not(:disabled) {
-  filter: brightness(1.2) saturate(1.05);
-  box-shadow: 0 3px 8px -4px rgb(var(--glow) / 0.6);
-  transform: scale(0.97);
-  transition-duration: 90ms;
+  filter: brightness(1.1);
+  transform: translateY(calc(var(--edge) - 1px));
+  box-shadow: 0 1px 0 var(--deep);
+  transition-duration: 70ms;
 }
 
 /* Focused (keyboard only, see inputMode.js): a ring of the page's color, then one of the button's */
 :global(html:not([data-input='pointer'])) .button:focus-visible {
   outline: none;
   box-shadow:
+    0 var(--edge) 0 var(--deep),
     0 0 0 3px var(--surface-page),
-    0 0 0 6px var(--from);
+    0 0 0 6px var(--deep);
 }
 
 .button:disabled,
 .button[aria-disabled='true'] {
-  --from: #8f8a85;
-  --to: #9a8a8a;
+  --face: #b9b2a8;
+  --deep: #948c80;
   --label: #f6f1ea;
   cursor: not-allowed;
-  box-shadow: none;
 }
 
 .primary {
-  /* deep sage to teal-green, see defaults */
+  /* sage, see defaults */
 }
 
 /* Success / "go" moments */
 .go {
-  --from: #2f9a8a;
-  --to: #3aa5b0;
-  --glow: 47 154 138;
+  --face: #3fae9c;
+  --deep: #23786a;
 }
 
 /* Rewards and currency: honey, with a dark label (white can't be read on yellow) */
 .gold {
-  --from: #f5cf62;
-  --to: #f0b24a;
-  --label: #3b2a00;
-  --glow: 220 160 50;
+  --face: #f3c552;
+  --deep: #b98a1e;
+  --label: #4a3200;
+  text-shadow: none;
 }
 
-/* Quiet actions: a soft tonal pill that sits on cards and sheets */
+/* Quiet actions: a cream sticker with dark text */
 .secondary {
-  --from: var(--surface-tonal);
-  --to: var(--surface-tonal);
+  --face: #fffaf0;
+  --deep: #c9b796;
   --label: var(--text-strong);
-  box-shadow: none;
-}
-
-.secondary:active:not(:disabled) {
-  box-shadow: none;
-  filter: brightness(0.96);
+  text-shadow: none;
 }
 
 .ghost {
-  --from: transparent;
-  --to: transparent;
+  --face: transparent;
+  --deep: transparent;
   --label: var(--text-strong);
+  text-shadow: none;
   box-shadow: none;
 }
 
 .ghost:active:not(:disabled) {
-  box-shadow: none;
   background: var(--surface-tonal);
 }
 

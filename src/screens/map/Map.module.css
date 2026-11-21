@@ -275,7 +275,7 @@ a.node:active {
   border-radius: 50%;
   color: var(--label);
   background: var(--fill-bottom);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 0 var(--ledge);
 }
 
 .nodeNumber {
@@ -586,8 +586,10 @@ a.node:active {
   margin-bottom: 5px;
   color: #fff;
   --label: #fff;
-  background: linear-gradient(100deg, #3c9068, #3a9b8c);
-  box-shadow: 0 10px 22px -8px rgb(60 150 115 / 0.7);
+  border: 4px solid #2c7350;
+  text-shadow: 0 2px 0 #2c7350;
+  background: #4aa577;
+  box-shadow: 0 5px 0 #2c7350;
   transition:
     transform 110ms var(--ease-out),
     box-shadow 110ms var(--ease-out);
@@ -625,10 +627,10 @@ a.node:active {
 }
 
 .playButton:active {
-  filter: brightness(1.2);
-  transform: translateX(-50%) scale(0.97);
-  box-shadow: 0 4px 10px -5px rgb(60 150 115 / 0.6);
-  transition-duration: 90ms;
+  filter: brightness(1.1);
+  transform: translateX(-50%) translateY(4px);
+  box-shadow: 0 1px 0 #2c7350;
+  transition-duration: 70ms;
 }
 
 /* A Glowbug waiting on this level (rescue it with three stars) */

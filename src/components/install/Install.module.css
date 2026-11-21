@@ -10,7 +10,7 @@
   border-radius: 16px;
   color: var(--warm-label);
   background: var(--warm-bottom);
-  box-shadow: var(--shadow-button);
+  box-shadow: 0 3px 0 var(--warm-ledge);
   cursor: pointer;
   animation: nudge 5s ease-in-out 2s infinite;
   transition: transform 220ms var(--ease-spring);

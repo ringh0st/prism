@@ -84,6 +84,7 @@
   align-items: flex-start;
   justify-content: center;
   gap: var(--space-2);
+  margin-top: var(--space-3);
   margin-bottom: var(--space-3);
 }
 
@@ -140,8 +141,8 @@
 }
 
 .actions .toMap {
-  --from: color-mix(in srgb, var(--color-sage) 26%, var(--surface-raised));
-  --to: color-mix(in srgb, var(--color-mint) 26%, var(--surface-raised));
+  --face: #dff0e6;
+  --deep: #8fbfa4;
 }
 
 .diamond {

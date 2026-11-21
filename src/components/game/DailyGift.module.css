@@ -16,7 +16,7 @@
 .button.ready {
   color: var(--reward-label);
   background: var(--reward-bottom);
-  box-shadow: var(--shadow-button);
+  box-shadow: 0 3px 0 var(--reward-ledge);
   cursor: pointer;
   animation: wiggle 2.4s ease-in-out infinite;
 }

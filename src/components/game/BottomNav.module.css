@@ -74,7 +74,7 @@
   padding: 10px 0 8px;
   color: var(--action-label);
   background: var(--action-bottom);
-  box-shadow: 0 6px 14px -6px rgb(60 150 115 / 0.6);
+  box-shadow: 0 4px 0 #2c7350;
 }
 
 .main:hover,
@@ -90,7 +90,7 @@
 /* Where you are: on the map, its tile carries a soft ring */
 .main.active {
   box-shadow:
-    0 6px 14px -6px rgb(60 150 115 / 0.6),
+    0 4px 0 #2c7350,
     0 0 0 3px color-mix(in srgb, var(--color-sage) 30%, transparent);
 }
 
