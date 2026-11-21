@@ -1,37 +1,61 @@
 /*
- * Buttons pop up a little (owner: "everything is super flat"; a little 3D, not a lot): a solid color with a soft
- * highlight along the top and a darker edge underneath, like a key. Pressing pushes it down onto its edge and it
- * springs back on release. No outlines or glows.
+ * Buttons you want to press (owner: "the buttons still don't give the fun feel of a button"). Like a chunky game
+ * button: a bright face that is lighter at the top, a glossy band across its upper half, a thick darker edge
+ * underneath, and bold lettering. A press pushes the face down onto its edge and it springs back up with a little
+ * bounce. No outlines or glows.
  */
 .button {
   --fill: var(--action-bottom);
-  --fill-hover: var(--action-top);
+  --fill-top: var(--action-top);
   --ledge: var(--action-ledge);
   --label: var(--action-label);
+  --edge: 7px;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 50px;
+  min-height: 54px;
+  margin-bottom: var(--edge);
   padding: 0 var(--space-5);
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: 20px;
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 18px;
+  font-weight: 700;
+  font-size: 19px;
   line-height: 1;
+  letter-spacing: 0.01em;
   color: var(--label);
   text-decoration: none;
-  background: var(--fill);
-  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.5), inset 0 -3px 0 rgba(0, 0, 0, 0.1), 0 6px 0 var(--ledge), 0 12px 14px -6px hsl(var(--shadow-hue) / 0.32);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  background: linear-gradient(180deg, var(--fill-top), var(--fill));
+  box-shadow:
+    inset 0 -3px 0 rgba(0, 0, 0, 0.1),
+    0 var(--edge) 0 var(--ledge),
+    0 calc(var(--edge) + 5px) 12px -3px hsl(var(--shadow-hue) / 0.35);
   cursor: pointer;
   user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  /* Coming back up is springy; going down (below) is quick */
   transition:
-    transform 260ms var(--ease-spring),
-    border-radius 260ms var(--ease-spring),
-    background-color 160ms ease,
-    box-shadow 160ms ease;
+    transform 320ms var(--ease-pop),
+    box-shadow 320ms var(--ease-pop),
+    filter 160ms ease;
+}
+
+/* The glossy band across the top half */
+.button::before {
+  content: '';
+  position: absolute;
+  inset: 4px 6px auto;
+  height: 44%;
+  border-radius: 15px 15px 12px 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.08));
+  pointer-events: none;
+}
+
+.button > * {
+  position: relative;
 }
 
 .button > span {
@@ -42,22 +66,26 @@
 
 @media (hover: hover) {
   .button:hover:not(:disabled) {
-    background: var(--fill-hover);
+    filter: brightness(1.05);
     transform: translateY(-1px);
   }
 }
 
 .button:active:not(:disabled) {
-  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.5), inset 0 -3px 0 rgba(0, 0, 0, 0.1), 0 1px 0 var(--ledge);
-  transform: translateY(3px);
-  transition-duration: 90ms;
+  box-shadow:
+    inset 0 -3px 0 rgba(0, 0, 0, 0.1),
+    0 2px 0 var(--ledge),
+    0 3px 4px -2px hsl(var(--shadow-hue) / 0.35);
+  transform: translateY(calc(var(--edge) - 2px));
+  transition-duration: 70ms;
+  transition-timing-function: ease-out;
 }
 
 .button:disabled,
 .button[aria-disabled='true'] {
   cursor: not-allowed;
-  opacity: 0.45;
-  box-shadow: none;
+  opacity: 0.5;
+  filter: saturate(0.6);
 }
 
 .primary {
@@ -67,7 +95,7 @@
 /* Success / "go" moments */
 .go {
   --fill: var(--calm-bottom);
-  --fill-hover: var(--calm-top);
+  --fill-top: var(--calm-top);
   --ledge: var(--calm-ledge);
   --label: var(--calm-label);
 }
@@ -75,58 +103,96 @@
 /* Rewards and currency */
 .gold {
   --fill: var(--reward-bottom);
-  --fill-hover: var(--reward-top);
+  --fill-top: var(--reward-top);
   --ledge: var(--reward-ledge);
   --label: var(--reward-label);
 }
 
-/* Quiet actions: a tonal surface that sits on cards and sheets */
+/* Quiet actions: a white keycap with a clear edge, so it still looks like a button on a cream card */
 .secondary {
-  --fill: var(--surface-tonal);
-  --fill-hover: var(--surface-tonal-hover);
-  --ledge: color-mix(in srgb, var(--surface-tonal) 78%, var(--text-strong));
+  --fill: color-mix(in srgb, var(--surface-tonal) 55%, var(--surface-raised));
+  --fill-top: var(--surface-raised);
+  --ledge: color-mix(in srgb, var(--surface-tonal) 72%, var(--text-strong));
   --label: var(--text-strong);
-  box-shadow: 0 3px 0 var(--ledge);
-}
-
-.secondary:active:not(:disabled) {
-  box-shadow: 0 1px 0 var(--ledge);
-  transform: translateY(2px);
+  --edge: 5px;
+  text-shadow: none;
 }
 
 .ghost {
   --fill: transparent;
-  --fill-hover: var(--surface-tonal);
+  --fill-top: transparent;
   --label: var(--text-strong);
+  --edge: 0px;
+  text-shadow: none;
   box-shadow: none;
+}
+
+.ghost::before {
+  display: none;
 }
 
 .ghost:active:not(:disabled) {
   box-shadow: none;
+  background: var(--surface-tonal);
   transform: scale(0.96);
 }
 
 .sm {
-  min-height: 40px;
+  --edge: 5px;
+  min-height: 42px;
   padding: 0 var(--space-4);
+  border-radius: 16px;
   font-size: 16px;
 }
 
+.sm::before {
+  inset: 3px 5px auto;
+  border-radius: 12px 12px 9px 9px;
+}
+
+/* The one big thing to press on a screen: taller, bolder, and it breathes a little so the eye finds it */
 .lg {
-  min-height: 60px;
+  --edge: 9px;
+  min-height: 66px;
   padding: 0 var(--space-6);
-  font-size: 21px;
+  border-radius: 24px;
+  font-size: 24px;
+}
+
+.lg::before {
+  inset: 5px 8px auto;
+  border-radius: 18px 18px 14px 14px;
+}
+
+.lg:not(.secondary):not(.ghost):not(:disabled) {
+  animation: breathe 2.6s ease-in-out infinite;
+}
+
+.lg:active {
+  animation: none;
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg:not(.secondary):not(.ghost):not(:disabled) {
+    animation: none;
+  }
 }
 
 .iconOnly {
-  width: 50px;
+  width: 54px;
   padding: 0;
 }
 
 .iconOnly.sm {
-  width: 40px;
+  width: 42px;
 }
 
 .iconOnly.lg {
-  width: 60px;
+  width: 66px;
 }

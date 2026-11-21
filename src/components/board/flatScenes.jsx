@@ -415,20 +415,20 @@ const CastleLawn = () => (
   </svg>
 );
 
-/** A pennant on its pole, fluttering. */
-const Pennant = ({ x, y, color }) => (
-  <g transform={`translate(${x} ${y})`}>
-    <path d="M0 0v-15" stroke="#6b4a2c" strokeWidth="1" strokeLinecap="round" />
-    <circle cy="-15.6" r="1" fill="#f0c14e" stroke={INK} strokeWidth="0.3" />
-    <path className={styles.flutter} data-scenery d="M0.5-14.6l9 3-9 3z" fill={color} stroke={INK} strokeWidth="0.4" strokeLinejoin="round" />
+/** A small pennant on its pole, flying away from the board (`side`: -1 to the left, 1 to the right), so it never covers a square. */
+const Pennant = ({ x, y, color, side }) => (
+  <g transform={`translate(${x} ${y}) scale(${side} 1)`}>
+    <path d="M0 0v-9" stroke="#6b4a2c" strokeWidth="0.9" strokeLinecap="round" />
+    <circle cy="-9.5" r="0.8" fill="#f0c14e" stroke={INK} strokeWidth="0.3" />
+    <path className={styles.flutter} data-scenery d="M0.4-8.8l5.5 2-5.5 2z" fill={color} stroke={INK} strokeWidth="0.35" strokeLinejoin="round" />
   </g>
 );
 
 /* At the Castle's edge: pennants at the two top corners and round bushes at the bottom ones. */
 const CastleEdge = () => (
   <svg className={styles.sceneEdge} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <Pennant x={1} y={6} color="#d9584f" />
-    <Pennant x={97.5} y={6} color="#4fbfad" />
+    <Pennant x={-0.5} y={9} color="#d9584f" side={-1} />
+    <Pennant x={100.5} y={9} color="#4fbfad" side={1} />
     {[
       [0, 101],
       [100, 101],
