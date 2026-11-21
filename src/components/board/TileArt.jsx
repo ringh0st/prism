@@ -8,6 +8,12 @@ import styles from './Board.module.css';
 
 const DIRECTION_ANGLE = { right: 0, down: 90, left: 180, up: 270 };
 
+/** Each pair (portals or twin mirrors) has its own color and its own shape, so color is never the only clue. */
+const PAIR_LOOKS = {
+  a: { color: '#F0C14E', ink: '#8a6410', symbol: 'M0-7l2 5 5 .5-4 3.5 1.3 5L0 8.3-4.3 11l1.3-5-4-3.5 5-.5z' },
+  b: { color: '#F2A67E', ink: '#9c4f2c', symbol: 'M0 7C-8 2-8-5-4-6-2-6.5 0-5 0-3c0-2 2-3.5 4-3 4 1 4 8-4 13z' },
+};
+
 /** Shared SVG gradients, rendered once per board. */
 export function TileDefs() {
   return (
@@ -17,6 +23,20 @@ export function TileDefs() {
           <stop offset="0" style={{ stopColor: 'var(--mirror-top)' }} />
           <stop offset="1" style={{ stopColor: 'var(--mirror-bottom)' }} />
         </linearGradient>
+        {/* A mirror that can't turn is steel grey, so it never reads as one of the colored mirrors that do */}
+        <linearGradient id="tile-mirror-fixed" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#c3c8cf" />
+          <stop offset="1" stopColor="#6d737c" />
+        </linearGradient>
+        {/* A portal: a dark hole in the middle, its pair's color at the rim */}
+        {Object.entries(PAIR_LOOKS).map(([pair, look]) => (
+          <radialGradient key={pair} id={`tile-portal-${pair}`} cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0" stopColor="#120c09" />
+            <stop offset="0.5" stopColor="#3a2718" />
+            <stop offset="0.86" stopColor={look.ink} />
+            <stop offset="1" stopColor={look.color} />
+          </radialGradient>
+        ))}
         <linearGradient id="tile-splitter" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#d6fff8" stopOpacity="0.95" />
           <stop offset="1" stopColor="#2ec4b6" stopOpacity="0.75" />
@@ -41,12 +61,6 @@ export function TileDefs() {
   );
 }
 
-/** Each pair (portals or twin mirrors) has its own color and its own shape, so color is never the only clue. */
-const PAIR_LOOKS = {
-  a: { color: '#F0C14E', ink: '#8a6410', symbol: 'M0-7l2 5 5 .5-4 3.5 1.3 5L0 8.3-4.3 11l1.3-5-4-3.5 5-.5z' },
-  b: { color: '#F2A67E', ink: '#9c4f2c', symbol: 'M0 7C-8 2-8-5-4-6-2-6.5 0-5 0-3c0-2 2-3.5 4-3 4 1 4 8-4 13z' },
-};
-
 function TwinMark({ link }) {
   const look = PAIR_LOOKS[link] ?? PAIR_LOOKS.a;
   return (
@@ -57,24 +71,40 @@ function TwinMark({ link }) {
   );
 }
 
+/**
+ * A portal looks like one (owner: "it doesn't look much like a portal"): a glowing ring round a dark hole, with
+ * arms of light swirling into it and a slower ring of sparks turning the other way. Its pair's shape sits on a
+ * little badge in the corner, so the two ends of a pair can be matched without relying on color.
+ */
 function Portal({ pair }) {
   const look = PAIR_LOOKS[pair] ?? PAIR_LOOKS.a;
+  const id = PAIR_LOOKS[pair] ? pair : 'a';
   return (
     <g className={styles.portal}>
-      <circle cx="50" cy="50" r="38" fill={look.color} opacity="0.3" />
-      <circle cx="50" cy="50" r="32" fill="none" stroke={look.color} strokeWidth="8" />
-      <g className={styles.portalSwirl}>
-        <path
-          d="M50 28a22 22 0 0 1 22 22M50 72a22 22 0 0 1-22-22"
-          stroke={look.ink}
-          strokeWidth="4"
-          strokeLinecap="round"
-          fill="none"
-          opacity=".55"
-        />
+      <circle cx="50" cy="50" r="40" fill={look.color} filter="url(#tile-glow)" opacity="0.6" />
+      <circle cx="50" cy="50" r="40" fill={`url(#tile-portal-${id})`} stroke={look.ink} strokeWidth="3" />
+      <g className={styles.portalSwirl} data-scenery>
+        {[0, 120, 240].map((turn) => (
+          <path
+            key={turn}
+            d="M50 50c-3-13 6-26 22-27 8 1 13 6 15 12"
+            transform={`rotate(${turn} 50 50)`}
+            fill="none"
+            stroke={look.color}
+            strokeWidth="5"
+            strokeLinecap="round"
+            opacity="0.95"
+          />
+        ))}
       </g>
-      <circle cx="50" cy="50" r="14" fill="#fffaf2" />
-      <path d={look.symbol} transform="translate(50 49) scale(1.1)" fill={look.ink} />
+      <g className={styles.portalSparks} data-scenery>
+        {[20, 95, 170, 245, 320].map((turn, n) => (
+          <circle key={turn} cx="50" cy="16" r={n % 2 ? 2 : 3} fill="#fffaf0" transform={`rotate(${turn} 50 50)`} />
+        ))}
+      </g>
+      <circle cx="50" cy="50" r="7" fill="#fffaf0" opacity="0.9" />
+      <circle cx="80" cy="80" r="14" fill="#fffaf2" stroke={look.ink} strokeWidth="3" />
+      <path d={look.symbol} transform="translate(80 79) scale(0.95)" fill={look.ink} />
     </g>
   );
 }
@@ -98,8 +128,8 @@ function Mirror({ turns, isSplitter, isLocked, link, oneSided }) {
           width="82"
           height="16"
           rx="8"
-          fill={isSplitter ? 'url(#tile-splitter)' : 'url(#tile-mirror)'}
-          stroke={isSplitter ? '#17988c' : 'var(--mirror-edge, none)'}
+          fill={isSplitter ? 'url(#tile-splitter)' : isLocked ? 'url(#tile-mirror-fixed)' : 'url(#tile-mirror)'}
+          stroke={isSplitter ? '#17988c' : isLocked ? '#3d4248' : 'var(--mirror-edge, none)'}
           strokeWidth="2.5"
         />
         {oneSided !== undefined && (
@@ -123,7 +153,11 @@ function Mirror({ turns, isSplitter, isLocked, link, oneSided }) {
       {link ? (
         <TwinMark link={link} />
       ) : (
-        <circle cx="50" cy="50" r="6.5" fill={isLocked ? '#9c8873' : 'var(--color-sage)'} stroke="#fff" strokeWidth="2.5" />
+        // A turning mirror has a soft green pivot; a fixed one is held by a dark bolt.
+        <>
+          <circle cx="50" cy="50" r={isLocked ? 7.5 : 6.5} fill={isLocked ? '#3d4248' : 'var(--color-sage)'} stroke="#fff" strokeWidth="2.5" />
+          {isLocked && <path d="M46.5 46.5l7 7M53.5 46.5l-7 7" stroke="#c3c8cf" strokeWidth="2" strokeLinecap="round" />}
+        </>
       )}
     </>
   );

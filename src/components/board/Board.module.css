@@ -677,9 +677,15 @@
 }
 
 /* Portals swirl slowly */
+/* A portal's arms of light swirl into it; a slower ring of sparks turns the other way */
 .portalSwirl {
   transform-origin: 50px 50px;
-  animation: portalSpin 4s linear infinite;
+  animation: portalSpin 3.2s linear infinite;
+}
+
+.portalSparks {
+  transform-origin: 50px 50px;
+  animation: portalSpin 9s linear infinite reverse;
 }
 
 @keyframes portalSpin {
@@ -689,7 +695,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portalSwirl {
+  .portalSwirl,
+  .portalSparks {
     animation: none;
   }
 }
