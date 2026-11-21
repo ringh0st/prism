@@ -248,3 +248,10 @@
     padding-block: 4px 6px;
   }
 }
+
+/* "?" on Lumi's shoulder: ask her what the pieces on this board do */
+.askLumi {
+  position: absolute;
+  top: 0;
+  inset-inline-end: -6px;
+}

@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFeature } from '../../hooks/useFeature.js';
+import GuideButton from '../../components/guide/GuideButton.jsx';
+import PiecesGuide from './PiecesGuide.jsx';
 import { useThemedBoard } from '../../hooks/useThemedBoard.js';
 import { boardThemeFor, lumisOf } from '../../game/boardThemes.js';
 import Board from '../../components/board/Board.jsx';
@@ -57,7 +59,7 @@ import { RescueWording, useI18n, useIsRescue } from '../../i18n/I18nContext.jsx'
 import { rescueWording } from '../../i18n/rescueWording.js';
 import { flavorText, levelTitle, pieceText, worldName } from '../../i18n/gameText.js';
 import { DIFFICULTY, TILE } from '../../game/constants.js';
-import { PIECE_FIRST_LEVEL, firstTileOf, newPiecesIn, pieceCellOf, piecesMetIn } from '../../game/pieces.js';
+import { PIECE_FIRST_LEVEL, firstTileOf, newPiecesIn, pieceCellOf, piecesMetIn, pieceOfTile } from '../../game/pieces.js';
 import { findHint, tapsLeftFinder } from '../../game/solver.js';
 import { isRotatable } from '../../game/beam.js';
 import { readJson, writeJson } from '../../lib/storage.js';
@@ -562,6 +564,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
 
   // Tapping a piece that can't turn says why (a little shake, a soft "nope" and a word from Lumi).
   const [nudgedCell, setNudgedCell] = useState(null);
+  const [showsPieces, setShowsPieces] = useState(false);
   const onBlocked = useCallback(
     (cell, tileIndex) => {
       if (isOver) return;
@@ -569,9 +572,14 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
       sfx.locked();
       setNudgedCell(null);
       requestAnimationFrame(() => setNudgedCell(cell));
-      setLumi({ mood: 'happy', line: t(`lumi.blocked.${['mirror', 'wall', 'emitter', 'gem'].includes(tile.type) ? tile.type : 'other'}`) });
+      // A special piece says again what it does (for a player who tapped its first explanation away);
+      // a plain mirror, wall, lamp or Lumi says why it won't turn.
+      const piece = pieceOfTile(tile);
+      const isPlain = ['basics', 'wall', 'locked'].includes(piece.id) && ['mirror', 'wall', 'emitter', 'gem'].includes(tile.type);
+      const words = inRescueWords(pieceText(lang, piece));
+      setLumi({ mood: 'happy', line: isPlain ? t(`lumi.blocked.${tile.type}`) : `${words.name}: ${words.text}` });
     },
-    [isOver, level.tiles, t],
+    [isOver, level.tiles, t, lang], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const onActivate = useCallback(
@@ -888,9 +896,12 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
         />
       </div>
 
+      {showsPieces && <PiecesGuide level={level} onClose={() => setShowsPieces(false)} />}
       <div className={styles.bottom}>
         <div className={styles.lumi}>
           <Lumi mood={lumi.mood} size={96} />
+          {/* Ask Lumi: what does each piece on this board do? */}
+          {!isFirstSteps && <GuideButton className={styles.askLumi} label={t('play.pieces.open')} onOpen={() => setShowsPieces(true)} />}
         </div>
         {/* Lumi's line sits beside her, above the buttons, so the board keeps all the height above. */}
         <div className={styles.side}>

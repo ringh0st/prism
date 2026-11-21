@@ -199,3 +199,12 @@ export function pieceCellOf(level, pieceId) {
   const tile = level.tiles[firstTileOf(level, pieceId)];
   return tile ? tile.y * level.width + tile.x : null;
 }
+
+/**
+ * The piece a tile is, for explaining it again when it's tapped (most special first: a twin that also cracks is a
+ * twin). A light switch belongs to its gate. Plain mirrors, lamps and Lumis are 'basics'.
+ */
+export function pieceOfTile(tile) {
+  if (tile.type === TILE.SWITCH) return PIECES.find((piece) => piece.id === 'gate');
+  return [...PIECES].reverse().find((piece) => piece.id !== 'basics' && HAS[piece.id]?.(tile)) ?? PIECES[0];
+}
