@@ -170,6 +170,35 @@ const twistAmount = (twist, world, index) => {
  * from world to world instead of starting over: longer solutions, bigger boards and more decoys, plus a
  * spike on Hard and boss levels and a quick breather after them. New pieces arrive one per world.
  */
+/** The difficulty a normal level aims for (feltDifficulty in levelQuality.js), by level number 1–1000: [level, target]. */
+const DIFFICULTY_CURVE = [
+  [1, 2],
+  [4, 7.5],
+  [12, 10.5],
+  [20, 12],
+  [60, 14],
+  [200, 16.5],
+  [500, 18.5],
+  [1000, 20],
+];
+/** How far above the road a Hard level and a boss stand. */
+const HARD_STEP = 2.5;
+const BOSS_STEP = 4.5;
+
+/**
+ * How hard this level should feel: a road that only climbs, a little at a time, with a Hard level standing clearly
+ * above it and a boss above that. The level builder picks the board closest to it.
+ */
+export function difficultyTargetFor(world, index) {
+  const number = (world - 1) * LEVELS_PER_WORLD + index;
+  const next = DIFFICULTY_CURVE.findIndex(([level]) => level >= number);
+  const [toLevel, toTarget] = DIFFICULTY_CURVE[Math.max(1, next)];
+  const [fromLevel, fromTarget] = DIFFICULTY_CURVE[Math.max(1, next) - 1];
+  const road = fromTarget + ((toTarget - fromTarget) * (number - fromLevel)) / (toLevel - fromLevel);
+  const difficulty = difficultyFor(index);
+  return road + (difficulty === DIFFICULTY.EXTRA ? BOSS_STEP : difficulty === DIFFICULTY.HARD ? HARD_STEP : 0);
+}
+
 export function generatorPresetFor(world, index) {
   const difficulty = difficultyFor(index);
   const number = (world - 1) * LEVELS_PER_WORLD + index;

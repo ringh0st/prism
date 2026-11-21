@@ -275,7 +275,8 @@ a.node:active {
   border-radius: 50%;
   color: var(--label);
   background: var(--fill-bottom);
-  box-shadow: var(--shadow-md);
+  /* A level is a chunky button: a highlight on top and its darker edge underneath */
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28), 0 5px 0 var(--ledge), 0 11px 14px -6px hsl(var(--shadow-hue) / 0.32);
 }
 
 .nodeNumber {
@@ -315,7 +316,7 @@ a.node:active {
 .lockedNode .nodeFace {
   color: var(--text-soft);
   background: color-mix(in srgb, var(--tint-b) 30%, var(--surface-raised));
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--tint-b) 55%, var(--surface-cell-edge));
 }
 
 .hard {
@@ -587,7 +588,7 @@ a.node:active {
   color: var(--action-label);
   --label: var(--action-label);
   background: var(--action-bottom);
-  box-shadow: var(--shadow-lg);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28), 0 6px 0 var(--action-ledge), 0 12px 14px -6px hsl(var(--shadow-hue) / 0.32);
   transition:
     transform 110ms var(--ease-out),
     box-shadow 110ms var(--ease-out);
@@ -606,9 +607,8 @@ a.node:active {
 }
 
 .playButton:active {
-  border-radius: var(--radius-lg);
-  transform: translateX(-50%) scale(0.96);
-  box-shadow: var(--shadow-sm);
+  transform: translateX(-50%) translateY(5px);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28), 0 1px 0 var(--action-ledge);
   transition-duration: 90ms;
 }
 

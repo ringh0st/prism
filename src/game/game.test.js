@@ -1070,14 +1070,13 @@ test('Light Rush milestones match the database', async () => {
 });
 
 test('worlds 1–3: every flavored level is built as its flavor, and no two in a row share one', async () => {
-  const { recipeFor, REST_RECIPES } = await import('./recipes.js');
+  const { recipeFor } = await import('./recipes.js');
   for (const world of [1, 2, 3]) {
     const levels = JSON.parse(readFileSync(new URL(`../data/worlds/world-00${world}.json`, import.meta.url), 'utf8'));
     levels.forEach((level, i) => {
       assert.equal(level.recipe ?? null, recipeFor(world, level.index), level.id);
       if (i > 0 && level.recipe) assert.notEqual(level.recipe, levels[i - 1].recipe, `${level.id} repeats ${level.recipe}`);
       const lamps = level.tiles.filter((t) => t.type === 'emitter').length;
-      if (level.recipe === 'oneTap') assert.equal(level.par, 1, level.id);
       if (level.recipe === 'twoLamps') assert.equal(lamps, 2, level.id);
       if (level.recipe === 'lightShow') assert.equal(lamps, 3, level.id);
       if (level.recipe === 'rainbow')
@@ -1085,9 +1084,41 @@ test('worlds 1–3: every flavored level is built as its flavor, and no two in a
           level.tiles.some((t) => t.type === 'filter'),
           level.id,
         );
-      if (level.recipe === 'oneTap') assert.notEqual(level.difficulty, 'hard', level.id);
-      if ([6, 11, 16].includes(level.index) && level.recipe) assert.ok(REST_RECIPES.includes(level.recipe), `${level.id} should be a breather`);
     });
+  }
+});
+
+test('no board is used twice in the whole game, however it is turned or flipped', async () => {
+  const { shapeKey } = await import('./levelQuality.js');
+  const seen = new Map();
+  for (let world = 1; world <= 50; world++) {
+    const levels = JSON.parse(readFileSync(new URL(`../data/worlds/world-${String(world).padStart(3, '0')}.json`, import.meta.url), 'utf8'));
+    for (const level of levels) {
+      const key = shapeKey(level);
+      assert.equal(seen.get(key), undefined, `${level.id} has the same board as ${seen.get(key)}`);
+      seen.set(key, level.id);
+    }
+  }
+  assert.equal(seen.size, 1000);
+});
+
+test('the levels get harder step by step: the road never drops, and Hard levels and bosses stand above it', async () => {
+  const { feltDifficulty } = await import('./levelQuality.js');
+  const { PIECE_FIRST_LEVEL } = await import('./pieces.js');
+  const intros = new Set(Object.values(PIECE_FIRST_LEVEL));
+  let road = 0;
+  for (const world of [1, 2, 3, 4, 5, 6]) {
+    const levels = JSON.parse(readFileSync(new URL(`../data/worlds/world-00${world}.json`, import.meta.url), 'utf8'));
+    for (const level of levels) {
+      if ((world === 1 && level.index <= 3) || intros.has(level.id)) continue; // tutorials and new pieces are gentle on purpose
+      const rating = feltDifficulty(level);
+      if (level.difficulty === 'normal') {
+        assert.ok(rating >= road - 1.5, `${level.id} (${rating.toFixed(1)}) is much easier than the levels before it (${road.toFixed(1)})`);
+        road = Math.max(road, rating);
+      } else {
+        assert.ok(rating > road, `${level.id} (${level.difficulty}, ${rating.toFixed(1)}) should stand above the road (${road.toFixed(1)})`);
+      }
+    }
   }
 });
 

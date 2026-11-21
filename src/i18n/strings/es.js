@@ -347,16 +347,12 @@ export const es = {
     'Tres rayos a la vez. ¿Puedes con todos?',
     '¡Hora del espectáculo: todas las gemas!',
   ],
-  'recipe.oneTap.name': 'Un solo toque',
-  'recipe.oneTap.goals': ['Solo un espejo está mal. ¿Lo encuentras?', 'Un toque lo arregla todo. ¿Cuál?', '¡Encuentra el espejo distinto!'],
   'recipe.longRoad.name': 'Camino largo',
   'recipe.longRoad.goals': [
     'La luz tiene un largo camino. ¡Guíala hasta el final!',
     'Un camino con muchas curvas. ¡Sigue el rayo!',
     '¡Haz que cruce todo el tablero!',
   ],
-  'recipe.tiny.name': 'Pequeño pero difícil',
-  'recipe.tiny.goals': ['Un tablero pequeño lleno de espejos.', '¡Tablero pequeño, gran idea!', 'Aquí cuenta cada espejo.'],
   'recipe.wallMaze.name': 'Laberinto',
   'recipe.wallMaze.goals': [
     '¡Paredes por todas partes! Busca el camino.',

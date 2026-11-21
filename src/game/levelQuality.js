@@ -86,7 +86,8 @@ export function trickScore(level, analysis = analyzeLevel(level)) {
     for (const i of group) turned[i] ^= 1;
     const after = traceBeams(level, turned, cells);
     const lightsMore = after.litGems.size > before.litGems.size;
-    const reachesFurther = cellsOnBeams(after.segments, level.width, level.height).size > cellsOnBeams(before.segments, level.width, level.height).size;
+    const reachesFurther =
+      cellsOnBeams(after.segments, level.width, level.height).size > cellsOnBeams(before.segments, level.width, level.height).size;
     if ((lightsMore || reachesFurther) && after.litShades.size === 0) traps++;
   });
   const idle = analysis.groups.filter((_, g) => !inBest(g)).length;
@@ -94,6 +95,47 @@ export function trickScore(level, analysis = analyzeLevel(level)) {
   const randomRate = randomSolveRate(level);
   const score = traps * 4 + (greedyFails ? 6 : 0) + (1 - randomRate) * 12 + analysis.par * 0.6 - Math.max(0, idle - traps - 1) * 1.2;
   return { score, traps, greedyFails, randomRate, idle };
+}
+
+/**
+ * How hard a level feels, as one number, so the levels can get harder step by step (owner: "I can play level 44 and
+ * then level 45 is super easy"). It adds up what makes a player think: the taps needed, the traps, whether the
+ * obvious move works, how rarely guessing works, how many pieces can turn and how big the board is.
+ * About 7 for the first real levels, about 15 for an early Hard level, into the 20s late in the game.
+ */
+export function feltDifficulty(level, trick = trickScore(level)) {
+  const turning = new Set(level.tiles.map((tile, i) => (isRotatable(tile) ? (tile.link ?? i) : null)).filter((piece) => piece !== null)).size;
+  const size = Math.max(level.width, level.height);
+  return level.par + trick.traps * 1.5 + (trick.greedyFails ? 3 : 0) + (1 - trick.randomRate) * 3 + turning * 0.3 + (size - 4) * 0.4;
+}
+
+/** The eight ways to turn or flip a square board: where cell (x, y) lands on a board `w` wide and `h` high. */
+const SYMMETRIES = [
+  (x, y) => [x, y],
+  (x, y, w) => [w - 1 - x, y],
+  (x, y, w, h) => [x, h - 1 - y],
+  (x, y, w, h) => [w - 1 - x, h - 1 - y],
+  (x, y) => [y, x],
+  (x, y, w) => [y, w - 1 - x],
+  (x, y, w, h) => [h - 1 - y, x],
+  (x, y, w, h) => [h - 1 - y, w - 1 - x],
+];
+
+/**
+ * A board's shape: where each kind of piece stands, whichever way the board is turned or flipped and however the
+ * mirrors start. Two levels with the same shape are the same puzzle to a player, so no shape is used twice.
+ */
+export function shapeKey(level) {
+  const keys = SYMMETRIES.map((place) =>
+    level.tiles
+      .map((tile) => {
+        const [x, y] = place(tile.x, tile.y, level.width, level.height);
+        return `${x},${y},${tile.type}${tile.color ?? ''}${tile.locked ? 'L' : ''}${tile.fragile ? 'F' : ''}${tile.link ?? ''}${tile.pair ?? ''}`;
+      })
+      .sort()
+      .join(';'),
+  );
+  return `${Math.min(level.width, level.height)}x${Math.max(level.width, level.height)}|${keys.sort()[0]}`;
 }
 
 const popcount = (n) => n.toString(2).replaceAll('0', '').length;

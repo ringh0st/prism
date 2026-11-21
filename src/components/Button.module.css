@@ -1,11 +1,12 @@
 /*
- * 2026 buttons: solid, flat color with a soft neutral shadow. No outlines, ledges or glows.
- * Pressing gives tactile feedback through motion instead: the button shrinks a little and its
- * corners morph (a pill softens into a rounded square), springing back on release.
+ * Buttons pop up a little (owner: "everything is super flat"; a little 3D, not a lot): a solid color with a soft
+ * highlight along the top and a darker edge underneath, like a key. Pressing pushes it down onto its edge and it
+ * springs back on release. No outlines or glows.
  */
 .button {
   --fill: var(--action-bottom);
   --fill-hover: var(--action-top);
+  --ledge: var(--action-ledge);
   --label: var(--action-label);
   position: relative;
   display: inline-flex;
@@ -23,7 +24,7 @@
   color: var(--label);
   text-decoration: none;
   background: var(--fill);
-  box-shadow: var(--shadow-button);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28), 0 4px 0 var(--ledge), 0 10px 14px -6px hsl(var(--shadow-hue) / 0.32);
   cursor: pointer;
   user-select: none;
   transition:
@@ -42,15 +43,13 @@
 @media (hover: hover) {
   .button:hover:not(:disabled) {
     background: var(--fill-hover);
-    box-shadow: var(--shadow-md);
     transform: translateY(-1px);
   }
 }
 
 .button:active:not(:disabled) {
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  transform: scale(0.95);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.28), 0 1px 0 var(--ledge);
+  transform: translateY(3px);
   transition-duration: 90ms;
 }
 
@@ -69,6 +68,7 @@
 .go {
   --fill: var(--calm-bottom);
   --fill-hover: var(--calm-top);
+  --ledge: var(--calm-ledge);
   --label: var(--calm-label);
 }
 
@@ -76,6 +76,7 @@
 .gold {
   --fill: var(--reward-bottom);
   --fill-hover: var(--reward-top);
+  --ledge: var(--reward-ledge);
   --label: var(--reward-label);
 }
 
@@ -83,8 +84,14 @@
 .secondary {
   --fill: var(--surface-tonal);
   --fill-hover: var(--surface-tonal-hover);
+  --ledge: color-mix(in srgb, var(--surface-tonal) 78%, var(--text-strong));
   --label: var(--text-strong);
-  box-shadow: none;
+  box-shadow: 0 3px 0 var(--ledge);
+}
+
+.secondary:active:not(:disabled) {
+  box-shadow: 0 1px 0 var(--ledge);
+  transform: translateY(2px);
 }
 
 .ghost {
@@ -92,6 +99,11 @@
   --fill-hover: var(--surface-tonal);
   --label: var(--text-strong);
   box-shadow: none;
+}
+
+.ghost:active:not(:disabled) {
+  box-shadow: none;
+  transform: scale(0.96);
 }
 
 .sm {

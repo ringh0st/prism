@@ -1,7 +1,6 @@
 /*
  * Level flavors for the early worlds, so no two levels in a row feel the same: two or three lamps,
- * "one tap wonder" boards where a single mirror is wrong, a long winding road, a tiny crowded board,
- * a wall maze, a gem shower (splitters) and a rainbow (color glass). Each one has a short goal the
+ * a long winding road, a wall maze, a gem shower (splitters) and a rainbow (color glass). Each one has a short goal the
  * player sees when the level opens. Levels that introduce a new piece keep their simple setup.
  */
 export const RECIPES = {
@@ -13,15 +12,10 @@ export const RECIPES = {
     name: 'Light show',
     goals: ['Three lamps! Get every gem glowing.', 'Three beams at once. Can you juggle them?', 'Light show time: every gem on!'],
   },
-  oneTap: {
-    name: 'One tap wonder',
-    goals: ['Only one mirror is wrong. Can you spot it?', 'One tap fixes it all. Which one?', 'Spot the odd mirror out!'],
-  },
   longRoad: {
     name: 'Long road',
     goals: ['The light has a long way to go. Guide it all the way!', 'A long, winding path. Follow the beam!', 'Bounce it across the whole board!'],
   },
-  tiny: { name: 'Tiny but tricky', goals: ['A little board packed with mirrors.', 'Small board, big think!', 'Every mirror counts here.'] },
   wallMaze: {
     name: 'Wall maze',
     goals: ['Walls everywhere! Find the way through.', 'Sneak the light past the walls!', 'A maze of walls. Find the gap!'],
@@ -31,8 +25,8 @@ export const RECIPES = {
 };
 
 // Index 1–20 in each world; null keeps the world's usual level (tutorials, piece introductions, bosses).
-// Each world runs in 5-level arcs: build up to a Hard level (5, 10, 15), then a breather (6, 11, 16:
-// a quick one tap wonder or tiny board) before the next arc. One tap wonders never land on Hard levels.
+// No two in a row share a flavor. How hard a level is doesn't come from its flavor: the level builder picks each
+// board to sit on the rising difficulty road (difficultyTargetFor in worlds.js), so there are no "breather" flavors.
 const SEQUENCES = {
   1: [
     null,
@@ -40,17 +34,17 @@ const SEQUENCES = {
     null,
     null,
     'wallMaze',
-    'oneTap',
-    'longRoad',
     'twoLamps',
-    'tiny',
-    null,
-    'tiny',
-    'lightShow',
     'longRoad',
-    'twoLamps',
     'wallMaze',
-    'tiny',
+    'twoLamps',
+    null,
+    'longRoad',
+    'lightShow',
+    'wallMaze',
+    'twoLamps',
+    'longRoad',
+    'lightShow',
     'wallMaze',
     'longRoad',
     'lightShow',
@@ -62,17 +56,17 @@ const SEQUENCES = {
     'gemShower',
     'twoLamps',
     'longRoad',
-    'tiny',
+    'gemShower',
     'longRoad',
     'gemShower',
     'wallMaze',
     'lightShow',
-    'tiny',
+    'wallMaze',
     'longRoad',
     'twoLamps',
     'gemShower',
     'wallMaze',
-    'tiny',
+    'twoLamps',
     'lightShow',
     'gemShower',
     'longRoad',
@@ -84,26 +78,23 @@ const SEQUENCES = {
     'rainbow',
     'twoLamps',
     'longRoad',
-    'tiny',
+    'gemShower',
     'rainbow',
     'longRoad',
     'wallMaze',
     'gemShower',
-    'tiny',
+    'twoLamps',
     'longRoad',
     'rainbow',
     'twoLamps',
     'wallMaze',
-    'tiny',
+    'gemShower',
     'rainbow',
     'lightShow',
     'longRoad',
     null,
   ],
 };
-
-/** Quick, easy flavors: the breather right after each Hard level (6, 11 and 16). */
-export const REST_RECIPES = ['oneTap', 'tiny'];
 
 /** The flavor of a built-in level (an id from RECIPES), or null for a plain one. */
 export const recipeFor = (world, index) => SEQUENCES[world]?.[index - 1] ?? null;
@@ -121,7 +112,6 @@ export function recipeOf(level) {
  */
 export function recipePreset(recipe, base, { world, spike }) {
   const preset = flavorPreset(recipe, base, { world, spike });
-  if (REST_RECIPES.includes(recipe)) return preset;
   // Every regular flavor needs at least the level's place on the difficulty curve (base.minPar). Its difficulty
   // comes from being tricky (the level builder keeps the trickiest board), not from extra mirrors.
   const minPar = Math.max(preset.minPar, base.minPar);
@@ -162,8 +152,6 @@ function flavorPreset(recipe, base, { world, spike }) {
         minPar: 3 + spike,
         maxPar: 6 + spike,
       };
-    case 'oneTap':
-      return { ...base, emitters: 1 + spike, width: 7, height: 7, turns: [3, 5], decoys: 6, walls: 2, flips: 1, minPar: 1, maxPar: 1 };
     case 'longRoad':
       return {
         ...base,
@@ -176,21 +164,6 @@ function flavorPreset(recipe, base, { world, spike }) {
         walls: 1,
         minPar: 3 + spike,
         maxPar: 6 + spike,
-      };
-    case 'tiny':
-      return {
-        ...base,
-        emitters: 1,
-        width: 4,
-        height: 4,
-        turns: [2, 3],
-        segment: [1, 1],
-        decoys: 6,
-        walls: 0,
-        splits: Math.min(1, base.splits ?? 0),
-        filters: Math.min(1, base.filters ?? 0),
-        minPar: 4,
-        maxPar: 6,
       };
     case 'wallMaze':
       return {

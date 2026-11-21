@@ -2,8 +2,9 @@
 // Run: npm run levels            (all worlds, in parallel)
 //      npm run levels -- 5 6 7   (only these worlds)
 //
-// For each level the generator searches for a while within the level's piece budget and keeps the trickiest
-// valid puzzle it finds (trickScore in levelQuality.js), not the one needing the most taps.
+// For each level the generator searches for a while within the level's piece budget and keeps the board whose felt
+// difficulty (feltDifficulty in levelQuality.js) is closest to the level's place on a road that only climbs
+// (difficultyTargetFor in worlds.js). No board shape is used twice.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { cpus } from 'node:os';
 import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
@@ -12,12 +13,11 @@ import { generateLevel } from '../src/game/generator.js';
 import { analyzeLevel } from '../src/game/solver.js';
 import { validateLevel } from '../src/game/levelSchema.js';
 import { PIECE_FIRST_LEVEL, piecesIn } from '../src/game/pieces.js';
-import { MAX_RANDOM_SOLVE_RATE, randomSolveRate, solvesWithoutPlanning, trickScore } from '../src/game/levelQuality.js';
-import { REST_RECIPES } from '../src/game/recipes.js';
-import { difficultyFor, generatorPresetFor, levelId, LEVELS_PER_WORLD, WORLD_COUNT } from '../src/game/worlds.js';
+import { MAX_RANDOM_SOLVE_RATE, feltDifficulty, shapeKey, trickScore } from '../src/game/levelQuality.js';
+import { difficultyFor, difficultyTargetFor, generatorPresetFor, levelId, LEVELS_PER_WORLD, WORLD_COUNT } from '../src/game/worlds.js';
 import { createRandom } from '../src/lib/random.js';
 import { addDarkness } from '../src/game/darknessBuilder.js';
-import { LEVEL_SCHEMA_VERSION } from '../src/game/constants.js';
+import { DIFFICULTY, LEVEL_SCHEMA_VERSION } from '../src/game/constants.js';
 
 const OUTPUT_DIR = new URL('../src/data/worlds/', import.meta.url);
 const TIME_BUDGET_MS = 6000;
@@ -55,21 +55,34 @@ function simplifications(preset) {
   ];
 }
 
-/** Tutorials, piece introductions and quick "rest" flavors may be easy; everything else needs a catch. */
-const needsCatchFor = (world, index, preset) =>
-  world <= CATCH_WORLDS && !(world === 1 && index <= 3) && !INTRO_LEVELS.has(levelId(world, index)) && !REST_RECIPES.includes(preset.recipe);
 /** Levels that teach a new piece stay gentle. */
 const INTRO_LEVELS = new Set(Object.values(PIECE_FIRST_LEVEL));
-/** Every world is built with the catch check. */
-const CATCH_WORLDS = 50;
+/** Levels 1–3 teach the game one mirror at a time; up to this level number a board may still be solved by the obvious moves. */
+const TUTORIAL_LEVELS = 3;
+const GENTLE_UNTIL = 12;
+/** A level may sit this far under the one before it, never further (the road only climbs). */
+const MAX_DROP = 1;
 
-function bestLevelFor(world, index) {
+/**
+ * The board for one level: among everything the search finds in its time, the one whose felt difficulty is closest
+ * to the level's place on the road (difficultyTargetFor), never easier than `floor`, and never a shape already used.
+ * @returns {{ level, rating }} rating: its felt difficulty (null for the three tutorial levels)
+ */
+function bestLevelFor(world, index, { floor, usedShapes }) {
   const preset = generatorPresetFor(world, index);
-  const needsCatch = needsCatchFor(world, index, preset);
+  const number = (world - 1) * LEVELS_PER_WORLD + index;
+  const isTutorial = number <= TUTORIAL_LEVELS;
+  const isIntro = INTRO_LEVELS.has(levelId(world, index));
+  // From here on the obvious move must not solve it, and nor may guessing (levelQuality.js).
+  const needsCatch = number > GENTLE_UNTIL && !isIntro;
+  // A level that teaches a piece sits a little under the road; it isn't held to the level before it.
+  const target = difficultyTargetFor(world, index) - (isIntro ? 2 : 0);
+  const lowest = isIntro ? -Infinity : floor;
   // A level that introduces a piece must show it (small boards don't always fit it by chance).
-  const required = preset.mustHave ?? Object.keys(PIECE_FIRST_LEVEL).find((piece) => PIECE_FIRST_LEVEL[piece] === levelId(world, index) && piece !== 'basics');
-  let best = null;
-  let fallback = null; // the least random-solvable board, if none passes the catch check
+  const required =
+    preset.mustHave ?? Object.keys(PIECE_FIRST_LEVEL).find((piece) => PIECE_FIRST_LEVEL[piece] === levelId(world, index) && piece !== 'basics');
+  let best = null; // closest to the target among boards that fit every rule
+  let hardest = null; // the hardest board in range, if none fits every rule
   for (const [attempt, variant] of simplifications(preset).entries()) {
     let darkTries = 0; // each simpler version gets its own tries (small boards take the darkness less often)
     const deadline = Date.now() + TIME_BUDGET_MS;
@@ -81,33 +94,48 @@ function bestLevelFor(world, index) {
         darkTries++;
         level = addDarkness(level, preset.darkness, random, preset.maxPar);
       } else if (preset.darkness) level = null;
+      if (!level || level.par > preset.maxPar) continue;
       // A level that introduces a piece must actually contain it.
-      const hasRequired = !required || (level && piecesIn(level).includes(required));
-      // Every regular level needs a real "catch": random tapping mustn't solve it, and nor may a player who just
-      // lights the most each move without planning (levelQuality.js). Such a board counts as fully guessable.
-      const rated = level && { ...level, difficulty: difficultyFor(index) };
-      const rate = level && hasRequired && needsCatch ? (solvesWithoutPlanning(rated) ? 1 : randomSolveRate(rated)) : 0;
-      const inRange = level && hasRequired && level.par <= preset.maxPar && level.par >= preset.minPar - (preset.mustHave ? 2 : 1);
-      if (inRange && (!fallback || rate < fallback.rate)) fallback = { level, rate };
-      if (inRange && rate <= MAX_RANDOM_SOLVE_RATE) {
-        // Plain levels (tutorials, introductions, breathers) just need to fit; the rest keep the trickiest board.
-        const trick = needsCatch ? trickScore(rated).score : -level.tiles.length;
-        if (!best || trick > best.trick) best = { level, trick };
+      if (required && !piecesIn(level).includes(required)) continue;
+      if (usedShapes.has(shapeKey(level))) continue;
+      if (isTutorial) {
+        // The tutorial boards just need to fit: the plainest one.
+        if (level.par === preset.minPar && (!best || level.tiles.length < best.level.tiles.length)) best = { level, rating: null, miss: 0 };
+        continue;
       }
+      const rated = { ...level, difficulty: difficultyFor(index) };
+      const trick = trickScore(rated);
+      const rating = feltDifficulty(rated, trick);
+      if (!hardest || rating > hardest.rating) hardest = { level, rating };
+      if (needsCatch && (!trick.greedyFails || trick.randomRate > MAX_RANDOM_SOLVE_RATE)) continue;
+      if (rating < lowest) continue;
+      const miss = Math.abs(rating - target);
+      if (!best || miss < best.miss) best = { level, rating, miss };
     }
-    if (best) return best.level;
+    if (best) return best;
   }
-  if (fallback) {
-    console.warn(`${levelId(world, index)}: no board with a clear catch; using the hardest to guess (${Math.round(fallback.rate * 100)}%)`);
-    return fallback.level;
+  if (hardest) {
+    console.warn(
+      `${levelId(world, index)}: no board on the road (wanted ${target.toFixed(1)}); using the hardest found (${hardest.rating.toFixed(1)})`,
+    );
+    return hardest;
   }
   throw new Error(`Could not generate ${levelId(world, index)}`);
 }
 
 function generateWorld(world) {
   const levels = [];
+  const usedShapes = new Set();
+  const ratings = [];
+  // The road so far: the last normal level's difficulty (a Hard level or a boss stands above the road, not on it).
+  let road = difficultyTargetFor(world, 1) - 2;
   for (let index = 1; index <= LEVELS_PER_WORLD; index++) {
-    const level = bestLevelFor(world, index);
+    const isNormal = difficultyFor(index) === DIFFICULTY.NORMAL;
+    // A Hard level or a boss must stand clearly above the road.
+    const { level, rating } = bestLevelFor(world, index, { floor: isNormal ? road - MAX_DROP : road + 1, usedShapes });
+    usedShapes.add(shapeKey(level));
+    ratings.push(rating);
+    if (isNormal && rating !== null && !INTRO_LEVELS.has(levelId(world, index))) road = Math.max(road, rating);
     const preset = generatorPresetFor(world, index);
     const check = analyzeLevel(level);
     const problems = validateLevel(level);
@@ -130,8 +158,7 @@ function generateWorld(world) {
     });
   }
   writeFileSync(new URL(worldFileName(world), OUTPUT_DIR), JSON.stringify(levels) + '\n');
-  const pars = levels.map((l) => l.par);
-  return `world ${String(world).padStart(2)}: par ${Math.min(...pars)}–${Math.max(...pars)}, boss par ${pars.at(-1)}, sizes ${levels[0].width}–${Math.max(...levels.map((l) => l.width))}`;
+  return `world ${String(world).padStart(2)}: ${ratings.map((rating) => (rating === null ? '–' : rating.toFixed(0))).join(' ')}`;
 }
 
 if (isMainThread) {
