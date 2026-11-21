@@ -2,28 +2,45 @@ import { useState } from 'react';
 import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import HelpTip from '../../components/game/HelpTip.jsx';
-import GiftReveal from '../../components/gifts/GiftReveal.jsx';
 import MissionKindIcon from './MissionKindIcon.jsx';
 import MissionRing from './MissionRing.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { todayKey } from '../../game/daily.js';
 import { MISSIONS_BONUS_SPARKS, isMissionReady, missionCount, missionLogFor, todaysMissions } from '../../game/dailyMissions.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
+import { errorText } from '../../i18n/meText.js';
+import { flyRewardsToCounter } from '../../lib/rewardFlight.js';
 import styles from './DailyMissions.module.css';
 
 /**
  * Today's three daily missions, as pictures: each a ring filling up around its kind's picture, the count, and the
- * sparks it pays (a gold button once it's done, opened like every gift). The gift up top is the bonus for all three.
+ * sparks it pays (a gold button once it's done). Tapping it opens nothing (owner's ask): the sparks fly straight up
+ * into the counter at the top, which counts up. The gift up top is the bonus for all three.
  */
 export default function DailyMissions() {
   const { progress, isSignedIn, claimDailyMission } = usePlayer();
   const { t } = useI18n();
-  const [opening, setOpening] = useState(null);
+  const [problem, setProblem] = useState(null);
+  const [collecting, setCollecting] = useState(null);
   const log = missionLogFor(progress, todayKey(), isSignedIn);
   const missions = todaysMissions(log);
   if (missions.length === 0) return null;
   const done = log.claimed.length;
   const isAllDone = done === missions.length;
+
+  const collect = async (mission, button) => {
+    if (collecting) return;
+    const box = button.getBoundingClientRect();
+    setCollecting(mission.id);
+    setProblem(null);
+    try {
+      const gift = await claimDailyMission(mission.id);
+      flyRewardsToCounter('spark', gift?.sparks ?? mission.sparks, { x: box.left + box.width / 2, y: box.top + box.height / 2 });
+    } catch (error) {
+      setProblem(errorText(t, error.message));
+    }
+    setCollecting(null);
+  };
 
   return (
     <section className={styles.card} aria-labelledby="missions-title">
@@ -71,7 +88,13 @@ export default function DailyMissions() {
                 {count}/{mission.target}
               </span>
               {isReady ? (
-                <Button size="sm" variant="gold" onClick={() => setOpening(mission)} aria-label={t('pals.today.collect', { n: mission.sparks })}>
+                <Button
+                  size="sm"
+                  variant="gold"
+                  disabled={collecting === mission.id}
+                  onClick={(event) => collect(mission, event.currentTarget)}
+                  aria-label={t('pals.today.collect', { n: mission.sparks })}
+                >
                   <Icon name="spark" size={14} /> {mission.sparks}
                 </Button>
               ) : (
@@ -84,14 +107,10 @@ export default function DailyMissions() {
           );
         })}
       </ul>
-      {opening && (
-        <GiftReveal
-          title={t('pals.today.giftTitle')}
-          doneTitle={t('ui.gift.title')}
-          wrapping={{ kind: 'box', tone: 'mint' }}
-          open={() => claimDailyMission(opening.id)}
-          onClose={() => setOpening(null)}
-        />
+      {problem && (
+        <p className={styles.problem} role="alert">
+          {problem}
+        </p>
       )}
     </section>
   );

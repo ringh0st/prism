@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import Button from '../../components/Button.jsx';
 import Icon from '../../components/Icon.jsx';
 import PalArt from '../../components/pals/PalArt.jsx';
@@ -6,8 +6,7 @@ import HelpTip from '../../components/game/HelpTip.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { palById, stageOf } from '../../game/pals.js';
 import { isQuestReady, questCount, questLogFor, questsForWeek, questWeekOf } from '../../game/quests.js';
-import { rewardShower } from '../../lib/effects.js';
-import { sfx } from '../../audio/sfx.js';
+import { flyRewardsToCounter } from '../../lib/rewardFlight.js';
 import styles from './PalQuests.module.css';
 import { palName, questText } from '../../i18n/palText.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
@@ -23,7 +22,6 @@ const KIND_ICONS = { solved: 'play', perfect: 'star', hard: 'flame' };
 export default function PalQuests() {
   const { progress, claimQuest } = usePlayer();
   const [message, setMessage] = useState('');
-  const cardRef = useRef(null);
   const { t, lang } = useI18n();
   const partner = palById(progress.pal.id);
   if (!partner) return null;
@@ -33,11 +31,12 @@ export default function PalQuests() {
   const quests = questsForWeek(week);
   const done = quests.filter((quest) => log.claimed.includes(quest.id)).length;
 
-  const collect = async (quest) => {
+  // Like the daily missions: the sparks fly from the button straight into the counter at the top.
+  const collect = async (quest, button) => {
+    const box = button.getBoundingClientRect();
     try {
       await claimQuest(quest.id);
-      sfx.reward();
-      rewardShower(cardRef.current);
+      flyRewardsToCounter('spark', quest.sparks, { x: box.left + box.width / 2, y: box.top + box.height / 2 });
       setMessage('');
     } catch (error) {
       setMessage(errorText(t, error.message));
@@ -45,7 +44,7 @@ export default function PalQuests() {
   };
 
   return (
-    <section ref={cardRef} className={styles.card} aria-labelledby="quests-title">
+    <section className={styles.card} aria-labelledby="quests-title">
       <div className={styles.head}>
         <PalArt palId={partner.id} stage={stageOf(progress.pal.owned[partner.id])} wearing={progress.pal.wearing} size={56} alive />
         <div className={styles.headText}>
@@ -98,7 +97,12 @@ export default function PalQuests() {
                 </div>
               </div>
               {isReady ? (
-                <Button size="sm" variant="gold" onClick={() => collect(quest)} aria-label={t('pals.quests.collect', { n: quest.sparks })}>
+                <Button
+                  size="sm"
+                  variant="gold"
+                  onClick={(event) => collect(quest, event.currentTarget)}
+                  aria-label={t('pals.quests.collect', { n: quest.sparks })}
+                >
                   <Icon name="spark" size={14} /> {quest.sparks}
                 </Button>
               ) : (
