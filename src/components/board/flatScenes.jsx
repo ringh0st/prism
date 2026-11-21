@@ -1,7 +1,8 @@
 /*
  * The flat board's scenes: the same five places as the 3D rooms (boardThemes.js), drawn as simple flat pictures.
- * A scene dresses the floor (colors below, and for the Pond real lily pads, water and cattails: `Backdrop`, `Edge`
- * and `data-scene` rules in Board.module.css), the walls, the lamp and what each sleeping Lumi rests on; mirrors and
+ * A scene dresses the floor (its own tiles, drawn in Board.module.css under `data-scene`: lily pads on water,
+ * floorboards on a rug, paving stones on a lawn, sandbars in the sea, mossy ground; plus what lies behind the tiles
+ * and what grows at the edge, `Backdrop` and `Edge` below), the walls, the lamp and what each sleeping Lumi rests on; mirrors and
  * the later pieces keep their plain shapes, which is what makes the flat board easy to read.
  * All art is drawn in a tile's viewBox (0 0 100 100).
  */
@@ -364,6 +365,189 @@ const PondEdge = () => (
   </svg>
 );
 
+/* The Library's rug: a gold border with a diamond at each corner, showing between the floorboards. */
+const LibraryRug = () => (
+  <svg className={styles.sceneBackdrop} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <rect x="1.2" y="1.2" width="97.6" height="97.6" rx="5" fill="none" stroke="#e0b65a" strokeWidth="0.8" />
+    <rect x="2.6" y="2.6" width="94.8" height="94.8" rx="4" fill="none" stroke="#e0b65a" strokeWidth="0.35" strokeDasharray="1.4 1.4" />
+  </svg>
+);
+
+/* At the Library's edge: a pile of books at one corner and an open book with a ribbon at the other. */
+const LibraryEdge = () => (
+  <svg className={styles.sceneEdge} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g transform="translate(-5.5 -4)" stroke={INK} strokeWidth="0.5">
+      <rect x="0" y="4" width="13" height="3.2" rx="0.8" fill="#2f5f73" />
+      <rect x="1" y="1" width="11" height="3.2" rx="0.8" fill="#b5503f" />
+      <rect x="2.2" y="-2" width="9" height="3.2" rx="0.8" fill="#3f6b4c" />
+      <path d="M4 -2v3.2M3 1v3.2" stroke="#f0c14e" strokeWidth="0.8" />
+    </g>
+    <g transform="translate(101 105)" stroke={INK} strokeWidth="0.5">
+      <path d="M0 0q-4-2.4-8 0v-6q4-2.4 8 0zM0 0q4-2.4 8 0v-6q-4-2.4-8 0z" fill="#fffaf0" />
+      <path d="M-6-3.6h4M-6-2.2h4M2-3.6h4M2-2.2h4" stroke="#b8a88f" strokeWidth="0.4" />
+      <path d="M0.6-6.4v9l1.2-1.2 1.2 1.2v-9" fill="#c8504a" />
+    </g>
+  </svg>
+);
+
+/* The Castle's lawn: tufts of grass round the courtyard. */
+const CastleLawn = () => (
+  <svg className={styles.sceneBackdrop} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    {[
+      [1.6, 22],
+      [1.4, 58],
+      [1.8, 86],
+      [98.4, 30],
+      [98.2, 66],
+      [30, 98.6],
+      [64, 98.4],
+      [48, 1.6],
+    ].map(([x, y]) => (
+      <path
+        key={`${x}-${y}`}
+        d={`M${x - 0.9} ${y}l0.5-1.6 0.5 1.6 0.5-1.9 0.5 1.9`}
+        stroke="#4f8a45"
+        strokeWidth="0.35"
+        fill="none"
+        strokeLinecap="round"
+      />
+    ))}
+  </svg>
+);
+
+/** A pennant on its pole, fluttering. */
+const Pennant = ({ x, y, color }) => (
+  <g transform={`translate(${x} ${y})`}>
+    <path d="M0 0v-15" stroke="#6b4a2c" strokeWidth="1" strokeLinecap="round" />
+    <circle cy="-15.6" r="1" fill="#f0c14e" stroke={INK} strokeWidth="0.3" />
+    <path className={styles.flutter} data-scenery d="M0.5-14.6l9 3-9 3z" fill={color} stroke={INK} strokeWidth="0.4" strokeLinejoin="round" />
+  </g>
+);
+
+/* At the Castle's edge: pennants at the two top corners and round bushes at the bottom ones. */
+const CastleEdge = () => (
+  <svg className={styles.sceneEdge} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <Pennant x={1} y={6} color="#d9584f" />
+    <Pennant x={97.5} y={6} color="#4fbfad" />
+    {[
+      [0, 101],
+      [100, 101],
+    ].map(([x, y]) => (
+      <g key={x} transform={`translate(${x} ${y})`} stroke="#3f7a3f" strokeWidth="0.4">
+        <circle cx="-2" cy="0" r="3.2" fill="#6aae5c" />
+        <circle cx="2" cy="-0.6" r="3.8" fill="#7fbf6a" />
+        <circle cx="0.4" cy="-3" r="2.6" fill="#8ccb78" />
+      </g>
+    ))}
+  </svg>
+);
+
+/* The Beach's sea: lines of foam rolling slowly between the sandbars. */
+const BeachSea = () => (
+  <svg className={styles.sceneBackdrop} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    {[
+      [16, 34, 0],
+      [66, 18, 1.8],
+      [84, 66, 3.2],
+      [34, 82, 2.4],
+    ].map(([x, y, delay]) => (
+      <path
+        key={`${x}-${y}`}
+        className={styles.ripple}
+        data-scenery
+        style={{ animationDelay: `${delay}s` }}
+        d={`M${x - 8} ${y}q4-3 8 0t8 0`}
+        fill="none"
+        stroke="#fff"
+        strokeWidth="0.8"
+        strokeLinecap="round"
+      />
+    ))}
+  </svg>
+);
+
+/* At the Beach's edge: palm fronds over one corner, a starfish and a shell at another, a beach ball at a third. */
+const BeachEdge = () => (
+  <svg className={styles.sceneEdge} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g className={styles.sway} data-scenery transform="translate(-2 1)">
+      {[-20, 10, 40, 70].map((turn) => (
+        <path
+          key={turn}
+          d="M0 0q8-5 16-1-8 1-16 1z"
+          transform={`rotate(${turn})`}
+          fill={turn % 20 ? '#4f9a55' : '#5fb065'}
+          stroke="#2f6b3a"
+          strokeWidth="0.4"
+          strokeLinejoin="round"
+        />
+      ))}
+    </g>
+    <g transform="translate(98 100)">
+      <path
+        d="M0-4.6l1.3 2.9 3.1.3-2.3 2.1.7 3.1L0 2.2l-2.8 1.6.7-3.1-2.3-2.1 3.1-.3z"
+        fill="#f2946f"
+        stroke={INK}
+        strokeWidth="0.4"
+        strokeLinejoin="round"
+      />
+      <path d="M-9 2q0-4 3-4t3 4z" fill="#fff1e0" stroke={INK} strokeWidth="0.4" />
+      <path d="M-7.6 2v-3M-6 2v-3.8M-4.4 2v-3" stroke="#e0b9a0" strokeWidth="0.35" />
+    </g>
+    <g transform="translate(98.5 1.5)" stroke={INK} strokeWidth="0.4">
+      <circle r="4" fill="#fffaf0" />
+      <path d="M0-4a4 4 0 0 1 3.5 2L0 0zM0 4a4 4 0 0 1-3.5-2L0 0z" fill="#e8615a" stroke="none" />
+      <path d="M3.5 2A4 4 0 0 1 0 4V0zM-3.5-2A4 4 0 0 1 0-4V0z" fill="#4fbfad" stroke="none" />
+      <circle r="4" fill="none" />
+    </g>
+  </svg>
+);
+
+/* The Forest floor: soft patches of sunlight coming through the leaves. */
+const ForestLight = () => (
+  <svg className={styles.sceneBackdrop} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    {[
+      [22, 18, 9],
+      [74, 40, 12],
+      [38, 76, 10],
+    ].map(([x, y, r]) => (
+      <circle key={`${x}-${y}`} cx={x} cy={y} r={r} fill="#e6ffb0" opacity="0.12" />
+    ))}
+  </svg>
+);
+
+/** A fern: a few fronds fanning out. */
+const Fern = ({ x, y, flip = 1 }) => (
+  <g className={styles.sway} data-scenery transform={`translate(${x} ${y}) scale(${flip} 1)`}>
+    {[-55, -25, 5].map((turn) => (
+      <path
+        key={turn}
+        d="M0 0q3-7 0-13-3 6 0 13z"
+        transform={`rotate(${turn})`}
+        fill="#5aa35f"
+        stroke="#2f6b3a"
+        strokeWidth="0.4"
+        strokeLinejoin="round"
+      />
+    ))}
+  </g>
+);
+
+/* At the Forest's edge: ferns at two corners and a pair of toadstools at a third. */
+const ForestEdge = () => (
+  <svg className={styles.sceneEdge} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <Fern x={1} y={8} flip={-1} />
+    <Fern x={99} y={101} />
+    <g transform="translate(1.5 101)" stroke={INK} strokeWidth="0.4">
+      <rect x="-1" y="-4" width="2" height="4" rx="0.8" fill="#fff6e6" />
+      <path d="M-4-4q0-4.4 4-4.4t4 4.4z" fill="#e2574c" />
+      <circle cx="-1.6" cy="-5.6" r="0.7" fill="#fff" stroke="none" />
+      <circle cx="1.4" cy="-6.4" r="0.7" fill="#fff" stroke="none" />
+      <rect x="4.2" y="-2.6" width="1.4" height="2.6" rx="0.6" fill="#fff6e6" />
+      <path d="M2.6-2.6q0-2.8 2.3-2.8t2.3 2.8z" fill="#e2574c" />
+    </g>
+  </svg>
+);
+
 /**
  * Each scene: the board's colors (CSS variables set on the board) and its pictures. The mirror colors are picked to
  * stand out on that scene's tiles (never green mirrors on green lily pads).
@@ -375,7 +559,6 @@ export const FLAT_SCENES = {
       '--surface-cell': '#efd3a6',
       '--surface-cell-alt': '#e3bf8b',
       '--surface-locked': '#c9a57a',
-      '--plate-round': '18%',
       '--mirror-top': '#7fd0b0',
       '--mirror-bottom': '#2f8f6d',
       '--mirror-edge': '#1f5f49',
@@ -384,6 +567,8 @@ export const FLAT_SCENES = {
     Wall: Bookcase,
     Lamp: BankerLamp,
     Perch: Books,
+    Backdrop: LibraryRug,
+    Edge: LibraryEdge,
   },
   pond: {
     vars: {
@@ -391,7 +576,6 @@ export const FLAT_SCENES = {
       '--surface-cell': '#a9d98f',
       '--surface-cell-alt': '#97cc7f',
       '--surface-locked': '#d7e6c8',
-      '--plate-round': '50%',
       '--mirror-top': '#ffffff',
       '--mirror-bottom': '#c9d3dc',
       '--mirror-edge': '#2f5a4a',
@@ -409,7 +593,6 @@ export const FLAT_SCENES = {
       '--surface-cell': '#d9d3ca',
       '--surface-cell-alt': '#c6bfb4',
       '--surface-locked': '#a8a096',
-      '--plate-round': '14%',
       '--mirror-top': '#f58f80',
       '--mirror-bottom': '#c9483f',
       '--mirror-edge': '#7a2a25',
@@ -418,6 +601,8 @@ export const FLAT_SCENES = {
     Wall: CastleWall,
     Lamp: Torch,
     Perch: Cushion,
+    Backdrop: CastleLawn,
+    Edge: CastleEdge,
   },
   beach: {
     vars: {
@@ -425,7 +610,6 @@ export const FLAT_SCENES = {
       '--surface-cell': '#f6e4bb',
       '--surface-cell-alt': '#eed6a2',
       '--surface-locked': '#e3c98f',
-      '--plate-round': '26%',
       '--mirror-top': '#6fd6c4',
       '--mirror-bottom': '#23877c',
       '--mirror-edge': '#17574f',
@@ -434,6 +618,8 @@ export const FLAT_SCENES = {
     Wall: BeachHut,
     Lamp: Lighthouse,
     Perch: SwimRing,
+    Backdrop: BeachSea,
+    Edge: BeachEdge,
   },
   forest: {
     vars: {
@@ -441,7 +627,6 @@ export const FLAT_SCENES = {
       '--surface-cell': '#bfe0a2',
       '--surface-cell-alt': '#aad38c',
       '--surface-locked': '#e3dcc6',
-      '--plate-round': '30%',
       '--mirror-top': '#fffdf6',
       '--mirror-bottom': '#dcd0b8',
       '--mirror-edge': '#2f5a3a',
@@ -450,5 +635,7 @@ export const FLAT_SCENES = {
     Wall: Trees,
     Lamp: Campfire,
     Perch: Stump,
+    Backdrop: ForestLight,
+    Edge: ForestEdge,
   },
 };
