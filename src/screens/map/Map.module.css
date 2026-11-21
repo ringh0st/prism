@@ -585,23 +585,22 @@ a.node:active {
   border-radius: var(--radius-pill);
   text-decoration: none;
   margin-bottom: 5px;
-  color: var(--action-label);
-  --label: var(--action-label);
-  background: linear-gradient(180deg, var(--action-top), var(--action-bottom));
-  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.1), 0 8px 0 var(--action-ledge), 0 14px 14px -6px hsl(var(--shadow-hue) / 0.32);
+  color: var(--action-on);
+  --label: var(--action-on);
+  background: linear-gradient(90deg, var(--action-from), var(--action-to));
+  box-shadow: 0 10px 16px -8px hsl(var(--shadow-hue) / 0.4);
   transition:
-    transform 110ms var(--ease-out),
-    box-shadow 110ms var(--ease-out);
+    transform 320ms var(--ease-pop),
+    filter 160ms ease;
 }
 
-/* The same glossy band as every big button (Button.module.css) */
+/* The same thin ring in its own color as every big button (Button.module.css) */
 .playButton::before {
   content: '';
   position: absolute;
-  inset: 5px 14px auto;
-  height: 42%;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.08));
+  inset: -5px;
+  border: 2.5px solid var(--action-from);
+  border-radius: inherit;
   pointer-events: none;
 }
 
@@ -631,8 +630,8 @@ a.node:active {
   border-radius: var(--radius-pill);
   font-size: 14px;
   line-height: 1;
-  color: var(--action-label);
-  background: color-mix(in srgb, var(--action-ledge) 55%, var(--action-bottom));
+  color: var(--action-on);
+  background: rgb(0 0 0 / 0.2);
 }
 
 .goalArrow {
@@ -641,9 +640,10 @@ a.node:active {
 }
 
 .playButton:active {
-  transform: translateX(-50%) translateY(5px);
-  box-shadow: inset 0 3px 0 rgba(255, 255, 255, 0.5), inset 0 -3px 0 rgba(0, 0, 0, 0.1), 0 1px 0 var(--action-ledge);
-  transition-duration: 90ms;
+  filter: brightness(1.12);
+  transform: translateX(-50%) scale(0.96, 0.93);
+  transition-duration: 70ms;
+  transition-timing-function: ease-out;
 }
 
 /* A Glowbug waiting on this level (rescue it with three stars) */
