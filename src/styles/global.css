@@ -57,6 +57,11 @@ a {
   border-radius: 6px;
 }
 
+/* The ring is for keyboard players: with a finger or mouse nothing gets a frame (inputMode.js), except a field being typed in */
+html[data-input='pointer'] :focus-visible:not(input, textarea, select) {
+  outline: none;
+}
+
 .visually-hidden {
   position: absolute !important;
   width: 1px;

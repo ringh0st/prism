@@ -53,7 +53,7 @@ Lumipals is a light-bending puzzle game: rotate mirrors and crystals to steer be
 | `--text-strong` | `#2B2118` | Text (warm near-black) |
 | night `--surface-page` | `#1C1A16` | Dark-mode background |
 
-Style: "Sunlit Paper". Matte surfaces, warm layered shadows and buttons that pop up a little (owner: "everything is super flat"; a little 3D, not a lot): a soft highlight along the top and a solid darker edge underneath in the color's `-ledge` token, and a press pushes the button down onto its edge (`Button`, the map's level circles and PLAY, the map's top-row buttons, the helpers in a level). No outlines, glass, neon glows or gradient text; only light beams glow. Each colored surface uses the `--action|reward|warm|alert|calm-*` tokens (fill, ledge, label) so text keeps WCAG contrast.
+Style: "Sunlit Paper". Matte surfaces, warm layered shadows and buttons that pop up a little (owner: "everything is super flat"; a little 3D, not a lot): a soft highlight along the top and a solid darker edge underneath in the color's `-ledge` token, and a press pushes the button down onto its edge (`Button`, the map's level circles and PLAY, the map's top-row buttons, the helpers in a level). No outlines, glass, neon glows or gradient text; only light beams glow. The focus ring is for keyboard players only (`src/lib/inputMode.js` remembers the last kind of input; a screen that focuses its main button by itself, like the "Let's go!" card, drew a red frame round it on phones). Each colored surface uses the `--action|reward|warm|alert|calm-*` tokens (fill, ledge, label) so text keeps WCAG contrast.
 
 ## Conventions
 

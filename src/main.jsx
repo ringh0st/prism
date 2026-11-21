@@ -18,7 +18,9 @@ import { isNativeApp } from './lib/platform.js';
 import { listenForInstallPrompt } from './lib/installApp.js';
 import { applyCheckoutReturn } from './lib/checkoutReturn.js';
 import { setPreviewTheme } from './game/boardThemes.js';
+import { watchInputMode } from './lib/inputMode.js';
 
+watchInputMode();
 // Catch the browser's install offer early, for the Home Screen helper.
 listenForInstallPrompt();
 // Back from a payment page: open the store's thank-you screen.
