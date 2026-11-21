@@ -933,3 +933,102 @@
     opacity: 0;
   }
 }
+
+/*
+ * The Pond (owner: "it's not giving a pond at all"): real lily pads on water. Each tile is a pad with its notch and
+ * veins, lying a different way round, darker underneath where it floats; a pad under the light turns sunlit gold.
+ */
+.board[data-scene='pond'] {
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 20%, rgba(255, 255, 255, 0.2), transparent 70%),
+    linear-gradient(160deg, #6fc3b6, #3f9a93 60%, #2f8580);
+}
+
+.board[data-scene='pond'] .plate {
+  margin: 2%;
+  border-radius: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' transform='translate%280 5%29' fill='%233f8f6a'/%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' fill='%239bd585'/%3E%3Cpath d='M50 50 20 26M50 50 12 54M50 50 28 82M50 50 56 92M50 50 82 80M50 50 46 8' stroke='%23d6f3c2' stroke-width='2.2' stroke-linecap='round' opacity='.55' fill='none'/%3E%3Cpath d='M18 34A36 36 0 0 1 60 12' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' opacity='.35' fill='none'/%3E%3C/svg%3E") center / contain no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 3px 3px rgba(20, 70, 66, 0.35));
+  transition: filter 350ms ease;
+}
+
+.board[data-scene='pond'] .plateAlt {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' transform='translate%280 5%29' fill='%233a8763'/%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' fill='%2386c873'/%3E%3Cpath d='M50 50 20 26M50 50 12 54M50 50 28 82M50 50 56 92M50 50 82 80M50 50 46 8' stroke='%23c6ecb0' stroke-width='2.2' stroke-linecap='round' opacity='.55' fill='none'/%3E%3Cpath d='M18 34A36 36 0 0 1 60 12' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' opacity='.35' fill='none'/%3E%3C/svg%3E");
+}
+
+.board[data-scene='pond'] .plateLit {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' transform='translate%280 5%29' fill='%23b99a2c'/%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' fill='%23f1e06a'/%3E%3Cpath d='M50 50 20 26M50 50 12 54M50 50 28 82M50 50 56 92M50 50 82 80M50 50 46 8' stroke='%23fff7c4' stroke-width='2.2' stroke-linecap='round' opacity='.55' fill='none'/%3E%3Cpath d='M18 34A36 36 0 0 1 60 12' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' opacity='.35' fill='none'/%3E%3C/svg%3E");
+  filter: drop-shadow(0 0 9px rgba(255, 213, 74, 0.95));
+}
+
+/* No two pads lie the same way */
+.board[data-scene='pond'] .plate:nth-child(3n) {
+  transform: rotate(115deg);
+}
+
+.board[data-scene='pond'] .plate:nth-child(4n + 1) {
+  transform: rotate(-70deg);
+}
+
+.board[data-scene='pond'] .plate:nth-child(5n + 2) {
+  transform: rotate(200deg);
+}
+
+/* A scene's own backdrop behind the tiles (ripples on the water) and what grows at its edge (cattails) */
+.sceneBackdrop,
+.sceneEdge {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.sceneBackdrop {
+  border-radius: inherit;
+}
+
+.sceneEdge {
+  z-index: 2;
+}
+
+.ripple {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ripple 5s ease-out infinite;
+}
+
+@keyframes ripple {
+  from {
+    opacity: 0.7;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+.sway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: sway 4.5s ease-in-out infinite alternate;
+}
+
+@keyframes sway {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ripple,
+  .sway {
+    animation: none;
+  }
+}

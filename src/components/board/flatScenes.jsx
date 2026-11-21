@@ -1,6 +1,7 @@
 /*
  * The flat board's scenes: the same five places as the 3D rooms (boardThemes.js), drawn as simple flat pictures.
- * A scene dresses the floor (colors below), the walls, the lamp and what each sleeping Lumi rests on; mirrors and
+ * A scene dresses the floor (colors below, and for the Pond real lily pads, water and cattails: `Backdrop`, `Edge`
+ * and `data-scene` rules in Board.module.css), the walls, the lamp and what each sleeping Lumi rests on; mirrors and
  * the later pieces keep their plain shapes, which is what makes the flat board easy to read.
  * All art is drawn in a tile's viewBox (0 0 100 100).
  */
@@ -299,6 +300,70 @@ const Stump = () => (
   </g>
 );
 
+/* The Pond's water: slow ripples between the lily pads. */
+const PondWater = () => (
+  <svg className={styles.sceneBackdrop} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    {[
+      [18, 30, 0],
+      [70, 16, 1.6],
+      [84, 62, 3.1],
+      [36, 78, 2.2],
+      [56, 46, 4],
+    ].map(([x, y, delay]) => (
+      <ellipse
+        key={`${x}-${y}`}
+        className={styles.ripple}
+        data-scenery
+        style={{ animationDelay: `${delay}s` }}
+        cx={x}
+        cy={y}
+        rx="9"
+        ry="4.5"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="0.7"
+      />
+    ))}
+  </svg>
+);
+
+/** A cattail: a stem, a leaf and its brown head. */
+const Cattail = ({ x, y, height, lean = 0 }) => (
+  <g transform={`translate(${x} ${y}) rotate(${lean})`}>
+    <path d={`M0 0v${-height}`} stroke="#3f7a4a" strokeWidth="1.3" strokeLinecap="round" />
+    <path d={`M0 0q5 ${-height * 0.5} 2 ${-height * 0.8}`} stroke="#5aa35f" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+    <rect x="-1.6" y={-height - 5} width="3.2" height="8" rx="1.6" fill="#7a4a2c" />
+  </g>
+);
+
+/* What grows at the Pond's edge, just outside the squares so nothing covers a piece: cattails at two corners, swaying a little, and a pink lily floating by the bank. */
+const PondEdge = () => (
+  <svg className={styles.sceneEdge} viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g className={styles.sway} data-scenery>
+      <Cattail x={-2.5} y={8} height={14} lean={-10} />
+      <Cattail x={0.5} y={6} height={18} lean={-3} />
+      <Cattail x={3} y={5} height={12} lean={6} />
+    </g>
+    <g className={styles.sway} data-scenery style={{ animationDelay: '-2s' }}>
+      <Cattail x={100} y={104} height={15} lean={4} />
+      <Cattail x={103} y={103} height={19} lean={9} />
+    </g>
+    <g transform="translate(97 4)">
+      {[-50, -25, 0, 25, 50].map((turn) => (
+        <path
+          key={turn}
+          d="M0 0q-2.6-3.4 0-7 2.6 3.6 0 7z"
+          transform={`rotate(${turn})`}
+          fill={turn % 2 ? '#f8cdd5' : '#f3a9bd'}
+          stroke="#c9728c"
+          strokeWidth="0.4"
+        />
+      ))}
+      <circle r="1.3" fill="#f0c14e" />
+    </g>
+  </svg>
+);
+
 /**
  * Each scene: the board's colors (CSS variables set on the board) and its pictures. The mirror colors are picked to
  * stand out on that scene's tiles (never green mirrors on green lily pads).
@@ -335,6 +400,8 @@ export const FLAT_SCENES = {
     Wall: Logs,
     Lamp: Lantern,
     Perch: Lily,
+    Backdrop: PondWater,
+    Edge: PondEdge,
   },
   castle: {
     vars: {

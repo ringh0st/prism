@@ -106,6 +106,9 @@ export default function Board({
     );
     return { coats, joins };
   }, [flat, level]);
+  // Night levels keep their dark floor: the scene's colors, water and edge step aside, its pictures stay.
+  const isDressed = Boolean(flat) && mood !== 'night';
+  const { Backdrop: SceneBackdrop, Edge: SceneEdge } = FLAT_SCENES[flat] ?? {};
   const tileAtCell = useMemo(() => {
     const map = Array.from({ length: width * height }, () => -1);
     tiles.forEach((tile, i) => {
@@ -206,9 +209,11 @@ export default function Board({
       className={`${styles.board} ${is3d ? styles.board3d : ''} ${flat ? styles.scene : ''} ${styles[mood] ?? ''} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''} ${
         darkness && isEclipseMove(level, darkMoves) ? styles.eclipse : ''
       }`}
-      style={{ '--cols': width, '--rows': height, ...(flat && mood !== 'night' ? FLAT_SCENES[flat].vars : null) }}
+      style={{ '--cols': width, '--rows': height, ...(isDressed ? FLAT_SCENES[flat].vars : null) }}
+      data-scene={isDressed ? flat : undefined}
     >
       <TileDefs />
+      {isDressed && SceneBackdrop && <SceneBackdrop />}
       {is3d && (
         <Suspense fallback={null}>
           <BoardFiber
@@ -356,6 +361,7 @@ export default function Board({
           </span>
         </div>
       )}
+      {isDressed && SceneEdge && <SceneEdge />}
       {ghostSegments && !is3d && <LensPath width={width} height={height} segments={ghostSegments} />}
     </div>
   );
