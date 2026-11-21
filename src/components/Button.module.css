@@ -77,15 +77,34 @@
     0 2px 0 var(--ledge),
     0 3px 4px -2px hsl(var(--shadow-hue) / 0.35);
   transform: translateY(calc(var(--edge) - 2px));
+  /* Pressed: it also lights up, like the reference */
+  filter: brightness(1.12) saturate(1.1);
   transition-duration: 70ms;
   transition-timing-function: ease-out;
 }
 
+/* Each state reads at a glance (owner's reference: default, hovered, pressed, focused, disabled). */
+
+/* Focused (keyboard only, see inputMode.js): a ring in the button's own color, a little way off its edge */
+.button:focus-visible {
+  outline: 3px solid var(--ledge);
+  outline-offset: 4px;
+}
+
+/* Disabled: plain grey, no gloss, no breathing, so it clearly can't be pressed right now */
 .button:disabled,
 .button[aria-disabled='true'] {
+  --fill: #a9a39b;
+  --fill-top: #bdb7af;
+  --ledge: #857f77;
+  --label: #f4efe8;
   cursor: not-allowed;
-  opacity: 0.5;
-  filter: saturate(0.6);
+  text-shadow: none;
+}
+
+.button:disabled::before,
+.button[aria-disabled='true']::before {
+  opacity: 0.35;
 }
 
 .primary {
