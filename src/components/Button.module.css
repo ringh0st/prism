@@ -1,61 +1,39 @@
 /*
- * Buttons you want to press (owner: "the buttons still don't give the fun feel of a button"). Like a chunky game
- * button: a bright face that is lighter at the top, a glossy band across its upper half, a thick darker edge
- * underneath, and bold lettering. A press pushes the face down onto its edge and it springs back up with a little
- * bounce. No outlines or glows.
+ * Buttons, 2026 style (owner: the 3D buttons looked "too 3D, in a not so nice way"; go back to modern and flat, like
+ * her reference picture of button states): a smooth pill with a soft gradient running across it, a white label and a
+ * soft shadow in its own color. No borders, ledges, gloss or bounce. Each state reads at a glance:
+ *   default · hovered (a little lighter) · pressed (lighter still, and it sinks slightly) ·
+ *   focused (a double ring, keyboard only) · disabled (plain grey).
  */
 .button {
-  --fill: var(--action-bottom);
-  --fill-top: var(--action-top);
-  --ledge: var(--action-ledge);
-  --label: var(--action-label);
-  --edge: 7px;
+  --from: #3c9068;
+  --to: #3a9b8c;
+  --label: #ffffff;
+  --glow: 60 150 115;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 54px;
-  margin-bottom: var(--edge);
+  min-height: 52px;
   padding: 0 var(--space-5);
   border: 0;
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 19px;
+  font-weight: 600;
+  font-size: 18px;
   line-height: 1;
-  letter-spacing: 0.01em;
   color: var(--label);
   text-decoration: none;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
-  background: linear-gradient(180deg, var(--fill-top), var(--fill));
-  box-shadow:
-    inset 0 -3px 0 rgba(0, 0, 0, 0.1),
-    0 var(--edge) 0 var(--ledge),
-    0 calc(var(--edge) + 5px) 12px -3px hsl(var(--shadow-hue) / 0.35);
+  background: linear-gradient(100deg, var(--from), var(--to));
+  box-shadow: 0 8px 18px -8px rgb(var(--glow) / 0.65);
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  /* Coming back up is springy; going down (below) is quick */
   transition:
-    transform 320ms var(--ease-pop),
-    box-shadow 320ms var(--ease-pop),
-    filter 160ms ease;
-}
-
-/* The glossy band across the top half */
-.button::before {
-  content: '';
-  position: absolute;
-  inset: 4px 6px auto;
-  height: 44%;
-  border-radius: 15px 15px 12px 12px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.08));
-  pointer-events: none;
-}
-
-.button > * {
-  position: relative;
+    transform 220ms var(--ease-out),
+    filter 200ms ease,
+    box-shadow 220ms ease;
 }
 
 .button > span {
@@ -66,152 +44,99 @@
 
 @media (hover: hover) {
   .button:hover:not(:disabled) {
-    filter: brightness(1.05);
-    transform: translateY(-1px);
+    filter: brightness(1.08);
   }
 }
 
 .button:active:not(:disabled) {
+  filter: brightness(1.2) saturate(1.05);
+  box-shadow: 0 3px 8px -4px rgb(var(--glow) / 0.6);
+  transform: scale(0.97);
+  transition-duration: 90ms;
+}
+
+/* Focused (keyboard only, see inputMode.js): a ring of the page's color, then one of the button's */
+:global(html:not([data-input='pointer'])) .button:focus-visible {
+  outline: none;
   box-shadow:
-    inset 0 -3px 0 rgba(0, 0, 0, 0.1),
-    0 2px 0 var(--ledge),
-    0 3px 4px -2px hsl(var(--shadow-hue) / 0.35);
-  transform: translateY(calc(var(--edge) - 2px));
-  /* Pressed: it also lights up, like the reference */
-  filter: brightness(1.12) saturate(1.1);
-  transition-duration: 70ms;
-  transition-timing-function: ease-out;
+    0 0 0 3px var(--surface-page),
+    0 0 0 6px var(--from);
 }
 
-/* Each state reads at a glance (owner's reference: default, hovered, pressed, focused, disabled). */
-
-/* Focused (keyboard only, see inputMode.js): a ring in the button's own color, a little way off its edge */
-.button:focus-visible {
-  outline: 3px solid var(--ledge);
-  outline-offset: 4px;
-}
-
-/* Disabled: plain grey, no gloss, no breathing, so it clearly can't be pressed right now */
 .button:disabled,
 .button[aria-disabled='true'] {
-  --fill: #a9a39b;
-  --fill-top: #bdb7af;
-  --ledge: #857f77;
-  --label: #f4efe8;
+  --from: #8f8a85;
+  --to: #9a8a8a;
+  --label: #f6f1ea;
   cursor: not-allowed;
-  text-shadow: none;
-}
-
-.button:disabled::before,
-.button[aria-disabled='true']::before {
-  opacity: 0.35;
+  box-shadow: none;
 }
 
 .primary {
-  /* sage, see defaults */
+  /* deep sage to teal-green, see defaults */
 }
 
 /* Success / "go" moments */
 .go {
-  --fill: var(--calm-bottom);
-  --fill-top: var(--calm-top);
-  --ledge: var(--calm-ledge);
-  --label: var(--calm-label);
+  --from: #2f9a8a;
+  --to: #3aa5b0;
+  --glow: 47 154 138;
 }
 
-/* Rewards and currency */
+/* Rewards and currency: honey, with a dark label (white can't be read on yellow) */
 .gold {
-  --fill: var(--reward-bottom);
-  --fill-top: var(--reward-top);
-  --ledge: var(--reward-ledge);
-  --label: var(--reward-label);
+  --from: #f5cf62;
+  --to: #f0b24a;
+  --label: #3b2a00;
+  --glow: 220 160 50;
 }
 
-/* Quiet actions: a white keycap with a clear edge, so it still looks like a button on a cream card */
+/* Quiet actions: a soft tonal pill that sits on cards and sheets */
 .secondary {
-  --fill: color-mix(in srgb, var(--surface-tonal) 55%, var(--surface-raised));
-  --fill-top: var(--surface-raised);
-  --ledge: color-mix(in srgb, var(--surface-tonal) 72%, var(--text-strong));
+  --from: var(--surface-tonal);
+  --to: var(--surface-tonal);
   --label: var(--text-strong);
-  --edge: 5px;
-  text-shadow: none;
-}
-
-.ghost {
-  --fill: transparent;
-  --fill-top: transparent;
-  --label: var(--text-strong);
-  --edge: 0px;
-  text-shadow: none;
   box-shadow: none;
 }
 
-.ghost::before {
-  display: none;
+.secondary:active:not(:disabled) {
+  box-shadow: none;
+  filter: brightness(0.96);
+}
+
+.ghost {
+  --from: transparent;
+  --to: transparent;
+  --label: var(--text-strong);
+  box-shadow: none;
 }
 
 .ghost:active:not(:disabled) {
   box-shadow: none;
   background: var(--surface-tonal);
-  transform: scale(0.96);
 }
 
 .sm {
-  --edge: 5px;
-  min-height: 42px;
+  min-height: 40px;
   padding: 0 var(--space-4);
-  border-radius: 16px;
   font-size: 16px;
 }
 
-.sm::before {
-  inset: 3px 5px auto;
-  border-radius: 12px 12px 9px 9px;
-}
-
-/* The one big thing to press on a screen: taller, bolder, and it breathes a little so the eye finds it */
 .lg {
-  --edge: 9px;
-  min-height: 66px;
+  min-height: 62px;
   padding: 0 var(--space-6);
-  border-radius: 24px;
-  font-size: 24px;
-}
-
-.lg::before {
-  inset: 5px 8px auto;
-  border-radius: 18px 18px 14px 14px;
-}
-
-.lg:not(.secondary):not(.ghost):not(:disabled) {
-  animation: breathe 2.6s ease-in-out infinite;
-}
-
-.lg:active {
-  animation: none;
-}
-
-@keyframes breathe {
-  50% {
-    transform: scale(1.035);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .lg:not(.secondary):not(.ghost):not(:disabled) {
-    animation: none;
-  }
+  font-size: 22px;
 }
 
 .iconOnly {
-  width: 54px;
+  width: 52px;
   padding: 0;
 }
 
 .iconOnly.sm {
-  width: 42px;
+  width: 40px;
 }
 
 .iconOnly.lg {
-  width: 66px;
+  width: 62px;
 }

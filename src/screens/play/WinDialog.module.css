@@ -140,9 +140,8 @@
 }
 
 .actions .toMap {
-  --fill: color-mix(in srgb, var(--color-sage) 34%, var(--surface-raised));
-  --fill-top: color-mix(in srgb, var(--color-sage) 16%, var(--surface-raised));
-  --ledge: color-mix(in srgb, var(--color-sage) 60%, var(--text-strong));
+  --from: color-mix(in srgb, var(--color-sage) 26%, var(--surface-raised));
+  --to: color-mix(in srgb, var(--color-mint) 26%, var(--surface-raised));
 }
 
 .diamond {
