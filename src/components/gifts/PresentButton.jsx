@@ -36,6 +36,9 @@ export default function PresentButton() {
             <span className={styles.fill} style={{ width: `${(have / need) * 100}%` }} />
           </span>
         )}
+        <span className={styles.caption} aria-hidden="true">
+          {t('map.extra.present')}
+        </span>
       </button>
       {isOpen && <PresentDialog onClose={() => setIsOpen(false)} />}
     </>

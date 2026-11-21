@@ -15,6 +15,17 @@
   box-shadow: var(--highlight), var(--shadow-lg);
 }
 
+/* Pages end cleanly at the bar: what scrolls under it fades into the page instead of peeking out around it */
+.fade {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 19;
+  height: calc(max(12px, env(safe-area-inset-bottom)) + 104px);
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, var(--surface-page) 46%);
+}
+
 .tab {
   display: grid;
   justify-items: center;

@@ -81,7 +81,9 @@ export default function DailyGift({ look = 'button', className = '' }) {
       {isReady && (
         <button type="button" className={`${styles.button} ${styles.ready} ${className}`} onClick={open} aria-label={t('gift.open', { n: day })}>
           <Icon name="gift" size={24} />
-          <span className={styles.dot} aria-hidden="true" />
+          <span className={styles.caption} aria-hidden="true">
+            {t('map.extra.gift')}
+          </span>
         </button>
       )}
       {dialog}

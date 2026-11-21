@@ -64,6 +64,12 @@ export const en = {
   'map.extra.event': 'Event',
   'map.extra.rush': 'Rush',
   'map.extra.missions': 'Today',
+  'map.extra.present': 'Present',
+  'map.extra.gift': 'Gift',
+  'map.extra.install': 'Get app',
+  'map.new.gift': 'New! A gift for you every day',
+  'map.new.daily': 'New! One special puzzle every day',
+  'map.new.ok': 'Got it!',
   'map.sign.stars.one': '{count} of {total} stars',
   'map.sign.stars.other': '{count} of {total} stars',
 

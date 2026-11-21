@@ -9,28 +9,98 @@
   top: 0;
   z-index: 15;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: var(--space-2);
   max-width: 560px;
   margin: 0 auto;
-  padding: max(10px, env(safe-area-inset-top)) var(--space-3) 18px;
+  padding: max(10px, env(safe-area-inset-top)) var(--space-3) 26px;
   /* A paper band that fades out at its lower edge, so content scrolling underneath melts away */
   background: var(--surface-page);
-  mask-image: linear-gradient(180deg, #000 78%, transparent);
-  -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent);
+  mask-image: linear-gradient(180deg, #000 80%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, #000 80%, transparent);
+}
+
+/* The wallet sits at the top end, as on every other screen; the things to do make a row under it */
+.hud > :first-child {
+  align-self: flex-end;
 }
 
 .hudStart {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-4);
+  /* Room for each button's name under it */
+  padding-bottom: 14px;
 }
 
-/* On a narrow phone the buttons and the wallet don't fit in one row: the wallet moves to its own row, at the end */
-.hudStart + * {
-  margin-inline-start: auto;
+.hudStart:empty {
+  display: none;
+}
+
+/* "New!": one line about the extra that just opened, until it's tapped away */
+.newNote {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  font: inherit;
+  font-weight: 600;
+  text-align: start;
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--color-honey) 30%, var(--surface-raised));
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  animation: newNoteIn 500ms var(--ease-pop) both;
+}
+
+.newNote > :nth-child(2) {
+  flex: 1;
+}
+
+.newIcon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+}
+
+.newOk {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--action-label);
+  background: var(--action-bottom);
+}
+
+@keyframes newNoteIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .newNote {
+    animation: none;
+  }
+}
+
+/* The road melts into the page under PLAY and the bottom bar */
+.groundFade {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 18;
+  /* Tall enough that the Pal's hello above PLAY stands on clear ground too */
+  height: calc(max(12px, env(safe-area-inset-bottom)) + 290px);
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, var(--surface-page) 38%);
 }
 
 /* The hot streak sits on the PLAY button's corner as a small flame badge */

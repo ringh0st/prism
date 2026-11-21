@@ -20,6 +20,8 @@ import PalPresent from '../../components/gifts/PalPresent.jsx';
 import { presentsWaiting } from '../../game/gifts.js';
 import PalHello from '../../components/pals/PalHello.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
+import { isExtraOpen } from '../../game/unlocks.js';
+import { useNewExtra } from '../../hooks/useNewExtra.js';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
 import { chestId } from '../../game/surprises.js';
@@ -102,9 +104,6 @@ function LockedWorld({ world, stars }) {
   );
 }
 
-/** Levels solved before the daily puzzle, gift and other extras show up on the map. */
-const EXTRAS_AFTER_LEVELS = 3;
-
 export default function MapScreen() {
   const { progress, claimChest } = usePlayer();
   const { worlds, levelRefsInWorld } = useLevels();
@@ -113,6 +112,7 @@ export default function MapScreen() {
   const stars = totalStars(progress);
   const solvedCount = Object.values(progress.levels).filter((entry) => entry.stars > 0).length;
   const { t } = useI18n();
+  const { newExtra, markSeen } = useNewExtra(solvedCount);
 
   const unlockedWorlds = worlds.filter((world) => stars >= world.starsToUnlock);
   const nextLockedWorld = worlds.find((world) => stars < world.starsToUnlock);
@@ -135,21 +135,26 @@ export default function MapScreen() {
   return (
     <div className={styles.page}>
       <header className={styles.hud}>
-        {/* Brand-new players see a calm map: the extras appear once they've solved a few levels. */}
-        <div className={styles.hudStart}>
-          {solvedCount >= EXTRAS_AFTER_LEVELS && (
-            <>
-              <DailyButton />
-              <MissionsButton />
-              <EventButton />
-              <RushButton />
-              <PresentButton />
-              <DailyGift />
-              <InstallButton />
-            </>
-          )}
-        </div>
         <CurrencyHud />
+        {/* Things to do now, each with its name. They open one at a time as the player goes (unlocks.js). */}
+        <div className={styles.hudStart}>
+          {isExtraOpen('gift', solvedCount) && <DailyGift />}
+          <PresentButton />
+          {isExtraOpen('daily', solvedCount) && <DailyButton />}
+          {isExtraOpen('missions', solvedCount) && <MissionsButton />}
+          <EventButton />
+          <RushButton />
+          {isExtraOpen('install', solvedCount) && <InstallButton />}
+        </div>
+        {newExtra && (
+          <button type="button" className={styles.newNote} onClick={() => markSeen(newExtra)}>
+            <span className={styles.newIcon} aria-hidden="true">
+              <Icon name={newExtra === 'gift' ? 'gift' : 'calendar'} size={18} />
+            </span>
+            <span>{t(`map.new.${newExtra}`)}</span>
+            <span className={styles.newOk}>{t('map.new.ok')}</span>
+          </button>
+        )}
       </header>
 
       <main className={styles.map}>
@@ -198,6 +203,8 @@ export default function MapScreen() {
         )}
       </main>
 
+      {/* The road fades out under PLAY and the bar, so nothing is half-covered by them. */}
+      <div className={styles.groundFade} aria-hidden="true" />
       {/* The partner Pal says hello once a day, or holds up a waiting present. */}
       {currentRef && <PalPresent />}
       {currentRef && presentsWaiting(progress) === 0 && <PalHello />}

@@ -39,6 +39,9 @@ export default function InstallButton() {
         <span className={styles.plus} aria-hidden="true">
           <Icon name="plus" size={12} strokeWidth={3.4} />
         </span>
+        <span className={styles.caption} aria-hidden="true">
+          {t('map.extra.install')}
+        </span>
       </button>
       {isOpen && <InstallDialog method={app.method} onInstall={app.install} onLater={later} onClose={() => setIsOpen(false)} />}
     </>

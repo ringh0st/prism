@@ -60,6 +60,12 @@ export const es = {
   'map.extra.event': 'Evento',
   'map.extra.rush': 'Carrera',
   'map.extra.missions': 'Hoy',
+  'map.extra.present': 'Sorpresa',
+  'map.extra.gift': 'Regalo',
+  'map.extra.install': 'App',
+  'map.new.gift': '¡Nuevo! Un regalo para ti cada día',
+  'map.new.daily': '¡Nuevo! Un puzle especial cada día',
+  'map.new.ok': '¡Entendido!',
   'map.sign.stars.one': '{count} de {total} estrellas',
   'map.sign.stars.other': '{count} de {total} estrellas',
 

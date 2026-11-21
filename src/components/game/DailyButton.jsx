@@ -22,7 +22,6 @@ export default function DailyButton() {
       <span className={`game-title ${styles.date}`} aria-hidden="true">
         {Number(today.slice(-2))}
       </span>
-      <span className={styles.dot} aria-hidden="true" />
       <span className={styles.caption} aria-hidden="true">
         {t('map.extra.daily')}
       </span>

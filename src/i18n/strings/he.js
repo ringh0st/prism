@@ -60,6 +60,12 @@ export const he = {
   'map.extra.event': 'אירוע',
   'map.extra.rush': 'מרתון',
   'map.extra.missions': 'היום',
+  'map.extra.present': 'הפתעה',
+  'map.extra.gift': 'מתנה',
+  'map.extra.install': 'אפליקציה',
+  'map.new.gift': 'חדש! מתנה בשבילך בכל יום',
+  'map.new.daily': 'חדש! חידה מיוחדת בכל יום',
+  'map.new.ok': 'הבנתי!',
   'map.sign.stars.one': '{count} מתוך {total} כוכבים',
   'map.sign.stars.other': '{count} מתוך {total} כוכבים',
 

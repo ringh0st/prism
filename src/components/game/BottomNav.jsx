@@ -20,21 +20,25 @@ const TABS = [
 export default function BottomNav({ active }) {
   const { t } = useI18n();
   return (
-    <nav className={styles.nav} aria-label={t('nav.main')}>
-      {TABS.map((tab) => (
-        <a
-          key={tab.route}
-          href={tab.href}
-          className={`${styles.tab} ${tab.isMain ? styles.main : ''} ${active === tab.route ? styles.active : ''}`}
-          aria-current={active === tab.route ? 'page' : undefined}
-          onClick={() => active !== tab.route && sfx.tab()}
-        >
-          <span className={styles.icon}>
-            <Icon name={tab.icon} size={tab.isMain ? 27 : 24} strokeWidth={2.6} />
-          </span>
-          <span className={styles.label}>{t(tab.label)}</span>
-        </a>
-      ))}
-    </nav>
+    <>
+      {/* Pages end cleanly at the bar: what scrolls under it fades into the page. */}
+      <div className={styles.fade} aria-hidden="true" />
+      <nav className={styles.nav} aria-label={t('nav.main')}>
+        {TABS.map((tab) => (
+          <a
+            key={tab.route}
+            href={tab.href}
+            className={`${styles.tab} ${tab.isMain ? styles.main : ''} ${active === tab.route ? styles.active : ''}`}
+            aria-current={active === tab.route ? 'page' : undefined}
+            onClick={() => active !== tab.route && sfx.tab()}
+          >
+            <span className={styles.icon}>
+              <Icon name={tab.icon} size={tab.isMain ? 27 : 24} strokeWidth={2.6} />
+            </span>
+            <span className={styles.label}>{t(tab.label)}</span>
+          </a>
+        ))}
+      </nav>
+    </>
   );
 }
