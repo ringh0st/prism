@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useThemedBoard } from '../../hooks/useThemedBoard.js';
-import { areFlatScenesOn, boardThemeFor, lumisOf } from '../../game/boardThemes.js';
+import { boardThemeFor, lumisOf } from '../../game/boardThemes.js';
 import Board from '../../components/board/Board.jsx';
 import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
@@ -868,7 +868,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
           mood={modifier}
           label={t('play.boardLabel', { name: levelName })}
           is3d={isThemed}
-          scene={!isThemed && areFlatScenesOn() ? boardThemeFor(level) : null}
+          scene={boardThemeFor(level)}
         />
       </div>
 
@@ -1058,11 +1058,10 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
   );
 }
 
-/** A level; on the themed board and the flat scenes every line and icon talks about saving Lumis instead of lighting gems. */
+/** A level. Its targets are Lumi's family (on the flat scenes and in the 3D rooms), so every line and icon talks about saving Lumis, not lighting gems. */
 export default function PlayScreen(props) {
-  const isThemed = useThemedBoard();
   return (
-    <RescueWording isOn={isThemed || areFlatScenesOn()}>
+    <RescueWording isOn>
       <PlayScreenBody {...props} />
     </RescueWording>
   );

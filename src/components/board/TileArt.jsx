@@ -99,7 +99,7 @@ function Mirror({ turns, isSplitter, isLocked, link, oneSided }) {
           height="16"
           rx="8"
           fill={isSplitter ? 'url(#tile-splitter)' : 'url(#tile-mirror)'}
-          stroke={isSplitter ? '#17988c' : 'none'}
+          stroke={isSplitter ? '#17988c' : 'var(--mirror-edge, none)'}
           strokeWidth="2.5"
         />
         {oneSided !== undefined && (

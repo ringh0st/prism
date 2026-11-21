@@ -24,7 +24,7 @@ export const RECIPES = {
   tiny: { name: 'Tiny but tricky', goals: ['A little board packed with mirrors.', 'Small board, big think!', 'Every mirror counts here.'] },
   wallMaze: {
     name: 'Wall maze',
-    goals: ['Walls everywhere! Find the way through.', 'Sneak the light past the walls!', 'A maze of bricks. Find the gap!'],
+    goals: ['Walls everywhere! Find the way through.', 'Sneak the light past the walls!', 'A maze of walls. Find the gap!'],
   },
   gemShower: { name: 'Gem shower', goals: ['Split the light to reach every gem.', 'One beam, many gems. Split it!', 'Share the light around!'] },
   rainbow: { name: 'Rainbow', goals: ['Every gem wants its own color.', 'Paint the light to match each gem!', 'Colors first, then aim!'] },

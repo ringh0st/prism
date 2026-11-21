@@ -355,7 +355,7 @@ export const es = {
   'recipe.wallMaze.goals': [
     '¡Paredes por todas partes! Busca el camino.',
     '¡Pasa la luz entre las paredes!',
-    'Un laberinto de ladrillos. ¡Busca el hueco!',
+    'Un laberinto de paredes. ¡Busca el hueco!',
   ],
   'recipe.gemShower.name': 'Lluvia de gemas',
   'recipe.gemShower.goals': ['Divide la luz para llegar a todas las gemas.', 'Un rayo, muchas gemas. ¡Divídelo!', '¡Reparte la luz!'],

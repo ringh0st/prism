@@ -17,15 +17,13 @@ import { startAutoUpdate } from './lib/autoUpdate.js';
 import { isNativeApp } from './lib/platform.js';
 import { listenForInstallPrompt } from './lib/installApp.js';
 import { applyCheckoutReturn } from './lib/checkoutReturn.js';
-import { setFlatScenesPreview, setPreviewTheme } from './game/boardThemes.js';
+import { setPreviewTheme } from './game/boardThemes.js';
 
 // Catch the browser's install offer early, for the Home Screen helper.
 listenForInstallPrompt();
 // Back from a payment page: open the store's thank-you screen.
-// The owner's preview switch for themes still being designed: add ?theme=forest (or beach) to the address.
+// The owner's switch to see one place on every level: add ?theme=forest (or pond, castle…) to the address.
 setPreviewTheme(new URLSearchParams(window.location.search).get('theme'));
-// The owner's preview of the flat board's scenes: add ?look=scenes to the address.
-setFlatScenesPreview(new URLSearchParams(window.location.search).get('look') === 'scenes');
 applyCheckoutReturn();
 
 createRoot(document.getElementById('root')).render(

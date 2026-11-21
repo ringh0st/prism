@@ -5,6 +5,7 @@
  * All art is drawn in a tile's viewBox (0 0 100 100).
  */
 import { beamColorVar } from '../GemShape.jsx';
+import styles from './Board.module.css';
 
 const INK = '#3b1a08';
 /** A tile's art is drawn a little smaller than its cell: a wall reaches this far to touch the wall on the next cell. */
@@ -188,14 +189,16 @@ function BankerLamp({ color }) {
 
 const Flame = ({ color, x = 50, y = 50, size = 1 }) => (
   <g transform={`translate(${x} ${y}) scale(${size})`}>
-    <path
-      d="M0-20c9 9 13 15 13 22a13 13 0 0 1-26 0c0-5 3-9 7-13 0 5 2 7 4 7 1-5 0-10 2-16z"
-      fill={beamColorVar(color)}
-      stroke={INK}
-      strokeWidth="2"
-      strokeLinejoin="round"
-    />
-    <path d="M0-4c4 4 5 6 5 9a5 5 0 0 1-10 0c0-3 2-6 5-9z" fill="#fff" opacity="0.75" />
+    <g className={styles.flame} data-scenery>
+      <path
+        d="M0-20c9 9 13 15 13 22a13 13 0 0 1-26 0c0-5 3-9 7-13 0 5 2 7 4 7 1-5 0-10 2-16z"
+        fill={beamColorVar(color)}
+        stroke={INK}
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path d="M0-4c4 4 5 6 5 9a5 5 0 0 1-10 0c0-3 2-6 5-9z" fill="#fff" opacity="0.75" />
+    </g>
   </g>
 );
 
@@ -306,9 +309,11 @@ export const FLAT_SCENES = {
       '--surface-board': '#7a4e36',
       '--surface-cell': '#efd3a6',
       '--surface-cell-alt': '#e3bf8b',
+      '--surface-locked': '#c9a57a',
       '--plate-round': '18%',
       '--mirror-top': '#7fd0b0',
       '--mirror-bottom': '#2f8f6d',
+      '--mirror-edge': '#1f5f49',
       '--pivot-fill': 'rgba(47,143,109,0.22)',
     },
     Wall: Bookcase,
@@ -320,9 +325,11 @@ export const FLAT_SCENES = {
       '--surface-board': '#5aa9a0',
       '--surface-cell': '#a9d98f',
       '--surface-cell-alt': '#97cc7f',
+      '--surface-locked': '#d7e6c8',
       '--plate-round': '50%',
       '--mirror-top': '#ffffff',
       '--mirror-bottom': '#c9d3dc',
+      '--mirror-edge': '#2f5a4a',
       '--pivot-fill': 'rgba(255,255,255,0.4)',
     },
     Wall: Logs,
@@ -334,9 +341,11 @@ export const FLAT_SCENES = {
       '--surface-board': '#5d5853',
       '--surface-cell': '#d9d3ca',
       '--surface-cell-alt': '#c6bfb4',
+      '--surface-locked': '#a8a096',
       '--plate-round': '14%',
       '--mirror-top': '#f58f80',
       '--mirror-bottom': '#c9483f',
+      '--mirror-edge': '#7a2a25',
       '--pivot-fill': 'rgba(201,72,63,0.18)',
     },
     Wall: CastleWall,
@@ -348,9 +357,11 @@ export const FLAT_SCENES = {
       '--surface-board': '#58b5ad',
       '--surface-cell': '#f6e4bb',
       '--surface-cell-alt': '#eed6a2',
+      '--surface-locked': '#e3c98f',
       '--plate-round': '26%',
       '--mirror-top': '#6fd6c4',
       '--mirror-bottom': '#23877c',
+      '--mirror-edge': '#17574f',
       '--pivot-fill': 'rgba(35,135,124,0.2)',
     },
     Wall: BeachHut,
@@ -362,9 +373,11 @@ export const FLAT_SCENES = {
       '--surface-board': '#4a7d55',
       '--surface-cell': '#bfe0a2',
       '--surface-cell-alt': '#aad38c',
+      '--surface-locked': '#e3dcc6',
       '--plate-round': '30%',
       '--mirror-top': '#fffdf6',
       '--mirror-bottom': '#dcd0b8',
+      '--mirror-edge': '#2f5a3a',
       '--pivot-fill': 'rgba(255,253,246,0.45)',
     },
     Wall: Trees,

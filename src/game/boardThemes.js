@@ -14,13 +14,6 @@ export function setPreviewTheme(theme) {
   previewTheme = [...THEMES_IN_PLAY, ...THEMES_IN_PREVIEW].includes(theme) ? theme : null;
 }
 
-let flatScenesOn = false;
-/** The owner's preview switch for the flat board's scenes (flatScenes.jsx), until they're shown to everyone. */
-export function setFlatScenesPreview(isOn) {
-  flatScenesOn = Boolean(isOn);
-}
-export const areFlatScenesOn = () => flatScenesOn;
-
 const turns = [];
 /** The theme of the n-th themed level (1-based): a seeded pick that never repeats the level before it. */
 function themeInTurn(number) {

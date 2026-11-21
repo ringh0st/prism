@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Button from '../../components/Button.jsx';
 import WelcomeTour from '../welcome/WelcomeTour.jsx';
-import { useI18n } from '../../i18n/I18nContext.jsx';
+import { RescueWording, useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './HowToPlayCard.module.css';
 
 /** "How to play" on the Me screen: one row that opens the picture tour (tiny boards that play themselves). */
@@ -14,7 +14,12 @@ export default function HowToPlayCard({ className = '' }) {
       <Button variant="secondary" icon="play" onClick={() => setIsOpen(true)}>
         {t('howTo.show')}
       </Button>
-      {isOpen && <WelcomeTour onDone={() => setIsOpen(false)} />}
+      {isOpen && (
+        // The tour's boards are a flat scene too, so it talks about Lumis like the levels do.
+        <RescueWording isOn>
+          <WelcomeTour onDone={() => setIsOpen(false)} />
+        </RescueWording>
+      )}
     </section>
   );
 }

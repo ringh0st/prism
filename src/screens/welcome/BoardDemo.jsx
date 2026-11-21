@@ -38,6 +38,7 @@ export default function BoardDemo({ level, frames }) {
         trace={trace}
         onActivate={() => {}}
         isLocked
+        scene="library"
         coach={tileToTurn >= 0 && !trace.isSolved ? { tile: tileToTurn, labels: false } : null}
       />
     </div>

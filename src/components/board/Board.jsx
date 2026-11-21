@@ -203,10 +203,10 @@ export default function Board({
     <div
       ref={boardRef}
       dir="ltr"
-      className={`${styles.board} ${is3d ? styles.board3d : ''} ${styles[mood] ?? ''} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''} ${
+      className={`${styles.board} ${is3d ? styles.board3d : ''} ${flat ? styles.scene : ''} ${styles[mood] ?? ''} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''} ${
         darkness && isEclipseMove(level, darkMoves) ? styles.eclipse : ''
       }`}
-      style={{ '--cols': width, '--rows': height, ...(flat ? FLAT_SCENES[flat].vars : null) }}
+      style={{ '--cols': width, '--rows': height, ...(flat && mood !== 'night' ? FLAT_SCENES[flat].vars : null) }}
     >
       <TileDefs />
       {is3d && (
