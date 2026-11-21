@@ -123,13 +123,15 @@
   --shadow-inset: inset 0 2px 4px hsl(var(--shadow-hue) / 0.1);
   --shadow-button: 0 1px 2px hsl(var(--shadow-hue) / 0.12), 0 6px 14px -6px hsl(var(--shadow-hue) / 0.3);
 
-  --ease-pop: cubic-bezier(0.3, 1.6, 0.5, 1);
-  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  /* Motion is smooth, not snappy (owner: things moved "like moving pictures"): a gentle overshoot at most, and
+     enough time to see a thing travel. */
+  --ease-pop: cubic-bezier(0.22, 1.25, 0.36, 1);
+  --ease-spring: cubic-bezier(0.25, 1.15, 0.4, 1);
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   /* A real spring: overshoots, then settles with a little wobble (falls back to --ease-pop) */
   --ease-wobble: var(--ease-pop);
-  --duration-fast: 140ms;
-  --duration-base: 260ms;
+  --duration-fast: 180ms;
+  --duration-base: 340ms;
 
   color-scheme: light;
 }

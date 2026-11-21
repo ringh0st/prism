@@ -108,6 +108,23 @@
   overflow: visible;
 }
 
+/* A new stretch of light fades in (a turned mirror doesn't make the beam jump) */
+.beamSegment {
+  animation: beamIn 300ms ease-out both;
+}
+
+@keyframes beamIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beamSegment {
+    animation: none;
+  }
+}
+
 .beamCore {
   stroke: #fff;
   opacity: 0.9;
@@ -948,17 +965,26 @@
   border-radius: 0;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' transform='translate%280 5%29' fill='%233f8f6a'/%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' fill='%239bd585'/%3E%3Cpath d='M50 50 20 26M50 50 12 54M50 50 28 82M50 50 56 92M50 50 82 80M50 50 46 8' stroke='%23d6f3c2' stroke-width='2.2' stroke-linecap='round' opacity='.55' fill='none'/%3E%3Cpath d='M18 34A36 36 0 0 1 60 12' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' opacity='.35' fill='none'/%3E%3C/svg%3E") center / contain no-repeat;
   box-shadow: none;
-  filter: drop-shadow(0 3px 3px rgba(20, 70, 66, 0.35));
-  transition: filter 350ms ease;
+  position: relative;
 }
 
 .board[data-scene='pond'] .plateAlt {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' transform='translate%280 5%29' fill='%233a8763'/%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' fill='%2386c873'/%3E%3Cpath d='M50 50 20 26M50 50 12 54M50 50 28 82M50 50 56 92M50 50 82 80M50 50 46 8' stroke='%23c6ecb0' stroke-width='2.2' stroke-linecap='round' opacity='.55' fill='none'/%3E%3Cpath d='M18 34A36 36 0 0 1 60 12' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' opacity='.35' fill='none'/%3E%3C/svg%3E");
 }
 
-.board[data-scene='pond'] .plateLit {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' transform='translate%280 5%29' fill='%23b99a2c'/%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' fill='%23f1e06a'/%3E%3Cpath d='M50 50 20 26M50 50 12 54M50 50 28 82M50 50 56 92M50 50 82 80M50 50 46 8' stroke='%23fff7c4' stroke-width='2.2' stroke-linecap='round' opacity='.55' fill='none'/%3E%3Cpath d='M18 34A36 36 0 0 1 60 12' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' opacity='.35' fill='none'/%3E%3C/svg%3E");
-  filter: drop-shadow(0 0 9px rgba(255, 213, 74, 0.95));
+.board[data-scene='pond'] .plate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' transform='translate%280 5%29' fill='%23b99a2c'/%3E%3Cpath d='M50 50 88.8 29.3A44 44 0 1 0 93.6 56.1Z' fill='%23f1e06a'/%3E%3Cpath d='M50 50 20 26M50 50 12 54M50 50 28 82M50 50 56 92M50 50 82 80M50 50 46 8' stroke='%23fff7c4' stroke-width='2.2' stroke-linecap='round' opacity='.55' fill='none'/%3E%3Cpath d='M18 34A36 36 0 0 1 60 12' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' opacity='.35' fill='none'/%3E%3C/svg%3E") center / contain no-repeat;
+  box-shadow: 0 0 14px 2px rgba(255, 213, 74, 0.7);
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.board[data-scene='pond'] .plateLit::after {
+  opacity: 1;
 }
 
 /* No two pads lie the same way */
@@ -1032,6 +1058,10 @@
   }
 }
 
+/*
+ * Light arriving on a scene's tile is a layer that fades in over it (and a soft glow), so the lit path flows on and
+ * off smoothly. No per-tile `filter`: dozens of filtered tiles made phones drop frames (owner: "nothing moves smooth").
+ */
 /* The Library: oak parquet on a red rug. Each tile is a little square of floorboards, every other one laid the other way. A tile under the light turns sunlit gold. */
 .board[data-scene='library'] {
   background: linear-gradient(160deg, #96433a, #7d2f2a);
@@ -1042,8 +1072,7 @@
   border-radius: 0;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='13' fill='%238a5a34'/%3E%3Crect x='3' y='3' width='94' height='90' rx='13' fill='%23e9c592'/%3E%3Crect x='3' y='33' width='94' height='30' fill='%23dfb57c'/%3E%3Cpath d='M3 33H97M3 63H97M64 3V33M30 63V93' stroke='%23a8763f' stroke-width='2.2' fill='none'/%3E%3Cpath d='M12 14q14-3 30 0M70 22q10 3 20 0M12 44q20 4 40 0M62 52q12-3 26 0M40 76q16-3 34 0M10 84q6 2 12 0' stroke='%23f6dcae' stroke-width='1.5' stroke-linecap='round' opacity='.7' fill='none'/%3E%3Ccircle cx='82' cy='78' r='2.6' fill='none' stroke='%23a8763f' stroke-width='1.2' opacity='.7'/%3E%3Cpath d='M14 7H86' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.4'/%3E%3C/svg%3E") center / contain no-repeat;
   box-shadow: none;
-  filter: drop-shadow(0 2px 2px rgba(60, 20, 14, 0.4));
-  transition: filter 350ms ease;
+  position: relative;
 }
 
 .board[data-scene='library'] .plateAlt {
@@ -1054,9 +1083,19 @@
   transform: rotate(90deg);
 }
 
-.board[data-scene='library'] .plateLit {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='13' fill='%23b8922e'/%3E%3Crect x='3' y='3' width='94' height='90' rx='13' fill='%23f6dd76'/%3E%3Crect x='3' y='33' width='94' height='30' fill='%23f0d05c'/%3E%3Cpath d='M3 33H97M3 63H97M64 3V33M30 63V93' stroke='%23c9a23a' stroke-width='2.2' fill='none'/%3E%3Cpath d='M12 14q14-3 30 0M70 22q10 3 20 0M12 44q20 4 40 0M62 52q12-3 26 0M40 76q16-3 34 0M10 84q6 2 12 0' stroke='%23fff3bd' stroke-width='1.5' stroke-linecap='round' opacity='.7' fill='none'/%3E%3Ccircle cx='82' cy='78' r='2.6' fill='none' stroke='%23c9a23a' stroke-width='1.2' opacity='.7'/%3E%3Cpath d='M14 7H86' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.4'/%3E%3C/svg%3E");
-  filter: drop-shadow(0 0 9px rgba(255, 213, 74, 0.9));
+.board[data-scene='library'] .plate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='13' fill='%23b8922e'/%3E%3Crect x='3' y='3' width='94' height='90' rx='13' fill='%23f6dd76'/%3E%3Crect x='3' y='33' width='94' height='30' fill='%23f0d05c'/%3E%3Cpath d='M3 33H97M3 63H97M64 3V33M30 63V93' stroke='%23c9a23a' stroke-width='2.2' fill='none'/%3E%3Cpath d='M12 14q14-3 30 0M70 22q10 3 20 0M12 44q20 4 40 0M62 52q12-3 26 0M40 76q16-3 34 0M10 84q6 2 12 0' stroke='%23fff3bd' stroke-width='1.5' stroke-linecap='round' opacity='.7' fill='none'/%3E%3Ccircle cx='82' cy='78' r='2.6' fill='none' stroke='%23c9a23a' stroke-width='1.2' opacity='.7'/%3E%3Cpath d='M14 7H86' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.4'/%3E%3C/svg%3E") center / contain no-repeat;
+  box-shadow: 0 0 14px 2px rgba(255, 213, 74, 0.7);
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.board[data-scene='library'] .plateLit::after {
+  opacity: 1;
 }
 
 /* The Castle: a paved courtyard on a green lawn. Each tile is a slab of fitted stones with a little moss in the corners. A tile under the light turns sunlit gold. */
@@ -1069,17 +1108,26 @@
   border-radius: 0;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='10' fill='%2377726b'/%3E%3Crect x='3' y='3' width='94' height='90' rx='10' fill='%23d5d0c8'/%3E%3Cpath d='M3 44Q30 40 52 46T97 42M36 3Q34 24 38 42M70 44Q66 70 72 93M26 45Q30 70 24 93' stroke='%238e8880' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3Cpath d='M56 16l8 6M14 66l6 8M82 66l-5 9' stroke='%238e8880' stroke-width='1.4' stroke-linecap='round' opacity='.6'/%3E%3Ccircle cx='12' cy='14' r='4' fill='%238fbf78' opacity='.75'/%3E%3Ccircle cx='18' cy='10' r='2.5' fill='%238fbf78' opacity='.75'/%3E%3Ccircle cx='88' cy='86' r='3.5' fill='%238fbf78' opacity='.6'/%3E%3Cpath d='M12 7H88' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.45'/%3E%3C/svg%3E") center / contain no-repeat;
   box-shadow: none;
-  filter: drop-shadow(0 2px 2px rgba(30, 60, 26, 0.4));
-  transition: filter 350ms ease;
+  position: relative;
 }
 
 .board[data-scene='castle'] .plateAlt {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='10' fill='%236d6862'/%3E%3Crect x='3' y='3' width='94' height='90' rx='10' fill='%23c6c0b6'/%3E%3Cpath d='M3 44Q30 40 52 46T97 42M36 3Q34 24 38 42M70 44Q66 70 72 93M26 45Q30 70 24 93' stroke='%23827c74' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3Cpath d='M56 16l8 6M14 66l6 8M82 66l-5 9' stroke='%23827c74' stroke-width='1.4' stroke-linecap='round' opacity='.6'/%3E%3Ccircle cx='12' cy='14' r='4' fill='%237fb56a' opacity='.75'/%3E%3Ccircle cx='18' cy='10' r='2.5' fill='%237fb56a' opacity='.75'/%3E%3Ccircle cx='88' cy='86' r='3.5' fill='%237fb56a' opacity='.6'/%3E%3Cpath d='M12 7H88' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.45'/%3E%3C/svg%3E");
 }
 
-.board[data-scene='castle'] .plateLit {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='10' fill='%23b3962f'/%3E%3Crect x='3' y='3' width='94' height='90' rx='10' fill='%23f3df8a'/%3E%3Cpath d='M3 44Q30 40 52 46T97 42M36 3Q34 24 38 42M70 44Q66 70 72 93M26 45Q30 70 24 93' stroke='%23c2a64a' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3Cpath d='M56 16l8 6M14 66l6 8M82 66l-5 9' stroke='%23c2a64a' stroke-width='1.4' stroke-linecap='round' opacity='.6'/%3E%3Ccircle cx='12' cy='14' r='4' fill='%23b7c765' opacity='.75'/%3E%3Ccircle cx='18' cy='10' r='2.5' fill='%23b7c765' opacity='.75'/%3E%3Ccircle cx='88' cy='86' r='3.5' fill='%23b7c765' opacity='.6'/%3E%3Cpath d='M12 7H88' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.45'/%3E%3C/svg%3E");
-  filter: drop-shadow(0 0 9px rgba(255, 213, 74, 0.9));
+.board[data-scene='castle'] .plate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 11%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='10' fill='%23b3962f'/%3E%3Crect x='3' y='3' width='94' height='90' rx='10' fill='%23f3df8a'/%3E%3Cpath d='M3 44Q30 40 52 46T97 42M36 3Q34 24 38 42M70 44Q66 70 72 93M26 45Q30 70 24 93' stroke='%23c2a64a' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3Cpath d='M56 16l8 6M14 66l6 8M82 66l-5 9' stroke='%23c2a64a' stroke-width='1.4' stroke-linecap='round' opacity='.6'/%3E%3Ccircle cx='12' cy='14' r='4' fill='%23b7c765' opacity='.75'/%3E%3Ccircle cx='18' cy='10' r='2.5' fill='%23b7c765' opacity='.75'/%3E%3Ccircle cx='88' cy='86' r='3.5' fill='%23b7c765' opacity='.6'/%3E%3Cpath d='M12 7H88' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.45'/%3E%3C/svg%3E") center / contain no-repeat;
+  box-shadow: 0 0 14px 2px rgba(255, 213, 74, 0.7);
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.board[data-scene='castle'] .plateLit::after {
+  opacity: 1;
 }
 
 /* The Beach: little sandbars in a teal sea, the sand rippled by the tide. A tile under the light turns sunlit gold. */
@@ -1092,17 +1140,26 @@
   border-radius: 0;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='24' fill='%23c9a86a'/%3E%3Crect x='3' y='3' width='94' height='90' rx='24' fill='%23f7e6bd'/%3E%3Cpath d='M14 30q9-6 18 0t18 0 18 0 18 0M14 52q9-6 18 0t18 0 18 0 18 0M14 74q9-6 18 0t18 0 18 0 18 0' stroke='%23e6cd96' stroke-width='2.4' stroke-linecap='round' fill='none' opacity='.75'/%3E%3Ccircle cx='24' cy='18' r='1.6' fill='%23c9a86a'/%3E%3Ccircle cx='72' cy='40' r='1.6' fill='%23c9a86a'/%3E%3Ccircle cx='40' cy='64' r='1.6' fill='%23c9a86a'/%3E%3Ccircle cx='80' cy='84' r='1.6' fill='%23c9a86a'/%3E%3Cpath d='M22 7H78' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.5'/%3E%3C/svg%3E") center / contain no-repeat;
   box-shadow: none;
-  filter: drop-shadow(0 2px 2px rgba(20, 80, 86, 0.35));
-  transition: filter 350ms ease;
+  position: relative;
 }
 
 .board[data-scene='beach'] .plateAlt {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='24' fill='%23c09d5e'/%3E%3Crect x='3' y='3' width='94' height='90' rx='24' fill='%23f1dba8'/%3E%3Cpath d='M14 30q9-6 18 0t18 0 18 0 18 0M14 52q9-6 18 0t18 0 18 0 18 0M14 74q9-6 18 0t18 0 18 0 18 0' stroke='%23dcc188' stroke-width='2.4' stroke-linecap='round' fill='none' opacity='.75'/%3E%3Ccircle cx='24' cy='18' r='1.6' fill='%23bd9a58'/%3E%3Ccircle cx='72' cy='40' r='1.6' fill='%23bd9a58'/%3E%3Ccircle cx='40' cy='64' r='1.6' fill='%23bd9a58'/%3E%3Ccircle cx='80' cy='84' r='1.6' fill='%23bd9a58'/%3E%3Cpath d='M22 7H78' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.5'/%3E%3C/svg%3E");
 }
 
-.board[data-scene='beach'] .plateLit {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='24' fill='%23c9a02a'/%3E%3Crect x='3' y='3' width='94' height='90' rx='24' fill='%23ffe873'/%3E%3Cpath d='M14 30q9-6 18 0t18 0 18 0 18 0M14 52q9-6 18 0t18 0 18 0 18 0M14 74q9-6 18 0t18 0 18 0 18 0' stroke='%23f2cf4a' stroke-width='2.4' stroke-linecap='round' fill='none' opacity='.75'/%3E%3Ccircle cx='24' cy='18' r='1.6' fill='%23c9a02a'/%3E%3Ccircle cx='72' cy='40' r='1.6' fill='%23c9a02a'/%3E%3Ccircle cx='40' cy='64' r='1.6' fill='%23c9a02a'/%3E%3Ccircle cx='80' cy='84' r='1.6' fill='%23c9a02a'/%3E%3Cpath d='M22 7H78' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.5'/%3E%3C/svg%3E");
-  filter: drop-shadow(0 0 9px rgba(255, 213, 74, 0.9));
+.board[data-scene='beach'] .plate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 25%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='24' fill='%23c9a02a'/%3E%3Crect x='3' y='3' width='94' height='90' rx='24' fill='%23ffe873'/%3E%3Cpath d='M14 30q9-6 18 0t18 0 18 0 18 0M14 52q9-6 18 0t18 0 18 0 18 0M14 74q9-6 18 0t18 0 18 0 18 0' stroke='%23f2cf4a' stroke-width='2.4' stroke-linecap='round' fill='none' opacity='.75'/%3E%3Ccircle cx='24' cy='18' r='1.6' fill='%23c9a02a'/%3E%3Ccircle cx='72' cy='40' r='1.6' fill='%23c9a02a'/%3E%3Ccircle cx='40' cy='64' r='1.6' fill='%23c9a02a'/%3E%3Ccircle cx='80' cy='84' r='1.6' fill='%23c9a02a'/%3E%3Cpath d='M22 7H78' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  box-shadow: 0 0 14px 2px rgba(255, 213, 74, 0.7);
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.board[data-scene='beach'] .plateLit::after {
+  opacity: 1;
 }
 
 /* The Forest: mossy ground in a clearing, with tufts of grass and fallen leaves. A tile under the light turns sunlit gold. */
@@ -1115,17 +1172,26 @@
   border-radius: 0;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='20' fill='%234f8a52'/%3E%3Crect x='3' y='3' width='94' height='90' rx='20' fill='%23b4dd97'/%3E%3Cpath d='M16 30l3-8 3 8M70 22l3-8 3 8M40 56l3-8 3 8M78 70l3-8 3 8M20 80l3-8 3 8' stroke='%236fae62' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cellipse cx='52' cy='24' rx='6' ry='3' transform='rotate%28-30 52 24%29' fill='%238fc978'/%3E%3Cellipse cx='30' cy='52' rx='5' ry='2.6' transform='rotate%2840 30 52%29' fill='%238fc978'/%3E%3Cellipse cx='62' cy='80' rx='6' ry='3' transform='rotate%28-15 62 80%29' fill='%238fc978'/%3E%3Cpath d='M18 7H82' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.35'/%3E%3C/svg%3E") center / contain no-repeat;
   box-shadow: none;
-  filter: drop-shadow(0 2px 2px rgba(16, 50, 30, 0.45));
-  transition: filter 350ms ease;
+  position: relative;
 }
 
 .board[data-scene='forest'] .plateAlt {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='20' fill='%23487f4b'/%3E%3Crect x='3' y='3' width='94' height='90' rx='20' fill='%23a3d285'/%3E%3Cpath d='M16 30l3-8 3 8M70 22l3-8 3 8M40 56l3-8 3 8M78 70l3-8 3 8M20 80l3-8 3 8' stroke='%2362a257' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cellipse cx='52' cy='24' rx='6' ry='3' transform='rotate%28-30 52 24%29' fill='%2380bd6a'/%3E%3Cellipse cx='30' cy='52' rx='5' ry='2.6' transform='rotate%2840 30 52%29' fill='%2380bd6a'/%3E%3Cellipse cx='62' cy='80' rx='6' ry='3' transform='rotate%28-15 62 80%29' fill='%2380bd6a'/%3E%3Cpath d='M18 7H82' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.35'/%3E%3C/svg%3E");
 }
 
-.board[data-scene='forest'] .plateLit {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='20' fill='%23a99a2c'/%3E%3Crect x='3' y='3' width='94' height='90' rx='20' fill='%23efe571'/%3E%3Cpath d='M16 30l3-8 3 8M70 22l3-8 3 8M40 56l3-8 3 8M78 70l3-8 3 8M20 80l3-8 3 8' stroke='%23c9bf45' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cellipse cx='52' cy='24' rx='6' ry='3' transform='rotate%28-30 52 24%29' fill='%23f8f0a0'/%3E%3Cellipse cx='30' cy='52' rx='5' ry='2.6' transform='rotate%2840 30 52%29' fill='%23f8f0a0'/%3E%3Cellipse cx='62' cy='80' rx='6' ry='3' transform='rotate%28-15 62 80%29' fill='%23f8f0a0'/%3E%3Cpath d='M18 7H82' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.35'/%3E%3C/svg%3E");
-  filter: drop-shadow(0 0 9px rgba(255, 213, 74, 0.9));
+.board[data-scene='forest'] .plate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 21%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='3' y='9' width='94' height='90' rx='20' fill='%23a99a2c'/%3E%3Crect x='3' y='3' width='94' height='90' rx='20' fill='%23efe571'/%3E%3Cpath d='M16 30l3-8 3 8M70 22l3-8 3 8M40 56l3-8 3 8M78 70l3-8 3 8M20 80l3-8 3 8' stroke='%23c9bf45' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3Cellipse cx='52' cy='24' rx='6' ry='3' transform='rotate%28-30 52 24%29' fill='%23f8f0a0'/%3E%3Cellipse cx='30' cy='52' rx='5' ry='2.6' transform='rotate%2840 30 52%29' fill='%23f8f0a0'/%3E%3Cellipse cx='62' cy='80' rx='6' ry='3' transform='rotate%28-15 62 80%29' fill='%23f8f0a0'/%3E%3Cpath d='M18 7H82' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.35'/%3E%3C/svg%3E") center / contain no-repeat;
+  box-shadow: 0 0 14px 2px rgba(255, 213, 74, 0.7);
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.board[data-scene='forest'] .plateLit::after {
+  opacity: 1;
 }
 
 /* The pennants on the castle wall and the palm at the beach move a little in the wind */

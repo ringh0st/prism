@@ -20,7 +20,8 @@ function BeamLayer({ width, height, segments }) {
         };
         const color = beamColorVar(segment.color);
         return (
-          <g key={i}>
+          // Keyed by where it runs, so only a stretch that is new fades in.
+          <g key={`${segment.x1},${segment.y1},${segment.x2},${segment.y2},${segment.color}`} className={styles.beamSegment}>
             {/* A thin warm-dark edge keeps pale beams visible on light cells */}
             <line {...points} stroke="var(--beam-edge)" strokeWidth="0.21" strokeLinecap="round" />
             <line {...points} stroke={color} strokeWidth="0.32" strokeLinecap="round" filter="url(#beam-glow)" opacity="0.6" />

@@ -168,7 +168,11 @@ export default function App() {
             <GameBackground />
             <BeamThemeStyle />
             <SplashContext.Provider value={showsSplash}>
-              <Routes />
+              {/* Every screen fades in, so moving between screens is never a hard cut. Opacity only: a transform here
+                  would stop the bottom bar and PLAY from staying fixed to the screen. */}
+              <div key={`${route.name}/${route.params.join('/')}`} className="screen-in">
+                <Routes />
+              </div>
             </SplashContext.Provider>
             {/* Pop-ups wait until the splash is gone */}
             {showsSplash ? (
