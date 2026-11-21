@@ -1,27 +1,11 @@
 import GemShape from '../GemShape.jsx';
 import { BEAM_COLORS } from '../../game/constants.js';
 import { useIsRescue } from '../../i18n/I18nContext.jsx';
-
-/** Each light's Lumi tones: body and the glowing tail. */
-const LUMI_TONES = {
-  sun: ['#f9c46b', '#ffb81f'],
-  coral: ['#f6a08f', '#ff6a55'],
-  lime: ['#a8d98c', '#58c94a'],
-  sky: ['#9fd0ee', '#3aaeea'],
-};
-/** The color's shape on the antenna tips (so color is never the only clue). */
-const TIP_PATHS = {
-  diamond: 'M0-4 3 0 0 4-3 0Z',
-  circle: 'M-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0Z',
-  triangle: 'M0-3.6 3.4 2.6H-3.4Z',
-  square: 'M-2.8-2.8H2.8V2.8H-2.8Z',
-};
-const INK = '#3b1a08';
+import { LUMI_INK as INK, TIP_PATHS, lumiTones } from './lumiLook.js';
 
 /** A little Lumi face in a light's color, with that color's shape on its antennae. */
 function LumiFace({ color, coat, size }) {
-  // Its own pastel coat when it has one (a deeper shade of it for the tail), else its light's tones.
-  const [body, glow] = coat ? [coat, `color-mix(in srgb, ${coat} 70%, #b0306a)`] : (LUMI_TONES[color] ?? LUMI_TONES.sun);
+  const [body, glow] = lumiTones(color, coat);
   const tip = TIP_PATHS[BEAM_COLORS[color]?.shape ?? 'diamond'];
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true">

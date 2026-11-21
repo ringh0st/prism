@@ -10,7 +10,8 @@ import { glowbugName } from '../../i18n/groveText.js';
 import { describeTile } from '../../game/describe.js';
 import { cellsOnBeams, isRotatable as tileIsRotatable } from '../../game/beam.js';
 import { TILE } from '../../game/constants.js';
-import { boardThemeFor } from '../../game/boardThemes.js';
+import { boardThemeFor, lumisOf } from '../../game/boardThemes.js';
+import { FLAT_SCENES, JOIN } from './flatScenes.jsx';
 import { flyToCounter, gemBurst, glint } from '../../lib/effects.js';
 import CoachHand from './CoachHand.jsx';
 import { useI18n } from '../../i18n/I18nContext.jsx';
@@ -39,6 +40,7 @@ const COACH_LABELS = { [TILE.EMITTER]: 'board.lamp', [TILE.GEM]: 'board.gem' };
  * @param isEditing    in the editor every cell is actionable
  * @param ghostSegments faint preview of the solved light path (Lens helper)
  * @param mood         surprise look: normal | disco | night | boss
+ * @param scene        the flat board's scene (flatScenes.jsx: library, pond…): its own floor, walls, lamp and sleeping Lumis; null is the plain board
  * @param turnsLeft    turns each cracking mirror has left (a cracked one can't turn)
  * @param revealedCells cells the light has reached (fog lifts there); null shows everything (editor)
  * @param glowbug      { id, cell, isAwake, isFreed }: a Glowbug sleeping on a cell (it wakes in the light)
@@ -73,6 +75,7 @@ export default function Board({
   darkness = null,
   darkMoves = 0,
   is3d = false,
+  scene = null,
 }) {
   const { t, lang } = useI18n();
   const { width, height, tiles } = level;
@@ -83,6 +86,26 @@ export default function Board({
   const [cellRects, setCellRects] = useState(null);
   const allTurns = useMemo(() => tiles.map((_, i) => turns[i] ?? orients[i] ?? 0), [tiles, turns, orients]);
 
+  // A flat scene: each Lumi's coat, and for each wall the sides it touches another wall on (they join into one).
+  const flat = !is3d && FLAT_SCENES[scene] ? scene : null;
+  const sceneLook = useMemo(() => {
+    if (!flat) return null;
+    const coats = new Map(lumisOf(level).map(({ i, coat }) => [i, coat]));
+    const walls = new Set(level.tiles.filter((tile) => tile.type === TILE.WALL && !tile.fog).map((tile) => tile.y * level.width + tile.x));
+    const isWall = (x, y) => x >= 0 && y >= 0 && x < level.width && y < level.height && walls.has(y * level.width + x);
+    const joins = new Map(
+      level.tiles.map((tile, i) => [
+        i,
+        tile.type !== TILE.WALL || tile.fog
+          ? 0
+          : (isWall(tile.x - 1, tile.y) ? JOIN.left : 0) |
+            (isWall(tile.x + 1, tile.y) ? JOIN.right : 0) |
+            (isWall(tile.x, tile.y - 1) ? JOIN.up : 0) |
+            (isWall(tile.x, tile.y + 1) ? JOIN.down : 0),
+      ]),
+    );
+    return { coats, joins };
+  }, [flat, level]);
   const tileAtCell = useMemo(() => {
     const map = Array.from({ length: width * height }, () => -1);
     tiles.forEach((tile, i) => {
@@ -183,7 +206,7 @@ export default function Board({
       className={`${styles.board} ${is3d ? styles.board3d : ''} ${styles[mood] ?? ''} ${hasLitShade ? styles.alarm : ''} ${trace.isSolved && !isEditing ? styles.solved : ''} ${
         darkness && isEclipseMove(level, darkMoves) ? styles.eclipse : ''
       }`}
-      style={{ '--cols': width, '--rows': height }}
+      style={{ '--cols': width, '--rows': height, ...(flat ? FLAT_SCENES[flat].vars : null) }}
     >
       <TileDefs />
       {is3d && (
@@ -286,7 +309,7 @@ export default function Board({
                     {coach?.tile === tileIndex && tileIndex >= 0 && <CoachHand />}
                     {coach?.labels && COACH_LABELS[tile?.type] && (
                       <span className={styles.coachLabel} aria-hidden="true">
-                        {t(tile.type === TILE.GEM && is3d ? 'board.lumi' : COACH_LABELS[tile.type])}
+                        {t(tile.type === TILE.GEM && (is3d || flat) ? 'board.lumi' : COACH_LABELS[tile.type])}
                       </span>
                     )}
                     {is3d && gloom && (
@@ -310,6 +333,9 @@ export default function Board({
                         isFogged={isFogged}
                         darkCount={darkCount}
                         isDarkened={isDarkened}
+                        scene={flat}
+                        coat={sceneLook?.coats.get(tileIndex) ?? null}
+                        joins={sceneLook?.joins.get(tileIndex) ?? 0}
                       />
                     )}
                   </button>

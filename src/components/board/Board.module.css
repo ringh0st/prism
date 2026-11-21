@@ -74,7 +74,8 @@
 
 .plate {
   margin: 6%;
-  border-radius: 26%;
+  /* A scene can round its tiles its own way (lily pads are round) */
+  border-radius: var(--plate-round, 26%);
   background: var(--surface-cell);
   box-shadow: var(--shadow-sm);
   transition:
@@ -264,6 +265,36 @@
 
 .lockBase circle {
   fill: rgba(0, 0, 0, 0.18);
+}
+
+/* One of Lumi's family on a flat scene: asleep and a little pale, then awake, bright and hopping once */
+.lumi {
+  transform-origin: 50px 60px;
+  filter: saturate(0.7) brightness(0.96);
+  transition: filter var(--duration-base) ease;
+}
+
+.lumiAwake {
+  filter: none;
+  animation: lumiHop 700ms var(--ease-pop);
+}
+
+@keyframes lumiHop {
+  0% {
+    transform: scale(0.8);
+  }
+  40% {
+    transform: translateY(-12px) scale(1.08);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lumiAwake {
+    animation: none;
+  }
 }
 
 .gem {

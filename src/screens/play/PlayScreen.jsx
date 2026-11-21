@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useThemedBoard } from '../../hooks/useThemedBoard.js';
-import { lumisOf } from '../../game/boardThemes.js';
+import { areFlatScenesOn, boardThemeFor, lumisOf } from '../../game/boardThemes.js';
 import Board from '../../components/board/Board.jsx';
 import Button from '../../components/Button.jsx';
 import Dialog from '../../components/Dialog.jsx';
@@ -211,7 +211,8 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
   });
   // Game content is translated outside t(), so in themed worlds its gem words are swapped for Lumis here.
   const isRescue = useIsRescue();
-  const inRescueWords = (texts) => (isRescue && texts ? Object.fromEntries(Object.entries(texts).map(([key, text]) => [key, rescueWording(text, lang)])) : texts);
+  const inRescueWords = (texts) =>
+    isRescue && texts ? Object.fromEntries(Object.entries(texts).map(([key, text]) => [key, rescueWording(text, lang)])) : texts;
   const flavor = inRescueWords(flavorText(lang, level));
   // Spare Moves, a moves Pal and every Undo add to the limit (never to the stars); Keep going adds too, with 1★ at most.
   const moveLimit =
@@ -867,6 +868,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
           mood={modifier}
           label={t('play.boardLabel', { name: levelName })}
           is3d={isThemed}
+          scene={!isThemed && areFlatScenesOn() ? boardThemeFor(level) : null}
         />
       </div>
 
@@ -1009,7 +1011,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
       {isMeetingFriend && <FriendFoundDialog onDone={() => (nextLevel ? navigate(nextLevel) : navigate(backHref))} />}
       {isQuiet && !wantsFullWin && (
         <QuickWin
-          headline={t(headlineFor(result, level.difficulty, isThemed))}
+          headline={t(headlineFor(result, level.difficulty, isRescue))}
           stars={result.stars}
           sparksEarned={result.sparksEarned}
           onNext={goToNextLevel}
@@ -1025,7 +1027,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
           result={result}
           par={level.par}
           difficulty={level.difficulty}
-          isRescue={isThemed}
+          isRescue={isRescue}
           cap={
             starCap < 3
               ? { stars: starCap, icon: bonusMoves > 0 && starCap === 1 ? 'plus' : (toolFor(puzzle.usedHelpers.at(-1))?.icon ?? 'hint') }
@@ -1056,11 +1058,11 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
   );
 }
 
-/** A level; on the themed board every line and icon talks about saving Lumis instead of lighting gems. */
+/** A level; on the themed board and the flat scenes every line and icon talks about saving Lumis instead of lighting gems. */
 export default function PlayScreen(props) {
   const isThemed = useThemedBoard();
   return (
-    <RescueWording isOn={isThemed}>
+    <RescueWording isOn={isThemed || areFlatScenesOn()}>
       <PlayScreenBody {...props} />
     </RescueWording>
   );

@@ -2,6 +2,8 @@ import { memo } from 'react';
 import { FRAGILE_TURNS, TILE } from '../../game/constants.js';
 import { beamColorVar, shapePathFor } from '../GemShape.jsx';
 import { DarkCounter, DarkenedGem, EclipseArt, SmudgeArt, VoidArt } from './darkTileArt.jsx';
+import { FLAT_SCENES } from './flatScenes.jsx';
+import SleepyLumi from './SleepyLumi.jsx';
 import styles from './Board.module.css';
 
 const DIRECTION_ANGLE = { right: 0, down: 90, left: 180, up: 270 };
@@ -187,6 +189,23 @@ function Prism() {
   );
 }
 
+/** A scene's lamp: its own picture standing upright, and a bold arrow on the side the light leaves from. */
+function SceneLamp({ Lamp, dir, color, turnable, turns }) {
+  const angle = DIRECTION_ANGLE[dir] + (turnable ? (turns % 2) * 90 : 0);
+  return (
+    <g>
+      <circle cx="50" cy="50" r="44" fill="#fffaf0" opacity="0.72" />
+      {turnable && <circle cx="50" cy="50" r="44" fill="none" stroke="var(--color-sage)" strokeWidth="5" strokeDasharray="10 8" />}
+      <g transform="translate(50 52) scale(0.8) translate(-50 -52)">
+        <Lamp color={color} />
+      </g>
+      <g className={turnable ? styles.rotor : undefined} style={{ transform: `rotate(${angle}deg)`, transformOrigin: '50px 50px' }}>
+        <path d="M80 34 L100 50 L80 66 Z" fill={beamColorVar(color)} stroke="#3b1a08" strokeWidth="3" strokeLinejoin="round" />
+      </g>
+    </g>
+  );
+}
+
 function Emitter({ dir, color, turnable, turns }) {
   // A turning lamp swings a quarter turn clockwise and back on each tap (it has two positions), on a round turntable.
   const angle = DIRECTION_ANGLE[dir] + (turnable ? (turns % 2) * 90 : 0);
@@ -303,6 +322,8 @@ function Wall() {
  * darkCount: moves left on a fading gem or a dying lamp (darkness.js; null hides it, e.g. once a gem is saved);
  * isDarkened: a gem the darkness took.
  * The darkness pieces 'gloom' and 'eclipse' are drawn too, for the spotlight that introduces them.
+ * scene: the flat scene's name (flatScenes.jsx), which draws its own walls and lamps and a sleeping Lumi (in `coat`)
+ * instead of a gem; joins: which sides a wall touches another wall on (JOIN bits).
  */
 function TileArt({
   tile,
@@ -314,7 +335,11 @@ function TileArt({
   isFogged = false,
   darkCount = undefined,
   isDarkened = false,
+  scene = null,
+  coat = null,
+  joins = 0,
 }) {
+  const look = FLAT_SCENES[scene];
   let art = null;
   switch (isFogged ? 'fog' : tile.type) {
     case 'fog':
@@ -333,10 +358,23 @@ function TileArt({
       art = <Prism />;
       break;
     case TILE.EMITTER:
-      art = <Emitter dir={tile.dir} color={tile.color} turnable={tile.turnable} turns={turns} />;
+      art = look ? (
+        <SceneLamp Lamp={look.Lamp} dir={tile.dir} color={tile.color} turnable={tile.turnable} turns={turns} />
+      ) : (
+        <Emitter dir={tile.dir} color={tile.color} turnable={tile.turnable} turns={turns} />
+      );
       break;
     case TILE.GEM:
-      art = isDarkened ? <DarkenedGem /> : <Gem color={tile.color} isLit={isLit} />;
+      art = isDarkened ? (
+        <DarkenedGem />
+      ) : look ? (
+        <>
+          <look.Perch />
+          <SleepyLumi color={tile.color} coat={coat} isLit={isLit} />
+        </>
+      ) : (
+        <Gem color={tile.color} isLit={isLit} />
+      );
       break;
     case TILE.VOID:
       art = <VoidArt />;
@@ -354,7 +392,7 @@ function TileArt({
       art = <Shade isLit={isLit} />;
       break;
     case TILE.WALL:
-      art = <Wall />;
+      art = look ? <look.Wall joins={joins} seed={tile.x * 3 + tile.y * 5} /> : <Wall />;
       break;
     case TILE.PORTAL:
       art = <Portal pair={tile.pair} />;

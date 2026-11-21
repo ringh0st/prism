@@ -277,7 +277,7 @@ export const en = {
   'settings.vibrationHint': 'On supported phones',
   'settings.calm': 'Calm board',
   'settings.board3d': 'Themed 3D board',
-  'settings.board3dHint': 'Every level is a little place (a library, a pond, a castle, a beach, a forest) that you can spin and zoom. Switch it off for the flat board.',
+  'settings.board3dHint': 'Every level is a little place (a library, a pond, a castle, a beach, a forest) that you can spin and zoom. Off: the flat board, which is easier to read.',
   'settings.calmHint': 'Nothing moves around the board while you think',
 
   'howTo.title': 'How to play',

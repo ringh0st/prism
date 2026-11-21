@@ -78,7 +78,9 @@ import { sfx } from '../audio/sfx.js';
 const PROGRESS_KEY = 'prism.progress.v1';
 const SETTINGS_KEY = 'prism.settings.v1';
 // language: null follows the device's language (see src/i18n/translate.js).
-const DEFAULT_SETTINGS = { sound: true, music: true, haptics: true, calmBoard: false, board3d: true, language: null };
+// themedBoard: the 3D rooms are a choice; the flat board is what everyone starts with (playtest: a 9-year-old found
+// the flat board far easier). It replaced `board3d`, which was on by default, so nobody is left in 3D by an old save.
+const DEFAULT_SETTINGS = { sound: true, music: true, haptics: true, calmBoard: false, themedBoard: false, language: null };
 
 const PlayerContext = createContext(null);
 
