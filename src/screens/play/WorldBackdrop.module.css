@@ -9,6 +9,11 @@
   pointer-events: none;
 }
 
+/* Under a sheet (win screen, out of moves) the landscape rests, so the sheet's own motion gets the frames */
+body:has([role='dialog']) .backdrop * {
+  animation-play-state: paused;
+}
+
 .hills {
   position: absolute;
   inset: auto 0 0;

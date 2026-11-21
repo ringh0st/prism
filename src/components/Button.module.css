@@ -1,25 +1,22 @@
 /*
- * Buttons you want to press (owner: "the buttons still don't give the fun feel of a button"). Like a chunky game
- * button: a bright face that is lighter at the top, a glossy band across its upper half, a thick darker edge
- * underneath, and bold lettering. A press pushes the face down onto its edge and it springs back up with a little
- * bounce. No outlines or glows.
+ * Flat gradient pills (owner: the chunky glossy buttons looked "too 3D, in a not so nice way"; she picked a soft
+ * sideways gradient instead). One matte face whose color slides into its neighbor, no gloss and no edge underneath.
+ * What says "button" is the motion: a press squashes and brightens it, and it springs back with a little bounce.
+ * The one big button on a screen also wears a thin ring in its own color, a tinted take on a game outline.
  */
 .button {
-  --fill: var(--action-bottom);
-  --fill-top: var(--action-top);
-  --ledge: var(--action-ledge);
-  --label: var(--action-label);
-  --edge: 7px;
+  --fill-top: var(--action-from);
+  --fill: var(--action-to);
+  --label: var(--action-on);
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
   min-height: 54px;
-  margin-bottom: var(--edge);
   padding: 0 var(--space-5);
   border: 0;
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 19px;
@@ -27,35 +24,15 @@
   letter-spacing: 0.01em;
   color: var(--label);
   text-decoration: none;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
-  background: linear-gradient(180deg, var(--fill-top), var(--fill));
-  box-shadow:
-    inset 0 -3px 0 rgba(0, 0, 0, 0.1),
-    0 var(--edge) 0 var(--ledge),
-    0 calc(var(--edge) + 5px) 12px -3px hsl(var(--shadow-hue) / 0.35);
+  background: linear-gradient(90deg, var(--fill-top), var(--fill));
+  box-shadow: 0 6px 12px -6px hsl(var(--shadow-hue) / 0.35);
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   /* Coming back up is springy; going down (below) is quick */
   transition:
     transform 320ms var(--ease-pop),
-    box-shadow 320ms var(--ease-pop),
     filter 160ms ease;
-}
-
-/* The glossy band across the top half */
-.button::before {
-  content: '';
-  position: absolute;
-  inset: 4px 6px auto;
-  height: 44%;
-  border-radius: 15px 15px 12px 12px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.08));
-  pointer-events: none;
-}
-
-.button > * {
-  position: relative;
 }
 
 .button > span {
@@ -66,17 +43,13 @@
 
 @media (hover: hover) {
   .button:hover:not(:disabled) {
-    filter: brightness(1.05);
-    transform: translateY(-1px);
+    filter: brightness(1.06);
   }
 }
 
 .button:active:not(:disabled) {
-  box-shadow:
-    inset 0 -3px 0 rgba(0, 0, 0, 0.1),
-    0 2px 0 var(--ledge),
-    0 3px 4px -2px hsl(var(--shadow-hue) / 0.35);
-  transform: translateY(calc(var(--edge) - 2px));
+  filter: brightness(1.12);
+  transform: scale(0.96, 0.93);
   transition-duration: 70ms;
   transition-timing-function: ease-out;
 }
@@ -89,79 +62,67 @@
 }
 
 .primary {
-  /* sage, see defaults */
+  /* sage into teal, see defaults */
 }
 
 /* Success / "go" moments */
 .go {
-  --fill: var(--calm-bottom);
-  --fill-top: var(--calm-top);
-  --ledge: var(--calm-ledge);
-  --label: var(--calm-label);
+  --fill-top: var(--calm-from);
+  --fill: var(--calm-to);
+  --label: var(--calm-on);
 }
 
 /* Rewards and currency */
 .gold {
-  --fill: var(--reward-bottom);
-  --fill-top: var(--reward-top);
-  --ledge: var(--reward-ledge);
-  --label: var(--reward-label);
+  --fill-top: var(--reward-from);
+  --fill: var(--reward-to);
+  --label: var(--reward-on);
 }
 
-/* Quiet actions: a white keycap with a clear edge, so it still looks like a button on a cream card */
+/* Quiet actions: a white pill with a thin ring, so only one button on a screen carries a gradient */
 .secondary {
-  --fill: color-mix(in srgb, var(--surface-tonal) 55%, var(--surface-raised));
   --fill-top: var(--surface-raised);
-  --ledge: color-mix(in srgb, var(--surface-tonal) 72%, var(--text-strong));
+  --fill: var(--surface-raised);
   --label: var(--text-strong);
-  --edge: 5px;
-  text-shadow: none;
+  --ring: color-mix(in srgb, var(--action-from) 55%, var(--surface-raised));
+  box-shadow:
+    inset 0 0 0 2px var(--ring),
+    0 6px 12px -6px hsl(var(--shadow-hue) / 0.25);
 }
 
 .ghost {
-  --fill: transparent;
   --fill-top: transparent;
+  --fill: transparent;
   --label: var(--text-strong);
-  --edge: 0px;
-  text-shadow: none;
   box-shadow: none;
-}
-
-.ghost::before {
-  display: none;
 }
 
 .ghost:active:not(:disabled) {
-  box-shadow: none;
   background: var(--surface-tonal);
   transform: scale(0.96);
 }
 
 .sm {
-  --edge: 5px;
   min-height: 42px;
   padding: 0 var(--space-4);
-  border-radius: 16px;
   font-size: 16px;
 }
 
-.sm::before {
-  inset: 3px 5px auto;
-  border-radius: 12px 12px 9px 9px;
-}
-
-/* The one big thing to press on a screen: taller, bolder, and it breathes a little so the eye finds it */
+/* The one big thing to press on a screen: taller, ringed, and it breathes a little so the eye finds it */
 .lg {
-  --edge: 9px;
   min-height: 66px;
+  margin-block: 5px;
   padding: 0 var(--space-6);
-  border-radius: 24px;
   font-size: 24px;
 }
 
-.lg::before {
-  inset: 5px 8px auto;
-  border-radius: 18px 18px 14px 14px;
+.lg:not(.secondary):not(.ghost)::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border: 2.5px solid var(--fill-top);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .lg:not(.secondary):not(.ghost):not(:disabled) {

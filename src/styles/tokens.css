@@ -50,6 +50,20 @@
   --calm-ledge: #2f8f80;
   --calm-label: #0f2e29;
 
+  /*
+   * Flat gradient buttons (Button, PLAY): the color slides sideways into its neighbor at the same depth.
+   * `-on` is the label; the white ones keep WCAG contrast (4.5:1) on both ends of their gradient.
+   */
+  --action-from: #33825f;
+  --action-to: #2e787c;
+  --action-on: #ffffff;
+  --calm-from: #278273;
+  --calm-to: #2b7a86;
+  --calm-on: #ffffff;
+  --reward-from: #f0c14e;
+  --reward-to: #ee9a55;
+  --reward-on: #3b2a00;
+
   /* Surfaces: matte, sunlit paper. Edges come from fill contrast and shadow, never from lines. */
   --surface-page: #faf6ee;
   --surface-raised: #ffffff;
