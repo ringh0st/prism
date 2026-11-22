@@ -75,17 +75,22 @@
   }
 }
 
+/* What the Pal says: at its feet, inside the stage, so the name and the "?" stay in view */
 .bubble {
   position: absolute;
-  top: -4px;
-  left: 4%;
+  bottom: 2px;
+  inset-inline: 4px;
   z-index: 2;
+  width: fit-content;
+  margin-inline: auto;
   padding: 6px 12px;
-  border-radius: 16px 16px 16px 4px;
+  border-radius: 4px 16px 16px;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 15px;
-  white-space: nowrap;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
   color: var(--text-strong);
   background: var(--surface-raised);
   box-shadow: var(--shadow-md);

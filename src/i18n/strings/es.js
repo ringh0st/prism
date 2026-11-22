@@ -285,7 +285,7 @@ export const es = {
   'power.hint.line.one': '{count} pista gratis en cada nivel',
   'power.hint.line.other': '{count} pistas gratis en cada nivel',
   'power.chip': '{name} ayuda: {power}',
-  'power.switch': 'Toca para traer otro Pal',
+  'power.switch': 'Toca para traer otro amigo',
 
   'hello.label': '{name} dice: {line} Visita a tus amigos.',
   'hello.morning': '¡Buenos días!',
@@ -302,7 +302,8 @@ export const es = {
   'settings.vibrationHint': 'En los teléfonos compatibles',
   'settings.calm': 'Tablero tranquilo',
   'settings.board3d': 'Tablero 3D con temas',
-  'settings.board3dHint': 'Cada nivel es un pequeño lugar (una biblioteca, un estanque, un castillo, una playa, un bosque) que puedes girar y acercar. Apágalo para usar el tablero plano.',
+  'settings.board3dHint':
+    'Cada nivel es un pequeño lugar (una biblioteca, un estanque, un castillo, una playa, un bosque) que puedes girar y acercar. Apágalo para usar el tablero plano.',
   'settings.calmHint': 'Nada se mueve alrededor del tablero mientras piensas',
 
   'howTo.title': 'Cómo jugar',

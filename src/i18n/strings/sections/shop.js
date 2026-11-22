@@ -249,7 +249,7 @@ export const es = {
   'shop.picks.allLegendary': '¡Tienes todos los amigos legendarios!',
   'shop.picks.allMythic': '¡Tienes todos los amigos míticos!',
   'shop.picks.help':
-    'Cada día tienes un Pal Legendario y uno Mítico elegidos para ti. Puedes adoptar 2 por semana. Siempre ves a quién recibes antes de comprar.',
+    'Cada día tienes un amigo legendario y uno mítico elegidos para ti. Puedes adoptar 2 por semana. Siempre ves a quién recibes antes de comprar.',
 
   'shop.adopt.title': 'Adopta un amigo',
   'shop.adopt.ownedAria': '{name} ({species}): ya es tuyo',

@@ -110,11 +110,21 @@ const GOAL_ICONS = { friend: 'heart', present: 'gift', world: 'map' };
 /** The picture on each feature's "New!" note. */
 const NEW_ICONS = { gift: 'gift', daily: 'calendar', missions: 'check', treats: 'heart', quests: 'star', glowbugs: 'heart', stickers: 'star' };
 
+/** The HUD's see-through lower edge, in px: the road may show under it. */
+const HUD_FADE = 26;
+/** From the bottom of PLAY up to the top of the Pal's bubble beside it (PalPresent, PalHello), in px. */
+const PAL_ROOM = 170;
+/** From the middle of the current level down to the bottom of the level before it, in px. */
+const ROOM_FOR_LEVEL_BEFORE = ROW_HEIGHT + 39;
+
 export default function MapScreen() {
   const { progress, claimChest } = usePlayer();
   const { worlds, levelRefsInWorld } = useLevels();
   const [chestOpening, setChestOpening] = useState(null);
   const currentNodeRef = useRef(null);
+  const hudRef = useRef(null);
+  const playRef = useRef(null);
+  const [isHelloUp, setIsHelloUp] = useState(false);
   const stars = totalStars(progress);
   const solvedCount = Object.values(progress.levels).filter((entry) => entry.stars > 0).length;
   const { t } = useI18n();
@@ -130,20 +140,31 @@ export default function MapScreen() {
   // The closest prize to play for, shown on the PLAY button.
   const levelsLeftInWorld = currentRef ? (refsByWorld.get(currentRef.world) ?? []).filter((ref) => starsFor(progress, ref.id) === 0).length : 0;
   const goal = currentRef ? nextGoalFor(progress, levelsLeftInWorld) : null;
+  const hasPresent = Boolean(progress.pal.id) && presentsWaiting(progress) > 0;
+  const isPalBesidePlay = hasPresent || isHelloUp;
   const worldsLeft = worlds.length - unlockedWorlds.length - (nextLockedWorld ? 1 : 0);
 
-  // The current level is always the main view: centered in the space between the HUD and the PLAY button
-  // (see .currentNode scroll-margin), with Lumi bouncing beside it.
-  // Runs again if the current level only becomes known after the levels load.
+  // The current level is always the main view: in the middle of the clear stretch of road between the HUD
+  // and PLAY (or the partner Pal's bubble above PLAY, while it's up), with the level before it clear of
+  // them too, and Lumi bouncing beside it.
+  // Runs again if the current level only becomes known after the levels load, and when the Pal pops up.
   useEffect(() => {
     if (!currentRef) return undefined;
-    const frame = requestAnimationFrame(() => currentNodeRef.current?.scrollIntoView({ block: 'center' }));
+    const frame = requestAnimationFrame(() => {
+      const node = currentNodeRef.current?.getBoundingClientRect();
+      const play = playRef.current?.getBoundingClientRect();
+      if (!node || !play) return;
+      const top = hudRef.current.getBoundingClientRect().bottom - HUD_FADE;
+      const bottom = isPalBesidePlay ? play.bottom - PAL_ROOM : play.top;
+      const center = Math.min((top + bottom) / 2, bottom - ROOM_FOR_LEVEL_BEFORE);
+      window.scrollBy(0, node.top + node.height / 2 - center);
+    });
     return () => cancelAnimationFrame(frame);
-  }, [currentRef?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentRef?.id, isPalBesidePlay]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className={styles.page}>
-      <header className={styles.hud}>
+      <header ref={hudRef} className={styles.hud}>
         <CurrencyHud />
         {/* Things to do now, each with its name. They open one at a time as the player goes (unlocks.js). */}
         <div className={styles.hudStart}>
@@ -167,6 +188,44 @@ export default function MapScreen() {
       </header>
 
       <main className={styles.map}>
+        {/* First in the page so the keyboard reaches PLAY before the road's levels; it's fixed, so it looks the same. */}
+        {currentRef && (
+          <a
+            ref={playRef}
+            href={`#/play/${currentRef.id}`}
+            className={styles.playButton}
+            onPointerDown={() => sfx.press()}
+            aria-label={[
+              t('map.play'),
+              t('level.title', { label: levelNumber(currentRef.world, currentRef.index) }),
+              progress.hotStreak >= 2 && t('map.hotStreak', { count: progress.hotStreak }),
+              goal && t(`map.goal.${goal.kind}`, { count: goal.left }),
+            ]
+              .filter(Boolean)
+              .join(', ')}
+          >
+            {/* One slim row: the word and the level's number (owner: PLAY looked fat and unclear). */}
+            <span className={styles.playRow}>
+              <span className="game-title on-color">{t('map.play')}</span>
+              <span className={styles.playLevel} dir="ltr" aria-hidden="true">
+                {levelNumber(currentRef.world, currentRef.index)}
+              </span>
+            </span>
+            {progress.hotStreak >= 2 && (
+              <span className={styles.hotStreak} aria-hidden="true">
+                <Icon name="flame" size={12} />
+                <span className="game-title on-color">{progress.hotStreak}</span>
+              </span>
+            )}
+            {/* The closest prize, in words with its picture: "4 stars to a present" (nextGoal.js). */}
+            {goal && (
+              <span className={styles.nextGoal} aria-hidden="true">
+                <Icon name={GOAL_ICONS[goal.kind]} size={14} />
+                {t(`map.goal.${goal.kind}`, { count: goal.left })}
+              </span>
+            )}
+          </a>
+        )}
         {unlockedWorlds.map((world) => (
           <WorldSection
             key={world.id}
@@ -185,48 +244,13 @@ export default function MapScreen() {
             <span dir="ltr">+{worldsLeft}</span>
           </p>
         )}
-        {currentRef && (
-          <a
-            href={`#/play/${currentRef.id}`}
-            className={styles.playButton}
-            onPointerDown={() => sfx.press()}
-            aria-label={[
-              t('map.play'),
-              t('level.title', { label: levelNumber(currentRef.world, currentRef.index) }),
-              progress.hotStreak >= 2 && t('map.hotStreak', { count: progress.hotStreak }),
-              goal && t(`map.goal.${goal.kind}`, { count: goal.left }),
-            ]
-              .filter(Boolean)
-              .join(', ')}
-          >
-            <span className="game-title on-color">{t('map.play')}</span>
-            {progress.hotStreak >= 2 && (
-              <span className={styles.hotStreak} aria-hidden="true">
-                <Icon name="flame" size={12} />
-                <span className="game-title on-color">{progress.hotStreak}</span>
-              </span>
-            )}
-            <span className={styles.playLevel} dir="ltr" aria-hidden="true">
-              {levelNumber(currentRef.world, currentRef.index)}
-            </span>
-            {/* The closest prize, as a picture: "3 ★ → present", "2 levels → new world" (nextGoal.js). */}
-            {goal && (
-              <span className={styles.nextGoal} dir="ltr" aria-hidden="true">
-                <Icon name={goal.unit === 'stars' ? 'star' : 'play'} size={12} />
-                <span className="game-title on-color">{goal.left}</span>
-                <span className={styles.goalArrow}>→</span>
-                <Icon name={GOAL_ICONS[goal.kind]} size={15} />
-              </span>
-            )}
-          </a>
-        )}
       </main>
 
       {/* The road fades out under PLAY and the bar, so nothing is half-covered by them. */}
       <div className={styles.groundFade} aria-hidden="true" />
       {/* The partner Pal says hello once a day, or holds up a waiting present. */}
       {currentRef && <PalPresent />}
-      {currentRef && presentsWaiting(progress) === 0 && <PalHello />}
+      {currentRef && presentsWaiting(progress) === 0 && <PalHello onShow={() => setIsHelloUp(true)} />}
       <BottomNav active="map" />
       {chestOpening && <ChestDialog opening={chestOpening} onClose={() => setChestOpening(null)} />}
     </div>

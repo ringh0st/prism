@@ -20,8 +20,9 @@ const LEAVE_MS = 400;
 /**
  * Pal of the day: the first time you open the map each day, your partner pops up beside PLAY, waves and
  * says something short that fits (almost grown, an event weekend, your streak…). Tap it to visit your Pals.
+ * `onShow` tells the map it has popped up, so the road can make room for it.
  */
-export default function PalHello() {
+export default function PalHello({ onShow }) {
   const { progress } = usePlayer();
   const isSplashShowing = useIsSplashShowing();
   const partner = palById(progress.pal.id);
@@ -40,6 +41,7 @@ export default function PalHello() {
     // The greetings are English wordplay; other languages get a warm hello for the time of day.
     setLine(lang === 'en' ? palGreetingFor(progress) : t(`hello.${partOfDay(new Date())}`));
     setPhase('in');
+    onShow?.();
   }, [isSplashShowing, phase, partner, progress]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {

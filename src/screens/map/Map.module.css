@@ -257,6 +257,8 @@
   text-decoration: none;
   z-index: 1;
   transition: transform 160ms var(--ease-out);
+  /* A level reached with the keyboard scrolls into view clear of the HUD above and PLAY below */
+  scroll-margin: 160px 0 290px;
 }
 
 a.node:hover {
@@ -415,7 +417,8 @@ a.node:active {
 
 .lumiOnNode {
   position: absolute;
-  top: -50px;
+  /* Beside the level, below the next one up the road, so she never stands on it */
+  top: -22px;
   pointer-events: none;
 }
 
@@ -425,11 +428,6 @@ a.node:active {
 
 .lumiRight {
   left: calc(100% + 4px);
-}
-
-.currentNode {
-  /* Keeps the current level clear of the HUD and the PLAY button when it is scrolled into view */
-  scroll-margin: 96px 0 205px;
 }
 
 .currentNode .nodeStars {
@@ -457,6 +455,7 @@ a.node:active {
   background: var(--surface-raised);
   box-shadow: var(--highlight), var(--shadow-md);
   z-index: 1;
+  scroll-margin: 160px 0 290px;
 }
 
 .chest svg {
@@ -578,8 +577,8 @@ a.node:active {
   z-index: 19;
   display: grid;
   justify-items: center;
-  min-width: 230px;
-  padding: 10px 36px 12px;
+  min-width: 210px;
+  padding: 8px 30px 9px;
   transform: translateX(-50%);
   border-radius: var(--radius-pill);
   text-decoration: none;
@@ -595,35 +594,38 @@ a.node:active {
     box-shadow 110ms var(--ease-out);
 }
 
-.playButton > :first-child {
-  font-size: 32px;
+.playRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 27px;
   line-height: 1;
 }
 
+/* The level's number, on a small darker chip beside the word */
 .playLevel {
+  padding: 3px 9px 4px;
+  border-radius: var(--radius-pill);
   font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 14px;
-  opacity: 0.92;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
+  text-shadow: none;
+  background: #2c7350;
 }
 
-/* The closest prize, on the PLAY button: a small darker chip with "3 ★ → gift" */
+/* The closest prize, in words under PLAY: "4 stars to a present" */
 .nextGoal {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  margin-top: 5px;
-  padding: 3px 10px;
-  border-radius: var(--radius-pill);
-  font-size: 14px;
-  line-height: 1;
-  color: var(--action-label);
-  background: color-mix(in srgb, var(--action-ledge) 55%, var(--action-bottom));
-}
-
-.goalArrow {
-  font-weight: 700;
-  opacity: 0.7;
+  gap: 5px;
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.1;
+  text-shadow: none;
+  white-space: nowrap;
 }
 
 .playButton:active {

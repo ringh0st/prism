@@ -146,12 +146,12 @@ export const en = {
 };
 
 export const es = {
-  'palGuide.title': 'Cómo funcionan los Pals',
-  'palGuide.grow': 'Gana niveles y tu Pal crece',
+  'palGuide.title': 'Cómo funcionan los amigos',
+  'palGuide.grow': 'Gana niveles y tu amigo crece',
   'palGuide.power': 'Cuanto más crece, más te ayuda en los niveles',
   'palGuide.gift': 'Cada 10 ★ te trae un regalo',
-  'palGuide.more': 'Se unen más Pals mientras juegas. ¡Elige quién juega contigo!',
-  'palGuide.open': 'Cómo funcionan los Pals',
+  'palGuide.more': 'Se unen más amigos mientras juegas. ¡Elige quién juega contigo!',
+  'palGuide.open': 'Cómo funcionan los amigos',
   'records.title': 'Récords juntos',
   'records.new': 'Nueva medalla con {name}:',
   'records.brave.name': 'Valientes juntos',
@@ -187,7 +187,7 @@ export const es = {
   'pals.unlock.worlds.other': 'Termina {count} mundos',
   'pals.unlock.streak': 'Logra una racha de {streak} días',
 
-  'pals.team.label': 'Tus Pals',
+  'pals.team.label': 'Tus amigos',
   'pals.team.partnerUp': 'Juega conmigo',
   'pals.switch.title': 'Juega con',
 
