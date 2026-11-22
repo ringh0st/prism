@@ -58,12 +58,14 @@
 }
 
 /* ---------- Shop note ---------- */
+/* A flex row that wraps: on a narrow phone (or with a long word) the button drops under the week's pips. */
 .note {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3);
   border-radius: var(--radius-md);
   background: var(--paper);
   box-shadow: var(--shadow-md);
@@ -86,6 +88,7 @@
 }
 
 .noteText {
+  flex: 1 0 auto;
   display: grid;
   gap: 4px;
   font-size: 14px;
@@ -103,7 +106,7 @@
 .pips {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   margin: 0;
   padding: 0;
   list-style: none;

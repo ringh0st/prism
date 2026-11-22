@@ -9,6 +9,7 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './WelcomeTour.module.css';
 
 const TAP_LEVEL = {
+  id: 'tour-tap',
   width: 3,
   height: 3,
   tiles: [
@@ -19,6 +20,7 @@ const TAP_LEVEL = {
 };
 
 const GEMS_LEVEL = {
+  id: 'tour-gems',
   width: 4,
   height: 4,
   tiles: [

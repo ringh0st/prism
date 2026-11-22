@@ -1,7 +1,8 @@
 /* The partner Pal holding a present, beside the map's PLAY button */
 .present {
   position: fixed;
-  inset-inline-start: max(8px, env(safe-area-inset-left));
+  /* On wide screens: inside the map's centered column (560px), not at the window's edge */
+  inset-inline-start: max(8px, env(safe-area-inset-left), calc(50% - 272px));
   /* Just above the PLAY button, never on it */
   bottom: calc(max(12px, env(safe-area-inset-bottom)) + 178px);
   z-index: 20;

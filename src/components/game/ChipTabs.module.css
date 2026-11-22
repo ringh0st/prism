@@ -72,3 +72,14 @@
 .fit .chipCount {
   padding: 0 5px;
 }
+
+/* Narrow phones: words only, each tab as wide as its word needs, so long ones don't run into the next */
+@media (max-width: 360px) {
+  .fit {
+    grid-auto-columns: minmax(min-content, 1fr);
+  }
+
+  .fit .chip > svg {
+    display: none;
+  }
+}

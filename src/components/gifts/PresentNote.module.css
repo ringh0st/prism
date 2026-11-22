@@ -12,6 +12,17 @@
   color: var(--calm-label);
 }
 
+/* The dark label vanished on the dark win screen */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .ready {
+    color: var(--text-calm);
+  }
+}
+
+:root[data-theme='dark'] .ready {
+  color: var(--text-calm);
+}
+
 .ready svg {
   animation: wiggle 1.6s ease-in-out infinite;
 }

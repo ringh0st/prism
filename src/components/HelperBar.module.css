@@ -124,3 +124,18 @@
   color: var(--reward-label);
   background: var(--reward-bottom);
 }
+
+/* Narrow phones: tighter gaps so four helpers keep their icons and names whole */
+@media (max-width: 360px) {
+  .buttons {
+    gap: 4px;
+  }
+
+  .helper {
+    padding-inline: 1px;
+  }
+
+  .name {
+    font-size: 12px;
+  }
+}

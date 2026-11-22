@@ -105,6 +105,17 @@
   filter: brightness(0) opacity(0.18);
 }
 
+/* On the dark theme a black shape vanished into the dark card: a light one there */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .locked .art {
+    filter: brightness(0) invert(1) opacity(0.3);
+  }
+}
+
+:root[data-theme='dark'] .locked .art {
+  filter: brightness(0) invert(1) opacity(0.3);
+}
+
 /* ---------- Rarity ribbon: always in the same place ---------- */
 .locked {
   --face: var(--surface-tonal);

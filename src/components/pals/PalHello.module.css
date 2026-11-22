@@ -1,7 +1,8 @@
 /* Pal of the day, popping up beside the map's PLAY button */
 .hello {
   position: fixed;
-  left: max(8px, env(safe-area-inset-left));
+  /* On wide screens: inside the map's centered column (560px), not at the window's edge */
+  left: max(8px, env(safe-area-inset-left), calc(50% - 272px));
   /* Just above the PLAY button, never on it */
   bottom: calc(max(12px, env(safe-area-inset-bottom)) + 178px);
   z-index: 20;

@@ -111,6 +111,13 @@
   }
 }
 
+/* Narrow phones: two cards per row, so "Play with me" fits its card */
+@media (max-width: 360px) {
+  .collection {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 .pickButton {
   min-height: 32px;
   margin-top: 2px;

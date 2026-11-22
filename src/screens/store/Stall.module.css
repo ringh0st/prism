@@ -100,6 +100,8 @@
 /* ---------- Wall and shelves ---------- */
 .wall {
   display: grid;
+  /* minmax(0, …): wide content (the gift card, a shelf) shrinks to the stall instead of widening it */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
   padding: var(--space-2) var(--space-3) var(--space-5);
 }

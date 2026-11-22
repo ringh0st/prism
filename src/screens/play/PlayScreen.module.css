@@ -255,3 +255,15 @@
   top: 0;
   inset-inline-end: -6px;
 }
+
+/* Narrow phones: a smaller Lumi leaves the helpers room to stay readable */
+@media (max-width: 360px) {
+  .lumi > div > svg {
+    width: 60px;
+    height: 66px;
+  }
+
+  .controls {
+    gap: 6px;
+  }
+}

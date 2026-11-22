@@ -98,7 +98,8 @@
 .secondary {
   --face: #fffaf0;
   --deep: #c9b796;
-  --label: var(--text-strong);
+  /* A fixed dark label: the face stays cream in the dark theme too */
+  --label: #2b2118;
   text-shadow: none;
 }
 

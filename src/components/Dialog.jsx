@@ -29,7 +29,8 @@ export default function Dialog({ title, onClose, children, tone = 'default', clo
   useEffect(() => {
     const previouslyFocused = document.activeElement;
     const dialog = dialogRef.current;
-    (dialog.querySelector('[data-autofocus]') ?? dialog).focus();
+    // Without scrolling: a tall dialog must open at its title, not at its button
+    (dialog.querySelector('[data-autofocus]') ?? dialog).focus({ preventScroll: true });
 
     const onKeyDown = (event) => {
       if (event.key === 'Escape' && onClose) {

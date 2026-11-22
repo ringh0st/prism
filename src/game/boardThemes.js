@@ -59,7 +59,7 @@ export function lumiCoatFor(level, order, color = 'sun') {
   if (color !== 'sun') return null;
   const coats = coatsFor(boardThemeFor(level));
   let hash = 7;
-  for (const char of level.id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  for (const char of level.id ?? '') hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
   return coats[(hash + order) % coats.length];
 }
 

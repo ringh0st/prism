@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import ScreenTitle from '../../components/game/ScreenTitle.jsx';
 import Button from '../../components/Button.jsx';
@@ -86,6 +86,18 @@ export default function LevelIntro({
     return () => clearTimeout(timer);
   }, [onDone, isPicking]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Keyboard: Tab stays on the card, so it can't reach the board and helpers dimmed behind it.
+  const cardRef = useRef(null);
+  const keepTabOnCard = (event) => {
+    if (event.key !== 'Tab' || isSwitchingPal) return;
+    const stops = [...cardRef.current.querySelectorAll('button:not(:disabled), a[href], [tabindex="0"]')];
+    if (!stops.length) return;
+    const at = stops.indexOf(document.activeElement);
+    const next = at === -1 ? 0 : (at + (event.shiftKey ? -1 : 1) + stops.length) % stops.length;
+    event.preventDefault();
+    stops[next].focus();
+  };
+
   const { t, lang } = useI18n();
   const gems = lumisOf(level).map(({ tile, coat }) => ({ ...tile, coat }));
   const limit = moveLimit ?? moveLimitFor(level.par, level.difficulty);
@@ -100,8 +112,8 @@ export default function LevelIntro({
 
   return (
     // Clicking anywhere also starts; the button is the keyboard and screen-reader path.
-    <div className={styles.overlay} onClick={onDone} role="presentation">
-      <div className={`${styles.card} ${mood ? styles[mood] : ''}`} onClick={(event) => event.stopPropagation()} role="presentation">
+    <div className={styles.overlay} onClick={onDone} onKeyDown={keepTabOnCard} role="presentation">
+      <div ref={cardRef} className={`${styles.card} ${mood ? styles[mood] : ''}`} onClick={(event) => event.stopPropagation()} role="presentation">
         {moods.length > 0 && (
           <span className={styles.medallions} aria-hidden="true">
             {moods.map((id) => (

@@ -105,7 +105,8 @@
   width: calc(100% - 2 * var(--pad));
   height: calc(100% - 2 * var(--pad));
   pointer-events: none;
-  overflow: visible;
+  /* A beam that leaves the board ends at the outer tiles' edge, not out on the frame */
+  overflow: hidden;
 }
 
 /* A new stretch of light fades in (a turned mirror doesn't make the beam jump) */

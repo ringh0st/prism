@@ -93,13 +93,13 @@ export default function GiftReveal({
   const isMounted = useRef(true);
   const isBig = Boolean(wrapping.isBig);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
       isMounted.current = false;
       hurry.current?.();
-    },
-    [],
-  );
+    };
+  }, []);
 
   // A pause that a tap can cut short (and that's skipped for reduced motion).
   const pause = (ms) =>

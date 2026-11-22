@@ -42,11 +42,13 @@ export default function QuickBuyDialog({ helperId, onBought, onClose }) {
         <ShopItemArt art={helperId} size={84} />
       </div>
       <p className={styles.description}>{text.description}</p>
-      {/* Using a helper caps the stars: shown as the stars still possible (the sentence is for screen readers). */}
-      <p className={styles.cap}>
-        <Stars count={helper.starCap} size={24} />
-        <span className="visually-hidden">{t('buy.cap', { count: helper.starCap })}</span>
-      </p>
+      {/* Using a helper caps the stars (one that doesn't shows nothing): shown as the stars still possible (the sentence is for screen readers). */}
+      {helper.starCap < 3 && (
+        <p className={styles.cap}>
+          <Stars count={helper.starCap} size={24} />
+          <span className="visually-hidden">{t('buy.cap', { count: helper.starCap })}</span>
+        </p>
+      )}
 
       <div className={styles.buy}>
         <BuyButtons item={item} itemName={text.name} progress={progress} isSignedIn={isSignedIn} isBusy={isBusy} onBuy={buy} />

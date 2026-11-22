@@ -189,7 +189,11 @@ export default function SettingsScreen() {
           </p>
           <p className={styles.about}>
             {STORE_NAME} · {t('me.data.version', { version: APP_VERSION })}
-            <br />© {COPYRIGHT_YEAR} {STUDIO_NAME}
+            <br />
+            {/* Latin text: kept in its own left-to-right order on a Hebrew page */}
+            <bdi dir="ltr">
+              © {COPYRIGHT_YEAR} {STUDIO_NAME}
+            </bdi>
           </p>
         </section>
       </main>

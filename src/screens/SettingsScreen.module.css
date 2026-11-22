@@ -106,8 +106,14 @@
 
 .links {
   display: flex;
-  gap: var(--space-4);
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
   font-weight: 700;
+}
+
+/* A link never breaks inside its own words; the row wraps between links instead */
+.links a {
+  white-space: nowrap;
 }
 
 .dialogText {
