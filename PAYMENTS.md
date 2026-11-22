@@ -10,7 +10,7 @@ How a purchase works:
 2. The player pays on Stripe's page and is sent back to the game.
 3. Stripe notifies the `stripe-webhook` function, which checks the signature and adds the diamonds to the player's account.
 
-The game itself can never add diamonds. Purchases are web-only: the iPhone app never shows them (Apple requires its own in-app purchases there).
+The game itself can never add diamonds. The website sells through Stripe; the iPhone app sells the same packs through **Apple's in-app purchases** and never opens the web checkout (Apple's rule). The Apple setup is in its own section below.
 
 Never paste API keys, secrets or tokens into a chat, an issue or a commit. They only go into the dashboards and secrets named below.
 
@@ -81,3 +81,66 @@ Refund a payment in Stripe (Payments → the payment → Refund). The webhook ta
 ## Lemon Squeezy (until 31 March 2027)
 
 The old setup keeps working until you switch: store ID `523117`, the product variants saved in `supabase/economy.sql` (`diamond_packs.variant_id`), the `LEMONSQUEEZY_API_KEY` and `LEMONSQUEEZY_WEBHOOK_SECRET` secrets, and the webhook `https://wapxwfpgrijxaclsbwkq.supabase.co/functions/v1/lemonsqueezy-webhook` (events **order_created** and **order_refunded**). Orders made through Lemon Squeezy can still be refunded there, and its webhook still takes the diamonds back. After it closes, its function, secrets and the `variant_id` column can be removed.
+
+## Apple in-app purchases (iPhone app)
+
+Apple only lets an app use diamonds bought on the web if the app also sells them through Apple. So the iPhone app has the same three packs as in-app purchases. Apple takes its commission (15% in the Small Business Program, otherwise 30%) and handles payment, tax and refunds.
+
+How a purchase works:
+
+1. The player taps a pack in the app's Shop and pays on Apple's payment sheet.
+2. The app sends the transaction's id to the `apple-purchase` function, which asks Apple what was bought and adds the diamonds to the buyer's account.
+3. If Apple refunds the purchase, it notifies the `apple-notifications` function, which takes the diamonds back.
+
+A purchase that was paid but not delivered (the app closed, no network) is delivered the next time the app opens.
+
+You need to be in the Apple Developer Program and have the app created in App Store Connect (IOS.md) first.
+
+### A. Agreements
+
+App Store Connect → **Business**: accept the **Paid Apps Agreement** and fill in your bank and tax details. Without it, products don't load in the app. If you qualify, also enrol in the **App Store Small Business Program** (15% commission).
+
+### B. Create the three products
+
+App Store Connect → your app → **Monetization → In-App Purchases → +**, type **Consumable**, three times. The Product ID must be exactly as written:
+
+| Reference name | Product ID | Price | Pack in the game |
+| --- | --- | --- | --- |
+| 10 diamonds | `app.lumipals.diamonds10` | €0.99 | `diamonds-10` |
+| 60 diamonds | `app.lumipals.diamonds60` | €4.99 | `diamonds-60` |
+| 130 diamonds | `app.lumipals.diamonds130` | €9.99 | `diamonds-130` |
+
+For each: set the price, add a display name and description (English at least), and add a review screenshot (a picture of the Shop's Diamonds tab). The first time, the products are submitted together with the app version.
+
+### C. The key for our server
+
+App Store Connect → **Users and Access → Integrations → In-App Purchase** → **Generate In-App Purchase Key**. Download the `.p8` file (only possible once) and note its **Key ID** and the **Issuer ID** shown at the top of the page.
+
+In Supabase ([Edge Functions → Secrets](https://supabase.com/dashboard/project/wapxwfpgrijxaclsbwkq/functions/secrets)) add:
+
+| Name | Value |
+| --- | --- |
+| `APPLE_IAP_ISSUER_ID` | the Issuer ID |
+| `APPLE_IAP_KEY_ID` | the Key ID |
+| `APPLE_IAP_PRIVATE_KEY` | the whole text of the `.p8` file, including the BEGIN and END lines |
+
+### D. Refund notices
+
+App Store Connect → your app → **App Information → App Store Server Notifications**: set both the **Production** and **Sandbox** URL to
+
+`https://wapxwfpgrijxaclsbwkq.supabase.co/functions/v1/apple-notifications`
+
+and choose **Version 2**.
+
+### E. Xcode
+
+After `npm run ios`, in Xcode select the **App** target → **Signing & Capabilities → + Capability → In-App Purchase**.
+
+### F. Deploy and test
+
+1. [Actions → Deploy Supabase functions](https://github.com/ringh0st/prism/actions/workflows/supabase-functions.yml) → **Run workflow** (it also runs by itself when the functions change).
+2. App Store Connect → **Users and Access → Sandbox → Test Accounts**: create a sandbox tester. On the iPhone: Settings → Developer → Sandbox Apple Account, sign in with it.
+3. Install the app through Xcode or TestFlight, sign in to the game, open Shop → Diamonds. The three packs should show Apple's prices. Buy one: no real money is charged in the sandbox, and the diamonds should fly into the counter within seconds.
+4. If the buttons show "…", the products didn't load: check step A (agreement), the Product IDs, and that the capability from step E is on.
+
+This part was written without an iPhone or an Apple account to test on, so the first sandbox purchase is the real test. If it fails, the function logs in Supabase (Edge Functions → apple-purchase → Logs) say why.

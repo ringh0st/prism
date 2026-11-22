@@ -4,7 +4,8 @@ import styles from './Board.module.css';
 
 /**
  * One of Lumi's family on the flat board (viewBox 0 0 100 100): asleep until the light reaches it, then awake and
- * glowing. It wears its own pastel coat, or its light's color with that color's shape on its antennae and tummy.
+ * glowing. It wears its own pastel coat, or its light's color with that color's shape on its antennae (a white mark under
+ * the mouth was dropped: the owner read it as a stray dot).
  */
 export default function SleepyLumi({ color, coat, isLit }) {
   const [body, glow] = lumiTones(color, coat);
@@ -51,8 +52,6 @@ export default function SleepyLumi({ color, coat, isLit }) {
               </text>
             </>
           )}
-          {/* A Lumi that needs a colored light shows that color's shape on its tummy too. */}
-          {color !== 'sun' && <path d={tip} transform="translate(50 64) scale(1.7)" fill="#fff" stroke={INK} strokeWidth="0.8" />}
         </g>
       </g>
     </g>

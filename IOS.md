@@ -75,3 +75,7 @@ Apple and Supabase dashboards.
 Apple rejects apps that are "just a website", so the app keeps the game inside the app, uses real haptics, works
 offline, and has Sign in with Apple. Good next additions before or after the first review: Game Center
 leaderboards and a daily-puzzle reminder notification.
+
+## 6. Selling diamonds in the app
+
+The app sells the diamond packs through Apple's in-app purchases. The setup (agreement, three products, a key, refund notices, the Xcode capability and a sandbox test) is in PAYMENTS.md → "Apple in-app purchases".

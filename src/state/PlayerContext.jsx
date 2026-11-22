@@ -74,6 +74,7 @@ import { buyThemeItemLocally } from '../game/themes.js';
 import { feedTreat } from '../game/treats.js';
 import { music } from '../audio/music.js';
 import { sfx } from '../audio/sfx.js';
+import { APPLE_PURCHASES_ENABLED } from '../lib/config.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
 const SETTINGS_KEY = 'prism.settings.v1';
@@ -207,6 +208,15 @@ export function PlayerProvider({ children }) {
   useEffect(() => {
     if (userId) syncWithServer();
     else setSyncStatus('local');
+  }, [userId, syncWithServer]);
+
+  // iPhone app: a purchase that was paid but never delivered (the app closed, no network) is delivered now.
+  useEffect(() => {
+    if (!userId || !APPLE_PURCHASES_ENABLED) return;
+    import('../lib/applePurchases.js')
+      .then(({ deliverWaitingApplePurchases }) => deliverWaitingApplePurchases())
+      .then((delivered) => delivered > 0 && syncWithServer())
+      .catch(() => {});
   }, [userId, syncWithServer]);
 
   const value = useMemo(

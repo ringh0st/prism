@@ -10,3 +10,11 @@ verify_jwt = false
 
 [functions.stripe-webhook]
 verify_jwt = false
+
+# In-app purchases from the iPhone app: the player is signed in, and Apple confirms the purchase.
+[functions.apple-purchase]
+verify_jwt = true
+
+# Apple's refund notices carry no Supabase login; the function looks every transaction up at Apple instead.
+[functions.apple-notifications]
+verify_jwt = false

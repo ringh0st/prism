@@ -8,7 +8,7 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { accessoryById, stageOf } from '../../game/pals.js';
 import { groveItemById } from '../../game/grove.js';
 import { themeById, themeItemBlocker, themeItemById } from '../../game/themes.js';
-import { isNativeApp } from '../../lib/platform.js';
+import { PAYMENTS_ENABLED } from '../../lib/config.js';
 import { rewardShower } from '../../lib/effects.js';
 import { sfx } from '../../audio/sfx.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
@@ -125,8 +125,8 @@ export default function TryOnDialog({ item, onClose, onGetDiamonds }) {
               {t('shop.tryOn.play')}
             </Button>
           )}
-          {blocker === 'short' && currency === 'diamonds' && isNativeApp && <p className={styles.note}>{t('shop.tryOn.earnDiamondsApp')}</p>}
-          {blocker === 'short' && currency === 'diamonds' && !isNativeApp && (
+          {blocker === 'short' && currency === 'diamonds' && !PAYMENTS_ENABLED && <p className={styles.note}>{t('shop.tryOn.earnDiamondsApp')}</p>}
+          {blocker === 'short' && currency === 'diamonds' && PAYMENTS_ENABLED && (
             <>
               <Button icon="diamond" onClick={onGetDiamonds} data-autofocus>
                 {t('shop.tryOn.getDiamonds')}

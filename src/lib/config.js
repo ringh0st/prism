@@ -3,7 +3,7 @@
 export const SUPABASE_URL = 'https://wapxwfpgrijxaclsbwkq.supabase.co';
 export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_P96gX4pjrmkFtvrbHGQdRg_6K1eXEtc';
 
-import { isNativeApp } from './platform.js';
+import { isNativeApp, platformName } from './platform.js';
 
 // Full addresses, so they also work inside the app (where they open in Safari).
 export const HOME_PAGE_URL = 'https://lumipals.app/';
@@ -11,10 +11,12 @@ export const PRIVACY_URL = 'https://lumipals.app/privacy.html';
 export const TERMS_URL = 'https://lumipals.app/terms.html';
 
 /**
- * Real-money diamond purchases on the website (Stripe Managed Payments, see PAYMENTS.md). App stores require
- * their own payment systems, so the apps don't sell diamonds (yet): players earn them by playing.
+ * Real-money diamond purchases. On the website they go through a checkout page (Stripe Managed Payments, see
+ * PAYMENTS.md). App stores require their own payment systems, so the iPhone app sells the same packs through
+ * Apple's in-app purchases (src/lib/applePurchases.js) and never opens the web checkout.
  */
-export const PAYMENTS_ENABLED = !isNativeApp;
+export const APPLE_PURCHASES_ENABLED = isNativeApp && platformName === 'ios';
+export const PAYMENTS_ENABLED = !isNativeApp || APPLE_PURCHASES_ENABLED;
 
 /** Sign in with Apple: App Store rules require it next to Google sign-in in the iPhone app. */
 export const APPLE_SIGN_IN_ENABLED = isNativeApp;

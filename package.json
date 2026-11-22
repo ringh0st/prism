@@ -20,6 +20,7 @@
     "@capacitor/core": "^8.6.2",
     "@capacitor/haptics": "^8.0.2",
     "@capacitor/ios": "^8.6.2",
+    "@capgo/native-purchases": "^8.9.17",
     "@fontsource/fredoka": "^5.3.0",
     "@fontsource/nunito": "^5.3.0",
     "@fontsource/rubik": "^5.3.0",

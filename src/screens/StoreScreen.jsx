@@ -18,7 +18,9 @@ import { sparkPurchasesLeft } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
 import { startDiamondCheckout } from '../lib/economyApi.js';
 import { flyRewardsToCounter } from '../lib/rewardFlight.js';
-import { PAYMENTS_ENABLED, TERMS_URL } from '../lib/config.js';
+import { APPLE_PURCHASES_ENABLED, PAYMENTS_ENABLED, TERMS_URL } from '../lib/config.js';
+import { buyDiamondPackInApp, fetchApplePrices } from '../lib/applePurchases.js';
+import { useAuth } from '../state/AuthContext.jsx';
 import { sfx } from '../audio/sfx.js';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import { helperText } from '../i18n/gameText.js';
@@ -145,14 +147,30 @@ function FreeDiamonds() {
   );
 }
 
-function DiamondsShelf({ onError }) {
-  const { isSignedIn } = usePlayer();
+function DiamondsShelf({ onError, onBuying }) {
+  const { isSignedIn, refresh } = usePlayer();
+  const { user } = useAuth();
+  // In the iPhone app the App Store gives each pack's price in the player's own currency.
+  const [applePrices, setApplePrices] = useState(null);
+  useEffect(() => {
+    if (!APPLE_PURCHASES_ENABLED) return;
+    fetchApplePrices()
+      .then(setApplePrices)
+      .catch(() => setApplePrices({}));
+  }, []);
+  const priceOf = (pack) => (APPLE_PURCHASES_ENABLED ? applePrices?.[pack.id] : pack.displayPrice);
   const { t, lang } = useI18n();
   const [busyPack, setBusyPack] = useState(null);
 
   const buyPack = async (packId) => {
     setBusyPack(packId);
     try {
+      if (APPLE_PURCHASES_ENABLED) {
+        onBuying();
+        if (await buyDiamondPackInApp(packId, user.id)) await refresh();
+        setBusyPack(null);
+        return;
+      }
       window.location.assign(await startDiamondCheckout(packId));
     } catch (error) {
       onError(errorText(t, error.message));
@@ -166,7 +184,7 @@ function DiamondsShelf({ onError }) {
 
       {!isSignedIn && <SignInNote />}
 
-      {/* Diamond packs are sold on the website only; in the app, diamonds are earned by playing. */}
+      {/* Diamond packs: a checkout page on the website, Apple's in-app purchase in the iPhone app. */}
       {PAYMENTS_ENABLED && (
         <>
           <ul className={styles.shelf}>
@@ -180,11 +198,11 @@ function DiamondsShelf({ onError }) {
               >
                 <Button
                   className={styles.moneyTag}
-                  disabled={!isSignedIn || busyPack !== null}
+                  disabled={!isSignedIn || busyPack !== null || !priceOf(pack)}
                   onClick={() => buyPack(pack.id)}
-                  aria-label={t('shop.packs.buy', { count: pack.diamonds + pack.bonus, price: pack.displayPrice })}
+                  aria-label={t('shop.packs.buy', { count: pack.diamonds + pack.bonus, price: priceOf(pack) ?? '' })}
                 >
-                  {busyPack === pack.id ? t('shop.packs.opening') : pack.displayPrice}
+                  {busyPack === pack.id ? t('shop.packs.opening') : (priceOf(pack) ?? '…')}
                 </Button>
               </ShelfItem>
             ))}
@@ -220,9 +238,11 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
     const timers = [1500, 4000, 8000, 15000, 25000].map((ms) => setTimeout(refresh, ms));
     return () => timers.forEach(clearTimeout);
   }, [isReturningFromCheckout, refresh]);
+  // Bought diamonds are on their way: back from the web checkout, or after a purchase in the app.
+  const [isAwaitingDiamonds, setIsAwaitingDiamonds] = useState(isReturningFromCheckout);
   const diamondsBefore = useRef(null);
   useEffect(() => {
-    if (!isReturningFromCheckout || !isSignedIn) return;
+    if (!isAwaitingDiamonds || !isSignedIn) return;
     if (diamondsBefore.current === null) {
       diamondsBefore.current = progress.diamonds;
       return;
@@ -233,7 +253,7 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
       flyRewardsToCounter('diamond', arrived);
       setLumi({ mood: 'dance', line: t('shop.lumi.arrived', { count: arrived }) });
     }
-  }, [isReturningFromCheckout, isSignedIn, progress.diamonds, t]);
+  }, [isAwaitingDiamonds, isSignedIn, progress.diamonds, t]);
 
   const buy = async (itemId, currency) => {
     setBusyItem(itemId);
@@ -285,7 +305,9 @@ export default function StoreScreen({ isReturningFromCheckout = false }) {
           {tab === 'helpers' && <HelpersShelf buyProps={buyProps} onInfo={setInfo} />}
           {tab === 'sparks' && <SparksShelf buyProps={buyProps} onInfo={setInfo} />}
           {tab === 'pals' && <PalShop onLumi={setLumi} onGetDiamonds={() => setTab('diamonds')} />}
-          {tab === 'diamonds' && <DiamondsShelf onError={(message) => setLumi({ mood: 'worried', line: message })} />}
+          {tab === 'diamonds' && (
+            <DiamondsShelf onError={(message) => setLumi({ mood: 'worried', line: message })} onBuying={() => setIsAwaitingDiamonds(true)} />
+          )}
         </section>
       </main>
       <BottomNav active="store" />
