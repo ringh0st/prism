@@ -20,9 +20,11 @@ import { applyCheckoutReturn } from './lib/checkoutReturn.js';
 import { setPreviewTheme } from './game/boardThemes.js';
 import { watchInputMode } from './lib/inputMode.js';
 import { recordVisit } from './lib/visits.js';
+import { keepProgress } from './lib/keepProgress.js';
 
 watchInputMode();
 recordVisit();
+keepProgress();
 // Catch the browser's install offer early, for the Home Screen helper.
 listenForInstallPrompt();
 // Back from a payment page: open the store's thank-you screen.
