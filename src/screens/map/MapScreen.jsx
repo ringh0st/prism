@@ -21,7 +21,7 @@ import { presentsWaiting } from '../../game/gifts.js';
 import PalHello from '../../components/pals/PalHello.jsx';
 import { usePlayer } from '../../state/PlayerContext.jsx';
 import { isFeatureOpen } from '../../game/unlocks.js';
-import { nextGoalFor } from '../../game/nextGoal.js';
+import { FRIEND_AFTER_LEVELS } from '../../game/firstFriend.js';
 import { useNewExtra } from '../../hooks/useNewExtra.js';
 import { useLevels } from '../../state/LevelsContext.jsx';
 import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
@@ -71,6 +71,8 @@ function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeR
                   stars={starsFor(progress, stop.ref.id)}
                   isUnlocked={isLevelUnlocked(position)}
                   isCurrent={isCurrent}
+                  // The first friend turns up after this level: a wrapped surprise waits on it.
+                  hasSurprise={!progress.pal?.id && world.id === 1 && position === FRIEND_AFTER_LEVELS - 1}
                   nodeRef={isCurrent ? currentNodeRef : undefined}
                 />
               </li>
@@ -105,8 +107,6 @@ function LockedWorld({ world, stars }) {
   );
 }
 
-/** The picture for each kind of next goal on the PLAY button. */
-const GOAL_ICONS = { friend: 'heart', present: 'gift', world: 'map' };
 /** The picture on each feature's "New!" note. */
 const NEW_ICONS = { gift: 'gift', daily: 'calendar', missions: 'check', treats: 'heart', quests: 'star', glowbugs: 'heart', stickers: 'star' };
 
@@ -137,9 +137,6 @@ export default function MapScreen() {
     [unlockedWorlds.length, levelRefsInWorld], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const currentRef = [...refsByWorld.values()].flat().find((ref) => starsFor(progress, ref.id) === 0) ?? null;
-  // The closest prize to play for, shown on the PLAY button.
-  const levelsLeftInWorld = currentRef ? (refsByWorld.get(currentRef.world) ?? []).filter((ref) => starsFor(progress, ref.id) === 0).length : 0;
-  const goal = currentRef ? nextGoalFor(progress, levelsLeftInWorld) : null;
   const hasPresent = Boolean(progress.pal.id) && presentsWaiting(progress) > 0;
   const isPalBesidePlay = hasPresent || isHelloUp;
   const worldsLeft = worlds.length - unlockedWorlds.length - (nextLockedWorld ? 1 : 0);
@@ -199,7 +196,6 @@ export default function MapScreen() {
               t('map.play'),
               t('level.title', { label: levelNumber(currentRef.world, currentRef.index) }),
               progress.hotStreak >= 2 && t('map.hotStreak', { count: progress.hotStreak }),
-              goal && t(`map.goal.${goal.kind}`, { count: goal.left }),
             ]
               .filter(Boolean)
               .join(', ')}
@@ -215,13 +211,6 @@ export default function MapScreen() {
               <span className={styles.hotStreak} aria-hidden="true">
                 <Icon name="flame" size={12} />
                 <span className="game-title on-color">{progress.hotStreak}</span>
-              </span>
-            )}
-            {/* The closest prize, in words with its picture: "4 stars to a present" (nextGoal.js). */}
-            {goal && (
-              <span className={styles.nextGoal} aria-hidden="true">
-                <Icon name={GOAL_ICONS[goal.kind]} size={14} />
-                {t(`map.goal.${goal.kind}`, { count: goal.left })}
               </span>
             )}
           </a>

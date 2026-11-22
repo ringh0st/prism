@@ -462,9 +462,51 @@ a.node:active {
   filter: drop-shadow(0 3px 4px rgba(var(--shadow-color), 0.35));
 }
 
+/* A chest still ahead is a prize in plain sight (owner: highlight the presents on the map, not a line on PLAY):
+   honey on cream inside a soft ring of light that breathes slowly */
 .chest_locked {
-  color: #c9b49c;
+  color: var(--reward-ledge);
   cursor: default;
+  background: color-mix(in srgb, var(--color-honey) 30%, var(--surface-raised));
+  box-shadow:
+    var(--shadow-md),
+    0 0 0 5px color-mix(in srgb, var(--color-honey) 35%, transparent);
+  animation: prizeGlow 2.6s ease-in-out infinite;
+}
+
+@keyframes prizeGlow {
+  50% {
+    box-shadow:
+      var(--shadow-md),
+      0 0 0 9px color-mix(in srgb, var(--color-honey) 18%, transparent);
+  }
+}
+
+/* The surprise waiting on a level (the first friend): a small wrapped gift on its shoulder */
+.surpriseBadge {
+  position: absolute;
+  top: -10px;
+  inset-inline-end: -12px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: var(--reward-label);
+  background: var(--reward-bottom);
+  box-shadow:
+    var(--shadow-sm),
+    0 0 0 3px var(--surface-raised);
+  pointer-events: none;
+  animation: wiggle 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chest_locked,
+  .surpriseBadge {
+    animation: none;
+  }
 }
 
 .chest_ready {
@@ -578,7 +620,7 @@ a.node:active {
   display: grid;
   justify-items: center;
   min-width: 210px;
-  padding: 8px 30px 9px;
+  padding: 11px 30px 12px;
   transform: translateX(-50%);
   border-radius: var(--radius-pill);
   text-decoration: none;
@@ -612,20 +654,6 @@ a.node:active {
   line-height: 1;
   text-shadow: none;
   background: #2c7350;
-}
-
-/* The closest prize, in words under PLAY: "4 stars to a present" */
-.nextGoal {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 4px;
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 13px;
-  line-height: 1.1;
-  text-shadow: none;
-  white-space: nowrap;
 }
 
 .playButton:active {

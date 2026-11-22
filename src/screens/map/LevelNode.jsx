@@ -13,7 +13,7 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 const DIFFICULTY_LABEL = { [DIFFICULTY.HARD]: 'map.node.hard', [DIFFICULTY.EXTRA]: 'map.node.boss' };
 
 /** One level bubble on the map. */
-export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef }) {
+export default function LevelNode({ stop, stars, isUnlocked, isCurrent, hasSurprise = false, nodeRef }) {
   const { t } = useI18n();
   // A Glowbug still waiting to be rescued here (three stars frees it).
   const hasGlowbugs = useFeature('glowbugs');
@@ -25,6 +25,7 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef 
     kindLabel && t(kindLabel),
     isUnlocked ? t('map.node.stars', { count: stars, max: MAX_STARS }) : t('map.node.locked'),
     glowbug && t('map.node.glowbug'),
+    hasSurprise && t('map.node.surprise'),
   ]
     .filter(Boolean)
     .join(', ');
@@ -60,6 +61,11 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, nodeRef 
         </span>
       )}
       {ref.difficulty === DIFFICULTY.EXTRA && <span className={`game-title on-color ${styles.bossPlate}`}>{t('map.boss')}</span>}
+      {hasSurprise && (
+        <span className={styles.surpriseBadge} aria-hidden="true">
+          <Icon name="gift" size={20} />
+        </span>
+      )}
       {glowbug && (
         <span className={styles.glowbugBadge} aria-hidden="true">
           <GlowbugArt id={glowbug.id} size={30} isAwake={false} />
