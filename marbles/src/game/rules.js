@@ -5,11 +5,11 @@
 //                   a foul: the turn ends and you give one marble back.
 // Chase ("tzlifa"): each side has a shooter. Hit the other shooter to win a marble from their bag.
 // In all three a good shot gives another turn, and a miss passes the turn (as in the old rules).
-import { cloneWorld, flick, isLive, makeMarble, settle } from './physics.js';
+import { GROUNDS, cloneWorld, flick, isLive, makeMarble, settle } from './physics.js';
 
 export const YARD = { w: 360, h: 560 };
 export const MODES = {
-  ring: { name: 'Ring', blurb: 'Knock marbles out of the chalk ring', toWin: 5 },
+  ring: { name: 'Ring', blurb: 'Knock marbles out of the chalk ring', toWin: 7 },
   hole: { name: 'Mor', blurb: 'Push marbles into the Mor, the little hole', toWin: 4 },
   chase: { name: 'Chase', blurb: 'Hit the other shooter', toWin: 3 },
 };
@@ -30,20 +30,20 @@ export function seeded(seed) {
 }
 
 /** A new game of a mode: the yard with its marbles laid out, both shooters at their lines. */
-export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'shooter' }, stones = 2 } = {}) {
+export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'shooter' }, stones = 3, ground = 'earth' } = {}) {
   const rnd = seeded(seed);
   const cx = YARD.w / 2;
   const cy = YARD.h / 2;
-  const world = { ...YARD, marbles: [], stones: [], sand: [], hole: null, ring: null };
+  const world = { ...YARD, ground: GROUNDS[ground] ?? GROUNDS.earth, marbles: [], stones: [], sand: [], hole: null, ring: null };
   let id = 1;
   for (const side of SIDES) world.marbles.push(makeMarble(side, shooters[side], HOME[side].x, HOME[side].y, side));
   if (mode === 'ring') {
-    world.ring = { x: cx, y: cy, r: 112 };
+    world.ring = { x: cx, y: cy, r: 124 };
     // A cross of marbles in the middle, as children lay them out, with a few loose ones.
-    const spots = [[0, 0], [31, 0], [-31, 0], [0, 31], [0, -31], [62, 0], [-62, 0], [0, 62], [0, -62]];
+    const spots = [[0, 0], [31, 0], [-31, 0], [0, 31], [0, -31], [62, 0], [-62, 0], [0, 62], [0, -62], [39, 39], [-39, 39], [39, -39], [-39, -39]];
     for (const [dx, dy] of spots) world.marbles.push(makeMarble(`t${id++}`, 'glass', cx + dx + (rnd() - 0.5) * 6, cy + dy + (rnd() - 0.5) * 6));
   } else if (mode === 'hole') {
-    world.hole = { x: cx, y: cy, r: 28 };
+    world.hole = { x: cx, y: cy, r: 25 };
     for (let i = 0; i < 7; i++) {
       const angle = (i / 7) * Math.PI * 2 + rnd() * 0.5;
       const far = 70 + rnd() * 50;
@@ -64,6 +64,8 @@ export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'sho
     bag: { you: 0, foe: 0 },
     // Each side may call each of these once a game.
     calls: { you: { bakol: 1, bagova: 1 }, foe: { bakol: 1, bagova: 1 } },
+    // Ring: whether each shooter lies inside the ring (a shooter knocked out of it costs its side a marble).
+    inRing: { you: false, foe: false },
     winner: null,
     shots: 0,
     last: null,
@@ -102,6 +104,7 @@ export function judge(game, side, events) {
   const foeShooter = world.marbles.find((m) => m.id === other(side));
   let won = 0;
   let foul = null;
+  let knocked = false;
   if (mode === 'ring') {
     for (const m of targetsLeft(world)) {
       if (Math.hypot(m.x - world.ring.x, m.y - world.ring.y) > world.ring.r + m.r * 0.2) {
@@ -109,6 +112,17 @@ export function judge(game, side, events) {
         won++;
       }
     }
+    // A shooter left inside the ring is fair game: knock it out and you take one of its side's marbles.
+    const lies = (s) => Boolean(s) && Math.hypot(s.x - world.ring.x, s.y - world.ring.y) < world.ring.r;
+    if (foeShooter && game.inRing?.[other(side)] && !lies(foeShooter)) {
+      if (game.bag[other(side)] > 0) {
+        game.bag[other(side)]--;
+        won++;
+      }
+      Object.assign(foeShooter, { x: HOME[other(side)].x, y: HOME[other(side)].y, vx: 0, vy: 0 });
+      knocked = true;
+    }
+    if (game.inRing) game.inRing = { [side]: lies(shooter), [other(side)]: lies(foeShooter) };
   } else if (mode === 'hole') {
     for (const m of world.marbles) {
       if (!m.owner && m.sunk && !m.counted) {
@@ -146,8 +160,8 @@ export function judge(game, side, events) {
   if (game.bag[side] >= MODES[mode].toWin) game.winner = side;
   else if (mode !== 'chase' && targetsLeft(world).length === 0) game.winner = game.bag.you === game.bag.foe ? side : game.bag.you > game.bag.foe ? 'you' : 'foe';
   if (!again && !game.winner) game.turn = other(side);
-  game.last = { side, won, foul, again };
-  return { events, won, foul, again, hits: events.filter((e) => e.type === 'clack').length };
+  game.last = { side, won, foul, again, knocked };
+  return { events, won, foul, again, knocked, hits: events.filter((e) => e.type === 'clack').length };
 }
 
 /** What a shot would do, without touching the game (the computer and the tests use it). */

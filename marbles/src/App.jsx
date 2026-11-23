@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import Yard from './components/Yard.jsx';
 import HowTo from './components/HowTo.jsx';
 import { MODES, newGame } from './game/rules.js';
+import { GROUNDS } from './game/physics.js';
 import { LEVELS } from './game/ai.js';
 import { CHALLENGES, newChallenge, starsFor } from './game/challenges.js';
 import { sfx } from './game/audio.js';
@@ -47,6 +48,7 @@ export default function App() {
   const [mode, setMode] = useState(() => store.get('marbles.mode', 'ring'));
   const [rival, setRival] = useState(() => store.get('marbles.rival', 'easy'));
   const [shooter, setShooter] = useState(() => store.get('marbles.shooter', 'shooter'));
+  const [ground, setGround] = useState(() => store.get('marbles.ground', 'earth'));
   const [soundOn, setSoundOn] = useState(() => store.get('marbles.sound', true));
   const [stars, setStars] = useState(() => store.get('marbles.stars', {}));
   // The match being played: { game, rival, challenge } and a counter that goes up after every shot.
@@ -84,7 +86,8 @@ export default function App() {
     store.set('marbles.mode', mode);
     store.set('marbles.rival', rival);
     store.set('marbles.shooter', shooter);
-    const game = newGame(mode, { seed: Math.floor(Math.random() * 1e9), shooters: { you: shooter, foe: 'shooter' } });
+    store.set('marbles.ground', ground);
+    const game = newGame(mode, { seed: Math.floor(Math.random() * 1e9), shooters: { you: shooter, foe: 'shooter' }, ground });
     setMatch({ game, rival, challenge: null });
     setNote(null);
     setPhase('play');
@@ -117,7 +120,8 @@ export default function App() {
       return;
     }
     const who = names[game.last.side];
-    if (result.foul) say(`${who}: into the Mor! One marble back.`);
+    if (result.knocked) say(`${who} knocked the other shooter out of the ring!`);
+    else if (result.foul) say(`${who}: into the Mor! One marble back.`);
     else if (result.won > 1) say(`${who}: ${result.won} marbles! Shoot again.`);
     else if (result.won === 1) say(challenge ? 'Got one!' : `${who}: got one! Shoot again.`);
     else say(challenge ? 'Missed.' : `Missed. ${names[game.turn]}${game.turn === 'you' && match.rival !== 'two' ? 'r' : '’s'} turn.`);
@@ -204,6 +208,15 @@ export default function App() {
                 </button>
               ))}
             </div>
+            <h3>Ground</h3>
+            <div className="chips">
+              {Object.values(GROUNDS).map((g) => (
+                <button key={g.id} className={ground === g.id ? 'on' : ''} aria-pressed={ground === g.id} onClick={() => setGround(g.id)}>
+                  <i className={`swatch ground-${g.id}`} aria-hidden="true" />
+                  {g.name} <small>{g.blurb}</small>
+                </button>
+              ))}
+            </div>
             <h3>Your shooter</h3>
             <div className="chips">
               {SHOOTERS.map((s) => (
@@ -215,7 +228,7 @@ export default function App() {
             <button className="btn" onClick={startGame}>
               Play
               <small>
-                {MODES[mode].name} · first to {MODES[mode].toWin}
+                {MODES[mode].name} on {GROUNDS[ground].name.toLowerCase()} · first to {MODES[mode].toWin}
               </small>
             </button>
           </section>

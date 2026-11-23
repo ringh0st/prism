@@ -42,22 +42,88 @@ const swirl = (color, seed) =>
     }
   });
 
-const earth = () =>
+/** What each ground looks like from above. */
+const GROUND_LOOKS = {
+  earth: { base: '#bd935c', light: [255, 240, 210], dark: [110, 78, 46], beyond: '#9db572' },
+  sand: { base: '#e8d3a2', light: [255, 250, 232], dark: [176, 148, 96], beyond: '#7cc6d6' },
+  asphalt: { base: '#6f7178', light: [200, 204, 212], dark: [40, 42, 48], beyond: '#8a8d94' },
+  grass: { base: '#6fae4c', light: [176, 226, 120], dark: [44, 104, 40], beyond: '#5c9a40' },
+  hill: { base: '#b98a55', light: [250, 232, 200], dark: [104, 70, 40], beyond: '#9db572' },
+};
+
+const groundPicture = (id) =>
   paint(512, 800, (c, w, h) => {
-    c.fillStyle = '#bd935c';
+    const look = GROUND_LOOKS[id] ?? GROUND_LOOKS.earth;
+    c.fillStyle = look.base;
     c.fillRect(0, 0, w, h);
-    // Packed earth: grains, a few darker damp patches and scuff marks.
     let seed = 7;
     const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const ink = (rgb, alpha) => `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+    // Soft patches, then grain.
     for (let i = 0; i < 26; i++) {
-      c.fillStyle = `rgba(150, 110, 70, ${0.04 + rnd() * 0.05})`;
+      c.fillStyle = ink(look.dark, 0.04 + rnd() * 0.05);
       c.beginPath();
       c.ellipse(rnd() * w, rnd() * h, 30 + rnd() * 80, 20 + rnd() * 50, rnd() * 3, 0, Math.PI * 2);
       c.fill();
     }
     for (let i = 0; i < 5200; i++) {
-      c.fillStyle = rnd() < 0.5 ? `rgba(255, 240, 210, ${rnd() * 0.35})` : `rgba(110, 78, 46, ${rnd() * 0.3})`;
+      c.fillStyle = rnd() < 0.5 ? ink(look.light, rnd() * 0.35) : ink(look.dark, rnd() * 0.3);
       c.fillRect(rnd() * w, rnd() * h, 1 + rnd() * 2, 1 + rnd() * 2);
+    }
+    if (id === 'sand') {
+      // Wind ripples.
+      c.strokeStyle = ink(look.dark, 0.16);
+      c.lineWidth = 2;
+      for (let y = 10; y < h; y += 22) {
+        c.beginPath();
+        for (let x = 0; x <= w; x += 8) c.lineTo(x, y + Math.sin(x * 0.03 + y) * 4);
+        c.stroke();
+      }
+    } else if (id === 'grass') {
+      // Blades, and darker dips where the ground is uneven.
+      for (let i = 0; i < 2600; i++) {
+        const x = rnd() * w;
+        const y = rnd() * h;
+        c.strokeStyle = rnd() < 0.5 ? ink(look.light, 0.5) : ink(look.dark, 0.45);
+        c.lineWidth = 1.4;
+        c.beginPath();
+        c.moveTo(x, y);
+        c.lineTo(x + (rnd() - 0.5) * 6, y - 5 - rnd() * 7);
+        c.stroke();
+      }
+    } else if (id === 'asphalt') {
+      // Cracks and an old painted line.
+      c.strokeStyle = ink(look.dark, 0.6);
+      c.lineWidth = 1.6;
+      for (let i = 0; i < 7; i++) {
+        c.beginPath();
+        let x = rnd() * w;
+        let y = rnd() * h;
+        c.moveTo(x, y);
+        for (let k = 0; k < 6; k++) c.lineTo((x += (rnd() - 0.5) * 70), (y += 20 + rnd() * 40));
+        c.stroke();
+      }
+      c.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      c.fillRect(0, h * 0.5 - 3, w, 6);
+    } else if (id === 'hill') {
+      // Lighter at the top, with faint arrows pointing downhill.
+      const g = c.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, 'rgba(255, 244, 214, 0.3)');
+      g.addColorStop(1, 'rgba(60, 36, 14, 0.22)');
+      c.fillStyle = g;
+      c.fillRect(0, 0, w, h);
+      c.strokeStyle = 'rgba(255, 250, 235, 0.3)';
+      c.lineWidth = 5;
+      c.lineCap = 'round';
+      for (let y = 90; y < h; y += 170) {
+        for (let x = 80; x < w; x += 170) {
+          c.beginPath();
+          c.moveTo(x - 16, y - 10);
+          c.lineTo(x, y + 8);
+          c.lineTo(x + 16, y - 10);
+          c.stroke();
+        }
+      }
     }
   });
 
@@ -89,7 +155,7 @@ export function createView(canvas, yard) {
   scene.add(sun, sun.target);
 
   // The yard, with a kerb round it and plain ground beyond.
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(yard.w, yard.h), new THREE.MeshStandardMaterial({ map: earth(), roughness: 0.95 }));
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(yard.w, yard.h), new THREE.MeshStandardMaterial({ map: groundPicture('earth'), roughness: 0.95 }));
   ground.rotation.x = -Math.PI / 2;
   ground.position.copy(center);
   ground.receiveShadow = true;
@@ -97,6 +163,7 @@ export function createView(canvas, yard) {
   beyond.rotation.x = -Math.PI / 2;
   beyond.position.set(center.x, -0.5, center.z);
   beyond.receiveShadow = true;
+  ground.userData.id = 'earth';
   scene.add(ground, beyond);
   const kerbMat = new THREE.MeshStandardMaterial({ color: '#c97b5a', roughness: 0.8 });
   for (const [x, z, w, d] of [[yard.w / 2, -7, yard.w + 28, 14], [yard.w / 2, yard.h + 7, yard.w + 28, 14], [-7, yard.h / 2, 14, yard.h], [yard.w + 7, yard.h / 2, 14, yard.h]]) {
@@ -120,9 +187,17 @@ export function createView(canvas, yard) {
   };
   let fixtureKey = '';
   function layFixtures(world) {
-    const key = JSON.stringify([world.ring, world.hole, world.sand, world.stones]);
+    const groundId = world.ground?.id ?? 'earth';
+    const key = JSON.stringify([groundId, world.ring, world.hole, world.sand, world.stones]);
     if (key === fixtureKey) return;
     fixtureKey = key;
+    if (ground.userData.id !== groundId) {
+      ground.material.map?.dispose();
+      ground.material.map = groundPicture(groundId);
+      ground.material.needsUpdate = true;
+      ground.userData.id = groundId;
+      beyond.material.color.set((GROUND_LOOKS[groundId] ?? GROUND_LOOKS.earth).beyond);
+    }
     fixtures.clear();
     for (const s of world.sand) flat(new THREE.CircleGeometry(s.r, 40), new THREE.MeshStandardMaterial({ color: '#f1dfb6', roughness: 1 }), s.x, s.y, 0.3);
     if (world.ring) flat(new THREE.RingGeometry(world.ring.r - 2.6, world.ring.r + 2.6, 96), new THREE.MeshStandardMaterial({ color: '#fffdf6', roughness: 1, transparent: true, opacity: 0.9 }), world.ring.x, world.ring.y, 0.4);
@@ -179,6 +254,12 @@ export function createView(canvas, yard) {
     dot.rotation.x = -Math.PI / 2;
     scene.add(dot);
     return dot;
+  });
+
+  const fan = [0, 1].map(() => {
+    const line = new THREE.Mesh(new THREE.PlaneGeometry(1, 1.6), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true }));
+    scene.add(line);
+    return line;
   });
 
   const up = new THREE.Vector3(0, 1, 0);
@@ -254,6 +335,17 @@ export function createView(canvas, yard) {
         dot.scale.setScalar(4.2 - i * 0.28);
         dot.material.opacity = (i / 9 < aim.power + 0.15 ? 0.95 : 0.25) * (1 - i * 0.05);
         dot.material.color.set(aim.high ? '#8fe3ff' : '#ffffff');
+      });
+      // How far a flick this hard may stray: two faint lines that open like a fan.
+      fan.forEach((line, i) => {
+        line.visible = Boolean(aim && shooter);
+        if (!line.visible) return;
+        const angle = aim.angle + (i ? 1 : -1) * aim.stray;
+        const length = shooter.r + 12 + 8 * (10 + aim.power * 16);
+        line.scale.set(length, 1, 1);
+        line.position.set(shooter.x + (Math.cos(angle) * length) / 2, 0.65, shooter.y + (Math.sin(angle) * length) / 2);
+        line.rotation.set(-Math.PI / 2, 0, -angle);
+        line.material.opacity = 0.12 + 0.3 * aim.power;
       });
       renderer.render(scene, camera);
     },

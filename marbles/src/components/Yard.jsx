@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { STEP, flick, isAtRest, speedOf, step } from '../game/physics.js';
+import { STEP, flick, isAtRest, speedOf, step, strayOf } from '../game/physics.js';
 import { YARD, callBakol, judge } from '../game/rules.js';
 import { pickShot } from '../game/ai.js';
 import { createView } from '../game/view3d.js';
@@ -68,7 +68,7 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
             onChangeRef.current(result);
           }
         }
-        if (state.moving) sfx.roll(Math.max(...g.world.marbles.map(speedOf)) / 700);
+        if (state.moving) sfx.roll(Math.max(...g.world.marbles.map(speedOf)) / 700, g.world.ground?.hiss);
       }
       view.render(g.world, { aim: state.aim, turn: g.winner || state.moving ? null : g.turn, now, dt });
     };
@@ -115,7 +115,8 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
     const dx = state.pull.x - at.x;
     const dy = state.pull.y - at.y;
     const far = Math.hypot(dx, dy);
-    state.aim = far < 6 ? null : { angle: Math.atan2(dy, dx), power: Math.min(1, far / FULL_PULL), high: isHigh };
+    const power = Math.min(1, far / FULL_PULL);
+    state.aim = far < 6 ? null : { angle: Math.atan2(dy, dx), power, stray: strayOf(power), high: isHigh };
   };
   const onDown = (event) => {
     if (!canShoot || live.current.moving) return;
@@ -129,7 +130,8 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
     const { aim } = live.current;
     live.current.pull = null;
     live.current.aim = null;
-    if (aim && aim.power >= MIN_POWER && canShoot) fire(aim.angle, aim.power, isHigh);
+    // A real flick is never perfectly true, and a hard one least of all: it strays a little inside the fan shown.
+    if (aim && aim.power >= MIN_POWER && canShoot) fire(aim.angle + (Math.random() * 2 - 1) * aim.stray, aim.power, isHigh);
   };
 
   const calls = game.calls[side];

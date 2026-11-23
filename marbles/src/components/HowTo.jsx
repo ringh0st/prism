@@ -70,7 +70,9 @@ export default function HowTo({ onClose }) {
         <h3 className="part">Good to know</h3>
         <ul>
           <li>A slow marble drops into the Mor. A fast one skips over it.</li>
-          <li>Sand slows marbles down. Pebbles and the kerb bounce them back.</li>
+          <li>A hard flick is less accurate: the fan round your aim shows how far it may stray.</li>
+          <li>Every ground rolls differently: sand stops marbles fast, asphalt is quick and bouncy, grass bends shots, and on the slope everything rolls back down.</li>
+          <li>Pale patches are soft sand. Pebbles and the kerb bounce marbles back.</li>
           <li>The Steelie is heavy and plows through. The Jumbo is big and easy to hit with.</li>
           <li>New here? Start with the Challenges: they teach one thing at a time.</li>
         </ul>
@@ -84,7 +86,7 @@ export default function HowTo({ onClose }) {
 }
 
 const RULES = {
-  ring: `Knock marbles out of the chalk ring. Each one that leaves it is yours. First to ${MODES.ring.toWin} wins.`,
+  ring: `Knock marbles out of the chalk ring. Each one that leaves it is yours. A shooter left inside the ring can be knocked out too, and that costs its player a marble. First to ${MODES.ring.toWin} wins.`,
   hole: `The Mor is the little hole in the middle of the yard. Push marbles into it. If your own shooter falls in, your turn ends and you give one marble back. First to ${MODES.hole.toWin} wins.`,
   chase: `Hit the other player's shooter with yours to win one of their marbles. First to ${MODES.chase.toWin} wins.`,
 };

@@ -1,10 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { cloneWorld, flick, isAtRest, makeMarble, settle } from './physics.js';
+import { GROUNDS, cloneWorld, flick, isAtRest, makeMarble, settle, strayOf } from './physics.js';
 import { MODES, YARD, newGame, shoot, tryShot } from './rules.js';
 import { pickShot } from './ai.js';
 
 const yard = (marbles, extra = {}) => ({ ...YARD, marbles, stones: [], sand: [], hole: null, ring: null, ...extra });
+const roll = (ground, power = 0.6, angle = -Math.PI / 2) => {
+  const world = yard([makeMarble('a', 'glass', 180, 500)], { ground: GROUNDS[ground] });
+  flick(world.marbles[0], angle, power);
+  settle(world);
+  return world.marbles[0];
+};
 
 test('a flicked marble rolls, slows down and stops', () => {
   const world = yard([makeMarble('a', 'glass', 180, 500)]);
@@ -43,7 +49,7 @@ test('ring: a marble knocked out of the circle is won and gives another turn; a 
 });
 
 test('hole: a slow marble drops in, a fast one skips over, and the shooter in the hole is a foul', () => {
-  const hole = { x: 180, y: 280, r: 28 };
+  const hole = { x: 180, y: 280, r: 25 };
   const slow = yard([makeMarble('a', 'glass', 180, 380)], { hole });
   flick(slow.marbles[0], -Math.PI / 2, 0.12);
   settle(slow);
@@ -139,4 +145,33 @@ test('every challenge can be won within its shots (the computer finds a way)', a
     }
     assert.ok(won, `${challenge.name} can be won`);
   }
+});
+
+test('every ground rolls its own way', () => {
+  const far = (ground) => 500 - roll(ground).y;
+  assert.ok(far('sand') < far('earth') * 0.7, 'sand stops a marble much sooner than earth');
+  assert.ok(far('asphalt') > far('earth') * 1.2 || roll('asphalt').y > 60, 'asphalt lets it roll farther (or bounce back off the far kerb)');
+  assert.ok(Math.abs(roll('grass').x - 180) > 4, 'grass bends a straight shot');
+  assert.equal(Math.round(roll('earth').x), 180, 'earth keeps it straight');
+  assert.ok(roll('hill', 0.35).y > roll('earth', 0.35).y, 'uphill on the slope it gets less far');
+});
+
+test('a harder flick may stray more', () => {
+  assert.ok(strayOf(1) > strayOf(0.3) * 3);
+});
+
+test('ring: a shooter left in the ring can be knocked out, and that costs its side a marble', () => {
+  const game = newGame('ring', { seed: 2, stones: 0 });
+  game.world.marbles = game.world.marbles.filter((m) => m.owner || m.id === 't1');
+  Object.assign(game.world.marbles.find((m) => m.id === 't1'), { x: 60, y: 280 });
+  const foe = game.world.marbles.find((m) => m.id === 'foe');
+  Object.assign(foe, { x: 180, y: 190 });
+  game.inRing.foe = true;
+  game.bag.foe = 2;
+  Object.assign(game.world.marbles.find((m) => m.id === 'you'), { x: 180, y: 330 });
+  const result = shoot(game, -Math.PI / 2, 0.9);
+  assert.ok(result.knocked);
+  assert.equal(game.bag.foe, 1);
+  assert.equal(game.bag.you, 1);
+  assert.equal(game.turn, 'you');
 });

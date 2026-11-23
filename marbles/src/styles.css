@@ -610,3 +610,33 @@ button {
 .howto .mode-art {
   display: block;
 }
+
+/* A dab of each ground's color on its chip. */
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 5px;
+  border-radius: 50%;
+  vertical-align: -2px;
+  box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.15);
+}
+.ground-earth {
+  background: #bd935c;
+}
+.ground-sand {
+  background: #e8d3a2;
+}
+.ground-asphalt {
+  background: #6f7178;
+}
+.ground-grass {
+  background: #6fae4c;
+}
+.ground-hill {
+  background: linear-gradient(180deg, #e2c08e, #8d6238);
+}
+.pips i {
+  width: 11px;
+  height: 11px;
+}

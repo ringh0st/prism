@@ -115,7 +115,7 @@ export const sfx = {
     tone(1400, 2000, 0.03, { vol: 0.05 });
   },
   /** Marbles rolling on earth: a soft hiss that follows how fast they go (0…1). Call every frame. */
-  roll(level) {
+  roll(level, hiss = 0.5) {
     const a = ac();
     if (!a) return;
     if (!rolling) {
@@ -134,8 +134,9 @@ export const sfx = {
       rolling = { filter, gain };
     }
     const k = isOn ? Math.min(1, level) : 0;
-    rolling.gain.gain.setTargetAtTime(k * 0.07, a.currentTime, 0.05);
-    rolling.filter.frequency.setTargetAtTime(500 + k * 1500, a.currentTime, 0.05);
+    rolling.gain.gain.setTargetAtTime(k * (0.04 + hiss * 0.06), a.currentTime, 0.05);
+    // Asphalt hisses bright, grass and sand are muffled.
+    rolling.filter.frequency.setTargetAtTime(300 + hiss * 900 + k * (700 + hiss * 1600), a.currentTime, 0.05);
   },
   /** "Bakol!": a broom sweeps the pebbles away. */
   sweep() {
