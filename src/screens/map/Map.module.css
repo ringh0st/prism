@@ -21,8 +21,32 @@
 }
 
 /* The wallet sits at the top end, as on every other screen; the things to do make a row under it */
-.hud > :first-child {
-  align-self: flex-end;
+/* Top row: the way back to all games at the start, the wallet at the end. */
+.hudTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.hudTop > :last-child {
+  margin-inline-start: auto;
+}
+
+.allGames {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  color: var(--text-strong);
+  background: var(--surface-raised);
+  box-shadow: 0 3px 0 var(--surface-cell-edge);
+}
+
+.allGames:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--surface-cell-edge);
 }
 
 .hudStart {

@@ -41,6 +41,7 @@ export const en = {
   'world.number': 'World {n}',
   'level.title': 'Level {label}',
 
+  'map.allGames': 'All games',
   'map.play': 'PLAY',
   'map.boss': 'BOSS',
   'map.toUnlock.one': '{count} more ★ to unlock',

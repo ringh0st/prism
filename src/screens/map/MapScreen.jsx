@@ -28,6 +28,7 @@ import { isChestUnlocked, starsFor, totalStars } from '../../game/progress.js';
 import { chestId } from '../../game/surprises.js';
 import { areAllLevelsOpen } from '../../lib/openAllLevels.js';
 import { MAX_STARS } from '../../game/scoring.js';
+import { isNativeApp } from '../../lib/platform.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import { buildWorldStops, pathThrough, ROW_HEIGHT } from './mapLayout.js';
 import styles from './Map.module.css';
@@ -162,7 +163,20 @@ export default function MapScreen() {
   return (
     <div className={styles.page}>
       <header ref={hudRef} className={styles.hud}>
-        <CurrencyHud />
+        <div className={styles.hudTop}>
+          {/* Back to the page with all of Rinny's games (the app has no such page to go to). */}
+          {!isNativeApp && (
+            <a className={styles.allGames} href="../" aria-label={t('map.allGames')} title={t('map.allGames')}>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                <rect x="3" y="3" width="8" height="8" rx="2.5" />
+                <rect x="13" y="3" width="8" height="8" rx="2.5" />
+                <rect x="3" y="13" width="8" height="8" rx="2.5" />
+                <rect x="13" y="13" width="8" height="8" rx="2.5" />
+              </svg>
+            </a>
+          )}
+          <CurrencyHud />
+        </div>
         {/* Things to do now, each with its name. They open one at a time as the player goes (unlocks.js). */}
         <div className={styles.hudStart}>
           {isFeatureOpen('gift', solvedCount) && <DailyGift />}

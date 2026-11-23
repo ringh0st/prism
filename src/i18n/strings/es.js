@@ -37,6 +37,7 @@ export const es = {
   'world.number': 'Mundo {n}',
   'level.title': 'Nivel {label}',
 
+  'map.allGames': 'Todos los juegos',
   'map.play': 'JUGAR',
   'map.boss': 'JEFE',
   'map.toUnlock.one': 'Falta {count} ★ para abrir',

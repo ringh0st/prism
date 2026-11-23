@@ -37,6 +37,7 @@ export const he = {
   'world.number': 'עולם {n}',
   'level.title': 'שלב {label}',
 
+  'map.allGames': 'כל המשחקים',
   'map.play': 'שחקו',
   'map.boss': 'בוס',
   'map.toUnlock.one': 'עוד ★ אחד לפתיחה',
