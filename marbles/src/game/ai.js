@@ -1,6 +1,6 @@
 // The computer player: it tries many shots in its head (the physics is exact, so it can) and plays the best one,
 // with a shaky hand that depends on the level.
-import { isLive, strayOf } from './physics.js';
+import { isLive, ringCorners, strayOf } from './physics.js';
 import { other, tryShot } from './rules.js';
 
 export const LEVELS = {
@@ -14,6 +14,19 @@ export const LEVELS = {
 
 /** The nearest point outside the ring for a marble lying in it. */
 function outOfRing(ring, m) {
+  const corners = ringCorners(ring);
+  if (corners) {
+    // The nearest side of a triangle or square: straight out across it.
+    let best = null;
+    for (let i = 0; i < corners.length; i++) {
+      const a = corners[i];
+      const b = corners[(i + 1) % corners.length];
+      const length = Math.hypot(b.x - a.x, b.y - a.y);
+      const depth = ((b.x - a.x) * (m.y - a.y) - (b.y - a.y) * (m.x - a.x)) / length;
+      if (!best || depth < best.depth) best = { depth, nx: (b.y - a.y) / length, ny: -(b.x - a.x) / length };
+    }
+    return { x: m.x + best.nx * (best.depth + 40), y: m.y + best.ny * (best.depth + 40) };
+  }
   const d = Math.hypot(m.x - ring.x, m.y - ring.y) || 1;
   return { x: ring.x + ((m.x - ring.x) / d) * (ring.r + 40), y: ring.y + ((m.y - ring.y) / d) * (ring.r + 40) };
 }

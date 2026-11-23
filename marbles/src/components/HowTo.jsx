@@ -84,6 +84,8 @@ export default function HowTo({ onClose }) {
           <li>A hard flick is less accurate: the fan round your aim shows how far it may stray.</li>
           <li>Every ground rolls differently: sand stops marbles fast, asphalt is quick and bouncy, grass bends shots, and on the slope everything rolls back down.</li>
           <li>Pale patches are soft sand. Pebbles and the kerb bounce marbles back.</li>
+          <li>Every yard has its own shape. A mound (the light bump) rolls marbles off to the side, a dip (the dark hollow) pulls them in, a puddle stops them dead, and gate posts leave a narrow way through.</li>
+          <li>The ring isn’t always a circle: sometimes it is a triangle or a square. A marble is out when it crosses the chalk line.</li>
           <li>The Steelie is heavy and plows through. The Jumbo is big and easy to hit with.</li>
           <li>New here? Start with the Challenges: they teach one thing at a time.</li>
         </ul>

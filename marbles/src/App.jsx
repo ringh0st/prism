@@ -23,6 +23,12 @@ const RIVALS = [
   { id: 'live', name: 'A friend · live with a code' },
 ];
 const SPLASH_MS = 2200;
+/** What a yard's own shape is called in the line under the score at the start of a game. */
+const FEATURE_NAMES = { mound: 'a mound', dip: 'a dip', puddle: 'a puddle', gates: 'gates' };
+const yardLine = (world) => {
+  const parts = [...(world.ring && world.ring.shape !== 'circle' ? [`a ${world.ring.shape} ring`] : []), ...(world.features ?? []).map((f) => FEATURE_NAMES[f])];
+  return parts.length ? ` This yard: ${parts.join(', ')}.` : '';
+};
 
 const Icon = {
   home: <path d="M4 11.5 12 4l8 7.5M6.5 10v9h11v-9M10 19v-5h4v5" />,
@@ -442,6 +448,7 @@ export default function App() {
                   ? `Player 1 has the warm marbles, Player 2 the cool ones. Knock the other's out. ${turnLine(game.turn)}`
                   : `${mySide === 'you' ? 'Warm' : 'Cool'} marbles are yours: knock the ${mySide === 'you' ? 'cool' : 'warm'} ones out. ${turnLine(game.turn)}`
                 : `${MODES[game.mode].blurb}. ${turnLine(game.turn)}`}
+            {!challenge && yardLine(game.world)}
           </p>
         )}
         {note && !game.winner && (

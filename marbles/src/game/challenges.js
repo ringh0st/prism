@@ -27,7 +27,7 @@ export const starsFor = (challenge, shotsUsed) => (shotsUsed <= challenge.par ? 
 
 /** A game of a challenge: only you shoot. */
 export function newChallenge(challenge, shooter = 'shooter') {
-  const game = newGame(challenge.mode, { seed: 1, shooters: { you: shooter, foe: 'shooter' }, stones: 0 });
+  const game = newGame(challenge.mode, { seed: 1, shooters: { you: shooter, foe: 'shooter' }, stones: 0, terrain: false });
   const you = game.world.marbles.find((m) => m.id === 'you');
   const foe = game.world.marbles.find((m) => m.id === 'foe');
   // In a chase challenge the other shooter is the thing to hit; in the others it isn't there.

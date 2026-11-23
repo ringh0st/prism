@@ -6,10 +6,13 @@
 //   stone:  { x, y, r }            a pebble that doesn't move
 //   sand:   { x, y, r }            a soft patch that slows marbles down
 //   hole:   { x, y, r } | null     the "mor": slow marbles drop in, fast ones skip over its lip
-//   ring:   { x, y, r } | null     the chalk circle (the rules use it; physics doesn't)
+//   ring:   { x, y, r, shape } | null   the chalk ring: a circle, a triangle or a square (the rules use it)
+//   puddles: [{ x, y, r }]          water: a marble that rolls in stops almost at once
+//   terrain: [{ x, y, r, push }]    a mound (push > 0: marbles roll off it) or a dip (push < 0: they roll in)
 
 export const STEP = 1 / 120;
 const SAND_DRAG = 1500;
+const PUDDLE_DRAG = 3600;
 
 /**
  * The grounds a yard can have. Each rolls differently:
@@ -52,6 +55,39 @@ export function makeMarble(id, kind, x, y, owner = null) {
 /** How much less true a harder flick flies: the widest it can stray to either side, in radians (power 0…1). */
 export const strayOf = (power) => 0.014 + 0.085 * power * power;
 
+/** The corners of a chalk ring that isn't a circle (null for a circle). */
+export function ringCorners(ring) {
+  if (ring.shape === 'triangle') {
+    // It points sideways, so both players, shooting from the two ends, face the same shape.
+    const R = ring.r * 1.06;
+    return [
+      { x: ring.x - R, y: ring.y },
+      { x: ring.x + R / 2, y: ring.y - R * 0.866 },
+      { x: ring.x + R / 2, y: ring.y + R * 0.866 },
+    ];
+  }
+  if (ring.shape === 'square') {
+    const half = ring.r * 0.9;
+    return [[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([sx, sy]) => ({ x: ring.x + sx * half, y: ring.y + sy * half }));
+  }
+  return null;
+}
+
+/** How deep inside the ring a point lies (negative: that far outside), for a ring of any shape. */
+export function depthInRing(ring, x, y) {
+  const corners = ringCorners(ring);
+  if (!corners) return ring.r - Math.hypot(x - ring.x, y - ring.y);
+  let depth = Infinity;
+  for (let i = 0; i < corners.length; i++) {
+    const a = corners[i];
+    const b = corners[(i + 1) % corners.length];
+    const length = Math.hypot(b.x - a.x, b.y - a.y);
+    // The corners go clockwise on screen, so the inside is on the right of each side.
+    depth = Math.min(depth, ((b.x - a.x) * (y - a.y) - (b.y - a.y) * (x - a.x)) / length);
+  }
+  return depth;
+}
+
 export const cloneWorld = (world) => ({ ...world, marbles: world.marbles.map((m) => ({ ...m })), stones: world.stones.map((s) => ({ ...s })) });
 
 export const isLive = (m) => !m.sunk && !m.out;
@@ -89,11 +125,22 @@ export function step(world) {
       }
     } else if (v > 0) {
       const inSand = world.sand.some((s) => Math.hypot(m.x - s.x, m.y - s.y) < s.r);
-      const next = v - ((inSand ? SAND_DRAG : ground.drag) + AIR_DRAG * v) * STEP;
+      const inWater = world.puddles?.some((s) => Math.hypot(m.x - s.x, m.y - s.y) < s.r);
+      const next = v - ((inWater ? PUDDLE_DRAG : inSand ? SAND_DRAG : ground.drag) + AIR_DRAG * v) * STEP;
       const keep = next > REST_SPEED ? next / v : 0;
       m.vx *= keep;
       m.vy *= keep;
       if (keep > 0) {
+        // Mounds and dips: a rolling marble is pushed down their slope, steepest half-way up.
+        for (const t of world.terrain ?? []) {
+          const dx = m.x - t.x;
+          const dy = m.y - t.y;
+          const d = Math.hypot(dx, dy);
+          if (d >= t.r || d === 0) continue;
+          const steep = Math.sin((d / t.r) * Math.PI) * t.push * STEP;
+          m.vx += (dx / d) * steep;
+          m.vy += (dy / d) * steep;
+        }
         // A slope pulls a rolling marble downhill; uneven ground bends its way sideways.
         m.vy += ground.slope * STEP;
         if (ground.bumps) {

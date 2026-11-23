@@ -2,7 +2,7 @@
 // from above at a slight tilt. It only draws: the physics (physics.js) says where everything is.
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import { isLive } from './physics.js';
+import { isLive, ringCorners } from './physics.js';
 
 const TARGET_COLORS = ['#e2574c', '#3fa7d6', '#59cd90', '#f6ae2d', '#b565d8', '#ee6c9c', '#2ec4b6', '#ff8c42', '#7d8cf8'];
 // In the ring game each side's marbles wear its own colors: warm for the near side, cool for the far side.
@@ -191,7 +191,7 @@ export function createView(canvas, yard, { flip = false } = {}) {
   let fixtureKey = '';
   function layFixtures(world) {
     const groundId = world.ground?.id ?? 'earth';
-    const key = JSON.stringify([groundId, world.ring, world.hole, world.sand, world.stones]);
+    const key = JSON.stringify([groundId, world.ring, world.hole, world.sand, world.stones, world.puddles, world.terrain]);
     if (key === fixtureKey) return;
     fixtureKey = key;
     if (ground.userData.id !== groundId) {
@@ -203,7 +203,46 @@ export function createView(canvas, yard, { flip = false } = {}) {
     }
     fixtures.clear();
     for (const s of world.sand) flat(new THREE.CircleGeometry(s.r, 40), new THREE.MeshStandardMaterial({ color: '#f1dfb6', roughness: 1 }), s.x, s.y, 0.3);
-    if (world.ring) flat(new THREE.RingGeometry(world.ring.r - 2.6, world.ring.r + 2.6, 96), new THREE.MeshStandardMaterial({ color: '#fffdf6', roughness: 1, transparent: true, opacity: 0.9 }), world.ring.x, world.ring.y, 0.4);
+    // Mounds and dips: shaded so the eye reads the height (light on the sunny side of a mound, dark in a dip).
+    for (const t of world.terrain ?? []) {
+      const isMound = t.push > 0;
+      const shade = paint(128, 128, (c) => {
+        const g = c.createRadialGradient(isMound ? 50 : 64, isMound ? 48 : 64, 4, 64, 64, 64);
+        if (isMound) {
+          g.addColorStop(0, 'rgba(255, 246, 220, 0.75)');
+          g.addColorStop(0.6, 'rgba(255, 240, 205, 0.25)');
+          g.addColorStop(0.85, 'rgba(70, 44, 20, 0.28)');
+          g.addColorStop(1, 'rgba(70, 44, 20, 0)');
+        } else {
+          g.addColorStop(0, 'rgba(50, 30, 12, 0.6)');
+          g.addColorStop(0.7, 'rgba(60, 38, 16, 0.3)');
+          g.addColorStop(0.92, 'rgba(255, 244, 214, 0.35)');
+          g.addColorStop(1, 'rgba(255, 244, 214, 0)');
+        }
+        c.fillStyle = g;
+        c.fillRect(0, 0, 128, 128);
+      });
+      flat(new THREE.CircleGeometry(t.r * 1.08, 48), new THREE.MeshBasicMaterial({ map: shade, transparent: true }), t.x, t.y, 0.32).receiveShadow = false;
+    }
+    // Puddles: shiny water.
+    for (const p of world.puddles ?? []) {
+      flat(new THREE.CircleGeometry(p.r, 40), new THREE.MeshPhysicalMaterial({ color: '#5aa9d6', roughness: 0.05, metalness: 0.1, clearcoat: 1, transparent: true, opacity: 0.85, envMapIntensity: 1.2 }), p.x, p.y, 0.36);
+      flat(new THREE.RingGeometry(p.r - 1.6, p.r + 1.4, 40), new THREE.MeshBasicMaterial({ color: '#3c7fa8', transparent: true, opacity: 0.55 }), p.x, p.y, 0.38).receiveShadow = false;
+    }
+    if (world.ring) {
+      const chalk = new THREE.MeshStandardMaterial({ color: '#fffdf6', roughness: 1, transparent: true, opacity: 0.9 });
+      const corners = ringCorners(world.ring);
+      if (!corners) flat(new THREE.RingGeometry(world.ring.r - 2.6, world.ring.r + 2.6, 96), chalk, world.ring.x, world.ring.y, 0.4);
+      else {
+        // A triangle or a square, drawn in chalk: one thin bar per side, with a dot of chalk at every corner.
+        corners.forEach((a, i) => {
+          const b = corners[(i + 1) % corners.length];
+          const side = flat(new THREE.PlaneGeometry(Math.hypot(b.x - a.x, b.y - a.y), 5.2), chalk, (a.x + b.x) / 2, (a.y + b.y) / 2, 0.4);
+          side.rotation.z = -Math.atan2(b.y - a.y, b.x - a.x);
+          flat(new THREE.CircleGeometry(2.6, 16), chalk, a.x, a.y, 0.4);
+        });
+      }
+    }
     if (world.hole) {
       const pit = paint(128, 128, (c) => {
         const g = c.createRadialGradient(64, 64, 6, 64, 64, 64);
@@ -218,6 +257,17 @@ export function createView(canvas, yard, { flip = false } = {}) {
       flat(new THREE.CircleGeometry(world.hole.r, 40), new THREE.MeshBasicMaterial({ map: pit }), world.hole.x, world.hole.y, 0.5).receiveShadow = false;
     }
     world.stones.forEach((s, i) => {
+      if (s.post) {
+        // A gate post: a short wooden peg with a painted top.
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(s.r, s.r * 1.08, 26, 20), new THREE.MeshStandardMaterial({ color: '#b07a48', roughness: 0.8 }));
+        post.position.set(s.x, 13, s.y);
+        post.castShadow = true;
+        const cap = new THREE.Mesh(new THREE.CylinderGeometry(s.r * 1.02, s.r * 1.02, 5, 20), new THREE.MeshStandardMaterial({ color: '#e2574c', roughness: 0.6 }));
+        cap.position.set(s.x, 28, s.y);
+        cap.castShadow = true;
+        fixtures.add(post, cap);
+        return;
+      }
       const stone = new THREE.Mesh(new THREE.IcosahedronGeometry(s.r, 1), new THREE.MeshStandardMaterial({ color: i % 2 ? '#9a958c' : '#857f76', roughness: 0.9, flatShading: true }));
       stone.scale.y = 0.62;
       stone.rotation.y = i * 1.7;

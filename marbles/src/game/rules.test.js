@@ -40,7 +40,7 @@ test('the same shot always ends the same way', () => {
 
 test('ring: knocking out one of theirs wins it and gives a bonus shot; knocking out your own gives it to them', () => {
   const lay = (team) => {
-    const game = newGame('ring', { seed: 3, stones: 0 });
+    const game = newGame('ring', { seed: 3, stones: 0, terrain: false });
     game.turn = 'you';
     game.world.marbles = game.world.marbles.filter((m) => m.owner || m.id === 't1' || m.id === 't2');
     Object.assign(game.world.marbles.find((m) => m.id === 't1'), { x: 180, y: 180, team });
@@ -78,7 +78,7 @@ test('hole: a slow marble drops in, a fast one skips over, and the shooter in th
   settle(fast);
   assert.ok(!fast.marbles[0].sunk);
 
-  const game = newGame('hole', { seed: 2, stones: 0 });
+  const game = newGame('hole', { seed: 2, stones: 0, terrain: false });
   game.turn = 'you';
   // Only one target is left, far from the hole, so the game isn't over.
   game.world.marbles = game.world.marbles.filter((m) => m.owner || m.id === 't1');
@@ -92,7 +92,7 @@ test('hole: a slow marble drops in, a fast one skips over, and the shooter in th
 });
 
 test('chase: hitting the other shooter wins a marble, and it goes back to its line', () => {
-  const game = newGame('chase', { seed: 1, stones: 0 });
+  const game = newGame('chase', { seed: 1, stones: 0, terrain: false });
   game.turn = 'you';
   game.world.sand = [];
   const you = game.world.marbles.find((m) => m.id === 'you');
@@ -187,7 +187,7 @@ test('a harder flick may stray more', () => {
 });
 
 test('ring: a shooter left in the ring can be knocked out, and that costs its side a marble', () => {
-  const game = newGame('ring', { seed: 2, stones: 0 });
+  const game = newGame('ring', { seed: 2, stones: 0, terrain: false });
   game.turn = 'you';
   game.world.marbles = game.world.marbles.filter((m) => m.owner || m.id === 't1');
   Object.assign(game.world.marbles.find((m) => m.id === 't1'), { x: 60, y: 280 });
@@ -204,7 +204,7 @@ test('ring: a shooter left in the ring can be knocked out, and that costs its si
 });
 
 test('chase: a wild shot into the kerb is out, and gives the other side a marble', () => {
-  const game = newGame('chase', { seed: 1, stones: 0 });
+  const game = newGame('chase', { seed: 1, stones: 0, terrain: false });
   game.turn = 'you';
   game.world.sand = [];
   Object.assign(game.world.marbles.find((m) => m.id === 'you'), { x: 180, y: 400 });
@@ -217,7 +217,7 @@ test('chase: a wild shot into the kerb is out, and gives the other side a marble
 
 test('fair turns: one bonus shot at most, and the side that shot second always gets its turn to answer', () => {
   const hitGame = () => {
-    const game = newGame('chase', { seed: 1, stones: 0 });
+    const game = newGame('chase', { seed: 1, stones: 0, terrain: false });
     game.world.sand = [];
     return game;
   };
@@ -246,4 +246,49 @@ test('fair turns: one bonus shot at most, and the side that shot second always g
   game.turns = { you: 2, foe: 1 };
   shoot(game, 0, 0.1);
   assert.equal(game.winner, 'you');
+});
+
+test('rings that are not circles: a marble is out of a triangle or a square when it crosses a side', async () => {
+  const { depthInRing, ringCorners } = await import('./physics.js');
+  for (const shape of ['circle', 'triangle', 'square']) {
+    const ring = { x: 180, y: 280, r: 150, shape };
+    assert.ok(depthInRing(ring, 180, 280) > 50, `${shape}: the middle is well inside`);
+    assert.ok(depthInRing(ring, 180, 20) < 0, `${shape}: far above is outside`);
+    assert.ok(depthInRing(ring, 355, 280) < 0, `${shape}: far to the side is outside`);
+  }
+  assert.equal(ringCorners({ x: 0, y: 0, r: 100, shape: 'circle' }), null);
+  // The corner of a square is inside; the same spot is outside a circle of that size.
+  assert.ok(depthInRing({ x: 180, y: 280, r: 150, shape: 'square' }, 180 + 125, 280 + 125) > 0);
+  assert.ok(depthInRing({ x: 180, y: 280, r: 150, shape: 'circle' }, 180 + 125, 280 + 125) < 0);
+});
+
+test('the yard has its own shape: a mound rolls marbles off, a dip pulls them in, a puddle stops them', () => {
+  const run = (extra, angle = -Math.PI / 2) => {
+    const world = yard([makeMarble('a', 'glass', 180, 500)], extra);
+    flick(world.marbles[0], angle, 0.7);
+    settle(world);
+    return world.marbles[0];
+  };
+  const flat = run({});
+  // Passing beside the top of a mound, the marble is pushed away from it; beside a dip, toward it.
+  assert.ok(run({ terrain: [{ x: 150, y: 330, r: 58, push: 1500 }] }).x > flat.x + 4, 'the mound pushes it aside');
+  assert.ok(run({ terrain: [{ x: 150, y: 330, r: 54, push: -1300 }] }).x < flat.x - 4, 'the dip pulls it in');
+  const wet = run({ puddles: [{ x: 180, y: 380, r: 30 }] });
+  assert.ok(wet.y > 340, 'the puddle stops it');
+});
+
+test('every yard is laid out from its seed: the same seed gives the same shape, and seeds differ', () => {
+  const a = newGame('ring', { seed: 11 });
+  const b = newGame('ring', { seed: 11 });
+  assert.deepEqual(a.world.features, b.world.features);
+  assert.equal(a.world.ring.shape, b.world.ring.shape);
+  const kinds = new Set();
+  const shapes = new Set();
+  for (let seed = 1; seed <= 40; seed++) {
+    const game = newGame('ring', { seed });
+    game.world.features.forEach((f) => kinds.add(f));
+    shapes.add(game.world.ring.shape);
+  }
+  assert.deepEqual([...kinds].sort(), ['dip', 'gates', 'mound', 'puddle']);
+  assert.deepEqual([...shapes].sort(), ['circle', 'square', 'triangle']);
 });

@@ -5,7 +5,7 @@
 //                   a foul: the turn ends and you give one marble back.
 // Chase ("tzlifa"): each side has a shooter. Hit the other shooter to win a marble from their bag.
 // In all three a good shot gives another turn, and a miss passes the turn (as in the old rules).
-import { GROUNDS, cloneWorld, flick, isLive, makeMarble, settle } from './physics.js';
+import { GROUNDS, cloneWorld, depthInRing, flick, isLive, makeMarble, settle } from './physics.js';
 
 export const YARD = { w: 360, h: 560 };
 export const MODES = {
@@ -31,12 +31,16 @@ export function seeded(seed) {
   };
 }
 
-/** A new game of a mode: the yard with its marbles laid out, both shooters at their lines. */
-export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'shooter' }, stones = mode === 'chase' ? 6 : 3, ground = 'earth' } = {}) {
+/**
+ * A new game of a mode: the yard with its marbles laid out, both shooters at their lines.
+ * @param terrain lay out the yard's own shape (a mound, a dip, a puddle or gates) and draw the ring as a circle,
+ *   a triangle or a square, all from the seed: no two yards are alike. False for a plain flat yard with a circle.
+ */
+export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'shooter' }, stones = mode === 'chase' ? 6 : 3, ground = 'earth', terrain = true } = {}) {
   const rnd = seeded(seed);
   const cx = YARD.w / 2;
   const cy = YARD.h / 2;
-  const world = { ...YARD, ground: GROUNDS[ground] ?? GROUNDS.earth, marbles: [], stones: [], sand: [], hole: null, ring: null };
+  const world = { ...YARD, ground: GROUNDS[ground] ?? GROUNDS.earth, marbles: [], stones: [], sand: [], puddles: [], terrain: [], features: [], hole: null, ring: null };
   let id = 1;
   for (const side of SIDES) world.marbles.push(makeMarble(side, shooters[side], HOME[side].x, HOME[side].y, side));
   if (mode === 'chase') {
@@ -47,7 +51,9 @@ export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'sho
     world.sand.push({ x: cx + (rnd() - 0.5) * 120, y: cy + (rnd() - 0.5) * 120, r: 44 });
   }
   if (mode === 'ring') {
-    world.ring = { x: cx, y: cy, r: 150 };
+    // Sometimes the ring isn't a circle (as children drew it): a triangle or a square, about as roomy.
+    const shape = terrain ? ['circle', 'circle', 'triangle', 'square'][Math.floor(rnd() * 4)] : 'circle';
+    world.ring = { x: cx, y: cy, r: 150, shape };
     // A cross of marbles in the middle, as children lay them out, with a few loose ones.
     // Each side puts six marbles in, mixed together: a shot has to pick the other side's out of the pack, because
     // knocking out one of your own gives it to them.
@@ -70,8 +76,31 @@ export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'sho
       world.marbles.push(makeMarble(`t${id++}`, 'glass', cx + Math.cos(angle) * far, cy + Math.sin(angle) * far));
     }
   }
+  if (terrain) {
+    // The yard's own shape: one or two of a mound, a dip, a puddle and a pair of gates, the same for both sides.
+    const kinds = ['mound', 'dip', 'puddle', 'gates'];
+    for (let i = kinds.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      [kinds[i], kinds[j]] = [kinds[j], kinds[i]];
+    }
+    const spot = () => {
+      for (let tries = 0; tries < 40; tries++) {
+        const at = { x: 70 + rnd() * (YARD.w - 140), y: 150 + rnd() * (YARD.h - 300) };
+        if (!world.hole || Math.hypot(world.hole.x - at.x, world.hole.y - at.y) > 95) return at;
+      }
+      return { x: 80, y: 180 };
+    };
+    for (const kind of kinds.slice(0, rnd() < 0.5 ? 1 : 2)) {
+      world.features.push(kind);
+      if (kind === 'mound') world.terrain.push({ ...spot(), r: 58, push: 1500 });
+      else if (kind === 'dip') world.terrain.push({ ...spot(), r: 54, push: -1300 });
+      else if (kind === 'puddle') world.puddles.push({ ...spot(), r: 30 });
+      else for (const y of [YARD.h - 118, 118]) for (const dx of [-30, 30]) world.stones.push({ x: cx + dx, y, r: 8, post: true });
+    }
+  }
   // Pebbles lie about the yard, never on a marble or right at a shooting line.
-  for (let tries = 0; world.stones.length < stones && tries < 200; tries++) {
+  const posts = world.stones.length;
+  for (let tries = 0; world.stones.length < stones + posts && tries < 200; tries++) {
     const stone = { x: 40 + rnd() * (YARD.w - 80), y: 110 + rnd() * (YARD.h - 220), r: 9 + rnd() * 6 };
     const isClear = world.marbles.every((m) => Math.hypot(m.x - stone.x, m.y - stone.y) > m.r + stone.r + 18) && world.stones.every((s) => Math.hypot(s.x - stone.x, s.y - stone.y) > 50);
     const onTarget = (world.hole && Math.hypot(world.hole.x - stone.x, world.hole.y - stone.y) < 60) || (world.ring && Math.hypot(world.ring.x - stone.x, world.ring.y - stone.y) < world.ring.r + 10);
@@ -98,9 +127,9 @@ export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'sho
 
 /** "Bakol!": the pebbles are swept off the yard. */
 export function callBakol(game, side) {
-  if (game.calls[side].bakol < 1 || !game.world.stones.length) return false;
+  if (game.calls[side].bakol < 1 || !game.world.stones.some((stone) => !stone.post)) return false;
   game.calls[side].bakol--;
-  game.world.stones = [];
+  game.world.stones = game.world.stones.filter((stone) => stone.post);
   return true;
 }
 
@@ -132,7 +161,7 @@ export function judge(game, side, events) {
   let lost = 0;
   if (mode === 'ring') {
     for (const m of targetsLeft(world)) {
-      if (Math.hypot(m.x - world.ring.x, m.y - world.ring.y) > world.ring.r + m.r * 0.2) {
+      if (depthInRing(world.ring, m.x, m.y) < -m.r * 0.2) {
         m.out = true;
         // One of your own knocked out goes to the other side.
         if (m.team === side) lost++;
@@ -140,7 +169,7 @@ export function judge(game, side, events) {
       }
     }
     // A shooter left inside the ring is fair game: knock it out and you take one of its side's marbles.
-    const lies = (s) => Boolean(s) && Math.hypot(s.x - world.ring.x, s.y - world.ring.y) < world.ring.r;
+    const lies = (s) => Boolean(s) && depthInRing(world.ring, s.x, s.y) > 0;
     if (foeShooter && game.inRing?.[other(side)] && !lies(foeShooter)) {
       if (game.bag[other(side)] > 0) {
         game.bag[other(side)]--;
