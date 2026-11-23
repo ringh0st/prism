@@ -204,7 +204,7 @@ export function createView(canvas, yard, { flip = false } = {}) {
     fixtures.clear();
     for (const s of world.sand) flat(new THREE.CircleGeometry(s.r, 40), new THREE.MeshStandardMaterial({ color: '#f1dfb6', roughness: 1 }), s.x, s.y, 0.3);
     // Mounds and dips: shaded so the eye reads the height (light on the sunny side of a mound, dark in a dip).
-    for (const t of world.terrain ?? []) {
+    (world.terrain ?? []).forEach((t, layer) => {
       const isMound = t.push > 0;
       const shade = paint(128, 128, (c) => {
         const g = c.createRadialGradient(isMound ? 50 : 64, isMound ? 48 : 64, 4, 64, 64, 64);
@@ -222,8 +222,9 @@ export function createView(canvas, yard, { flip = false } = {}) {
         c.fillStyle = g;
         c.fillRect(0, 0, 128, 128);
       });
-      flat(new THREE.CircleGeometry(t.r * 1.08, 48), new THREE.MeshBasicMaterial({ map: shade, transparent: true }), t.x, t.y, 0.32).receiveShadow = false;
-    }
+      // Each on its own thin layer, so two that overlap don't flicker.
+      flat(new THREE.CircleGeometry(t.r * 1.08, 48), new THREE.MeshBasicMaterial({ map: shade, transparent: true, depthWrite: false }), t.x, t.y, 0.31 + layer * 0.02).receiveShadow = false;
+    });
     // Puddles: shiny water.
     for (const p of world.puddles ?? []) {
       flat(new THREE.CircleGeometry(p.r, 40), new THREE.MeshPhysicalMaterial({ color: '#5aa9d6', roughness: 0.05, metalness: 0.1, clearcoat: 1, transparent: true, opacity: 0.85, envMapIntensity: 1.2 }), p.x, p.y, 0.36);
