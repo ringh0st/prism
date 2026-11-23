@@ -20,25 +20,27 @@ const SAND_DRAG = 1500;
  *   hiss   how bright the rolling sound is (0 dull … 1 bright)
  */
 export const GROUNDS = {
-  earth: { id: 'earth', name: 'Packed earth', blurb: 'The classic yard', drag: 420, kerb: 0.5, slope: 0, bumps: 0, hiss: 0.5 },
-  sand: { id: 'sand', name: 'Beach sand', blurb: 'Soft: marbles stop fast', drag: 900, kerb: 0.25, slope: 0, bumps: 60, hiss: 0.2 },
-  asphalt: { id: 'asphalt', name: 'Asphalt', blurb: 'Fast: they roll far and bounce', drag: 210, kerb: 0.78, slope: 0, bumps: 0, hiss: 1 },
-  grass: { id: 'grass', name: 'Grass', blurb: 'Bumpy: shots curve', drag: 620, kerb: 0.35, slope: 0, bumps: 520, hiss: 0.1 },
-  hill: { id: 'hill', name: 'The slope', blurb: 'Downhill: everything rolls back', drag: 400, kerb: 0.5, slope: 190, bumps: 0, hiss: 0.5 },
+  earth: { id: 'earth', name: 'Packed earth', blurb: 'The classic yard', drag: 640, kerb: 0.5, slope: 0, bumps: 0, hiss: 0.5 },
+  sand: { id: 'sand', name: 'Beach sand', blurb: 'Soft: marbles stop fast', drag: 1150, kerb: 0.25, slope: 0, bumps: 60, hiss: 0.2 },
+  asphalt: { id: 'asphalt', name: 'Asphalt', blurb: 'Fast: they roll far and bounce', drag: 330, kerb: 0.78, slope: 0, bumps: 0, hiss: 1 },
+  grass: { id: 'grass', name: 'Grass', blurb: 'Bumpy: shots curve', drag: 800, kerb: 0.35, slope: 0, bumps: 620, hiss: 0.1 },
+  hill: { id: 'hill', name: 'The slope', blurb: 'Downhill: everything rolls back', drag: 600, kerb: 0.5, slope: 190, bumps: 0, hiss: 0.5 },
 };
+/** The challenges' yard: swept smooth, so marbles roll a little farther than on the playing grounds. */
+export const SWEPT_EARTH = { ...GROUNDS.earth, drag: 440 };
 const groundOf = (world) => world.ground ?? GROUNDS.earth;
 /** Uneven ground: a slow, fixed pattern of dips and bumps over the yard (−1…1). */
-const unevenAt = (x, y) => Math.sin(x * 0.045 + 1.3) * Math.cos(y * 0.038 + 0.7) + 0.5 * Math.sin((x + y) * 0.071);
+const unevenAt = (x, y) => Math.sin(x * 0.019 + 1.3) * Math.cos(y * 0.011 + 0.7) + 0.35 * Math.sin((x + y) * 0.03);
 const AIR_DRAG = 0.35; // 1/s
 const REST_SPEED = 6;
 const BOUNCE = { marble: 0.93, stone: 0.55 };
 /** A marble crossing the hole faster than this skips over it. */
-const HOLE_SKIP_SPEED = 470;
+const HOLE_SKIP_SPEED = 540;
 
 export const MARBLE_KINDS = {
   glass: { r: 13.5, m: 1 },
   // Shooters ("taws"): a normal one, a heavy steel one that plows through, and a big one that is easy to hit with.
-  shooter: { r: 16, m: 1.6 },
+  shooter: { r: 16, m: 1.3 },
   steelie: { r: 15, m: 2.8 },
   jumbo: { r: 19.5, m: 2.4 },
 };
@@ -48,7 +50,7 @@ export function makeMarble(id, kind, x, y, owner = null) {
 }
 
 /** How much less true a harder flick flies: the widest it can stray to either side, in radians (power 0…1). */
-export const strayOf = (power) => 0.01 + 0.075 * power * power;
+export const strayOf = (power) => 0.014 + 0.085 * power * power;
 
 export const cloneWorld = (world) => ({ ...world, marbles: world.marbles.map((m) => ({ ...m })), stones: world.stones.map((s) => ({ ...s })) });
 
@@ -179,7 +181,7 @@ export function step(world) {
         m.vx = m.vy = 0;
         events.push({ type: 'sunk', a: m.id, force: v });
       } else if (d < hole.r + m.r && d > 0 && v > 0) {
-        const pull = 1100 * STEP;
+        const pull = 1500 * STEP;
         m.vx += (dx / d) * pull;
         m.vy += (dy / d) * pull;
       }

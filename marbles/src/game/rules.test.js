@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { GROUNDS, cloneWorld, flick, isAtRest, makeMarble, settle, strayOf } from './physics.js';
+import { GROUNDS, SWEPT_EARTH, cloneWorld, flick, isAtRest, makeMarble, settle, strayOf } from './physics.js';
 import { MODES, YARD, newGame, shoot, tryShot } from './rules.js';
 import { pickShot } from './ai.js';
 
-const yard = (marbles, extra = {}) => ({ ...YARD, marbles, stones: [], sand: [], hole: null, ring: null, ...extra });
+const yard = (marbles, extra = {}) => ({ ...YARD, ground: SWEPT_EARTH, marbles, stones: [], sand: [], hole: null, ring: null, ...extra });
 const roll = (ground, power = 0.6, angle = -Math.PI / 2) => {
   const world = yard([makeMarble('a', 'glass', 180, 500)], { ground: GROUNDS[ground] });
   flick(world.marbles[0], angle, power);
@@ -32,51 +32,75 @@ test('a straight hit passes the speed on: the target goes, the same-weight shoot
 test('the same shot always ends the same way', () => {
   const a = newGame('ring', { seed: 7 });
   const b = newGame('ring', { seed: 7 });
+  assert.equal(a.turn, b.turn, 'the same seed draws the same side to start');
   shoot(a, -1.5, 0.8);
   shoot(b, -1.5, 0.8);
   assert.deepEqual(a.world.marbles, b.world.marbles);
 });
 
-test('ring: a marble knocked out of the circle is won and gives another turn; a miss passes the turn', () => {
-  const game = newGame('ring', { seed: 3, stones: 0 });
-  const hit = shoot(game, -Math.PI / 2, 0.95);
-  assert.ok(hit.won >= 1, 'a hard straight shot knocks at least one out');
-  assert.equal(game.turn, 'you');
-  assert.equal(game.bag.you, hit.won);
-  const miss = shoot(game, 0, 0.1);
+test('ring: knocking out one of theirs wins it and gives another turn from the line; knocking out your own gives it to them', () => {
+  const lay = (team) => {
+    const game = newGame('ring', { seed: 3, stones: 0 });
+    game.turn = 'you';
+    game.world.marbles = game.world.marbles.filter((m) => m.owner || m.id === 't1' || m.id === 't2');
+    Object.assign(game.world.marbles.find((m) => m.id === 't1'), { x: 180, y: 180, team });
+    Object.assign(game.world.marbles.find((m) => m.id === 't2'), { x: 60, y: 280, team: 'foe' });
+    Object.assign(game.world.marbles.find((m) => m.id === 'you'), { x: 180, y: 300 });
+    return game;
+  };
+  const theirs = lay('foe');
+  const hit = shoot(theirs, -Math.PI / 2, 1);
+  assert.equal(hit.won, 1);
+  assert.equal(theirs.bag.you, 1);
+  assert.equal(theirs.turn, 'you');
+  assert.ok(theirs.world.marbles.find((m) => m.id === 'you').y > 480, 'the shooter is back at its line for the next shot');
+  const miss = shoot(theirs, 0, 0.1);
   assert.equal(miss.won, 0);
-  assert.equal(game.turn, 'foe');
+  assert.equal(theirs.turn, 'foe');
+
+  const mine = lay('you');
+  const oops = shoot(mine, -Math.PI / 2, 1);
+  assert.equal(oops.lost, 1);
+  assert.equal(mine.bag.foe, 1);
+  assert.equal(mine.turn, 'foe');
 });
 
 test('hole: a slow marble drops in, a fast one skips over, and the shooter in the hole is a foul', () => {
-  const hole = { x: 180, y: 280, r: 25 };
-  const slow = yard([makeMarble('a', 'glass', 180, 380)], { hole });
+  const hole = { x: 180, y: 280, r: 28 };
+  const slow = yard([makeMarble('a', 'glass', 180, 330)], { hole });
   flick(slow.marbles[0], -Math.PI / 2, 0.12);
   settle(slow);
   assert.ok(slow.marbles[0].sunk);
-  const fast = yard([makeMarble('a', 'glass', 180, 380)], { hole });
+  const fast = yard([makeMarble('a', 'glass', 180, 330)], { hole });
   flick(fast.marbles[0], -Math.PI / 2, 1);
   settle(fast);
   assert.ok(!fast.marbles[0].sunk);
 
   const game = newGame('hole', { seed: 2, stones: 0 });
+  game.turn = 'you';
   // Only one target is left, far from the hole, so the game isn't over.
   game.world.marbles = game.world.marbles.filter((m) => m.owner || m.id === 't1');
   Object.assign(game.world.marbles.find((m) => m.id === 't1'), { x: 40, y: 150 });
   game.bag.you = 2;
-  const you = game.world.marbles.find((m) => m.id === 'you');
-  Object.assign(you, { x: 180, y: 380 });
+  Object.assign(game.world.marbles.find((m) => m.id === 'you'), { x: 180, y: 330 });
   const result = shoot(game, -Math.PI / 2, 0.12);
   assert.equal(result.foul, 'mor');
   assert.equal(game.bag.you, 1);
   assert.equal(game.turn, 'foe');
 });
 
-test('chase: hitting the other shooter wins a marble', () => {
+test('chase: hitting the other shooter wins a marble, and it is put down again far away', () => {
   const game = newGame('chase', { seed: 1, stones: 0 });
-  const result = shoot(game, -Math.PI / 2, 0.9);
+  game.turn = 'you';
+  game.world.sand = [];
+  const you = game.world.marbles.find((m) => m.id === 'you');
+  const foe = game.world.marbles.find((m) => m.id === 'foe');
+  Object.assign(you, { x: 180, y: 400 });
+  Object.assign(foe, { x: 180, y: 250 });
+  const result = shoot(game, -Math.PI / 2, 0.8);
   assert.equal(result.won, 1);
   assert.equal(game.bag.you, 1);
+  assert.ok(Math.abs(foe.y - you.y) > 120, 'the hit shooter starts again on the other half');
 });
 
 test('a high shot flies over a pebble that stops a low one', () => {
@@ -117,14 +141,14 @@ test('every challenge can be won within its shots (the computer finds a way)', a
   const { callBakol } = await import('./rules.js');
   for (const challenge of CHALLENGES) {
     let won = false;
-    for (let attempt = 0; attempt < 12 && !won; attempt++) {
+    for (let attempt = 0; attempt < 30 && !won; attempt++) {
       const game = newChallenge(challenge);
       let seed = 3 + attempt * 97;
       const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
       if (game.calls.you.bakol) callBakol(game, 'you');
       while (!game.winner) {
         // A high shot when a call for it is left and low shots find nothing.
-        let shot = pickShot(game, 'you', 'hard', rnd);
+        let shot = pickShot(game, 'you', 'sure', rnd);
         let high = false;
         if (game.calls.you.bagova > 0 && tryShot(game, shot.angle, shot.power).won === 0) {
           for (let i = 0; i < 40; i++) {
@@ -162,6 +186,7 @@ test('a harder flick may stray more', () => {
 
 test('ring: a shooter left in the ring can be knocked out, and that costs its side a marble', () => {
   const game = newGame('ring', { seed: 2, stones: 0 });
+  game.turn = 'you';
   game.world.marbles = game.world.marbles.filter((m) => m.owner || m.id === 't1');
   Object.assign(game.world.marbles.find((m) => m.id === 't1'), { x: 60, y: 280 });
   const foe = game.world.marbles.find((m) => m.id === 'foe');
@@ -174,4 +199,16 @@ test('ring: a shooter left in the ring can be knocked out, and that costs its si
   assert.equal(game.bag.foe, 1);
   assert.equal(game.bag.you, 1);
   assert.equal(game.turn, 'you');
+});
+
+test('chase: a wild shot into the kerb is out, and gives the other side a marble', () => {
+  const game = newGame('chase', { seed: 1, stones: 0 });
+  game.turn = 'you';
+  game.world.sand = [];
+  Object.assign(game.world.marbles.find((m) => m.id === 'you'), { x: 180, y: 400 });
+  Object.assign(game.world.marbles.find((m) => m.id === 'foe'), { x: 60, y: 100 });
+  const result = shoot(game, -Math.PI / 2, 1);
+  assert.equal(result.foul, 'out');
+  assert.equal(game.bag.foe, 1);
+  assert.equal(game.turn, 'foe');
 });

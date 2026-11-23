@@ -43,7 +43,7 @@ export default function HowTo({ onClose }) {
           </span>
           <div>
             <h3>Whose turn</h3>
-            <p>Win a marble and you shoot again. Miss and the turn passes. Your shooter stays where it stopped, and you shoot from there.</p>
+            <p>Who starts is drawn. Win a marble and you shoot again. Miss and the turn passes.</p>
           </div>
         </section>
 
@@ -97,7 +97,7 @@ export default function HowTo({ onClose }) {
 }
 
 const RULES = {
-  ring: `Knock marbles out of the chalk ring. Each one that leaves it is yours. A shooter left inside the ring can be knocked out too, and that costs its player a marble. First to ${MODES.ring.toWin} wins.`,
+  ring: `Both players' marbles lie mixed in the chalk ring: yours are the warm colors (orange, yellow, red), theirs the cool ones (teal, blue, green). Knock theirs out of the ring to win them. Knock out one of your own and it goes to them. Every shot is taken from your line; a shooter that misses and stops inside the ring stays there, and can be knocked out for a marble. First to ${MODES.ring.toWin} wins.`,
   hole: `The Mor is the little hole in the middle of the yard. Push marbles into it. If your own shooter falls in, your turn ends and you give one marble back. First to ${MODES.hole.toWin} wins.`,
-  chase: `Hit the other player's shooter with yours to win one of their marbles. First to ${MODES.chase.toWin} wins.`,
+  chase: `Hit the other player's shooter with yours to win one of their marbles. Careful with wild shots: if your shooter crashes into the kerb without a hit, it is out and they take a marble. First to ${MODES.chase.toWin} wins.`,
 };

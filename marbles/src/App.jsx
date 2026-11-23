@@ -48,7 +48,7 @@ const Stars = ({ count }) => (
 export default function App() {
   const [phase, setPhase] = useState('splash'); // splash | home | live | play
   const [mode, setMode] = useState(() => store.get('marbles.mode', 'ring'));
-  const [rival, setRival] = useState(() => store.get('marbles.rival', 'easy'));
+  const [rival, setRival] = useState(() => store.get('marbles.rival', 'normal'));
   const [shooter, setShooter] = useState(() => store.get('marbles.shooter', 'shooter'));
   const [ground, setGround] = useState(() => store.get('marbles.ground', 'earth'));
   const [soundOn, setSoundOn] = useState(() => store.get('marbles.sound', true));
@@ -208,7 +208,9 @@ export default function App() {
       return;
     }
     const who = names[game.last.side];
-    if (result.knocked) say(`${who} knocked the other shooter out of the ring!`);
+    if (result.lost) say(`${who} knocked out ${names[game.last.side] === 'You' ? 'your' : 'their'} own marble! It goes to ${names[game.last.side === 'you' ? 'foe' : 'you'] === 'You' ? 'you' : names[game.last.side === 'you' ? 'foe' : 'you']}.`);
+    else if (result.knocked) say(`${who} knocked the other shooter out of the ring!`);
+    else if (result.foul === 'out') say(`${who}: into the kerb, out! A marble for the other side.`);
     else if (result.foul) say(`${who}: into the Mor! One marble back.`);
     else if (result.won > 1) say(`${who}: ${result.won} marbles! Shoot again.`);
     else if (result.won === 1) say(challenge ? 'Got one!' : `${who}: got one! Shoot again.`);
@@ -431,7 +433,17 @@ export default function App() {
       </div>
       <div className="stage">
         <Yard key={match.id} game={game} cpuLevel={isCpu ? match.rival : null} net={net} onChange={onShot} />
-        {game.shots === 0 && !note && <p className="coach">{challenge ? challenge.tip : `${MODES[game.mode].blurb}. Pull back anywhere and let go.`}</p>}
+        {game.shots === 0 && !note && (
+          <p className="coach">
+            {challenge
+              ? challenge.tip
+              : game.mode === 'ring'
+                ? match.rival === 'two'
+                  ? `Player 1 has the warm marbles, Player 2 the cool ones. Knock the other's out. ${turnLine(game.turn)}`
+                  : `${mySide === 'you' ? 'Warm' : 'Cool'} marbles are yours: knock the ${mySide === 'you' ? 'cool' : 'warm'} ones out. ${turnLine(game.turn)}`
+                : `${MODES[game.mode].blurb}. ${turnLine(game.turn)}`}
+          </p>
+        )}
         {note && !game.winner && (
           <p className="coach note" key={note.id} role="status">
             {note.text}

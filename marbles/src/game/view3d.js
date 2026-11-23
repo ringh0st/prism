@@ -5,6 +5,8 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { isLive } from './physics.js';
 
 const TARGET_COLORS = ['#e2574c', '#3fa7d6', '#59cd90', '#f6ae2d', '#b565d8', '#ee6c9c', '#2ec4b6', '#ff8c42', '#7d8cf8'];
+// In the ring game each side's marbles wear its own colors: warm for the near side, cool for the far side.
+const TEAM_COLORS = { you: ['#f08a24', '#e8b422', '#e2574c'], foe: ['#1fa898', '#3f8fd6', '#3fb46a'] };
 const SIDE_COLORS = { you: '#f0a030', foe: '#2bb3a3' };
 const AIR_TIME = 0.38;
 
@@ -232,7 +234,7 @@ export function createView(canvas, yard, { flip = false } = {}) {
     let ball = balls.get(m.id);
     if (ball && ball.kind === m.kind) return ball;
     if (ball) scene.remove(ball.mesh);
-    const color = m.owner ? SIDE_COLORS[m.owner] : TARGET_COLORS[index % TARGET_COLORS.length];
+    const color = m.owner ? SIDE_COLORS[m.owner] : m.team ? TEAM_COLORS[m.team][index % 3] : TARGET_COLORS[index % TARGET_COLORS.length];
     const material =
       m.kind === 'steelie'
         ? new THREE.MeshStandardMaterial({ color: '#d9dde3', metalness: 1, roughness: 0.12, envMapIntensity: 1.4 })
