@@ -1,18 +1,19 @@
 {
   "name": "prism",
   "private": true,
-  "version": "1.5.7",
+  "version": "1.5.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "oxlint src scripts",
+    "lint": "oxlint src scripts marbles/src",
     "test": "node --test src/game/*.test.js marbles/src/game/*.test.js",
     "levels": "node scripts/generate-levels.mjs",
     "events": "node scripts/generate-events.mjs",
     "ios": "vite build && cap sync ios",
-    "pals:fit": "node scripts/fit-pals.cjs"
+    "pals:fit": "node scripts/fit-pals.cjs",
+    "marbles": "vite --config marbles/vite.config.js"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",

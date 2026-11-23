@@ -15,14 +15,14 @@ const AIR_DRAG = 0.35; // 1/s
 const REST_SPEED = 6;
 const BOUNCE = { marble: 0.93, stone: 0.55, kerb: 0.5 };
 /** A marble crossing the hole faster than this skips over it. */
-const HOLE_SKIP_SPEED = 430;
+const HOLE_SKIP_SPEED = 520;
 
 export const MARBLE_KINDS = {
-  glass: { r: 11, m: 1 },
+  glass: { r: 13.5, m: 1 },
   // Shooters ("taws"): a normal one, a heavy steel one that plows through, and a big one that is easy to hit with.
-  shooter: { r: 13, m: 1.5 },
-  steelie: { r: 12, m: 2.6 },
-  jumbo: { r: 16, m: 2.2 },
+  shooter: { r: 16, m: 1.6 },
+  steelie: { r: 15, m: 2.8 },
+  jumbo: { r: 19.5, m: 2.4 },
 };
 
 export function makeMarble(id, kind, x, y, owner = null) {
@@ -147,7 +147,7 @@ export function step(world) {
         m.vx = m.vy = 0;
         events.push({ type: 'sunk', a: m.id, force: v });
       } else if (d < hole.r + m.r && d > 0 && v > 0) {
-        const pull = 900 * STEP;
+        const pull = 1500 * STEP;
         m.vx += (dx / d) * pull;
         m.vy += (dy / d) * pull;
       }

@@ -9,6 +9,12 @@ export const LEVELS = {
   hard: { name: 'Hard', wobble: 0.015, tries: 60 },
 };
 
+/** The nearest point outside the ring for a marble lying in it. */
+function outOfRing(ring, m) {
+  const d = Math.hypot(m.x - ring.x, m.y - ring.y) || 1;
+  return { x: ring.x + ((m.x - ring.x) / d) * (ring.r + 40), y: ring.y + ((m.y - ring.y) / d) * (ring.r + 40) };
+}
+
 /** The shot the computer takes for `side`: { angle, power }. `rnd` gives 0…1. */
 export function pickShot(game, side, level, rnd = Math.random) {
   const { world, mode } = game;
@@ -19,9 +25,17 @@ export function pickShot(game, side, level, rnd = Math.random) {
   for (let i = 0; i < tries; i++) {
     const aim = aims[Math.floor(rnd() * aims.length)];
     if (!aim) break;
-    // Straight at a marble, or a little to one side of it for a cut.
-    const angle = Math.atan2(aim.y - me.y, aim.x - me.x) + (rnd() - 0.5) * 0.16;
-    const power = 0.3 + rnd() * 0.7;
+    // Where to send the marble it aims at: into the hole, or out of the ring by the shortest way. To send a marble
+    // somewhere, the shooter must strike it on the far side: it aims at the spot one marble behind it.
+    let spot = aim;
+    const goal = world.hole ?? (world.ring && !aim.owner ? outOfRing(world.ring, aim) : null);
+    if (goal && rnd() < 0.7) {
+      const d = Math.hypot(goal.x - aim.x, goal.y - aim.y) || 1;
+      spot = { x: aim.x - ((goal.x - aim.x) / d) * (aim.r + me.r), y: aim.y - ((goal.y - aim.y) / d) * (aim.r + me.r) };
+    }
+    const angle = Math.atan2(spot.y - me.y, spot.x - me.x) + (rnd() - 0.5) * 0.08;
+    // Soft shots matter as much as hard ones: a marble has to arrive slowly to drop into the hole.
+    const power = 0.08 + rnd() * 0.92;
     const result = tryShot(game, angle, power);
     const score = result.won * 10 - (result.foul ? 8 : 0) + result.hits * 0.5 + rnd() * 0.2;
     if (score > best.score) best = { angle, power, score };

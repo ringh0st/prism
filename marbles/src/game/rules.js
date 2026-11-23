@@ -14,6 +14,7 @@ export const MODES = {
   chase: { name: 'Chase', hebrew: 'צליפה', blurb: 'Hit the other shooter', toWin: 3 },
 };
 export const SIDES = ['you', 'foe'];
+export const HOME_SPOT = { you: { x: 180, y: 514 }, foe: { x: 180, y: 46 } };
 export const other = (side) => (side === 'you' ? 'foe' : 'you');
 const HOME = { you: { x: YARD.w / 2, y: YARD.h - 46 }, foe: { x: YARD.w / 2, y: 46 } };
 
@@ -37,15 +38,15 @@ export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'sho
   let id = 1;
   for (const side of SIDES) world.marbles.push(makeMarble(side, shooters[side], HOME[side].x, HOME[side].y, side));
   if (mode === 'ring') {
-    world.ring = { x: cx, y: cy, r: 104 };
+    world.ring = { x: cx, y: cy, r: 112 };
     // A cross of marbles in the middle, as children lay them out, with a few loose ones.
-    const spots = [[0, 0], [26, 0], [-26, 0], [0, 26], [0, -26], [52, 0], [-52, 0], [0, 52], [0, -52]];
+    const spots = [[0, 0], [31, 0], [-31, 0], [0, 31], [0, -31], [62, 0], [-62, 0], [0, 62], [0, -62]];
     for (const [dx, dy] of spots) world.marbles.push(makeMarble(`t${id++}`, 'glass', cx + dx + (rnd() - 0.5) * 6, cy + dy + (rnd() - 0.5) * 6));
   } else if (mode === 'hole') {
-    world.hole = { x: cx, y: cy, r: 21 };
+    world.hole = { x: cx, y: cy, r: 28 };
     for (let i = 0; i < 7; i++) {
       const angle = (i / 7) * Math.PI * 2 + rnd() * 0.5;
-      const far = 62 + rnd() * 50;
+      const far = 70 + rnd() * 50;
       world.marbles.push(makeMarble(`t${id++}`, 'glass', cx + Math.cos(angle) * far, cy + Math.sin(angle) * far));
     }
   }
@@ -117,7 +118,7 @@ export function judge(game, side, events) {
     }
     for (const who of SIDES) {
       const s = world.marbles.find((m) => m.id === who);
-      if (!s.sunk) continue;
+      if (!s?.sunk) continue;
       // A shooter in the hole comes back to its line; the side that sent it there gives a marble back.
       Object.assign(s, { sunk: false, x: HOME[who].x, y: HOME[who].y, vx: 0, vy: 0 });
       if (who === side) foul = 'mor';
@@ -128,12 +129,20 @@ export function judge(game, side, events) {
     if (hit) {
       won = 1;
       // The shooter that was hit goes back to its line, as when a child picks it up to start again.
-      Object.assign(foeShooter, { x: HOME[other(side)].x, y: HOME[other(side)].y, vx: 0, vy: 0 });
+      if (!game.challenge) Object.assign(foeShooter, { x: HOME[other(side)].x, y: HOME[other(side)].y, vx: 0, vy: 0 });
     }
   }
   game.bag[side] += won;
   game.shots++;
   const again = won > 0 && !foul;
+  if (game.challenge) {
+    // A challenge is played alone: enough marbles won is a win, the last shot used without it a loss.
+    game.turn = 'you';
+    if (game.bag.you >= game.challenge.need) game.winner = 'you';
+    else if (game.shots >= game.challenge.shots) game.winner = 'foe';
+    game.last = { side, won, foul, again: false };
+    return { events, won, foul, again: false, hits: events.filter((e) => e.type === 'clack').length };
+  }
   if (game.bag[side] >= MODES[mode].toWin) game.winner = side;
   else if (mode !== 'chase' && targetsLeft(world).length === 0) game.winner = game.bag.you === game.bag.foe ? side : game.bag.you > game.bag.foe ? 'you' : 'foe';
   if (!again && !game.winner) game.turn = other(side);

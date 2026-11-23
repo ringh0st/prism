@@ -43,7 +43,7 @@ test('ring: a marble knocked out of the circle is won and gives another turn; a 
 });
 
 test('hole: a slow marble drops in, a fast one skips over, and the shooter in the hole is a foul', () => {
-  const hole = { x: 180, y: 280, r: 21 };
+  const hole = { x: 180, y: 280, r: 28 };
   const slow = yard([makeMarble('a', 'glass', 180, 380)], { hole });
   flick(slow.marbles[0], -Math.PI / 2, 0.12);
   settle(slow);
@@ -104,4 +104,39 @@ test('trying a shot leaves the game untouched', () => {
   tryShot(game, -1.4, 0.9);
   assert.equal(JSON.stringify(game.world), before);
   assert.equal(game.shots, 0);
+});
+
+test('every challenge can be won within its shots (the computer finds a way)', async () => {
+  const { CHALLENGES, newChallenge } = await import('./challenges.js');
+  const { callBakol } = await import('./rules.js');
+  for (const challenge of CHALLENGES) {
+    let won = false;
+    for (let attempt = 0; attempt < 12 && !won; attempt++) {
+      const game = newChallenge(challenge);
+      let seed = 3 + attempt * 97;
+      const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+      if (game.calls.you.bakol) callBakol(game, 'you');
+      while (!game.winner) {
+        // A high shot when a call for it is left and low shots find nothing.
+        let shot = pickShot(game, 'you', 'hard', rnd);
+        let high = false;
+        if (game.calls.you.bagova > 0 && tryShot(game, shot.angle, shot.power).won === 0) {
+          for (let i = 0; i < 40; i++) {
+            const you = game.world.marbles.find((m) => m.id === 'you');
+            const aim = game.world.marbles.find((m) => m.id === 'foe') ?? game.world.marbles.find((m) => !m.owner && !m.out && !m.sunk);
+            const angle = Math.atan2(aim.y - you.y, aim.x - you.x) + (rnd() - 0.5) * 0.1;
+            const power = 0.3 + rnd() * 0.7;
+            if (tryShot(game, angle, power, { high: true }).won > 0) {
+              shot = { angle, power };
+              high = true;
+              break;
+            }
+          }
+        }
+        shoot(game, shot.angle, shot.power, { high });
+      }
+      won = game.winner === 'you';
+    }
+    assert.ok(won, `${challenge.name} can be won`);
+  }
 });
