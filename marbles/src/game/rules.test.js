@@ -38,7 +38,7 @@ test('the same shot always ends the same way', () => {
   assert.deepEqual(a.world.marbles, b.world.marbles);
 });
 
-test('ring: knocking out one of theirs wins it and gives another turn from the line; knocking out your own gives it to them', () => {
+test('ring: knocking out one of theirs wins it and gives a bonus shot; knocking out your own gives it to them', () => {
   const lay = (team) => {
     const game = newGame('ring', { seed: 3, stones: 0 });
     game.turn = 'you';
@@ -54,7 +54,7 @@ test('ring: knocking out one of theirs wins it and gives another turn from the l
   assert.equal(theirs.bag.you, 1);
   assert.equal(theirs.turn, 'you', 'a good shot earns one bonus shot');
   assert.ok(hit.again);
-  assert.ok(theirs.world.marbles.find((m) => m.id === 'you').y > 480, 'the shooter is back at its line for the next shot');
+  assert.ok(theirs.world.marbles.find((m) => m.id === 'you').y < 400, 'the shooter stays where it stopped');
   const miss = shoot(theirs, 0, 0.1);
   assert.equal(miss.won, 0);
   assert.equal(theirs.turn, 'foe');
@@ -91,7 +91,7 @@ test('hole: a slow marble drops in, a fast one skips over, and the shooter in th
   assert.equal(game.turn, 'foe');
 });
 
-test('chase: hitting the other shooter wins a marble, and it is put down again far away', () => {
+test('chase: hitting the other shooter wins a marble, and it goes back to its line', () => {
   const game = newGame('chase', { seed: 1, stones: 0 });
   game.turn = 'you';
   game.world.sand = [];
@@ -102,7 +102,7 @@ test('chase: hitting the other shooter wins a marble, and it is put down again f
   const result = shoot(game, -Math.PI / 2, 0.8);
   assert.equal(result.won, 1);
   assert.equal(game.bag.you, 1);
-  assert.ok(Math.abs(foe.y - you.y) > 120, 'the hit shooter starts again on the other half');
+  assert.equal(foe.y, 46, 'the hit shooter is back at its line');
 });
 
 test('a high shot flies over a pebble that stops a low one', () => {

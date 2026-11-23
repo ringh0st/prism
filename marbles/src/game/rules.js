@@ -149,14 +149,8 @@ export function judge(game, side, events) {
       Object.assign(foeShooter, { x: HOME[other(side)].x, y: HOME[other(side)].y, vx: 0, vy: 0 });
       knocked = true;
     }
-    // Every shot is taken from the line: after a good shot the shooter is picked up, and so is one that missed and
-    // rolled clear. One that missed and stopped inside the ring stays there until its side's next turn, where the
-    // other side can knock it out.
-    const sendHome = (who, s) => Object.assign(s, { x: HOME[who].x, y: HOME[who].y, vx: 0, vy: 0 });
-    if (!game.challenge) {
-      if (won > 0 || lost > 0 || !lies(shooter)) sendHome(side, shooter);
-      if (won === 0 && foeShooter && lies(foeShooter)) sendHome(other(side), foeShooter);
-    }
+    // A shooter stays where it stopped and the next shot is taken from there (owner: sent back to the line every
+    // time, nobody could score at all on the slow grounds). One left inside the ring can be knocked out.
     if (game.inRing) game.inRing = { [side]: lies(shooter), [other(side)]: lies(foeShooter) };
   } else if (mode === 'hole') {
     for (const m of world.marbles) {
@@ -183,13 +177,8 @@ export function judge(game, side, events) {
     if (hit) {
       won = 1;
       // The shooter that was hit goes back to its line, as when a child picks it up to start again.
-      if (!game.challenge) {
-        // The shooter that was hit is put down again far from the hitter: on the other half, at a spot the number
-        // of shots so far decides (so both phones of a live game agree).
-        const spot = seeded(game.shots * 7919 + 13);
-        const farY = shooter.y > world.h / 2 ? 46 + spot() * 120 : world.h - 46 - spot() * 120;
-        Object.assign(foeShooter, { x: 40 + spot() * (world.w - 80), y: farY, vx: 0, vy: 0 });
-      }
+      // The shooter that was hit goes back to its line, as when a child picks it up to start again.
+      if (!game.challenge) Object.assign(foeShooter, { x: HOME[other(side)].x, y: HOME[other(side)].y, vx: 0, vy: 0 });
     }
   }
   game.bag[side] += won;
