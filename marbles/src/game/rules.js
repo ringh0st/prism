@@ -10,7 +10,7 @@ import { cloneWorld, flick, isLive, makeMarble, settle } from './physics.js';
 export const YARD = { w: 360, h: 560 };
 export const MODES = {
   ring: { name: 'Ring', blurb: 'Knock marbles out of the chalk ring', toWin: 5 },
-  hole: { name: 'Hole', blurb: 'Push marbles into the hole', toWin: 4 },
+  hole: { name: 'Mor', blurb: 'Push marbles into the Mor, the little hole', toWin: 4 },
   chase: { name: 'Chase', blurb: 'Hit the other shooter', toWin: 3 },
 };
 export const SIDES = ['you', 'foe'];

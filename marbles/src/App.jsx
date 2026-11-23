@@ -117,7 +117,7 @@ export default function App() {
       return;
     }
     const who = names[game.last.side];
-    if (result.foul) say(`${who}: into the hole! One marble back.`);
+    if (result.foul) say(`${who}: into the Mor! One marble back.`);
     else if (result.won > 1) say(`${who}: ${result.won} marbles! Shoot again.`);
     else if (result.won === 1) say(challenge ? 'Got one!' : `${who}: got one! Shoot again.`);
     else say(challenge ? 'Missed.' : `Missed. ${names[game.turn]}${game.turn === 'you' && match.rival !== 'two' ? 'r' : '’s'} turn.`);
