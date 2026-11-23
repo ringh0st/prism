@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="theme-color" content="#FFFAF2" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rinny's Games – cozy little games, free and without a download</title>
+<meta name="description" content="Rinny's Games: Lumipals, a light-bending puzzle with 1,000 levels, and Slime Merge, a squishy merge game with 17 jars. Free, for all ages, and they play right in the browser." />
+<link rel="icon" type="image/png" href="../logo.png" />
+<meta property="og:title" content="Rinny's Games" />
+<meta property="og:description" content="Cozy little games. Free, no download." />
+<meta property="og:image" content="https://lumipals.app/logo.png" />
+<link rel="canonical" href="https://lumipals.app/games/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  /* The games page: one game is the star at the top (it changes every week), all games are tiles under it.
+     Warm cream, so each game's own colors stand out. To add a game, add one hero slide and one tile below. */
+  :root {
+    --bg: #FFFAF2; --ink: #2B2118; --muted: #6B5D52; --card: #FFFFFF; --line: #F0E7D8;
+    --shadow: rgba(60, 40, 20, .28); --accent: #DF7458; --soon: #F4ECDD; --soon-ink: #B9A98F;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1C1A16; --ink: #F6EFE4; --muted: #C8B9A8; --card: #2A2620; --line: rgba(255, 255, 255, .08);
+      --shadow: rgba(0, 0, 0, .6); --soon: #25211B; --soon-ink: #6F6455;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: var(--ink); background: var(--bg); font: 16px/1.5 'DM Sans', system-ui, sans-serif; min-height: 100vh; }
+  h1, h2, h3 { font-family: 'Fredoka', system-ui, sans-serif; margin: 0; line-height: 1.1; }
+  a { color: inherit; }
+  .page { max-width: 1040px; margin: 0 auto; padding: 0 16px 40px; }
+  header { display: flex; align-items: center; gap: 10px; padding: 20px 4px 12px; }
+  .mark { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; color: #fff; font: 700 21px 'Fredoka', system-ui, sans-serif; background: linear-gradient(135deg, #F0C14E, #F2A67E); }
+  .brand { font: 700 23px 'Fredoka', system-ui, sans-serif; }
+  .brand span { color: var(--accent); }
+  .tagline { margin: 0 0 0 auto; color: var(--muted); font-size: 14px; text-align: right; }
+
+  /* The star of the week: slides you can swipe, one per game. */
+  .stars { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 28px; }
+  .stars::-webkit-scrollbar { display: none; }
+  .star { position: relative; flex: 0 0 100%; height: min(62vh, 430px); min-height: 320px; border-radius: 28px; overflow: hidden; scroll-snap-align: center; color: #fff; text-decoration: none; display: block; }
+  .star img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 46%; }
+  .star::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(40, 26, 10, 0) 30%, rgba(40, 26, 10, .86)); }
+  .star-text { position: absolute; z-index: 1; left: 20px; right: 20px; bottom: 18px; }
+  .flag { display: inline-block; padding: 3px 11px; border-radius: 99px; color: #3B2A00; background: #F0C14E; font: 600 12px 'Fredoka', system-ui, sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+  .star h2 { font-size: clamp(30px, 6vw, 44px); margin: 8px 0 4px; }
+  .star p { margin: 0 0 14px; font-size: 15px; opacity: .94; max-width: 34em; }
+  .play { display: inline-block; padding: 10px 26px; border-radius: 99px; color: #fff; font: 600 18px 'Fredoka', system-ui, sans-serif; background: var(--game); box-shadow: 0 4px 0 var(--game-deep); }
+  .star:hover .play, .tile:hover b { filter: brightness(1.08); }
+  /* On a wide screen the picture is a tilted phone at the side, on the game's own color. */
+  @media (min-width: 720px) {
+    .star { background: linear-gradient(120deg, var(--game-deep), var(--game)); }
+    .star img { inset: 9% 7% auto auto; width: auto; height: 130%; border-radius: 26px; border: 4px solid rgba(255, 255, 255, .85); box-shadow: 0 24px 40px -18px rgba(0, 0, 0, .6); transform: rotate(4deg); }
+    .star::after { background: none; }
+    .star-text { left: 44px; right: 46%; bottom: 44px; }
+    .star p { font-size: 17px; }
+    .star .play { color: var(--game-deep); background: #fff; box-shadow: 0 4px 0 rgba(0, 0, 0, .22); }
+  }
+  .dots { display: flex; gap: 6px; justify-content: center; margin: 10px 0 0; }
+  .dots button { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 9px; background: #DCCFBB; cursor: pointer; transition: width .25s ease, background .25s ease; }
+  .dots button[aria-current='true'] { width: 20px; background: var(--accent); }
+
+  .all { font-size: 21px; margin: 22px 4px 12px; }
+  .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  @media (min-width: 720px) { .tiles { grid-template-columns: repeat(4, 1fr); } }
+  .tile { display: block; padding: 12px; border-radius: 22px; background: var(--card); text-decoration: none; box-shadow: 0 10px 20px -14px var(--shadow), inset 0 0 0 1.5px var(--line); transition: transform .15s ease; }
+  a.tile:hover { transform: translateY(-2px); }
+  .tile img, .tile .blank { display: block; width: 100%; aspect-ratio: 1.25; border-radius: 14px; object-fit: cover; object-position: center 47%; }
+  .tile b { display: block; margin-top: 9px; font: 600 18px 'Fredoka', system-ui, sans-serif; }
+  .tile span { color: var(--muted); font-size: 13px; }
+  .tile.soon { box-shadow: inset 0 0 0 2px var(--line); background: transparent; }
+  .tile .blank { display: grid; place-items: center; color: var(--soon-ink); background: repeating-linear-gradient(45deg, var(--soon) 0 10px, transparent 10px 20px); font: 700 34px 'Fredoka', system-ui, sans-serif; }
+
+  footer { margin-top: 34px; padding: 16px 4px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  @media (max-width: 420px) { .tagline { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .stars { scroll-behavior: auto; } .tile, .dots button { transition: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="mark" aria-hidden="true">R</div>
+    <div class="brand">Rinny’s <span>Games</span></div>
+    <p class="tagline">Cozy little games. Free, no download.</p>
+  </header>
+
+  <main>
+    <h1 hidden>Rinny’s Games</h1>
+    <!-- One slide per game. The page opens on a different one each week. -->
+    <div class="stars" id="stars" aria-label="This week's game">
+      <a class="star" href="https://slime.lumipals.app/" style="--game:#8B5CF6;--game-deep:#6A3FD8">
+        <img src="./slime-merge.jpg" alt="" />
+        <div class="star-text">
+          <span class="flag">New jars</span>
+          <h2>Slime Merge</h2>
+          <p>Drop, match and merge squishy slimes. 17 jars, from honey to arcade, and live fights with a friend.</p>
+          <span class="play">Play now</span>
+        </div>
+      </a>
+      <a class="star" href="../play/" style="--game:#4AA577;--game-deep:#2C7350">
+        <img src="./lumipals.jpg" alt="" />
+        <div class="star-text">
+          <span class="flag">1,000 levels</span>
+          <h2>Lumipals</h2>
+          <p>Turn the mirrors, bend the light and wake the sleepy Lumis. A calm puzzle for all ages.</p>
+          <span class="play">Play now</span>
+        </div>
+      </a>
+    </div>
+    <div class="dots" id="dots"></div>
+
+    <h2 class="all">All games</h2>
+    <div class="tiles">
+      <a class="tile" href="../play/"><img src="./lumipals.jpg" alt="" loading="lazy" /><b>Lumipals</b><span>Light puzzle · 1,000 levels</span></a>
+      <a class="tile" href="https://slime.lumipals.app/"><img src="./slime-merge.jpg" alt="" loading="lazy" /><b>Slime Merge</b><span>Merge game · 17 jars</span></a>
+      <div class="tile soon"><div class="blank" aria-hidden="true">?</div><b>Coming soon</b><span>A new game is on its way</span></div>
+    </div>
+  </main>
+
+  <footer>
+    <span>© 2026 Ringhost’s Games</span>
+    <a href="../privacy.html">Privacy Policy</a>
+    <a href="../terms.html">Terms</a>
+  </footer>
+</div>
+<script>
+  // The star of the week: the page opens on a different game each week, and the dots follow the swipe.
+  const stars = document.getElementById('stars');
+  const slides = [...stars.children];
+  const dots = document.getElementById('dots');
+  const week = Math.floor(Date.now() / (7 * 24 * 3600 * 1000));
+  const show = (i, smooth) => stars.scrollTo({ left: slides[i].offsetLeft - stars.offsetLeft, behavior: smooth ? 'smooth' : 'auto' });
+  slides.forEach((slide, i) => {
+    const dot = document.createElement('button');
+    dot.type = 'button';
+    dot.setAttribute('aria-label', 'Show ' + slide.querySelector('h2').textContent);
+    dot.addEventListener('click', () => show(i, true));
+    dots.append(dot);
+  });
+  const mark = () => {
+    const now = Math.round(stars.scrollLeft / stars.clientWidth);
+    [...dots.children].forEach((dot, i) => dot.setAttribute('aria-current', String(i === now)));
+  };
+  stars.addEventListener('scroll', mark, { passive: true });
+  show(week % slides.length, false);
+  mark();
+</script>
+</body>
+</html>

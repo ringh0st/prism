@@ -2,6 +2,10 @@
 
 Lumipals is a light-bending puzzle game: rotate mirrors and crystals to steer beams of light so every gem lights up. It is for all ages and is published at https://lumipals.app/ (GitHub Pages with a custom domain; the domain is at Cloudflare, DNS only; the old https://ringh0st.github.io/prism/ redirects there). The game is at `/play/`, the home page at `/`. The store name is "Rinny's Lumipals: Light Puzzle". It was called Prism before; the repository and `prism.*` storage keys keep that name on purpose, so players keep their progress.
 
+## The games page (site/games/)
+
+A plain HTML page for all the owner's games (Lumipals, Slime Merge at slime.lumipals.app, more later), in the "featured + all games" layout she picked: one game is the star at the top (a swipeable slide per game; the page opens on a different one each week), all games are tiles under it, and a "Coming soon" tile. Warm cream, so each game's own colors stand out; on a wide screen the star is a tilted phone on the game's color. It is a preview at https://lumipals.app/games/ until the owner decides its name ("Rinny's Games" for now) and whether it takes over the home page at `/`. To add a game: one `.star` slide, one `.tile`, one screenshot (640×1280 JPG) in `site/games/`.
+
 ## Product requirements (from the owner, apply to all work)
 
 - **Best UX/UI:** polished, delightful, minimal and fun. Every interaction gets clear, juicy feedback.
