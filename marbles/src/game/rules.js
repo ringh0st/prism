@@ -142,7 +142,7 @@ const targetsLeft = (world) => world.marbles.filter((m) => !m.owner && isLive(m)
  */
 export function shoot(game, angle, power, { high = false, onStep = null } = {}) {
   const side = game.turn;
-  const { world, mode } = game;
+  const { world } = game;
   const shooter = world.marbles.find((m) => m.id === side);
   if (high) game.calls[side].bagova--;
   flick(shooter, angle, power, { high });
@@ -205,7 +205,6 @@ export function judge(game, side, events) {
     }
     if (hit) {
       won = 1;
-      // The shooter that was hit goes back to its line, as when a child picks it up to start again.
       // The shooter that was hit goes back to its line, as when a child picks it up to start again.
       if (!game.challenge) Object.assign(foeShooter, { x: HOME[other(side)].x, y: HOME[other(side)].y, vx: 0, vy: 0 });
     }

@@ -1,10 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
-import { STEP, flick, isAtRest, speedOf, step, strayOf } from '../game/physics.js';
-import { YARD, callBakol, endTurn, judge } from '../game/rules.js';
-import { TURN_SECONDS, applySnapshot, snapshotOf } from '../live.js';
-import { pickShot } from '../game/ai.js';
-import { createView } from '../game/view3d.js';
-import { sfx } from '../game/audio.js';
+import { useEffect, useRef, useState } from "react";
+import {
+  STEP,
+  flick,
+  isAtRest,
+  speedOf,
+  step,
+  strayOf,
+} from "../game/physics.js";
+import { YARD, callBakol, endTurn, judge } from "../game/rules.js";
+import { TURN_SECONDS, applySnapshot, snapshotOf } from "../live.js";
+import { pickShot } from "../game/ai.js";
+import { createView } from "../game/view3d.js";
+import { sfx } from "../game/audio.js";
 
 /** How far (in yard measures) a pull-back must be for full power. */
 const FULL_PULL = 150;
@@ -24,13 +31,23 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
   const canvasRef = useRef(null);
   const viewRef = useRef(null);
   // What is going on right now, outside React (it changes every frame).
-  const live = useRef({ aim: null, pull: null, moving: false, events: [], side: null, high: false, last: 0, acc: 0 });
+  const live = useRef({
+    aim: null,
+    pull: null,
+    moving: false,
+    events: [],
+    side: null,
+    high: false,
+    last: 0,
+    acc: 0,
+  });
   const [isHigh, setIsHigh] = useState(false);
   const [, redraw] = useState(0);
   const gameRef = useRef(game);
   gameRef.current = game;
   const side = game.turn;
-  const canShoot = !game.winner && (net ? side === net.side : !(cpuLevel && side === 'foe'));
+  const canShoot =
+    !game.winner && (net ? side === net.side : !(cpuLevel && side === "foe"));
   const barRef = useRef(null);
   const netRef = useRef(net);
   netRef.current = net;
@@ -38,7 +55,7 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
   // The 3D view, sized to its box.
   useEffect(() => {
     const canvas = canvasRef.current;
-    const view = createView(canvas, YARD, { flip: net?.side === 'foe' });
+    const view = createView(canvas, YARD, { flip: net?.side === "foe" });
     viewRef.current = view;
     const fit = () => view.resize(canvas.clientWidth, canvas.clientHeight);
     fit();
@@ -58,11 +75,11 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
           state.acc -= STEP;
           for (const event of step(g.world)) {
             state.events.push(event);
-            if (event.type === 'clack') sfx.clack(event.force);
-            else if (event.type === 'stone') sfx.stone(event.force);
-            else if (event.type === 'kerb') sfx.kerb(event.force);
-            else if (event.type === 'sunk') sfx.sunk();
-            else if (event.type === 'land') sfx.land(event.force);
+            if (event.type === "clack") sfx.clack(event.force);
+            else if (event.type === "stone") sfx.stone(event.force);
+            else if (event.type === "kerb") sfx.kerb(event.force);
+            else if (event.type === "sunk") sfx.sunk();
+            else if (event.type === "land") sfx.land(event.force);
           }
           state.time += STEP;
           if (isAtRest(g.world) || state.time > 12) {
@@ -73,7 +90,8 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
             const link = netRef.current;
             if (link) {
               // The shooter's phone says how it ended; the other one takes that over its own result.
-              if (state.side === link.side) link.send({ t: 'state', snap: snapshotOf(g) });
+              if (state.side === link.side)
+                link.send({ t: "state", snap: snapshotOf(g) });
               else if (state.snap) applySnapshot(g, state.snap);
               state.snap = null;
             }
@@ -83,7 +101,11 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
             onChangeRef.current(result);
           }
         }
-        if (state.moving) sfx.roll(Math.max(...g.world.marbles.map(speedOf)) / 700, g.world.ground?.hiss);
+        if (state.moving)
+          sfx.roll(
+            Math.max(...g.world.marbles.map(speedOf)) / 700,
+            g.world.ground?.hiss,
+          );
       }
       // A live game's turn clock: it starts when the yard lies still, and an unused turn passes.
       const link = netRef.current;
@@ -94,15 +116,22 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
           state.turnKey = turnKey;
           state.deadline = now + TURN_SECONDS * 1000;
         }
-        const left = state.deadline ? Math.max(0, (state.deadline - now) / (TURN_SECONDS * 1000)) : 0;
+        const left = state.deadline
+          ? Math.max(0, (state.deadline - now) / (TURN_SECONDS * 1000))
+          : 0;
         barRef.current.style.transform = `scaleX(${left})`;
         barRef.current.dataset.low = String(left < 0.3);
         if (state.deadline && left === 0 && g.turn === link.side) {
-          link.send({ t: 'pass' });
+          link.send({ t: "pass" });
           passTurn();
         }
       }
-      view.render(g.world, { aim: state.aim, turn: g.winner || state.moving ? null : g.turn, now, dt });
+      view.render(g.world, {
+        aim: state.aim,
+        turn: g.winner || state.moving ? null : g.turn,
+        now,
+        dt,
+      });
     };
     frame = requestAnimationFrame(loop);
     return () => {
@@ -132,11 +161,20 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
     const state = live.current;
     const g = gameRef.current;
     if (state.moving || g.winner) return;
-    if (netRef.current && !isFromFriend) netRef.current.send({ t: 'shot', angle, power, high });
+    if (netRef.current && !isFromFriend)
+      netRef.current.send({ t: "shot", angle, power, high });
     const shooter = g.world.marbles.find((m) => m.id === g.turn);
     if (high) g.calls[g.turn].bagova--;
     flick(shooter, angle, power, { high });
-    Object.assign(state, { moving: true, events: [], side: g.turn, time: 0, acc: 0, aim: null, pull: null });
+    Object.assign(state, {
+      moving: true,
+      events: [],
+      side: g.turn,
+      time: 0,
+      acc: 0,
+      aim: null,
+      pull: null,
+    });
     sfx.flick(power);
     setIsHigh(false);
     redraw((n) => n + 1);
@@ -148,12 +186,13 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
     return net.listen((message) => {
       const g = gameRef.current;
       const state = live.current;
-      if (message.t === 'shot') fire(message.angle, message.power, message.high, true);
-      else if (message.t === 'pass') passTurn();
-      else if (message.t === 'sweep') {
+      if (message.t === "shot")
+        fire(message.angle, message.power, message.high, true);
+      else if (message.t === "pass") passTurn();
+      else if (message.t === "sweep") {
         if (callBakol(g, g.turn)) sfx.sweep();
         onChangeRef.current(null);
-      } else if (message.t === 'state') {
+      } else if (message.t === "state") {
         if (state.moving) state.snap = message.snap;
         else {
           applySnapshot(g, message.snap);
@@ -165,11 +204,12 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
 
   // The computer's turn: it thinks for a moment, then shoots.
   useEffect(() => {
-    if (!cpuLevel || game.turn !== 'foe' || game.winner || live.current.moving) return undefined;
+    if (!cpuLevel || game.turn !== "foe" || game.winner || live.current.moving)
+      return undefined;
     const timer = setTimeout(() => {
-      const shot = pickShot(gameRef.current, 'foe', cpuLevel);
+      const shot = pickShot(gameRef.current, "foe", cpuLevel);
       fire(shot.angle, shot.power, false);
-    }, 900);
+    }, 1600); // long enough to read what the last shot did
     return () => clearTimeout(timer);
   }, [cpuLevel, game.turn, game.winner, game.shots]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -182,7 +222,15 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
     const dy = state.pull.y - at.y;
     const far = Math.hypot(dx, dy);
     const power = Math.min(1, far / FULL_PULL);
-    state.aim = far < 6 ? null : { angle: Math.atan2(dy, dx), power, stray: strayOf(power), high: isHigh };
+    state.aim =
+      far < 6
+        ? null
+        : {
+            angle: Math.atan2(dy, dx),
+            power,
+            stray: strayOf(power),
+            high: isHigh,
+          };
   };
   const onDown = (event) => {
     if (!canShoot || live.current.moving) return;
@@ -202,13 +250,14 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
     live.current.pull = null;
     live.current.aim = null;
     // A real flick is never perfectly true, and a hard one least of all: it strays a little inside the fan shown.
-    if (aim && aim.power >= MIN_POWER && canShoot) fire(aim.angle + (Math.random() * 2 - 1) * aim.stray, aim.power, isHigh);
+    if (aim && aim.power >= MIN_POWER && canShoot)
+      fire(aim.angle + (Math.random() * 2 - 1) * aim.stray, aim.power, isHigh);
   };
 
   const calls = game.calls[side];
   const sweep = () => {
     if (callBakol(game, side)) {
-      net?.send({ t: 'sweep' });
+      net?.send({ t: "sweep" });
       sfx.sweep();
       onChange(null);
       redraw((n) => n + 1);
@@ -221,14 +270,28 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
           <i ref={barRef} />
         </div>
       )}
-      <canvas ref={canvasRef} onPointerDown={onDown} onPointerMove={aimFrom} onPointerUp={onUp} onPointerCancel={onUp} />
+      <canvas
+        ref={canvasRef}
+        onPointerDown={onDown}
+        onPointerMove={aimFrom}
+        onPointerUp={onUp}
+        onPointerCancel={onUp}
+      />
       {canShoot && !live.current.moving && (
         <div className="calls" role="group" aria-label="Calls">
-          <button onClick={sweep} disabled={calls.bakol < 1 || game.world.stones.length === 0}>
+          <button
+            onClick={sweep}
+            disabled={calls.bakol < 1 || game.world.stones.length === 0}
+          >
             <b>Sweep!</b>
             <small>clear the pebbles · {calls.bakol}</small>
           </button>
-          <button className={isHigh ? 'on' : ''} aria-pressed={isHigh} onClick={() => setIsHigh((on) => !on)} disabled={calls.bagova < 1}>
+          <button
+            className={isHigh ? "on" : ""}
+            aria-pressed={isHigh}
+            onClick={() => setIsHigh((on) => !on)}
+            disabled={calls.bagova < 1}
+          >
             <b>High shot!</b>
             <small>fly over · {calls.bagova}</small>
           </button>
