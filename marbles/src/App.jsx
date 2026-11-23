@@ -212,8 +212,8 @@ export default function App() {
     else if (result.knocked) say(`${who} knocked the other shooter out of the ring!`);
     else if (result.foul === 'out') say(`${who}: into the kerb, out! A marble for the other side.`);
     else if (result.foul) say(`${who}: into the Mor! One marble back.`);
-    else if (result.won > 1) say(`${who}: ${result.won} marbles! Shoot again.`);
-    else if (result.won === 1) say(challenge ? 'Got one!' : `${who}: got one! Shoot again.`);
+    else if (result.won > 1) say(`${who}: ${result.won} marbles!${result.again ? ' One bonus shot.' : ` ${turnLine(game.turn)}`}`);
+    else if (result.won === 1) say(challenge ? 'Got one!' : `${who}: got one!${result.again ? ' One bonus shot.' : ` ${turnLine(game.turn)}`}`);
     else say(challenge ? 'Missed.' : `Missed. ${turnLine(game.turn)}`);
   };
 
@@ -459,7 +459,9 @@ export default function App() {
         )}
         {game.winner && (
           <div className="result" role="alertdialog" aria-labelledby="result-title">
-            <h2 id="result-title">{challenge ? (game.winner === 'you' ? 'Done!' : 'Out of shots') : `${names[game.winner]} win${names[game.winner] === 'You' ? '' : 's'}!`}</h2>
+            <h2 id="result-title">
+              {challenge ? (game.winner === 'you' ? 'Done!' : 'Out of shots') : game.winner === 'draw' ? 'A draw!' : `${names[game.winner]} win${names[game.winner] === 'You' ? '' : 's'}!`}
+            </h2>
             {challenge && game.winner === 'you' && <Stars count={starsFor(challenge, game.shots)} />}
             {!challenge && (
               <p className="sub">

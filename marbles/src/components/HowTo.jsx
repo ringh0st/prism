@@ -43,7 +43,7 @@ export default function HowTo({ onClose }) {
           </span>
           <div>
             <h3>Whose turn</h3>
-            <p>Who starts is drawn. Win a marble and you shoot again. Miss and the turn passes.</p>
+            <p>Who starts is drawn. Win a marble and you get one bonus shot, then the turn passes. Both players always get the same number of turns: if the one who started reaches the target first, the other still gets a turn to answer. Level after that? You play on until one leads.</p>
           </div>
         </section>
 

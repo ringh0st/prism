@@ -52,11 +52,13 @@ test('ring: knocking out one of theirs wins it and gives another turn from the l
   const hit = shoot(theirs, -Math.PI / 2, 1);
   assert.equal(hit.won, 1);
   assert.equal(theirs.bag.you, 1);
-  assert.equal(theirs.turn, 'you');
+  assert.equal(theirs.turn, 'you', 'a good shot earns one bonus shot');
+  assert.ok(hit.again);
   assert.ok(theirs.world.marbles.find((m) => m.id === 'you').y > 480, 'the shooter is back at its line for the next shot');
   const miss = shoot(theirs, 0, 0.1);
   assert.equal(miss.won, 0);
   assert.equal(theirs.turn, 'foe');
+  assert.deepEqual(theirs.turns, { you: 1, foe: 0 });
 
   const mine = lay('you');
   const oops = shoot(mine, -Math.PI / 2, 1);
@@ -211,4 +213,37 @@ test('chase: a wild shot into the kerb is out, and gives the other side a marble
   assert.equal(result.foul, 'out');
   assert.equal(game.bag.foe, 1);
   assert.equal(game.turn, 'foe');
+});
+
+test('fair turns: one bonus shot at most, and the side that shot second always gets its turn to answer', () => {
+  const hitGame = () => {
+    const game = newGame('chase', { seed: 1, stones: 0 });
+    game.world.sand = [];
+    return game;
+  };
+  const line = (game, side) => {
+    const me = game.world.marbles.find((m) => m.id === side);
+    const them = game.world.marbles.find((m) => m.id !== side && m.owner);
+    Object.assign(me, { x: 180, y: 380 });
+    Object.assign(them, { x: 180, y: 260 });
+    return shoot(game, -Math.PI / 2, 0.7);
+  };
+  // 'you' start, hit, take the bonus shot and hit again: the turn passes all the same.
+  const game = hitGame();
+  game.turn = 'you';
+  assert.ok(line(game, 'you').again);
+  assert.ok(!line(game, 'you').again, 'no third shot in one turn');
+  assert.equal(game.turn, 'foe');
+  // 'you' reach the target of three in the next turn; 'foe' have had one turn fewer, so the game goes on.
+  game.bag.you = 2;
+  game.turn = 'you';
+  game.turns = { you: 1, foe: 0 };
+  line(game, 'you');
+  assert.equal(game.bag.you, 3);
+  assert.equal(game.winner, null, 'the other side still answers');
+  assert.equal(game.turn, 'foe');
+  // 'foe' miss their answer: now the round is over and 'you' win.
+  game.turns = { you: 2, foe: 1 };
+  shoot(game, 0, 0.1);
+  assert.equal(game.winner, 'you');
 });

@@ -14,6 +14,8 @@ export const MODES = {
   chase: { name: 'Chase', blurb: 'Hit the other shooter', toWin: 3 },
 };
 export const SIDES = ['you', 'foe'];
+/** How many extra shots a turn can earn: win a marble and shoot once more, then the turn passes anyway. */
+export const BONUS_SHOTS = 1;
 export const HOME_SPOT = { you: { x: 180, y: 514 }, foe: { x: 180, y: 46 } };
 export const other = (side) => (side === 'you' ? 'foe' : 'you');
 const HOME = { you: { x: YARD.w / 2, y: YARD.h - 46 }, foe: { x: YARD.w / 2, y: 46 } };
@@ -85,6 +87,9 @@ export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'sho
     calls: { you: { bakol: 1, bagova: 1 }, foe: { bakol: 1, bagova: 1 } },
     // Ring: whether each shooter lies inside the ring (a shooter knocked out of it costs its side a marble).
     inRing: { you: false, foe: false },
+    // Fair turns: both sides always get the same number of turns (see endTurn), and a turn is at most 1 + BONUS_SHOTS shots.
+    turns: { you: 0, foe: 0 },
+    run: 0,
     winner: null,
     shots: 0,
     last: null,
@@ -199,17 +204,36 @@ export function judge(game, side, events) {
     game.last = { side, won, lost, foul, again: false };
     return { events, won, lost, foul, again: false, hits: events.filter((e) => e.type === 'clack').length };
   }
-  if (game.bag[side] >= MODES[mode].toWin) game.winner = side;
-  else if (!game.challenge && game.bag[other(side)] >= MODES[mode].toWin) game.winner = other(side);
-  else if (mode !== 'chase' && targetsLeft(world).length === 0) game.winner = game.bag.you === game.bag.foe ? side : game.bag.you > game.bag.foe ? 'you' : 'foe';
-  if (!again && !game.winner) game.turn = other(side);
-  game.last = { side, won, lost, foul, again, knocked };
-  return { events, won, lost, foul, again, knocked, hits: events.filter((e) => e.type === 'clack').length };
+  // A good shot earns one more, not a run of them; reaching the target ends the turn too.
+  const keeps = again && game.run < BONUS_SHOTS && game.bag[side] < MODES[mode].toWin;
+  if (keeps) game.run++;
+  else endTurn(game);
+  game.last = { side, won, lost, foul, again: keeps, knocked };
+  return { events, won, lost, foul, again: keeps, knocked, hits: events.filter((e) => e.type === 'clack').length };
+}
+
+/**
+ * The turn of the side now shooting is over (it missed, used its bonus shot, or ran out of time). The game is
+ * only decided when both sides have had the same number of turns, so shooting first is no advantage: if the
+ * first side reaches the target, the other still gets its turn to answer. Level at the end of a round, they play
+ * on until one leads. `winner` becomes 'you', 'foe' or 'draw' (nothing left to shoot at and the bags are level).
+ */
+export function endTurn(game) {
+  const side = game.turn;
+  const { mode, world, bag } = game;
+  game.turns[side]++;
+  game.run = 0;
+  const leader = bag.you === bag.foe ? null : bag.you > bag.foe ? 'you' : 'foe';
+  const isRoundOver = game.turns.you === game.turns.foe;
+  const isEmpty = mode !== 'chase' && targetsLeft(world).length === 0;
+  if (isEmpty) game.winner = leader ?? 'draw';
+  else if (isRoundOver && leader && bag[leader] >= MODES[mode].toWin) game.winner = leader;
+  if (!game.winner) game.turn = other(side);
 }
 
 /** What a shot would do, without touching the game (the computer and the tests use it). */
 export function tryShot(game, angle, power, options = {}) {
-  const copy = { ...game, world: cloneWorld(game.world), bag: { ...game.bag }, calls: { you: { ...game.calls.you }, foe: { ...game.calls.foe } } };
+  const copy = { ...game, world: cloneWorld(game.world), bag: { ...game.bag }, turns: { ...game.turns }, calls: { you: { ...game.calls.you }, foe: { ...game.calls.foe } } };
   copy.world.marbles = copy.world.marbles.map((m) => ({ ...m }));
   const result = shoot(copy, angle, power, options);
   return { ...result, game: copy };

@@ -52,6 +52,8 @@ export const snapshotOf = (game) => ({
   bag: game.bag,
   calls: game.calls,
   inRing: game.inRing,
+  turns: game.turns,
+  run: game.run,
   turn: game.turn,
   winner: game.winner,
   shots: game.shots,
@@ -65,5 +67,5 @@ export function applySnapshot(game, snap) {
     if (m) Object.assign(m, { x, y, vx: 0, vy: 0, air: 0, out: Boolean(out), sunk: Boolean(sunk), counted: Boolean(counted) });
   }
   if (!snap.hasStones) game.world.stones = [];
-  Object.assign(game, { bag: snap.bag, calls: snap.calls, inRing: snap.inRing, turn: snap.turn, winner: snap.winner, shots: snap.shots, last: snap.last });
+  Object.assign(game, { bag: snap.bag, calls: snap.calls, inRing: snap.inRing, turns: snap.turns, run: snap.run, turn: snap.turn, winner: snap.winner, shots: snap.shots, last: snap.last });
 }
