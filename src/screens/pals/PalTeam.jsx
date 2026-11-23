@@ -21,17 +21,25 @@ const unlockGoal = (unlock) => {
   return { icon: UNLOCK_ICONS[kind], n: kind === 'lucky' ? null : unlock[kind] };
 };
 
-/** The lock line on a locked Pal card (the full sentence for screen readers). */
+/**
+ * The lock line on a locked Pal card: a lock, a picture and a number (★ 90, a map and 2 worlds, a flame and a
+ * 3-day streak, or a gift). Tapping it says the goal in words (a player asked what the lock and the flame meant).
+ */
 function LockHint({ unlock, label }) {
   const goal = unlockGoal(unlock);
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <span className={styles.lockHint}>
-      <span aria-hidden="true" className={styles.lockGoal}>
+      <button type="button" className={styles.lockGoal} aria-expanded={isOpen} aria-label={label} onClick={() => setIsOpen((open) => !open)}>
         <Icon name="lock" size={12} />
         <Icon name={goal.icon} size={16} />
         {goal.n !== null && <span className="game-title">{goal.n}</span>}
-      </span>
-      <span className="visually-hidden">{label}</span>
+      </button>
+      {isOpen && (
+        <span className={styles.lockWords} role="status">
+          {label}
+        </span>
+      )}
     </span>
   );
 }

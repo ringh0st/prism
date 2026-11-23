@@ -39,7 +39,7 @@ export const en = {
   'pals.unlock.stars': 'Collect {stars} ★',
   'pals.unlock.worlds.one': 'Finish {count} world',
   'pals.unlock.worlds.other': 'Finish {count} worlds',
-  'pals.unlock.streak': 'Reach a {streak}-day streak',
+  'pals.unlock.streak': 'Play the daily puzzle {streak} days in a row',
 
   'pals.team.label': 'Your Pals',
   'pals.team.partnerUp': 'Play with me',
@@ -185,7 +185,7 @@ export const es = {
   'pals.unlock.stars': 'Junta {stars} ★',
   'pals.unlock.worlds.one': 'Termina {count} mundo',
   'pals.unlock.worlds.other': 'Termina {count} mundos',
-  'pals.unlock.streak': 'Logra una racha de {streak} días',
+  'pals.unlock.streak': 'Juega el puzle diario {streak} días seguidos',
 
   'pals.team.label': 'Tus amigos',
   'pals.team.partnerUp': 'Juega conmigo',
@@ -454,7 +454,7 @@ export const he = {
   'pals.unlock.stars': 'אספו {stars} ★',
   'pals.unlock.worlds.one': 'סיימו עולם אחד',
   'pals.unlock.worlds.other': 'סיימו {count} עולמות',
-  'pals.unlock.streak': 'הגיעו לרצף של {streak} ימים',
+  'pals.unlock.streak': 'שחקו בחידה היומית {streak} ימים ברצף',
 
   'pals.team.label': 'החברים שלכם',
   'pals.team.partnerUp': 'שחקו איתי',

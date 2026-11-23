@@ -197,3 +197,20 @@
   font-size: 15px;
   color: var(--text-soft);
 }
+
+/* The lock badge is a button: tapped, it says the goal in words. */
+button.lockGoal {
+  border: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.lockWords {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 0.78rem;
+  line-height: 1.25;
+  color: var(--text-soft);
+  text-align: center;
+}
