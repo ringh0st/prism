@@ -106,7 +106,7 @@ export default function App() {
   const onShot = (result) => {
     setShot((n) => n + 1);
     const { game, challenge } = match;
-    if (!result) return say('Bakol! The pebbles are swept off.');
+    if (!result) return say('Sweep! The pebbles are cleared off.');
     if (game.winner) {
       if (challenge && game.winner === 'you') {
         const earned = starsFor(challenge, game.shots);
@@ -117,7 +117,7 @@ export default function App() {
       return;
     }
     const who = names[game.last.side];
-    if (result.foul) say(`${who}: into the mor! One marble back.`);
+    if (result.foul) say(`${who}: into the hole! One marble back.`);
     else if (result.won > 1) say(`${who}: ${result.won} marbles! Shoot again.`);
     else if (result.won === 1) say(challenge ? 'Got one!' : `${who}: got one! Shoot again.`);
     else say(challenge ? 'Missed.' : `Missed. ${names[game.turn]}${game.turn === 'you' && match.rival !== 'two' ? 'r' : '’s'} turn.`);
@@ -132,9 +132,7 @@ export default function App() {
           <span className="m m3" />
         </div>
         <h1>Marbles</h1>
-        <p className="hebrew" lang="he" dir="rtl">
-          גולות
-        </p>
+        <p className="splash-tag">The old schoolyard game</p>
         <footer>
           <p>
             A <b>Rinny’s Games</b> production

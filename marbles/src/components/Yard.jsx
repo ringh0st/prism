@@ -146,12 +146,12 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
       {canShoot && !live.current.moving && (
         <div className="calls" role="group" aria-label="Calls">
           <button onClick={sweep} disabled={calls.bakol < 1 || game.world.stones.length === 0}>
-            <b>Bakol!</b>
-            <small>sweep the pebbles · {calls.bakol}</small>
+            <b>Sweep!</b>
+            <small>clear the pebbles · {calls.bakol}</small>
           </button>
           <button className={isHigh ? 'on' : ''} aria-pressed={isHigh} onClick={() => setIsHigh((on) => !on)} disabled={calls.bagova < 1}>
-            <b>Bagova!</b>
-            <small>a high shot · {calls.bagova}</small>
+            <b>High shot!</b>
+            <small>fly over · {calls.bagova}</small>
           </button>
         </div>
       )}

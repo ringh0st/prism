@@ -142,7 +142,7 @@ button {
   font-size: 58px;
   color: var(--go);
 }
-.hebrew {
+.splash-tag {
   margin: 0;
   font: 600 24px 'Fredoka', system-ui, sans-serif;
   color: var(--muted);

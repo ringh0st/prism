@@ -30,7 +30,7 @@ export default function HowTo({ onClose }) {
             </span>
             <div>
               <h3>
-                {mode.name} <small lang="he">{mode.hebrew}</small>
+                {mode.name}
               </h3>
               <p>{RULES[id]}</p>
             </div>
@@ -53,7 +53,7 @@ export default function HowTo({ onClose }) {
             🧹
           </span>
           <div>
-            <h3>Bakol!</h3>
+            <h3>Sweep!</h3>
             <p>Sweeps every pebble off the yard.</p>
           </div>
         </section>
@@ -62,7 +62,7 @@ export default function HowTo({ onClose }) {
             ⤴
           </span>
           <div>
-            <h3>Bagova!</h3>
+            <h3>High shot!</h3>
             <p>A high shot: tap it, then shoot. The shooter flies over pebbles and marbles and lands farther on.</p>
           </div>
         </section>
