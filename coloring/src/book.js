@@ -28,7 +28,7 @@ export const RAINBOW = ['#e8524f', '#f5923e', '#f7cf3d', '#a5d046', '#2fb3a6', '
 /** How many taps can be taken back. */
 export const UNDO_DEPTH = 40;
 
-export const emptyBook = () => ({ colors: {}, history: [] });
+export const emptyBook = () => ({ colors: {}, history: [], touched: {} });
 
 /** The color the crayon puts down now (the rainbow moves on with each tap). */
 export function colorFor(crayonId, tapCount) {
@@ -41,7 +41,7 @@ export function paintPart(book, pageId, part, color) {
   const page = book.colors[pageId] ?? {};
   if (page[part] === color) return book;
   const history = [...book.history, { pageId, part, was: page[part] ?? null }].slice(-UNDO_DEPTH);
-  return { ...book, colors: { ...book.colors, [pageId]: { ...page, [part]: color } }, history };
+  return { ...book, colors: { ...book.colors, [pageId]: { ...page, [part]: color } }, history, touched: { ...book.touched, [pageId]: Date.now() } };
 }
 
 /** Takes back the last tap on this page, if there is one. Returns the book and the part that changed. */
@@ -68,8 +68,14 @@ export function cleanPage(book, pageId) {
 export const paintedCount = (book, page) => Object.keys(book.colors[page.id] ?? {}).length;
 export const isPageDone = (book, page) => paintedCount(book, page) >= page.parts.length;
 
+/** Pages with any color, newest first: they hang on the wall. */
+export const coloredPageIds = (book) =>
+  Object.keys(book.colors)
+    .filter((id) => Object.keys(book.colors[id]).length)
+    .sort((a, b) => (book.touched[b] ?? 0) - (book.touched[a] ?? 0));
+
 /** What is saved on the device (the history is too, so a tap can be taken back after a reload). */
 export function restoreBook(saved) {
   if (!saved || typeof saved !== 'object' || typeof saved.colors !== 'object') return emptyBook();
-  return { colors: saved.colors ?? {}, history: Array.isArray(saved.history) ? saved.history.slice(-UNDO_DEPTH) : [] };
+  return { colors: saved.colors ?? {}, history: Array.isArray(saved.history) ? saved.history.slice(-UNDO_DEPTH) : [], touched: saved.touched ?? {} };
 }

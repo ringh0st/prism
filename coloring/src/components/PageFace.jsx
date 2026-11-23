@@ -1,20 +1,21 @@
 import Drawing from './Drawing.jsx';
 import Sticker from './Sticker.jsx';
-import Confetti from './Confetti.jsx';
 
 /**
  * One page of the book: paper with punched holes for the spiral, the Pal's name written at the top, its
- * drawing, the page number, and a gold star once it's finished. The page that's open takes taps; one that's
- * turning or underneath is just a picture.
+ * drawing, the page number, and a gold star once it's finished. The book is for choosing: a tap on the picture
+ * takes it out onto the desk to color (the big sheet), so a finger can never turn a page while coloring.
  */
-export default function PageFace({ page, number, colors, isDone, isOpen, celebrate, svgRef, onNext, onBack }) {
+export default function PageFace({ page, number, colors, isDone, isOpen, onColor, onNext, onBack }) {
   return (
-    <div className={`paper ${celebrate ? 'celebrating' : ''}`} data-face="drawing">
+    <div className="paper" data-face="drawing">
       <h2 className="page-name">{page.name}</h2>
-      <Drawing page={page} colors={colors} svgRef={isOpen ? svgRef : null} isLabelled={isOpen} className={celebrate ? 'hop' : ''} />
+      <button className="page-open" onClick={onColor} tabIndex={isOpen ? 0 : -1} aria-label={`Color ${page.name}`}>
+        <Drawing page={page} colors={colors} />
+        {isOpen && <span className="tap-hint" aria-hidden="true" />}
+      </button>
       <div className="grain" aria-hidden="true" />
-      {isDone && <Sticker isNew={celebrate} />}
-      {celebrate && <Confetti key={celebrate} />}
+      {isDone && <Sticker />}
       <span className="folio" aria-hidden="true">
         {number}
       </span>

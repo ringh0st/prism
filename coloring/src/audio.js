@@ -153,6 +153,54 @@ export const sfx = {
 };
 
 /**
+ * Drawing on the blank sheet: a crayon rubbing on paper for as long as the finger moves, louder and brighter the
+ * faster it goes, silent when it rests.
+ */
+let rub = null;
+export const crayonRub = {
+  start() {
+    const c = context();
+    if (!c || !isOn || rub) return;
+    const source = c.createBufferSource();
+    source.buffer = noise;
+    source.loop = true;
+    const band = c.createBiquadFilter();
+    band.type = 'bandpass';
+    band.frequency.value = 2200;
+    band.Q.value = 0.9;
+    const level = c.createGain();
+    level.gain.value = 0;
+    const grain = c.createGain();
+    grain.gain.value = 0.6;
+    const lfo = c.createOscillator();
+    lfo.type = 'triangle';
+    lfo.frequency.value = 17;
+    const depth = c.createGain();
+    depth.gain.value = 0.4;
+    lfo.connect(depth).connect(grain.gain);
+    source.connect(band).connect(level).connect(grain).connect(master);
+    source.start(0, Math.random());
+    lfo.start();
+    rub = { source, band, level, lfo };
+  },
+  /** `speed` in sheet units per millisecond. */
+  speed(speed) {
+    if (!rub) return;
+    const t = ctx.currentTime;
+    rub.level.gain.setTargetAtTime(Math.min(0.13, speed * 0.09), t, 0.04);
+    rub.band.frequency.setTargetAtTime(1800 + Math.min(1600, speed * 900), t, 0.06);
+  },
+  stop() {
+    if (!rub) return;
+    const { source, level, lfo } = rub;
+    rub = null;
+    level.gain.setTargetAtTime(0, ctx.currentTime, 0.05);
+    source.stop(ctx.currentTime + 0.3);
+    lfo.stop(ctx.currentTime + 0.3);
+  },
+};
+
+/**
  * A quiet lullaby: a slow music box wandering on the same scale, never the same twice, with a soft echo.
  * Starts after the first touch, stops while the page is hidden.
  */

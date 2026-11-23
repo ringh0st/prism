@@ -5,12 +5,12 @@ import bamboo from '../../../src/assets/pals/drawn/bamboo-1.svg?raw';
 
 /**
  * The hard cover: three Pals in full color, the title, crayon scribbles, and the studio with the version at the
- * bottom (it is also the opening screen). A tap swings it open around the spiral.
+ * bottom. It swings open around the spiral as the book is taken from the desk.
  */
-export default function Cover({ isOpening, onOpen }) {
+export default function Cover() {
   return (
-    <div className={`cover ${isOpening ? 'opening' : ''}`}>
-      <button className="cover-face" onClick={onOpen} aria-label="My Pals Coloring Book. Tap to open.">
+    <div className="cover opening" aria-hidden="true">
+      <div className="cover-face">
         <svg className="scribbles" viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden="true">
           <path d="M18 60c30-22 52 18 80-4s40-20 60 2" stroke="#f7cf3d" strokeWidth="9" fill="none" strokeLinecap="round" />
           <path d="M220 40c18 12 34-10 54 6" stroke="#5bb7ea" strokeWidth="8" fill="none" strokeLinecap="round" />
@@ -31,7 +31,7 @@ export default function Cover({ isOpening, onOpen }) {
         <span className="studio">
           Rinny’s Games <small>v{APP_VERSION}</small>
         </span>
-      </button>
+      </div>
       <div className="cover-inside" aria-hidden="true" />
     </div>
   );

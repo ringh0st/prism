@@ -17,14 +17,14 @@ export function applyColors(svg, colors = {}) {
   }
 }
 
-/** The part at a point on screen, or the nearest one within a fingertip; null when there is none. */
-export function partAt(svg, x, y) {
+/** The part at a point on screen, or (with `isNear`) the nearest one within a fingertip; null when there is none. */
+export function partAt(svg, x, y, { isNear = true } = {}) {
   const at = (px, py) => {
     const el = document.elementFromPoint(px, py)?.closest?.('[data-r]');
     return el && svg.contains(el) ? Number(el.dataset.r) : null;
   };
   const direct = at(x, y);
-  if (direct != null) return direct;
+  if (direct != null || !isNear) return direct;
   const reach = Math.max(10, svg.getBoundingClientRect().width * 0.045);
   for (let ring = 1; ring <= 4; ring++) {
     const radius = (reach * ring) / 4;
@@ -35,12 +35,6 @@ export function partAt(svg, x, y) {
     }
   }
   return null;
-}
-
-/** The middle of a part on screen (for keyboard painting and for the spread to start from). */
-export function centerOf(svg, part) {
-  const box = membersOf(svg, part).at(-1).getBoundingClientRect();
-  return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
 }
 
 const matrixText = (m) => `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`;

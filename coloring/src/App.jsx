@@ -6,14 +6,21 @@ import PageFace from './components/PageFace.jsx';
 import CrayonBox from './components/CrayonBox.jsx';
 import Spiral from './components/Spiral.jsx';
 import Dialog from './components/Dialog.jsx';
+import Room from './components/Room.jsx';
+import Sheet from './components/Sheet.jsx';
+import Sketch from './components/Sketch.jsx';
+import BackButton from './components/BackButton.jsx';
 import { PAGES } from './pages.js';
-import { CRAYONS, canUndo, cleanPage, colorFor, isPageDone, paintPart, restoreBook, undoOnPage } from './book.js';
-import { centerOf, partAt, spreadColor } from './drawingDom.js';
+import { CRAYONS, canUndo, cleanPage, coloredPageIds, colorFor, isPageDone, paintPart, restoreBook, undoOnPage } from './book.js';
+import { addStroke, clearSketch, isBlank, newSketch, undoStroke } from './sketches.js';
+import { deleteSketch, loadSketches, saveSketch } from './sketchStore.js';
+import { spreadColor } from './drawingDom.js';
 import { savePicture } from './savePicture.js';
 import { music, sfx } from './audio.js';
 import { store } from './storage.js';
 
 const PAINT_SECONDS = 0.55;
+const COVER_MS = 950;
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
 const Glyph = ({ d }) => (
@@ -33,7 +40,6 @@ const Glyph = ({ d }) => (
 );
 const ICONS = {
   games: 'M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z',
-  contents: 'M5 4.5h10.5a2 2 0 0 1 2 2V20H7a2 2 0 0 1-2-2zM5 18a2 2 0 0 1 2-2h10.5M9 8.5h5',
   clean: 'M4 20h16M7.5 16.5 4 13l8.5-8.5a2 2 0 0 1 2.8 0l3.2 3.2a2 2 0 0 1 0 2.8L11 18H8.5M9 8l7 7',
   share: 'M12 15V4M8 8l4-4 4 4M5 13v5.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V13',
   sound: 'M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13',
@@ -43,29 +49,49 @@ const ICONS = {
 };
 
 /**
- * My Pals Coloring Book: a spiral-bound book of the Pals from Lumipals for little ones (3 years and up).
- * Open the cover, turn the pages, pick a crayon and tap a part: the color spreads from the finger, with a
- * scribble and a soft note. Nothing to read and nothing to get wrong; a finished page gets a gold star.
+ * My Pals Coloring Book, for little ones (3 years and up). Three places, one way back from each (a picture of
+ * where it goes, top left):
+ * - the room: a wall with every picture the child made, and on the desk the coloring book and a blank pad;
+ * - the book: only for choosing, so turning pages never gets in the way of coloring; a tap on a Pal takes it out;
+ * - the sheet: the Pal (or a blank page) big on the desk, with the crayon box. Nothing moves there: tap or slide
+ *   a finger to color, or draw freely on the blank page.
  */
 export default function App() {
   const [book, setBook] = useState(() => restoreBook(store.get('coloring.book', null)));
+  const [sketches, setSketches] = useState([]);
   const [index, setIndex] = useState(() => Math.min(store.get('coloring.page', 0), PAGES.length));
-  const [cover, setCover] = useState('closed'); // closed → opening → open
+  const [view, setView] = useState({ name: 'room' }); // room | book | page { pageId, from } | sketch { id, from }
+  const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [crayonId, setCrayonId] = useState(() => store.get('coloring.crayon', 'red'));
   const [isSoundOn, setIsSoundOn] = useState(() => store.get('coloring.sound', true));
   const [isMusicOn, setIsMusicOn] = useState(() => store.get('coloring.music', true));
   const [request, setRequest] = useState(null);
   const [celebrate, setCelebrate] = useState(null); // { pageId, id }
+  const [pinnedId, setPinnedId] = useState(null);
   const [isCleaning, setIsCleaning] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const taps = useRef(0);
   const svgRef = useRef(null);
+  const canvasRef = useRef(null);
   const bookRef = useRef(book);
   bookRef.current = book;
   const isReduced = useMemo(reducedMotion, []);
 
-  const page = index > 0 ? PAGES[index - 1] : null;
+  const page = view.name === 'page' ? PAGES.find((p) => p.id === view.pageId) : null;
+  const sketch = view.name === 'sketch' ? sketches.find((s) => s.id === view.id) : null;
   const doneIds = useMemo(() => new Set(PAGES.filter((p) => isPageDone(book, p)).map((p) => p.id)), [book]);
+  const wallItems = useMemo(() => {
+    const pages = coloredPageIds(book).map((id) => {
+      const p = PAGES.find((x) => x.id === id);
+      return p && { id: `page-${id}`, page: p, colors: book.colors[id], isDone: doneIds.has(id), at: book.touched[id] ?? 0 };
+    });
+    const drawings = sketches.filter((s) => !isBlank(s)).map((s) => ({ id: s.id, sketch: s, at: s.updated }));
+    return [...pages.filter(Boolean), ...drawings].sort((a, b) => b.at - a.at);
+  }, [book, sketches, doneIds]);
 
+  useEffect(() => {
+    loadSketches().then((saved) => setSketches((now) => (now.length ? now : saved)));
+  }, []);
   useEffect(() => store.set('coloring.book', book), [book]);
   useEffect(() => store.set('coloring.page', index), [index]);
   useEffect(() => store.set('coloring.crayon', crayonId), [crayonId]);
@@ -75,30 +101,65 @@ export default function App() {
   }, [isSoundOn]);
   useEffect(() => {
     store.set('coloring.music', isMusicOn);
-    if (isMusicOn && isSoundOn && cover !== 'closed') music.start();
+    if (isMusicOn && isSoundOn && hasStarted) music.start();
     else music.stop();
     return () => music.stop();
-  }, [isMusicOn, isSoundOn, cover]);
+  }, [isMusicOn, isSoundOn, hasStarted]);
 
-  const openCover = () => {
-    if (cover !== 'closed') return;
+  const start = () => {
     sfx.unlock();
-    sfx.openCover();
-    setCover(isReduced ? 'open' : 'opening');
-    if (!isReduced) setTimeout(() => setCover('open'), 950);
+    setHasStarted(true);
   };
-  const turnTo = useCallback((to) => setRequest({ to, id: performance.now() }), []);
-  const onTurned = useCallback((to) => {
-    setIndex(to);
-    setCelebrate(null);
-  }, []);
 
-  /** Colors the part under a finger (or the one a keyboard user is on). */
-  const paintAt = async (x, y, part = null) => {
+  // --- Moving between the room, the book and the sheet ---------------------------------------------------
+  const openBook = () => {
+    start();
+    sfx.openCover();
+    setIsCoverOpen(isReduced);
+    setView({ name: 'book' });
+    if (!isReduced) setTimeout(() => setIsCoverOpen(true), COVER_MS);
+  };
+  const openPage = (pageId, from) => {
+    start();
+    sfx.turn();
+    const i = PAGES.findIndex((p) => p.id === pageId) + 1;
+    if (from === 'book') setIndex(i);
+    setCelebrate(null);
+    setView({ name: 'page', pageId, from });
+  };
+  const openSketch = (existing) => {
+    start();
+    sfx.turn();
+    const s = existing ?? newSketch();
+    if (!existing) setSketches((all) => [...all, s]);
+    setView({ name: 'sketch', id: s.id, from: 'room' });
+  };
+  const goBack = () => {
+    sfx.turn();
+    if (view.name === 'sketch') {
+      if (isBlank(sketch)) {
+        setSketches((all) => all.filter((s) => s.id !== sketch.id));
+        deleteSketch(sketch.id);
+      } else setPinnedId(sketch.id);
+    }
+    if (view.name === 'page' && view.from === 'room') setPinnedId(`page-${view.pageId}`);
+    if (view.name === 'page' && view.from === 'book') {
+      setIsCoverOpen(true);
+      setView({ name: 'book' });
+      return;
+    }
+    setView({ name: 'room' });
+  };
+  const openWallItem = (item) => (item.page ? openPage(item.page.id, 'room') : openSketch(item.sketch));
+
+  const turnTo = useCallback((to) => setRequest({ to, id: performance.now() }), []);
+  const onTurned = useCallback((to) => setIndex(to), []);
+
+  // --- Coloring a Pal ------------------------------------------------------------------------------------
+  const paint = async (part, x, y) => {
     const svg = svgRef.current;
     if (!page || !svg) return;
-    const k = part ?? partAt(svg, x, y);
-    if (k == null) return sfx.tap();
+    if (part == null) return sfx.tap();
     const color = colorFor(crayonId, taps.current++);
     const wasDone = isPageDone(bookRef.current, page);
     sfx.paint(
@@ -106,8 +167,8 @@ export default function App() {
       PAINT_SECONDS,
     );
     navigator.vibrate?.(8);
-    await spreadColor(svg, k, color, x, y, isReduced ? 0 : PAINT_SECONDS);
-    const next = paintPart(bookRef.current, page.id, k, color);
+    await spreadColor(svg, part, color, x, y, isReduced ? 0 : PAINT_SECONDS);
+    const next = paintPart(bookRef.current, page.id, part, color);
     bookRef.current = next;
     setBook(next);
     if (!wasDone && isPageDone(next, page)) {
@@ -118,45 +179,69 @@ export default function App() {
     return undefined;
   };
 
-  // Keyboard: arrows turn pages; Enter or Space on a part colors it.
+  // --- Free drawing --------------------------------------------------------------------------------------
+  const updateSketch = (change) => {
+    setSketches((all) =>
+      all.map((s) => {
+        if (s.id !== sketch.id) return s;
+        const next = change(s);
+        saveSketch(next);
+        return next;
+      }),
+    );
+  };
+  const pickStrokeColor = () => {
+    return colorFor(crayonId, taps.current++);
+  };
+
+  // --- The tray and the top bar --------------------------------------------------------------------------
+  const pick = (id) => {
+    start();
+    sfx.pick(CRAYONS.findIndex((c) => c.id === id));
+    setCrayonId(id);
+  };
+  const canTakeBack = page ? canUndo(book, page.id) : Boolean(sketch?.strokes.length);
+  const undo = () => {
+    if (page) {
+      const { book: next, part } = undoOnPage(book, page.id);
+      if (part == null) return;
+      setBook(next);
+    } else if (sketch?.strokes.length) updateSketch(undoStroke);
+    else return;
+    sfx.undo();
+  };
+  const clean = () => {
+    sfx.clean();
+    if (page) setBook(cleanPage(book, page.id));
+    else if (sketch) updateSketch(clearSketch);
+    setCelebrate(null);
+    setIsCleaning(false);
+  };
+  const hasMarks = page ? Boolean(Object.keys(book.colors[page.id] ?? {}).length) : Boolean(sketch?.strokes.length);
+  const share = () => (page ? savePicture(svgRef.current, page.name) : savePicture(canvasRef.current, ''));
+
+  // Keyboard: arrows turn the book's pages; Enter or Space on a part of the sheet colors it.
   useEffect(() => {
     const onKey = (event) => {
-      if (cover !== 'open' || isCleaning) return;
-      if (event.key === 'ArrowRight') turnTo(index + 1);
-      else if (event.key === 'ArrowLeft') turnTo(index - 1);
-      else if ((event.key === 'Enter' || event.key === ' ') && event.target.dataset?.r != null && svgRef.current) {
+      if (isCleaning) return;
+      if (view.name === 'book' && event.key === 'ArrowRight') turnTo(index + 1);
+      else if (view.name === 'book' && event.key === 'ArrowLeft') turnTo(index - 1);
+      else if (page && (event.key === 'Enter' || event.key === ' ') && event.target.dataset?.r != null) {
         event.preventDefault();
-        const part = Number(event.target.dataset.r);
-        const { x, y } = centerOf(svgRef.current, part);
-        paintAt(x, y, part);
+        const box = event.target.getBoundingClientRect();
+        paint(Number(event.target.dataset.r), box.left + box.width / 2, box.top + box.height / 2);
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   });
 
-  const pick = (id) => {
-    sfx.unlock();
-    sfx.pick(CRAYONS.findIndex((c) => c.id === id));
-    setCrayonId(id);
-  };
-  const undo = () => {
-    if (!page) return;
-    const { book: next, part } = undoOnPage(book, page.id);
-    if (part == null) return;
-    sfx.undo();
-    setBook(next);
-  };
-  const clean = () => {
-    sfx.clean();
-    setBook(cleanPage(book, page.id));
-    setCelebrate(null);
-    setIsCleaning(false);
-  };
-
   const renderFace = (i, isTop) => {
-    const isOpen = isTop && cover === 'open';
-    if (i === 0) return <Contents pages={PAGES} book={book} doneIds={doneIds} isOpen={isOpen} onOpenPage={turnTo} onNext={() => turnTo(1)} />;
+    const isOpen = isTop && isCoverOpen;
+    if (i === 0)
+      return (
+        <Contents pages={PAGES} book={book} doneIds={doneIds} isOpen={isOpen} onOpenPage={(n) => openPage(PAGES[n - 1].id, 'book')} onNext={() => turnTo(1)} />
+      );
     const p = PAGES[i - 1];
     return (
       <PageFace
@@ -165,32 +250,30 @@ export default function App() {
         colors={book.colors[p.id]}
         isDone={doneIds.has(p.id)}
         isOpen={isOpen}
-        celebrate={isOpen && celebrate?.pageId === p.id ? celebrate.id : null}
-        svgRef={svgRef}
+        onColor={() => openPage(p.id, 'book')}
         onNext={i < PAGES.length ? () => turnTo(i + 1) : null}
         onBack={() => turnTo(i - 1)}
       />
     );
   };
 
-  const hasColors = Boolean(page && Object.keys(book.colors[page.id] ?? {}).length);
+  const isOnSheet = view.name === 'page' || view.name === 'sketch';
   return (
-    <div className="desk">
+    <div className={`desk at-${view.name}`}>
       <header className="bar">
         <div className="bar-side">
-          <a className="icon-btn" href="../" aria-label="All games" title="All games">
-            <Glyph d={ICONS.games} />
-          </a>
-          {cover === 'open' && index > 0 && (
-            <button className="icon-btn" onClick={() => turnTo(0)} aria-label="All the friends in the book" title="Contents">
-              <Glyph d={ICONS.contents} />
-            </button>
+          {view.name === 'room' ? (
+            <a className="icon-btn" href="../" aria-label="All games" title="All games">
+              <Glyph d={ICONS.games} />
+            </a>
+          ) : (
+            <BackButton to={view.name === 'page' && view.from === 'book' ? 'book' : 'room'} isBeckoning={Boolean(page && celebrate)} onClick={goBack} />
           )}
         </div>
         <div className="bar-side">
-          {hasColors && (
+          {isOnSheet && hasMarks && (
             <>
-              <button className="icon-btn" onClick={() => savePicture(svgRef.current, page.name)} aria-label="Save or share the picture" title="Save picture">
+              <button className="icon-btn" onClick={share} aria-label="Save or share the picture" title="Save picture">
                 <Glyph d={ICONS.share} />
               </button>
               <button className="icon-btn" onClick={() => setIsCleaning(true)} aria-label="Clean this page" title="Clean page">
@@ -213,18 +296,42 @@ export default function App() {
         </div>
       </header>
       <main className="stage">
-        <div className="book-frame">
-          <Book index={index} count={PAGES.length + 1} request={request} isReduced={isReduced} onTurned={onTurned} onTap={paintAt} renderFace={renderFace} />
-          {cover !== 'open' && <Cover isOpening={cover === 'opening'} onOpen={openCover} />}
-          <Spiral />
-        </div>
+        {view.name === 'room' && (
+          <Room items={wallItems} pinnedId={pinnedId} onOpenBook={openBook} onNewSketch={() => openSketch(null)} onOpenItem={openWallItem} />
+        )}
+        {view.name === 'book' && (
+          <div className="book-frame">
+            <Book index={index} count={PAGES.length + 1} request={request} isReduced={isReduced} onTurned={onTurned} onTap={() => {}} renderFace={renderFace} />
+            {!isCoverOpen && <Cover />}
+            <Spiral />
+          </div>
+        )}
+        {page && (
+          <div className="sheet-frame" key={page.id}>
+            <Sheet
+              page={page}
+              colors={book.colors[page.id]}
+              isDone={doneIds.has(page.id)}
+              celebrate={celebrate?.pageId === page.id ? celebrate.id : null}
+              svgRef={svgRef}
+              onPaint={paint}
+            />
+          </div>
+        )}
+        {sketch && (
+          <div className="sheet-frame" key={sketch.id}>
+            <Sketch sketch={sketch} pickColor={pickStrokeColor} canvasRef={canvasRef} onStroke={(stroke) => updateSketch((s) => addStroke(s, stroke))} />
+          </div>
+        )}
       </main>
-      <footer className={`tray ${cover === 'open' ? '' : 'resting'}`}>
-        <CrayonBox crayonId={crayonId} onPick={pick} />
-        <button className="undo" onClick={undo} disabled={!page || !canUndo(book, page.id)} aria-label="Take back the last color">
-          <Glyph d={ICONS.undo} />
-        </button>
-      </footer>
+      {isOnSheet && (
+        <footer className="tray">
+          <CrayonBox crayonId={crayonId} onPick={pick} />
+          <button className="undo" onClick={undo} disabled={!canTakeBack} aria-label="Take back the last color">
+            <Glyph d={ICONS.undo} />
+          </button>
+        </footer>
+      )}
       {isCleaning && (
         <Dialog title="Clean this page?" picture={<div className="blank-page" />} yesLabel="Yes, clean it" onYes={clean} onNo={() => setIsCleaning(false)} />
       )}

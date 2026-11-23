@@ -61,3 +61,20 @@ test('every Pal has a page, and every page has parts to color that match its dra
     assert.ok(!svg.includes('#00ff00'), `${p.id}: no measuring colors left`);
   }
 });
+
+test('free drawings: strokes add up, the last one comes back off, and a cleared sheet is blank', async () => {
+  const { addStroke, clearSketch, isBlank, newSketch, undoStroke } = await import('./sketches.js');
+  let sketch = newSketch('s1');
+  assert.equal(isBlank(sketch), true);
+  sketch = addStroke(sketch, { c: '#e8524f', w: 26, p: [10, 10, 40, 40] });
+  sketch = addStroke(sketch, { c: '#3f6fd8', w: 26, p: [50, 50] });
+  assert.equal(sketch.strokes.length, 2);
+  assert.equal(undoStroke(sketch).strokes.at(-1).c, '#e8524f');
+  assert.equal(isBlank(clearSketch(sketch)), true);
+});
+
+test('the wall shows colored pages newest first', async () => {
+  const { coloredPageIds } = await import('./book.js');
+  const book = { colors: { a: { 0: '#fff' }, b: { 1: '#000' }, c: {} }, history: [], touched: { a: 1, b: 5 } };
+  assert.deepEqual(coloredPageIds(book), ['b', 'a']);
+});

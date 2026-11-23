@@ -1,0 +1,45 @@
+import { useRef } from 'react';
+import Drawing from './Drawing.jsx';
+import Sticker from './Sticker.jsx';
+import Confetti from './Confetti.jsx';
+import Tape from './Tape.jsx';
+import { partAt } from '../drawingDom.js';
+
+/**
+ * A Pal's picture taken out of the book onto the desk as a big sheet of paper. Nothing moves or turns here:
+ * a tap colors the part under the finger (or the nearest one), and a finger sliding over the picture colors
+ * every part it passes, which is what a small child tries first.
+ */
+export default function Sheet({ page, colors, isDone, celebrate, svgRef, onPaint }) {
+  const stroke = useRef(null);
+
+  const onPointerDown = (event) => {
+    if (event.button > 0 || !svgRef.current) return;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    const part = partAt(svgRef.current, event.clientX, event.clientY);
+    stroke.current = { id: event.pointerId, parts: new Set(part == null ? [] : [part]) };
+    onPaint(part, event.clientX, event.clientY);
+  };
+  const onPointerMove = (event) => {
+    const s = stroke.current;
+    if (!s || s.id !== event.pointerId || !svgRef.current) return;
+    const part = partAt(svgRef.current, event.clientX, event.clientY, { isNear: false });
+    if (part == null || s.parts.has(part)) return;
+    s.parts.add(part);
+    onPaint(part, event.clientX, event.clientY);
+  };
+  const onPointerEnd = () => {
+    stroke.current = null;
+  };
+
+  return (
+    <div className="sheet-paper lifted" onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerEnd} onPointerCancel={onPointerEnd}>
+      <Tape />
+      <h2 className="page-name">{page.name}</h2>
+      <Drawing page={page} colors={colors} svgRef={svgRef} isLabelled className={celebrate ? 'hop' : ''} />
+      <div className="grain" aria-hidden="true" />
+      {isDone && <Sticker isNew={Boolean(celebrate)} />}
+      {celebrate && <Confetti key={celebrate} />}
+    </div>
+  );
+}
