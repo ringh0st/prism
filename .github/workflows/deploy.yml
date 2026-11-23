@@ -41,5 +41,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+      # GitHub sometimes can't see a just-uploaded artifact for a moment ("No artifacts named github-pages").
+      - run: sleep 20
       - id: deployment
         uses: actions/deploy-pages@v4
