@@ -29,10 +29,11 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run lint
-      - name: Build Lumipals into dist/play and Marbles into dist/marbles, and add the site's pages
+      - name: Build Lumipals into dist/play, Marbles into dist/marbles and the coloring book into dist/coloring, and add the site's pages
         run: |
           npm run build
           npx vite build --config marbles/vite.config.js
+          npx vite build --config coloring/vite.config.js
           cp -r site/. dist/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

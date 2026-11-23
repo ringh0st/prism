@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="drawing" data-page="waffles"><defs>
+<linearGradient id="waffles-f1-fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbe3b8"/><stop offset="1" stop-color="#e5b574"/></linearGradient>
+<linearGradient id="waffles-f1-cream" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf1"/><stop offset="1" stop-color="#f8e6cc"/></linearGradient>
+</defs>
+<g>
+<path d="M66.2 86.0 C72.2 85.2 76.8 80.8 78.2 74.8 C79.0 71.8 82.0 70.2 83.5 72.5 C85.0 75.5 82.8 81.5 77.5 86.0 C73.8 89.0 69.2 90.5 66.2 90.5Z" fill="#ffffff" stroke="#4a3426" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-kind="fill" data-r="0"/>
+<path d="M23 88C21 80 26 74 33 74 40 74 43 81 41 88 40 92 36 94 31 94 27 94 24 92 23 88Z" fill="#ffffff" stroke="#4a3426" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-kind="fill" data-r="1"/>
+<path d="M77 88C79 80 74 74 67 74 60 74 57 81 59 88 60 92 64 94 69 94 73 94 76 92 77 88Z" fill="#ffffff" stroke="#4a3426" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-kind="fill" data-r="2"/>
+<path d="M30 91C26 79 33 67 50 66 67 67 74 79 70 91 68 94 63 94 58 94H42C37 94 32 94 30 91Z" fill="#ffffff" stroke="#4a3426" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-kind="fill" data-r="3"/>
+<path d="M62.6 73.4C66.4 73 69.6 76 70.4 80 70.8 83 69.4 85.6 67 86 64 86.4 61.6 84 61 80.6 60.4 77.4 60.6 74 62.6 73.4Z" fill="#ffffff" data-kind="fill" data-r="4"/>
+<path d="M50 69C57 69 61 74 61 80 61 86 56 90 50 90S39 86 39 80C39 74 43 69 50 69Z" fill="#ffffff" stroke="#4a3426" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-kind="fill" data-r="5"/>
+<path d="M35 91C35 86 38.4 83.6 42.4 83.6S49.6 86 49.6 91C49.6 93.6 47.6 94.8 42.4 94.8S35 93.6 35 91Z" fill="#ffffff" stroke="#4a3426" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-kind="fill" data-r="6"/><path d="M50.4 91C50.4 86 53.8 83.6 57.8 83.6S65 86 65 91C65 93.6 63 94.8 57.8 94.8S50.4 93.6 50.4 91Z" fill="#ffffff" stroke="#4a3426" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-kind="fill" data-r="7"/>
+<path d="M39.6 93v-2.4M42.4 93.6v-2.6M45.2 93v-2.4M55 93v-2.4M57.8 93.6v-2.6M60.6 93v-2.4" stroke="#dcb787" stroke-width="1" stroke-linecap="round"/>
+<path d="M50 25C68 25 80.6 36 80.6 50.6 80.6 63.6 68 71 50 71S19.4 63.6 19.4 50.6C19.4 36 32 25 50 25Z" fill="#ffffff" stroke="#4a3426" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-kind="fill" data-r="8"/>
+<clipPath id="waffles-f1-head"><path d="M50 25C68 25 80.6 36 80.6 50.6 80.6 63.6 68 71 50 71S19.4 63.6 19.4 50.6C19.4 36 32 25 50 25Z"/></clipPath>
+<path clip-path="url(#waffles-f1-head)" d="M55 40C58 35.6 66 34.6 71 38 76 41.6 77 49 73.6 54.6 70 59.6 62 60.6 57 57 52.6 53.6 52 45 55 40Z" fill="#ffffff" data-kind="fill" data-r="9"/>
+<path d="M45.6 26.4 C44.6 23.4 45.4 21.0 47.6 20.0 C47.2 22.0 48.0 23.2 49.2 23.6 C49.0 21.0 50.4 19.0 52.8 18.4 C52.0 20.4 52.4 22.2 53.4 23.4 C54.2 22.2 55.4 21.6 56.8 21.8 C55.4 23.0 54.8 24.6 54.8 26.4" fill="url(#waffles-f1-fur)" stroke="#4a3426" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M34 28.5 C25 25.5 16 30 14.6 41 C13.6 46.0 16 55.0 21.6 55.0 C27 55.0 29.4 46.0 30.6 39.0 C31.6 39 33.4 35.4 36 32.6Z" fill="#ffffff" stroke="#4a3426" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-kind="fill" data-r="10"/>
+<path d="M66 28.5 C75 25.5 84 30 85.4 41 C86.4 46.0 84 55.0 78.4 55.0 C73 55.0 70.6 46.0 69.4 39.0 C68.4 39 66.6 35.4 64 32.6Z" fill="#ffffff" stroke="#4a3426" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-kind="fill" data-r="11"/>
+<path d="M18.6 38 C17.2 42 16.8 46.6 17.6 51M81.4 38 C82.8 42 83.2 46.6 82.4 51" stroke="#f0c48c" stroke-width="1.4" fill="none" stroke-linecap="round" opacity=".8"/>
+<ellipse cx="37" cy="41.4" rx="2.6" ry="1.7" fill="url(#waffles-f1-cream)" transform="rotate(-12 37 41.4)"/><ellipse cx="63" cy="41.4" rx="2.6" ry="1.7" fill="url(#waffles-f1-cream)" transform="rotate(12 63 41.4)"/>
+<path d="M50 54.6C57.4 54.6 62.4 58 62.4 62.6 62.4 67 57.2 70 50 70S37.6 67 37.6 62.6C37.6 58 42.6 54.6 50 54.6Z" fill="#ffffff" stroke="#4a3426" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" data-kind="fill" data-r="12"/>
+<circle cx="39" cy="51" r="5.8" fill="#3a1e12"/><path d="M34.8 53.4A4.6 4.6 0 0 0 43.2 53.4 5.6 2.8 0 0 1 34.8 53.4Z" fill="#4a3426"/><circle cx="41.1" cy="48.6" r="2.3" fill="#fff"/><circle cx="36.8" cy="53.2" r=".9" fill="#fff"/>
+<circle cx="61" cy="51" r="5.8" fill="#3a1e12"/><path d="M56.8 53.4A4.6 4.6 0 0 0 65.2 53.4 5.6 2.8 0 0 1 56.8 53.4Z" fill="#4a3426"/><circle cx="63.1" cy="48.6" r="2.3" fill="#fff"/><circle cx="58.8" cy="53.2" r=".9" fill="#fff"/>
+<ellipse cx="30.6" cy="60" rx="4.4" ry="2.8" fill="#f79a86" opacity=".6"/><ellipse cx="69.4" cy="60" rx="4.4" ry="2.8" fill="#f79a86" opacity=".6"/>
+<path d="M45.4 57.4C45.4 55.6 47.4 54.6 50 54.6S54.6 55.6 54.6 57.4C54.6 59.8 52 61.4 50 61.4S45.4 59.8 45.4 57.4Z" fill="#3a1e12"/><ellipse cx="48.4" cy="56.4" rx="1.5" ry=".75" fill="#fff" opacity=".8"/>
+<path d="M47.6 64.8C47.6 67.4 48.6 68.6 50 68.6S52.4 67.4 52.4 64.8Z" fill="#f08a8a" stroke="#4a3426" stroke-width="0.9" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M50 61.4v1.8M45 63c1.5 2.2 3.8 2.2 5 0 1.2 2.2 3.5 2.2 5 0" fill="none" stroke="#4a3426" stroke-width="1.3" stroke-linecap="round" stroke-opacity="0.8"/>
+</g></svg>
