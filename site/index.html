@@ -97,6 +97,11 @@
 
   footer { margin-top: 34px; padding: 16px 4px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
   :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  /* A newer version of the page is out: one friendly bar to load it. */
+  .fresh { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 18px; border-radius: 999px; background: var(--text, #2B2118); color: #fff; font-weight: 600; box-shadow: 0 12px 24px -8px rgba(40, 20, 0, 0.5); z-index: 20; white-space: nowrap; animation: fresh-in 0.4s ease both; }
+  .fresh[hidden] { display: none; }
+  .fresh button { border: 0; border-radius: 999px; padding: 8px 16px; font: inherit; color: #fff; background: var(--accent); cursor: pointer; }
+  @keyframes fresh-in { from { opacity: 0; transform: translate(-50%, 16px); } }
   @media (max-width: 420px) { .tagline { display: none; } }
   @media (prefers-reduced-motion: reduce) { .stars { scroll-behavior: auto; } .tile, .dots button { transition: none; } }
 </style>
@@ -191,7 +196,26 @@
     <a href="./terms.html">Terms</a>
   </footer>
 </div>
+<div class="fresh" id="fresh" role="status" hidden>Something new is here <button type="button" id="fresh-load">Refresh</button></div>
 <script>
+  // Updates: each deploy stamps a version into this page and into site-version.json. A page opened from the Home
+  // Screen can be an old copy for a long time, so it asks for the newest stamp when it opens and when it comes
+  // back, and offers to load it.
+  const SITE_VERSION = '__SITE_VERSION__';
+  const fresh = document.getElementById('fresh');
+  let newest = null;
+  const checkForUpdate = async () => {
+    if (SITE_VERSION.startsWith('__')) return;
+    try {
+      const response = await fetch('./site-version.json?t=' + Date.now(), { cache: 'no-store' });
+      const { version } = await response.json();
+      if (version && version !== SITE_VERSION) { newest = version; fresh.hidden = false; }
+    } catch { /* offline: try again next time */ }
+  };
+  document.getElementById('fresh-load').addEventListener('click', () => location.replace('./?v=' + newest));
+  document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && checkForUpdate());
+  checkForUpdate();
+
   // The star of the week: the page opens on a different game each week, and the dots follow the swipe.
   const stars = document.getElementById('stars');
   const slides = [...stars.children];

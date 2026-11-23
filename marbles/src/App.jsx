@@ -8,6 +8,7 @@ import { GROUNDS } from './game/physics.js';
 import { CHALLENGES, newChallenge, starsFor } from './game/challenges.js';
 import { sfx } from './game/audio.js';
 import { store } from './storage.js';
+import { setInGame } from './update.js';
 import { TURN_SECONDS, joinLive, newCode, tidyCode } from './live.js';
 
 const SHOOTERS = [
@@ -86,6 +87,8 @@ export default function App() {
     if (!store.get('marbles.sawHelp', false)) setIsHelpOpen(true);
     return () => clearTimeout(timer);
   }, []);
+  // An update waits while a game or a live room is open.
+  useEffect(() => setInGame(phase === 'play' || phase === 'live'), [phase]);
   useEffect(() => {
     sfx.setOn(soundOn);
     store.set('marbles.sound', soundOn);

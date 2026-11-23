@@ -5,20 +5,22 @@ const isMidLevel = () => /^#\/(play|daily|test)/.test(window.location.hash);
 /**
  * Keeps installed and long-open copies of the game up to date. Phones often pause a home-screen app
  * instead of closing it, so the game checks for a newer version whenever it comes back on screen and
- * reloads by itself, waiting until the player isn't in the middle of a level.
+ * reloads by itself, waiting until the player isn't in the middle of a level. Marbles and the coloring
+ * book use it too, with their own `isBusy` and key. Returns a function to call when the player is free
+ * again (it reloads then if a newer version is waiting).
  */
 const RELOADED_KEY = 'prism.reloadedFor';
 
-export function startAutoUpdate() {
+export function startAutoUpdate({ isBusy = isMidLevel, reloadedKey = RELOADED_KEY } = {}) {
   let isUpdateReady = false;
   let newBuild = null;
 
   const reloadWhenSafe = () => {
-    if (!isUpdateReady || isMidLevel()) return;
+    if (!isUpdateReady || isBusy()) return;
     try {
       // Never loop: reload at most once for each published version.
-      if (sessionStorage.getItem(RELOADED_KEY) === newBuild) return;
-      sessionStorage.setItem(RELOADED_KEY, newBuild);
+      if (sessionStorage.getItem(reloadedKey) === newBuild) return;
+      sessionStorage.setItem(reloadedKey, newBuild);
     } catch {
       // Storage blocked: still fine to reload once.
     }
@@ -44,4 +46,5 @@ export function startAutoUpdate() {
   window.addEventListener('hashchange', reloadWhenSafe);
   setInterval(check, CHECK_EVERY_MS);
   check();
+  return reloadWhenSafe;
 }

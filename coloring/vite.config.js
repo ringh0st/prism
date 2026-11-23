@@ -4,12 +4,22 @@ import react from '@vitejs/plugin-react';
 
 const { version } = JSON.parse(readFileSync(new URL('./version.json', import.meta.url), 'utf8'));
 
+// A new id for every build, written to version.json next to the app so an open copy can tell a newer one is out
+// (../src/lib/autoUpdate.js, shared with Lumipals).
+const BUILD_ID = String(Date.now());
+const buildFile = {
+  name: 'build-file',
+  generateBundle() {
+    this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ build: BUILD_ID, version }) });
+  },
+};
+
 // The Pals coloring book: its own small app in this repository, published at lumipals.app/coloring/.
 export default defineConfig({
   root: new URL('.', import.meta.url).pathname,
-  plugins: [react()],
+  plugins: [react(), buildFile],
   base: './',
-  define: { __APP_VERSION__: JSON.stringify(version) },
+  define: { __APP_VERSION__: JSON.stringify(version), __BUILD_ID__: JSON.stringify(BUILD_ID) },
   build: { outDir: new URL('../dist/coloring', import.meta.url).pathname, emptyOutDir: true },
   server: { fs: { allow: ['..'] } },
 });

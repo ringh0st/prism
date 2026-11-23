@@ -35,6 +35,8 @@ jobs:
           npx vite build --config marbles/vite.config.js
           npx vite build --config coloring/vite.config.js
           cp -r site/. dist/
+          echo "{\"version\":\"$GITHUB_SHA\"}" > dist/site-version.json
+          sed -i "s/__SITE_VERSION__/$GITHUB_SHA/" dist/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
