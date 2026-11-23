@@ -1,19 +1,21 @@
 {
   "name": "prism",
   "private": true,
-  "version": "1.5.22",
+  "version": "1.5.23",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "oxlint src scripts marbles/src",
-    "test": "node --test src/game/*.test.js marbles/src/game/*.test.js",
+    "lint": "oxlint src scripts marbles/src coloring/src coloring/scripts",
+    "test": "node --test src/game/*.test.js marbles/src/game/*.test.js coloring/src/*.test.js",
     "levels": "node scripts/generate-levels.mjs",
     "events": "node scripts/generate-events.mjs",
     "ios": "vite build && cap sync ios",
     "pals:fit": "node scripts/fit-pals.cjs",
-    "marbles": "vite --config marbles/vite.config.js"
+    "marbles": "vite --config marbles/vite.config.js",
+    "coloring": "vite --config coloring/vite.config.js",
+    "coloring:pages": "node coloring/scripts/make-pages.mjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",
