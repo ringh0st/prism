@@ -16,7 +16,9 @@ The owner's schoolyard marbles game ("גולות"), published at https://lumipal
 - **Computer** (`ai.js`): tries shots ahead with the real physics (aiming a marble at the hole or out of the ring) and plays the best with a shakier hand on Easy. **Challenges** (`challenges.js`): 12 yards for one player with a few shots and stars; a test checks each can be won.
 - **View** (`view3d.js`, three.js): glass marbles that really roll, shadows, the yard at a slight tilt; taps are cast onto the ground. **Sounds** (`audio.js`, made in code): glass clack by force, pebble, kerb, the plop into the hole, rolling hiss.
 - **How to play** (`components/HowTo.jsx`): a sheet for newcomers (how to shoot, the three games, whose turn, the calls, good to know); it opens by itself on a first visit and from the "?" at the top or the chip on the home page.
-- Playing: pull back anywhere and let go (`components/Yard.jsx`). Against the computer (3 levels), two players on one phone, or the challenges. Still to do: a live game with a friend by code (as in Slime Merge), more challenges, night mode.
+- Playing: pull back anywhere and let go (`components/Yard.jsx`). Against the computer (3 levels), two players on one phone, the challenges, or a friend live.
+- **Live with a code** (`live.js`, the same Supabase Realtime broadcast as Slime Merge's fights, nothing stored; owner: "like the slime, but one board", with a 10-second turn shown as a bar): one player starts a game (their game and ground) and shares a five-digit code, the other joins. One yard: the host is side `you`, the friend is `foe` and sees the yard from its far end (`flip` in view3d.js), so each shoots from the bottom of their own screen. Every shot is sent and played on both phones, and the shooter's phone then sends where everything ended (`snapshotOf`/`applySnapshot`), so the yards can't drift apart. A turn not used in `TURN_SECONDS` passes. `?local` on the dev address links two tabs without the server. Not yet tried on two real phones.
+- Still to do: more challenges, night mode, grounds in the challenges.
 
 ## Product requirements (from the owner, apply to all work)
 

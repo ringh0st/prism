@@ -67,6 +67,17 @@ export default function HowTo({ onClose }) {
           </div>
         </section>
 
+        <h3 className="part">With a friend, live</h3>
+        <section>
+          <span className="badge" aria-hidden="true">
+            ⏱
+          </span>
+          <div>
+            <h3>One yard, two phones</h3>
+            <p>Pick “A friend · live with a code” and press Play. One of you starts a game and tells the other the code. You take turns, with 10 seconds for each shot: the bar at the top shows the time left.</p>
+          </div>
+        </section>
+
         <h3 className="part">Good to know</h3>
         <ul>
           <li>A slow marble drops into the Mor. A fast one skips over it.</li>

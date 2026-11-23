@@ -127,7 +127,8 @@ const groundPicture = (id) =>
     }
   });
 
-export function createView(canvas, yard) {
+/** @param flip look at the yard from its far end (the player who joined a live game shoots from there) */
+export function createView(canvas, yard, { flip = false } = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.shadowMap.enabled = true;
@@ -273,8 +274,9 @@ export function createView(canvas, yard) {
       // Far enough to see the whole yard with its kerb, whichever of width and height is tighter.
       const half = Math.tan((camera.fov * Math.PI) / 360);
       const distance = Math.max((yard.h + 70) / (2 * half), (yard.w + 64) / (2 * half * camera.aspect));
-      camera.position.set(center.x, Math.cos(TILT) * distance, center.z + Math.sin(TILT) * distance);
-      camera.lookAt(center.x, 0, center.z + 6);
+      const end = flip ? -1 : 1;
+      camera.position.set(center.x, Math.cos(TILT) * distance, center.z + end * Math.sin(TILT) * distance);
+      camera.lookAt(center.x, 0, center.z + end * 6);
       camera.updateProjectionMatrix();
     },
 

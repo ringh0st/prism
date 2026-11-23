@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { STEP, flick, isAtRest, speedOf, step, strayOf } from '../game/physics.js';
-import { YARD, callBakol, judge } from '../game/rules.js';
+import { YARD, callBakol, judge, other } from '../game/rules.js';
+import { TURN_SECONDS, applySnapshot, snapshotOf } from '../live.js';
 import { pickShot } from '../game/ai.js';
 import { createView } from '../game/view3d.js';
 import { sfx } from '../game/audio.js';
@@ -14,8 +15,12 @@ const MIN_POWER = 0.07;
  * sounds and applies the rules. The computer shoots for 'foe' when `cpuLevel` is set.
  * @param game the rules' game (changed in place as shots are played)
  * @param onChange called after every shot and call, so the page can show bags, turn and messages
+ * @param net a live game with a friend: { side, send(message), listen(handler) }. `side` is the side this phone
+ *   plays ('you' started the game and shoots from the near end; 'foe' joined and sees the yard from the far end).
+ *   Every shot is sent and played on both phones; the shooter's phone then sends where everything ended, so the
+ *   two yards can never drift apart. Each turn has TURN_SECONDS, shown as a bar; an unused turn passes.
  */
-export default function Yard({ game, cpuLevel = null, onChange }) {
+export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
   const canvasRef = useRef(null);
   const viewRef = useRef(null);
   // What is going on right now, outside React (it changes every frame).
@@ -25,12 +30,15 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
   const gameRef = useRef(game);
   gameRef.current = game;
   const side = game.turn;
-  const canShoot = !game.winner && !(cpuLevel && side === 'foe');
+  const canShoot = !game.winner && (net ? side === net.side : !(cpuLevel && side === 'foe'));
+  const barRef = useRef(null);
+  const netRef = useRef(net);
+  netRef.current = net;
 
   // The 3D view, sized to its box.
   useEffect(() => {
     const canvas = canvasRef.current;
-    const view = createView(canvas, YARD);
+    const view = createView(canvas, YARD, { flip: net?.side === 'foe' });
     viewRef.current = view;
     const fit = () => view.resize(canvas.clientWidth, canvas.clientHeight);
     fit();
@@ -62,6 +70,13 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
             state.moving = false;
             sfx.roll(0);
             const result = judge(g, state.side, state.events);
+            const link = netRef.current;
+            if (link) {
+              // The shooter's phone says how it ended; the other one takes that over its own result.
+              if (state.side === link.side) link.send({ t: 'state', snap: snapshotOf(g) });
+              else if (state.snap) applySnapshot(g, state.snap);
+              state.snap = null;
+            }
             if (g.winner) sfx.cheer();
             else if (result.won) sfx.win();
             else sfx.miss();
@@ -69,6 +84,23 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
           }
         }
         if (state.moving) sfx.roll(Math.max(...g.world.marbles.map(speedOf)) / 700, g.world.ground?.hiss);
+      }
+      // A live game's turn clock: it starts when the yard lies still, and an unused turn passes.
+      const link = netRef.current;
+      if (link && barRef.current) {
+        const turnKey = `${g.shots}-${g.turn}`;
+        if (state.moving || g.winner) state.deadline = 0;
+        else if (state.turnKey !== turnKey || !state.deadline) {
+          state.turnKey = turnKey;
+          state.deadline = now + TURN_SECONDS * 1000;
+        }
+        const left = state.deadline ? Math.max(0, (state.deadline - now) / (TURN_SECONDS * 1000)) : 0;
+        barRef.current.style.transform = `scaleX(${left})`;
+        barRef.current.dataset.low = String(left < 0.3);
+        if (state.deadline && left === 0 && g.turn === link.side) {
+          link.send({ t: 'pass' });
+          passTurn();
+        }
       }
       view.render(g.world, { aim: state.aim, turn: g.winner || state.moving ? null : g.turn, now, dt });
     };
@@ -83,11 +115,24 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
 
-  /** Lets the shooter go. */
-  const fire = (angle, power, high) => {
+  /** A turn that wasn't used in time goes to the other side. */
+  const passTurn = () => {
+    const g = gameRef.current;
+    const state = live.current;
+    if (state.moving || g.winner) return;
+    Object.assign(state, { aim: null, pull: null, deadline: 0 });
+    g.turn = other(g.turn);
+    g.shots++;
+    sfx.miss();
+    onChangeRef.current({ passed: true });
+  };
+
+  /** Lets the shooter go. A shot of this phone's own in a live game is sent to the other phone first. */
+  const fire = (angle, power, high, isFromFriend = false) => {
     const state = live.current;
     const g = gameRef.current;
     if (state.moving || g.winner) return;
+    if (netRef.current && !isFromFriend) netRef.current.send({ t: 'shot', angle, power, high });
     const shooter = g.world.marbles.find((m) => m.id === g.turn);
     if (high) g.calls[g.turn].bagova--;
     flick(shooter, angle, power, { high });
@@ -96,6 +141,27 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
     setIsHigh(false);
     redraw((n) => n + 1);
   };
+
+  // What the friend's phone says: their shots, calls and passed turns, and how each of their shots ended.
+  useEffect(() => {
+    if (!net) return undefined;
+    return net.listen((message) => {
+      const g = gameRef.current;
+      const state = live.current;
+      if (message.t === 'shot') fire(message.angle, message.power, message.high, true);
+      else if (message.t === 'pass') passTurn();
+      else if (message.t === 'sweep') {
+        if (callBakol(g, g.turn)) sfx.sweep();
+        onChangeRef.current(null);
+      } else if (message.t === 'state') {
+        if (state.moving) state.snap = message.snap;
+        else {
+          applySnapshot(g, message.snap);
+          onChangeRef.current({ synced: true });
+        }
+      }
+    });
+  }, [net]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The computer's turn: it thinks for a moment, then shoots.
   useEffect(() => {
@@ -123,7 +189,12 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
     sfx.unlock();
     const at = viewRef.current.toYard(event.clientX, event.clientY);
     if (!at) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
+    // Keep getting the finger's moves when it leaves the yard (where the browser allows it).
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // No capture: aiming still works while the finger stays on the yard.
+    }
     live.current.pull = at;
   };
   const onUp = () => {
@@ -137,6 +208,7 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
   const calls = game.calls[side];
   const sweep = () => {
     if (callBakol(game, side)) {
+      net?.send({ t: 'sweep' });
       sfx.sweep();
       onChange(null);
       redraw((n) => n + 1);
@@ -144,6 +216,11 @@ export default function Yard({ game, cpuLevel = null, onChange }) {
   };
   return (
     <div className="yard">
+      {net && !game.winner && (
+        <div className={`clock ${side}`} aria-hidden="true">
+          <i ref={barRef} />
+        </div>
+      )}
       <canvas ref={canvasRef} onPointerDown={onDown} onPointerMove={aimFrom} onPointerUp={onUp} onPointerCancel={onUp} />
       {canShoot && !live.current.moving && (
         <div className="calls" role="group" aria-label="Calls">

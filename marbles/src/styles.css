@@ -640,3 +640,65 @@ button {
   width: 11px;
   height: 11px;
 }
+
+/* A live game: the code to share, the form to join, and the turn clock over the yard. */
+.live {
+  text-align: center;
+}
+.code {
+  margin: 4px 0;
+  font: 700 54px 'Fredoka', system-ui, sans-serif;
+  letter-spacing: 0.12em;
+  color: var(--go);
+}
+.join {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+.join input {
+  min-width: 0;
+  padding: 12px 16px;
+  border: 2px solid var(--line);
+  border-radius: 99px;
+  color: var(--ink);
+  background: #fff;
+  font: 600 17px 'Fredoka', system-ui, sans-serif;
+}
+.join .btn {
+  margin: 0;
+  padding: 11px 22px;
+  font-size: 18px;
+}
+.btn:disabled {
+  opacity: 0.5;
+}
+.clock {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 8px;
+  z-index: 2;
+  height: 9px;
+  border-radius: 99px;
+  background: rgba(58, 42, 26, 0.25);
+  overflow: hidden;
+  pointer-events: none;
+}
+.clock i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--foe);
+  transform-origin: 0 50%;
+}
+.clock.you i {
+  background: var(--you);
+}
+.clock i[data-low='true'] {
+  background: var(--go);
+}
+.stage .coach {
+  top: 26px;
+}
