@@ -1,72 +1,50 @@
 /* global __APP_VERSION__ */
-import { useEffect, useMemo, useRef, useState } from "react";
-import Yard from "./components/Yard.jsx";
-import HowTo from "./components/HowTo.jsx";
-import { MODES, newGame } from "./game/rules.js";
-import { tellShot, turnStatus } from "./game/story.js";
-import { GROUNDS } from "./game/physics.js";
-import { CHALLENGES, newChallenge, starsFor } from "./game/challenges.js";
-import { sfx } from "./game/audio.js";
-import { store } from "./storage.js";
-import { TURN_SECONDS, joinLive, newCode, tidyCode } from "./live.js";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import Yard from './components/Yard.jsx';
+import HowTo from './components/HowTo.jsx';
+import { MODES, newGame } from './game/rules.js';
+import { tellShot, turnStatus } from './game/story.js';
+import { GROUNDS } from './game/physics.js';
+import { CHALLENGES, newChallenge, starsFor } from './game/challenges.js';
+import { sfx } from './game/audio.js';
+import { store } from './storage.js';
+import { TURN_SECONDS, joinLive, newCode, tidyCode } from './live.js';
 
 const SHOOTERS = [
-  { id: "shooter", name: "Glass", blurb: "Balanced" },
-  { id: "steelie", name: "Steelie", blurb: "Heavy: plows through" },
-  { id: "jumbo", name: "Jumbo", blurb: "Big: easy to hit with" },
+  { id: 'shooter', name: 'Glass', blurb: 'Balanced' },
+  { id: 'steelie', name: 'Steelie', blurb: 'Heavy: plows through' },
+  { id: 'jumbo', name: 'Jumbo', blurb: 'Big: easy to hit with' },
 ];
 const RIVALS = [
-  { id: "easy", name: "Computer · Easy" },
-  { id: "normal", name: "Computer · Normal" },
-  { id: "hard", name: "Computer · Hard" },
-  { id: "two", name: "2 players · one phone" },
-  { id: "live", name: "A friend · live with a code" },
+  { id: 'easy', name: 'Computer · Easy' },
+  { id: 'normal', name: 'Computer · Normal' },
+  { id: 'hard', name: 'Computer · Hard' },
+  { id: 'two', name: '2 players · one phone' },
+  { id: 'live', name: 'A friend · live with a code' },
 ];
 const SPLASH_MS = 2200;
 /** What a yard's own shape is called in the line under the score at the start of a game. */
-const FEATURE_NAMES = {
-  mound: "a mound",
-  dip: "a dip",
-  puddle: "a puddle",
-  gates: "gates",
-};
+const FEATURE_NAMES = { mound: 'a mound', dip: 'a dip', puddle: 'a puddle', gates: 'gates' };
 const yardLine = (world) => {
-  const parts = [
-    ...(world.ring && world.ring.shape !== "circle"
-      ? [`a ${world.ring.shape} ring`]
-      : []),
-    ...(world.features ?? []).map((f) => FEATURE_NAMES[f]),
-  ];
-  return parts.length ? ` This yard: ${parts.join(", ")}.` : "";
+  const parts = [...(world.ring && world.ring.shape !== 'circle' ? [`a ${world.ring.shape} ring`] : []), ...(world.features ?? []).map((f) => FEATURE_NAMES[f])];
+  return parts.length ? ` This yard: ${parts.join(', ')}.` : '';
 };
 
 const Icon = {
   home: <path d="M4 11.5 12 4l8 7.5M6.5 10v9h11v-9M10 19v-5h4v5" />,
-  sound: (
-    <path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />
-  ),
+  sound: <path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />,
   mute: <path d="M11 5 6 9H3v6h3l5 4zM16 9l5 6M21 9l-5 6" />,
   again: <path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v5h5" />,
 };
 const Glyph = ({ name }) => (
-  <svg
-    viewBox="0 0 24 24"
-    width="20"
-    height="20"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     {Icon[name]}
   </svg>
 );
 const Stars = ({ count }) => (
   <span className="stars" aria-label={`${count} of 3 stars`}>
     {[1, 2, 3].map((n) => (
-      <i key={n} className={n <= count ? "on" : ""}>
+      <i key={n} className={n <= count ? 'on' : ''}>
         ★
       </i>
     ))}
@@ -74,21 +52,13 @@ const Stars = ({ count }) => (
 );
 
 export default function App() {
-  const [phase, setPhase] = useState("splash"); // splash | home | live | play
-  const [mode, setMode] = useState(() => store.get("marbles.mode", "ring"));
-  const [rival, setRival] = useState(() =>
-    store.get("marbles.rival", "normal"),
-  );
-  const [shooter, setShooter] = useState(() =>
-    store.get("marbles.shooter", "shooter"),
-  );
-  const [ground, setGround] = useState(() =>
-    store.get("marbles.ground", "earth"),
-  );
-  const [soundOn, setSoundOn] = useState(() =>
-    store.get("marbles.sound", true),
-  );
-  const [stars, setStars] = useState(() => store.get("marbles.stars", {}));
+  const [phase, setPhase] = useState('splash'); // splash | home | live | play
+  const [mode, setMode] = useState(() => store.get('marbles.mode', 'ring'));
+  const [rival, setRival] = useState(() => store.get('marbles.rival', 'normal'));
+  const [shooter, setShooter] = useState(() => store.get('marbles.shooter', 'shooter'));
+  const [ground, setGround] = useState(() => store.get('marbles.ground', 'earth'));
+  const [soundOn, setSoundOn] = useState(() => store.get('marbles.sound', true));
+  const [stars, setStars] = useState(() => store.get('marbles.stars', {}));
   // The match being played: { game, rival, challenge } and a counter that goes up after every shot.
   const [match, setMatch] = useState(null);
   const [, setShot] = useState(0);
@@ -96,7 +66,7 @@ export default function App() {
   const noteTimer = useRef(0);
   // A live game with a friend: { code, role: 'host' | 'guest', status: 'connecting' | 'waiting' | 'failed' | 'left' }.
   const [live, setLive] = useState(null);
-  const [typedCode, setTypedCode] = useState("");
+  const [typedCode, setTypedCode] = useState('');
   const linkRef = useRef(null);
   const liveRef = useRef(null);
   liveRef.current = live;
@@ -107,21 +77,18 @@ export default function App() {
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   const closeHelp = () => {
     sfx.click();
-    store.set("marbles.sawHelp", true);
+    store.set('marbles.sawHelp', true);
     setIsHelpOpen(false);
   };
 
   useEffect(() => {
-    const timer = setTimeout(
-      () => setPhase((p) => (p === "splash" ? "home" : p)),
-      SPLASH_MS,
-    );
-    if (!store.get("marbles.sawHelp", false)) setIsHelpOpen(true);
+    const timer = setTimeout(() => setPhase((p) => (p === 'splash' ? 'home' : p)), SPLASH_MS);
+    if (!store.get('marbles.sawHelp', false)) setIsHelpOpen(true);
     return () => clearTimeout(timer);
   }, []);
   useEffect(() => {
     sfx.setOn(soundOn);
-    store.set("marbles.sound", soundOn);
+    store.set('marbles.sound', soundOn);
   }, [soundOn]);
 
   /** A line at the top of the yard, and the "+1" that flies up from the bag that scored. */
@@ -133,29 +100,17 @@ export default function App() {
 
   /** The host lays out a new yard and tells the friend's phone which one. */
   const dealLive = (friendShooter) => {
-    const setup = {
-      mode: setupRef.current.mode,
-      ground: setupRef.current.ground,
-      seed: Math.floor(Math.random() * 1e9),
-      shooters: { you: setupRef.current.shooter, foe: friendShooter },
-    };
-    linkRef.current?.send({ t: "start", ...setup });
-    beginLive(setup, "you");
+    const setup = { mode: setupRef.current.mode, ground: setupRef.current.ground, seed: Math.floor(Math.random() * 1e9), shooters: { you: setupRef.current.shooter, foe: friendShooter } };
+    linkRef.current?.send({ t: 'start', ...setup });
+    beginLive(setup, 'you');
   };
   const beginLive = (setup, side) => {
-    setMatch({
-      game: newGame(setup.mode, setup),
-      rival: "live",
-      challenge: null,
-      side,
-      id: setup.seed,
-      friendShooter: setup.shooters.foe,
-    });
+    setMatch({ game: newGame(setup.mode, setup), rival: 'live', challenge: null, side, id: setup.seed, friendShooter: setup.shooters.foe });
     setNote(null);
-    setPhase("play");
+    setPhase('play');
   };
   const leaveLive = () => {
-    linkRef.current?.send({ t: "bye" });
+    linkRef.current?.send({ t: 'bye' });
     linkRef.current?.leave();
     linkRef.current = null;
     setLive(null);
@@ -164,89 +119,67 @@ export default function App() {
     sfx.unlock();
     sfx.click();
     linkRef.current?.leave();
-    setLive({ code, role, status: "connecting" });
+    setLive({ code, role, status: 'connecting' });
     linkRef.current = joinLive(
       code,
       (message) => {
         const now = liveRef.current;
-        if (message.t === "hello" && now?.role === "host")
-          dealLive(message.shooter);
-        else if (message.t === "again" && now?.role === "host")
-          dealLive(message.shooter);
-        else if (message.t === "start" && now?.role === "guest")
-          beginLive(message, "foe");
-        else if (message.t === "bye")
-          setLive((l) => l && { ...l, status: "left" });
+        if (message.t === 'hello' && now?.role === 'host') dealLive(message.shooter);
+        else if (message.t === 'again' && now?.role === 'host') dealLive(message.shooter);
+        else if (message.t === 'start' && now?.role === 'guest') beginLive(message, 'foe');
+        else if (message.t === 'bye') setLive((l) => l && { ...l, status: 'left' });
         else for (const listener of listeners.current) listener(message);
       },
       (status) => {
-        if (status === "failed")
-          return setLive((l) => l && { ...l, status: "failed" });
-        setLive((l) => l && { ...l, status: "waiting" });
+        if (status === 'failed') return setLive((l) => l && { ...l, status: 'failed' });
+        setLive((l) => l && { ...l, status: 'waiting' });
         // The one who joins says hello; the host answers with the yard.
-        if (role === "guest")
-          linkRef.current?.send({
-            t: "hello",
-            shooter: setupRef.current.shooter,
-          });
+        if (role === 'guest') linkRef.current?.send({ t: 'hello', shooter: setupRef.current.shooter });
       },
     );
   };
   useEffect(() => () => linkRef.current?.leave(), []);
 
   const startGame = () => {
-    if (rival === "live") {
+    if (rival === 'live') {
       sfx.unlock();
       sfx.click();
-      store.set("marbles.rival", rival);
-      setTypedCode("");
-      return setPhase("live");
+      store.set('marbles.rival', rival);
+      setTypedCode('');
+      return setPhase('live');
     }
     sfx.unlock();
     sfx.click();
-    store.set("marbles.mode", mode);
-    store.set("marbles.rival", rival);
-    store.set("marbles.shooter", shooter);
-    store.set("marbles.ground", ground);
-    const game = newGame(mode, {
-      seed: Math.floor(Math.random() * 1e9),
-      shooters: { you: shooter, foe: "shooter" },
-      ground,
-    });
+    store.set('marbles.mode', mode);
+    store.set('marbles.rival', rival);
+    store.set('marbles.shooter', shooter);
+    store.set('marbles.ground', ground);
+    const game = newGame(mode, { seed: Math.floor(Math.random() * 1e9), shooters: { you: shooter, foe: 'shooter' }, ground });
     setMatch({ game, rival, challenge: null, id: Date.now() });
     setNote(null);
-    setPhase("play");
+    setPhase('play');
   };
   const startChallenge = (challenge) => {
     sfx.unlock();
     sfx.click();
-    setMatch({
-      game: newChallenge(challenge, shooter),
-      rival: null,
-      challenge,
-      id: Date.now(),
-    });
+    setMatch({ game: newChallenge(challenge, shooter), rival: null, challenge, id: Date.now() });
     setNote(null);
-    setPhase("play");
+    setPhase('play');
   };
   const goHome = () => {
     sfx.click();
     if (liveRef.current) leaveLive();
     setMatch(null);
-    setPhase("home");
+    setPhase('home');
   };
 
-  const mySide = match?.side ?? "you";
+  const mySide = match?.side ?? 'you';
   const names =
-    match?.rival === "two"
-      ? { you: "Player 1", foe: "Player 2" }
-      : match?.rival === "live"
-        ? { [mySide]: "You", [mySide === "you" ? "foe" : "you"]: "Friend" }
-        : { you: "You", foe: "Computer" };
+    match?.rival === 'two' ? { you: 'Player 1', foe: 'Player 2' } : match?.rival === 'live' ? { [mySide]: 'You', [mySide === 'you' ? 'foe' : 'you']: 'Friend' } : { you: 'You', foe: 'Computer' };
   // The yard's line to the friend's phone, the same one for the whole game.
   const net = useMemo(
     () =>
-      match?.rival === "live"
+      match?.rival === 'live'
         ? {
             side: match.side,
             send: (message) => linkRef.current?.send(message),
@@ -259,52 +192,36 @@ export default function App() {
     [match?.id], // eslint-disable-line react-hooks/exhaustive-deps
   );
   const playAgain = () => {
-    if (match.rival !== "live")
-      return match.challenge ? startChallenge(match.challenge) : startGame();
+    if (match.rival !== 'live') return match.challenge ? startChallenge(match.challenge) : startGame();
     sfx.click();
-    if (live.role === "host") dealLive(match.friendShooter);
-    else linkRef.current?.send({ t: "again", shooter });
+    if (live.role === 'host') dealLive(match.friendShooter);
+    else linkRef.current?.send({ t: 'again', shooter });
     return undefined;
   };
   const onShot = (result) => {
     setShot((n) => n + 1);
     const { game, challenge } = match;
-    if (!result) return say("Sweep! The pebbles are cleared off.");
+    if (!result) return say('Sweep! The pebbles are cleared off.');
     if (result.synced) return;
-    if (result.passed) return say("Time’s up! The turn passes.");
+    if (result.passed) return say('Time’s up! The turn passes.');
     if (game.winner) {
       clearTimeout(noteTimer.current);
-      setNote({
-        text: tellShot(result, game.last.side, names, game.mode).head,
-        id: performance.now(),
-        final: true,
-      });
-      if (challenge && game.winner === "you") {
+      setNote({ text: tellShot(result, game.last.side, names, game.mode).head, id: performance.now(), final: true });
+      if (challenge && game.winner === 'you') {
         const earned = starsFor(challenge, game.shots);
-        const next = {
-          ...stars,
-          [challenge.id]: Math.max(stars[challenge.id] ?? 0, earned),
-        };
+        const next = { ...stars, [challenge.id]: Math.max(stars[challenge.id] ?? 0, earned) };
         setStars(next);
-        store.set("marbles.stars", next);
+        store.set('marbles.stars', next);
       }
       return;
     }
     const told = tellShot(result, game.last.side, names, game.mode);
-    say(
-      result.again && !challenge ? `${told.head} Bonus shot!` : told.head,
-      told.gain,
-    );
+    say(result.again && !challenge ? `${told.head} Bonus shot!` : told.head, told.gain);
   };
 
-  if (phase === "splash") {
+  if (phase === 'splash') {
     return (
-      <div
-        className="splash"
-        onClick={() => setPhase("home")}
-        role="dialog"
-        aria-label="Marbles, a Rinny's Games production. Tap to skip."
-      >
+      <div className="splash" onClick={() => setPhase('home')} role="dialog" aria-label="Marbles, a Rinny's Games production. Tap to skip.">
         <div className="splash-marbles" aria-hidden="true">
           <span className="m m1" />
           <span className="m m2" />
@@ -329,20 +246,9 @@ export default function App() {
         Marbles
       </div>
       <div className="actions">
-        {phase === "home" ? (
-          <a
-            className="icon-btn"
-            href="../"
-            aria-label="All games"
-            title="All games"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              fill="currentColor"
-              aria-hidden="true"
-            >
+        {phase === 'home' ? (
+          <a className="icon-btn" href="../" aria-label="All games" title="All games">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
               <rect x="3" y="3" width="8" height="8" rx="2.5" />
               <rect x="13" y="3" width="8" height="8" rx="2.5" />
               <rect x="3" y="13" width="8" height="8" rx="2.5" />
@@ -354,25 +260,17 @@ export default function App() {
             <Glyph name="home" />
           </button>
         )}
-        <button
-          className="icon-btn"
-          onClick={() => setIsHelpOpen(true)}
-          aria-label="How to play"
-        >
+        <button className="icon-btn" onClick={() => setIsHelpOpen(true)} aria-label="How to play">
           <b className="q">?</b>
         </button>
-        <button
-          className="icon-btn"
-          onClick={() => setSoundOn((on) => !on)}
-          aria-label={soundOn ? "Sound off" : "Sound on"}
-        >
-          <Glyph name={soundOn ? "sound" : "mute"} />
+        <button className="icon-btn" onClick={() => setSoundOn((on) => !on)} aria-label={soundOn ? 'Sound off' : 'Sound on'}>
+          <Glyph name={soundOn ? 'sound' : 'mute'} />
         </button>
       </div>
     </header>
   );
 
-  if (phase === "live") {
+  if (phase === 'live') {
     const code = tidyCode(typedCode);
     return (
       <div className="app">
@@ -381,33 +279,20 @@ export default function App() {
           <section className="panel live" aria-labelledby="live-title">
             <h2 id="live-title">Play a friend, live</h2>
             <p className="sub">
-              One yard, two phones. You take turns, with {TURN_SECONDS} seconds
-              for each shot. {MODES[mode].name} on{" "}
-              {GROUNDS[ground].name.toLowerCase()}: the one who starts the game
-              picks.
+              One yard, two phones. You take turns, with {TURN_SECONDS} seconds for each shot. {MODES[mode].name} on {GROUNDS[ground].name.toLowerCase()}: the one who starts the game picks.
             </p>
-            {live?.role === "host" ? (
+            {live?.role === 'host' ? (
               <>
-                <p
-                  className="code"
-                  aria-label={`Your code is ${live.code.split("").join(" ")}`}
-                >
+                <p className="code" aria-label={`Your code is ${live.code.split('').join(' ')}`}>
                   {live.code}
                 </p>
                 <p className="sub" role="status">
-                  {live.status === "failed"
-                    ? "Couldn’t connect. Check your internet and try again."
-                    : live.status === "connecting"
-                      ? "Connecting…"
-                      : "Tell your friend this code. Waiting for them…"}
+                  {live.status === 'failed' ? 'Couldn’t connect. Check your internet and try again.' : live.status === 'connecting' ? 'Connecting…' : 'Tell your friend this code. Waiting for them…'}
                 </p>
               </>
             ) : (
               <>
-                <button
-                  className="btn"
-                  onClick={() => openLive("host", newCode())}
-                >
+                <button className="btn" onClick={() => openLive('host', newCode())}>
                   Start a game
                   <small>and get a code to share</small>
                 </button>
@@ -415,26 +300,17 @@ export default function App() {
                   className="join"
                   onSubmit={(event) => {
                     event.preventDefault();
-                    if (code) openLive("guest", code);
+                    if (code) openLive('guest', code);
                   }}
                 >
-                  <input
-                    value={typedCode}
-                    onChange={(event) => setTypedCode(event.target.value)}
-                    inputMode="numeric"
-                    maxLength={6}
-                    placeholder="Have a code? 12345"
-                    aria-label="Your friend’s code"
-                  />
+                  <input value={typedCode} onChange={(event) => setTypedCode(event.target.value)} inputMode="numeric" maxLength={6} placeholder="Have a code? 12345" aria-label="Your friend’s code" />
                   <button className="btn" disabled={!code}>
                     Join
                   </button>
                 </form>
-                {live?.role === "guest" && (
+                {live?.role === 'guest' && (
                   <p className="sub" role="status">
-                    {live.status === "failed"
-                      ? "Couldn’t connect. Check the code and your internet."
-                      : "Looking for your friend’s game…"}
+                    {live.status === 'failed' ? 'Couldn’t connect. Check the code and your internet.' : 'Looking for your friend’s game…'}
                   </p>
                 )}
               </>
@@ -449,15 +325,13 @@ export default function App() {
     );
   }
 
-  if (phase === "home") {
+  if (phase === 'home') {
     return (
       <div className="app">
         {top}
         <main className="home">
           <h1>Marbles</h1>
-          <p className="tag">
-            The old schoolyard game. Pull back, aim, let go.
-          </p>
+          <p className="tag">The old schoolyard game. Pull back, aim, let go.</p>
           <button className="chip-link" onClick={() => setIsHelpOpen(true)}>
             <b className="q">?</b> How to play
           </button>
@@ -466,12 +340,7 @@ export default function App() {
             <h2 id="pick-game">Pick a game</h2>
             <div className="modes">
               {Object.entries(MODES).map(([id, m]) => (
-                <button
-                  key={id}
-                  className={`mode mode-${id} ${mode === id ? "on" : ""}`}
-                  aria-pressed={mode === id}
-                  onClick={() => setMode(id)}
-                >
+                <button key={id} className={`mode mode-${id} ${mode === id ? 'on' : ''}`} aria-pressed={mode === id} onClick={() => setMode(id)}>
                   <span className="mode-art" aria-hidden="true" />
                   <b>{m.name}</b>
                   <small>{m.blurb}</small>
@@ -481,12 +350,7 @@ export default function App() {
             <h3>Against</h3>
             <div className="chips">
               {RIVALS.map((r) => (
-                <button
-                  key={r.id}
-                  className={rival === r.id ? "on" : ""}
-                  aria-pressed={rival === r.id}
-                  onClick={() => setRival(r.id)}
-                >
+                <button key={r.id} className={rival === r.id ? 'on' : ''} aria-pressed={rival === r.id} onClick={() => setRival(r.id)}>
                   {r.name}
                 </button>
               ))}
@@ -494,12 +358,7 @@ export default function App() {
             <h3>Ground</h3>
             <div className="chips">
               {Object.values(GROUNDS).map((g) => (
-                <button
-                  key={g.id}
-                  className={ground === g.id ? "on" : ""}
-                  aria-pressed={ground === g.id}
-                  onClick={() => setGround(g.id)}
-                >
+                <button key={g.id} className={ground === g.id ? 'on' : ''} aria-pressed={ground === g.id} onClick={() => setGround(g.id)}>
                   <i className={`swatch ground-${g.id}`} aria-hidden="true" />
                   {g.name} <small>{g.blurb}</small>
                 </button>
@@ -508,13 +367,7 @@ export default function App() {
             <h3>Your shooter</h3>
             <div className="chips">
               {SHOOTERS.map((s) => (
-                <button
-                  key={s.id}
-                  className={shooter === s.id ? "on" : ""}
-                  aria-pressed={shooter === s.id}
-                  onClick={() => setShooter(s.id)}
-                  title={s.blurb}
-                >
+                <button key={s.id} className={shooter === s.id ? 'on' : ''} aria-pressed={shooter === s.id} onClick={() => setShooter(s.id)} title={s.blurb}>
                   {s.name} <small>{s.blurb}</small>
                 </button>
               ))}
@@ -522,34 +375,22 @@ export default function App() {
             <button className="btn" onClick={startGame}>
               Play
               <small>
-                {MODES[mode].name} on {GROUNDS[ground].name.toLowerCase()} ·
-                first to {MODES[mode].toWin}
+                {MODES[mode].name} on {GROUNDS[ground].name.toLowerCase()} · first to {MODES[mode].toWin}
               </small>
             </button>
           </section>
 
           <section className="panel" aria-labelledby="challenges">
             <h2 id="challenges">Challenges</h2>
-            <p className="sub">
-              Alone, with only a few shots. Three stars for the fewest.
-            </p>
+            <p className="sub">Alone, with only a few shots. Three stars for the fewest.</p>
             <div className="levels">
               {CHALLENGES.map((c, i) => {
-                const isOpen =
-                  i === 0 || (stars[CHALLENGES[i - 1].id] ?? 0) > 0;
+                const isOpen = i === 0 || (stars[CHALLENGES[i - 1].id] ?? 0) > 0;
                 return (
-                  <button
-                    key={c.id}
-                    disabled={!isOpen}
-                    onClick={() => startChallenge(c)}
-                  >
+                  <button key={c.id} disabled={!isOpen} onClick={() => startChallenge(c)}>
                     <b>{i + 1}</b>
                     <span>{c.name}</span>
-                    {isOpen ? (
-                      <Stars count={stars[c.id] ?? 0} />
-                    ) : (
-                      <small>Locked</small>
-                    )}
+                    {isOpen ? <Stars count={stars[c.id] ?? 0} /> : <small>Locked</small>}
                   </button>
                 );
               })}
@@ -563,34 +404,27 @@ export default function App() {
   }
 
   const { game, challenge } = match;
-  const isCpu = match.rival && match.rival !== "two" && match.rival !== "live";
-  const hasFriendLeft = match.rival === "live" && live?.status === "left";
+  const isCpu = match.rival && match.rival !== 'two' && match.rival !== 'live';
+  const hasFriendLeft = match.rival === 'live' && live?.status === 'left';
   const toWin = challenge ? challenge.need : MODES[game.mode].toWin;
   const Bag = ({ side }) => (
-    <div
-      className={`bag ${side} ${game.turn === side && !game.winner ? "turn" : ""}`}
-    >
+    <div className={`bag ${side} ${game.turn === side && !game.winner ? 'turn' : ''}`}>
       <b>{names[side]}</b>
       {note?.gain?.side === side && (
-        <span
-          className={`gain ${note.gain.text.startsWith("+") ? "" : "minus"}`}
-          key={note.id}
-          aria-hidden="true"
-        >
+        <span className={`gain ${note.gain.text.startsWith('+') ? '' : 'minus'}`} key={note.id} aria-hidden="true">
           {note.gain.text}
         </span>
       )}
       <span className="pips" aria-label={`${game.bag[side]} of ${toWin}`}>
         {Array.from({ length: toWin }, (_, i) => (
-          <i key={i} className={i < game.bag[side] ? "on" : ""} />
+          <i key={i} className={i < game.bag[side] ? 'on' : ''} />
         ))}
       </span>
     </div>
   );
   const status = challenge ? null : turnStatus(game, names, toWin);
   const challengeIndex = challenge ? CHALLENGES.indexOf(challenge) : -1;
-  const nextChallenge =
-    challenge && game.winner === "you" ? CHALLENGES[challengeIndex + 1] : null;
+  const nextChallenge = challenge && game.winner === 'you' ? CHALLENGES[challengeIndex + 1] : null;
   return (
     <div className="app is-play">
       {top}
@@ -602,35 +436,25 @@ export default function App() {
             <small>shots left</small>
           </div>
         ) : (
-          <Bag side={mySide === "you" ? "foe" : "you"} />
+          <Bag side={mySide === 'you' ? 'foe' : 'you'} />
         )}
       </div>
       {status && (
-        <p
-          className={`turn-line ${status.side} ${status.urgent ? "urgent" : ""}`}
-          key={status.text}
-          role="status"
-        >
+        <p className={`turn-line ${status.side} ${status.urgent ? 'urgent' : ''}`} key={status.text} role="status">
           <span className="dot" aria-hidden="true" />
           {status.text}
         </p>
       )}
       <div className="stage">
-        <Yard
-          key={match.id}
-          game={game}
-          cpuLevel={isCpu ? match.rival : null}
-          net={net}
-          onChange={onShot}
-        />
+        <Yard key={match.id} game={game} cpuLevel={isCpu ? match.rival : null} net={net} onChange={onShot} />
         {game.shots === 0 && !note && (
           <p className="coach">
             {challenge
               ? challenge.tip
-              : game.mode === "ring"
-                ? match.rival === "two"
+              : game.mode === 'ring'
+                ? match.rival === 'two'
                   ? `Player 1 has the warm marbles, Player 2 the cool ones. Knock the other's out.`
-                  : `${mySide === "you" ? "Warm" : "Cool"} marbles are yours: knock the ${mySide === "you" ? "cool" : "warm"} ones out. First to ${toWin}.`
+                  : `${mySide === 'you' ? 'Warm' : 'Cool'} marbles are yours: knock the ${mySide === 'you' ? 'cool' : 'warm'} ones out. First to ${toWin}.`
                 : `${MODES[game.mode].blurb}. First to ${toWin}.`}
             {!challenge && yardLine(game.world)}
           </p>
@@ -641,11 +465,7 @@ export default function App() {
           </p>
         )}
         {hasFriendLeft && !game.winner && (
-          <div
-            className="result"
-            role="alertdialog"
-            aria-labelledby="left-title"
-          >
+          <div className="result" role="alertdialog" aria-labelledby="left-title">
             <h2 id="left-title">Your friend left</h2>
             <button className="btn" onClick={goHome}>
               Home
@@ -653,49 +473,26 @@ export default function App() {
           </div>
         )}
         {game.winner && (
-          <div
-            className="result"
-            role="alertdialog"
-            aria-labelledby="result-title"
-          >
+          <div className="result" role="alertdialog" aria-labelledby="result-title">
             <h2 id="result-title">
-              {challenge
-                ? game.winner === "you"
-                  ? "Done!"
-                  : "Out of shots"
-                : game.winner === "draw"
-                  ? "A draw!"
-                  : `${names[game.winner]} win${names[game.winner] === "You" ? "" : "s"}!`}
+              {challenge ? (game.winner === 'you' ? 'Done!' : 'Out of shots') : game.winner === 'draw' ? 'A draw!' : `${names[game.winner]} win${names[game.winner] === 'You' ? '' : 's'}!`}
             </h2>
-            {challenge && game.winner === "you" && (
-              <Stars count={starsFor(challenge, game.shots)} />
-            )}
+            {challenge && game.winner === 'you' && <Stars count={starsFor(challenge, game.shots)} />}
             {!challenge && (
               <p className="sub">
-                {game.bag[mySide]} :{" "}
-                {game.bag[mySide === "you" ? "foe" : "you"]}
+                {game.bag[mySide]} : {game.bag[mySide === 'you' ? 'foe' : 'you']}
               </p>
             )}
             {!challenge && note?.final && <p className="why">{note.text}</p>}
-            {!challenge && game.turns.you === game.turns.foe && (
-              <p className="why small">
-                Both sides had {game.turns.you} turns.
-              </p>
-            )}
+            {!challenge && game.turns.you === game.turns.foe && <p className="why small">Both sides had {game.turns.you} turns.</p>}
             {nextChallenge && (
-              <button
-                className="btn"
-                onClick={() => startChallenge(nextChallenge)}
-              >
+              <button className="btn" onClick={() => startChallenge(nextChallenge)}>
                 Next challenge
               </button>
             )}
             {!hasFriendLeft && (
-              <button
-                className={nextChallenge ? "btn ghost" : "btn"}
-                onClick={playAgain}
-              >
-                {challenge ? "Try again" : "Play again"}
+              <button className={nextChallenge ? 'btn ghost' : 'btn'} onClick={playAgain}>
+                {challenge ? 'Try again' : 'Play again'}
               </button>
             )}
             <button className="btn ghost" onClick={goHome}>
