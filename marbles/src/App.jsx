@@ -1,6 +1,7 @@
 /* global __APP_VERSION__ */
 import { useEffect, useRef, useState } from 'react';
 import Yard from './components/Yard.jsx';
+import HowTo from './components/HowTo.jsx';
 import { MODES, newGame } from './game/rules.js';
 import { LEVELS } from './game/ai.js';
 import { CHALLENGES, newChallenge, starsFor } from './game/challenges.js';
@@ -53,9 +54,17 @@ export default function App() {
   const [, setShot] = useState(0);
   const [note, setNote] = useState(null);
   const noteTimer = useRef(0);
+  // How to play: by itself on a first visit, and from the "?" at the top.
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const closeHelp = () => {
+    sfx.click();
+    store.set('marbles.sawHelp', true);
+    setIsHelpOpen(false);
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setPhase((p) => (p === 'splash' ? 'home' : p)), SPLASH_MS);
+    if (!store.get('marbles.sawHelp', false)) setIsHelpOpen(true);
     return () => clearTimeout(timer);
   }, []);
   useEffect(() => {
@@ -157,6 +166,9 @@ export default function App() {
             <Glyph name="home" />
           </button>
         )}
+        <button className="icon-btn" onClick={() => setIsHelpOpen(true)} aria-label="How to play">
+          <b className="q">?</b>
+        </button>
         <button className="icon-btn" onClick={() => setSoundOn((on) => !on)} aria-label={soundOn ? 'Sound off' : 'Sound on'}>
           <Glyph name={soundOn ? 'sound' : 'mute'} />
         </button>
@@ -171,6 +183,9 @@ export default function App() {
         <main className="home">
           <h1>Marbles</h1>
           <p className="tag">The old schoolyard game. Pull back, aim, let go.</p>
+          <button className="chip-link" onClick={() => setIsHelpOpen(true)}>
+            <b className="q">?</b> How to play
+          </button>
 
           <section className="panel" aria-labelledby="pick-game">
             <h2 id="pick-game">Pick a game</h2>
@@ -225,6 +240,7 @@ export default function App() {
           </section>
           <p className="foot">Version {__APP_VERSION__} · Rinny’s Games</p>
         </main>
+        {isHelpOpen && <HowTo onClose={closeHelp} />}
       </div>
     );
   }
@@ -289,6 +305,7 @@ export default function App() {
           </div>
         )}
       </div>
+      {isHelpOpen && <HowTo onClose={closeHelp} />}
     </div>
   );
 }
