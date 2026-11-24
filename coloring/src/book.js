@@ -3,6 +3,8 @@
  * Pure functions with no React or DOM, so they can be tested. A page is finished when every part has a color
  * (white counts: the child chose it).
  */
+import PART_MOVES from './partMoves.json' with { type: 'json' };
+
 export const CRAYONS = [
   { id: 'red', color: '#e8524f', name: 'Red' },
   { id: 'orange', color: '#f5923e', name: 'Orange' },
@@ -31,7 +33,25 @@ export const RAINBOW = ['#e8524f', '#f5923e', '#f7cf3d', '#a5d046', '#2fb3a6', '
 /** How many taps can be taken back. */
 export const UNDO_DEPTH = 40;
 
-export const emptyBook = () => ({ colors: {}, history: [], touched: {} });
+export const emptyBook = () => ({ colors: {}, history: [], touched: {}, parts: PARTS_VERSION });
+
+/**
+ * Saved colors are kept by part number. When `npm run coloring:pages` changes a page's parts (a brush stroke's
+ * outline used to count as a part to color), partMoves.json says where each old part went (null: gone), and a
+ * book saved before is moved over once, so nobody's colors shift to other parts.
+ */
+const PARTS_VERSION = 2;
+export function moveSavedParts(colors, moves = PART_MOVES) {
+  return Object.fromEntries(
+    Object.entries(colors).map(([pageId, page]) => {
+      const move = moves[pageId];
+      if (!move) return [pageId, page];
+      const moved = {};
+      for (const [part, color] of Object.entries(page)) if (move[part] != null) moved[move[part]] = color;
+      return [pageId, moved];
+    }),
+  );
+}
 
 /** The color the crayon puts down now (the rainbow moves on with each tap). */
 export function colorFor(crayonId, tapCount) {
@@ -80,5 +100,10 @@ export const coloredPageIds = (book) =>
 /** What is saved on the device (the history is too, so a tap can be taken back after a reload). */
 export function restoreBook(saved) {
   if (!saved || typeof saved !== 'object' || typeof saved.colors !== 'object') return emptyBook();
-  return { colors: saved.colors ?? {}, history: Array.isArray(saved.history) ? saved.history.slice(-UNDO_DEPTH) : [], touched: saved.touched ?? {} };
+  const isOld = saved.parts !== PARTS_VERSION;
+  const colors = isOld ? moveSavedParts(saved.colors ?? {}) : (saved.colors ?? {});
+  const history = Array.isArray(saved.history) ? saved.history.slice(-UNDO_DEPTH) : [];
+  // Taking back a tap made before the move would put a color on the wrong part: those steps go.
+  const kept = isOld ? history.filter((step) => !PART_MOVES[step.pageId]) : history;
+  return { colors, history: kept, touched: saved.touched ?? {}, parts: PARTS_VERSION };
 }

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
-import { CRAYONS, RAINBOW, canUndo, cleanPage, colorFor, emptyBook, isPageDone, paintPart, restoreBook, undoOnPage } from './book.js';
+import { CRAYONS, RAINBOW, canUndo, cleanPage, colorFor, emptyBook, isPageDone, moveSavedParts, paintPart, restoreBook, undoOnPage } from './book.js';
 
 const page = { id: 'waffles', parts: [{}, {}, {}] };
 
@@ -89,4 +89,12 @@ test('a replay counts a line by its points and a stamp as one step', async () =>
   const { stepsOf } = await import('./sketches.js');
   assert.equal(stepsOf({ c: '#000', w: 12, p: [0, 0, 10, 10, 20, 20] }), 3);
   assert.equal(stepsOf({ t: 'stamp', s: 'star', c: '#000', x: 1, y: 1, size: 150, turn: 0 }), 1);
+});
+
+test('saved colors move with their parts when a page changes', () => {
+  const moves = { 'big-x': [0, null, 1] };
+  assert.deepEqual(moveSavedParts({ 'big-x': { 0: 'a', 1: 'gone', 2: 'c' }, other: { 1: 'b' } }, moves), { 'big-x': { 0: 'a', 1: 'c' }, other: { 1: 'b' } });
+  const restored = restoreBook({ colors: { 'big-basil': { 0: '#111' } }, history: [{ pageId: 'big-basil', part: 0, was: null }] });
+  assert.equal(restored.history.length, 0, 'no undo across the move');
+  assert.equal(restoreBook(restored).colors['big-basil'][0], '#111', 'moved only once');
 });

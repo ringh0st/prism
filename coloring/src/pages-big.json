@@ -495,10 +495,6 @@
    },
    {
     "kind": "stroke",
-    "color": "#c27a52"
-   },
-   {
-    "kind": "stroke",
     "color": "#f4bf98"
    },
    {
@@ -3241,10 +3237,6 @@
     "color": "#d9d2c4"
    },
    {
-    "kind": "stroke",
-    "color": "#3a8566"
-   },
-   {
     "color": "#6cc29c"
    },
    {
@@ -3510,10 +3502,6 @@
    },
    {
     "color": "#e9b443"
-   },
-   {
-    "kind": "stroke",
-    "color": "#6e8445"
    },
    {
     "kind": "stroke",
@@ -3823,15 +3811,7 @@
    },
    {
     "kind": "stroke",
-    "color": "#a46a44"
-   },
-   {
-    "kind": "stroke",
     "color": "#d59a6c"
-   },
-   {
-    "kind": "stroke",
-    "color": "#b78a5c"
    },
    {
     "kind": "stroke",
@@ -4097,26 +4077,6 @@
    },
    {
     "kind": "stroke",
-    "color": "#c65e5a"
-   },
-   {
-    "kind": "stroke",
-    "color": "#c65e5a"
-   },
-   {
-    "kind": "stroke",
-    "color": "#c65e5a"
-   },
-   {
-    "kind": "stroke",
-    "color": "#c65e5a"
-   },
-   {
-    "kind": "stroke",
-    "color": "#c65e5a"
-   },
-   {
-    "kind": "stroke",
     "color": "#f5a59d"
    },
    {
@@ -4141,10 +4101,6 @@
    },
    {
     "color": "#f29790"
-   },
-   {
-    "kind": "stroke",
-    "color": "#c4913a"
    },
    {
     "kind": "stroke",
@@ -4229,10 +4185,6 @@
    },
    {
     "color": "#6fcdb9"
-   },
-   {
-    "kind": "stroke",
-    "color": "#4f9e8d"
    },
    {
     "kind": "stroke",
@@ -4627,10 +4579,6 @@
    },
    {
     "kind": "stroke",
-    "color": "#c46c4a"
-   },
-   {
-    "kind": "stroke",
     "color": "#f3a47c"
    },
    {
@@ -4762,10 +4710,6 @@
    },
    {
     "color": "#eebc45"
-   },
-   {
-    "kind": "stroke",
-    "color": "#c0832e"
    },
    {
     "kind": "stroke",
@@ -5326,10 +5270,6 @@
    },
    {
     "kind": "stroke",
-    "color": "#c06c45"
-   },
-   {
-    "kind": "stroke",
     "color": "#f1a172"
    },
    {
@@ -5771,10 +5711,6 @@
    },
    {
     "color": "#d9d2c4"
-   },
-   {
-    "kind": "stroke",
-    "color": "#a8927d"
    },
    {
     "kind": "stroke",
@@ -6242,10 +6178,6 @@
    },
    {
     "kind": "stroke",
-    "color": "#a64a33"
-   },
-   {
-    "kind": "stroke",
     "color": "#d96a4b"
    },
    {
@@ -6650,10 +6582,6 @@
    },
    {
     "kind": "stroke",
-    "color": "#a97424"
-   },
-   {
-    "kind": "stroke",
     "color": "#e9a83a"
    },
    {
@@ -6991,10 +6919,6 @@
    },
    {
     "color": "#72c19a"
-   },
-   {
-    "kind": "stroke",
-    "color": "#3d8a66"
    },
    {
     "kind": "stroke",
@@ -7722,10 +7646,6 @@
    },
    {
     "kind": "stroke",
-    "color": "#7a716a"
-   },
-   {
-    "kind": "stroke",
     "color": "#c9c3bd"
    },
    {
@@ -7842,10 +7762,6 @@
    },
    {
     "color": "#d9d2c4"
-   },
-   {
-    "kind": "stroke",
-    "color": "#b07a35"
    },
    {
     "kind": "stroke",
@@ -8001,10 +7917,6 @@
    },
    {
     "kind": "stroke",
-    "color": "#3f8a5e"
-   },
-   {
-    "kind": "stroke",
     "color": "#74bf8c"
    },
    {
@@ -8027,10 +7939,6 @@
    },
    {
     "color": "#f2876a"
-   },
-   {
-    "kind": "stroke",
-    "color": "#b98222"
    },
    {
     "kind": "stroke",
@@ -8165,18 +8073,6 @@
    },
    {
     "color": "#f0b845"
-   },
-   {
-    "kind": "stroke",
-    "color": "#1f6b5f"
-   },
-   {
-    "kind": "stroke",
-    "color": "#1f6b5f"
-   },
-   {
-    "kind": "stroke",
-    "color": "#1f6b5f"
    },
    {
     "kind": "stroke",
@@ -8455,10 +8351,6 @@
    },
    {
     "color": "#9cc650"
-   },
-   {
-    "kind": "stroke",
-    "color": "#4a7a26"
    },
    {
     "kind": "stroke",

@@ -117,6 +117,17 @@ async function makePage({ id, svg, minArea, thin, size, dropGlows }) {
     return b.width * b.height * s * s;
   };
   for (const el of root.querySelectorAll('[filter], filter')) el.remove();
+  // A brush stroke drawn as an outline pass: this path, then the same path again narrower on top (Basil's coils).
+  // Returns the stroke on top, or null.
+  const strokeOnTop = (el) => {
+    const d = el.getAttribute('d');
+    const width = parseFloat(getComputedStyle(el).strokeWidth) * scaleOf(el);
+    if (!d) return null;
+    for (let next = el.nextElementSibling; next; next = next.nextElementSibling) {
+      if (next.getAttribute('d') === d && parseFloat(getComputedStyle(next).strokeWidth) * scaleOf(next) < width) return next;
+    }
+    return null;
+  };
 
   // 1. Sort every shape: kept as drawn, ink, or part of a group that may become paintable.
   const groups = new Map(); // key → { kind: 'fill' | 'stroke', members: [], color }
@@ -222,11 +233,29 @@ async function makePage({ id, svg, minArea, thin, size, dropGlows }) {
   // 3. Paintable, ink or kept, and the page as it will be printed.
   const parts = [];
   const notes = [];
+  const fates = list.map((group, i) => {
+    const core = units(solid[i]);
+    return core < minArea ? (units(visible[i]) > minArea * 3 && core < 1 ? 'ink' : 'keep') : 'paint';
+  });
+  // A brush stroke's outline pass stays a line wherever the stroke on top of it is a part to color, so a coloured
+  // coil keeps its outline (it used to become a white part of its own and the lines vanished).
+  const groupOf = new Map(list.flatMap((group, i) => group.members.map((el) => [el, i])));
   list.forEach((group, i) => {
+    if (group.kind !== 'stroke') return;
+    group.members = group.members.filter((el) => {
+      const top = strokeOnTop(el);
+      if (!top || fates[groupOf.get(top)] !== 'paint') return true;
+      el.dataset.ink = 'outline';
+      delete el.dataset.kind;
+      el.removeAttribute('opacity');
+      return false;
+    });
+  });
+  list.forEach((group, i) => {
+    if (!group.members.length) return;
     const shows = units(visible[i]);
     const core = units(solid[i]);
-    let fate = 'paint';
-    if (core < minArea) fate = shows > minArea * 3 && core < 1 ? 'ink' : 'keep';
+    const fate = fates[i];
     notes.push(`${group.kind[0]}${Math.round(shows)}/${Math.round(core)}${fate[0]}`);
     const k = parts.length;
     for (const el of group.members) {
@@ -253,6 +282,11 @@ async function makePage({ id, svg, minArea, thin, size, dropGlows }) {
     }
     if (fate === 'paint') parts.push({ kind: group.kind, color: group.color, area: Math.round(core) });
   });
+  for (const el of root.querySelectorAll('[data-ink="outline"]')) {
+    el.setAttribute('stroke', INK);
+    delete el.dataset.ink;
+    delete el.dataset.was;
+  }
   for (const el of root.querySelectorAll('[data-ink]')) {
     el.setAttribute('stroke', INK);
     el.removeAttribute('opacity');
