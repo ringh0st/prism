@@ -5,7 +5,7 @@
 //                   a foul: the turn ends and you give one marble back.
 // Chase ("tzlifa"): each side has a shooter. Hit the other shooter to win a marble from their bag.
 // In all three a good shot gives another turn, and a miss passes the turn (as in the old rules).
-import { GROUNDS, cloneWorld, depthInRing, flick, isLive, makeMarble, settle } from './physics.js';
+import { GROUNDS, LOOKS, cloneWorld, depthInRing, flick, isLive, makeMarble, settle } from './physics.js';
 
 export const YARD = { w: 360, h: 560 };
 export const MODES = {
@@ -77,6 +77,7 @@ export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'sho
     spots.forEach(([dx, dy], i) => {
       const marble = makeMarble(`t${id++}`, 'glass', cx + dx + (rnd() - 0.5) * 6, cy + dy + (rnd() - 0.5) * 6);
       marble.team = teams[i];
+      marble.look = LOOKS[Math.floor(rnd() * LOOKS.length)];
       world.marbles.push(marble);
     });
   } else if (mode === 'hole') {
@@ -84,7 +85,7 @@ export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'sho
     for (let i = 0; i < 8; i++) {
       const angle = (i / 8) * Math.PI * 2 + rnd() * 0.5;
       const far = 70 + rnd() * 50;
-      world.marbles.push(makeMarble(`t${id++}`, 'glass', cx + Math.cos(angle) * far, cy + Math.sin(angle) * far));
+      world.marbles.push({ ...makeMarble(`t${id++}`, 'glass', cx + Math.cos(angle) * far, cy + Math.sin(angle) * far), look: LOOKS[i % LOOKS.length] });
     }
     // The golden one lies a little further out, so it has to be worked toward the hole.
     const angle = rnd() * Math.PI * 2;

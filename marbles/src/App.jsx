@@ -13,7 +13,11 @@ import { setInGame } from './update.js';
 import { TURN_SECONDS, joinLive, newCode, tidyCode } from './live.js';
 
 const SHOOTERS = [
-  { id: 'shooter', name: 'Glass', blurb: 'Balanced' },
+  { id: 'shooter', name: 'Swirl', blurb: 'Balanced' },
+  { id: 'milky', name: 'Milky', blurb: 'Balanced' },
+  { id: 'clear', name: 'Clear', blurb: 'Balanced' },
+  { id: 'cateye', name: "Cat's eye", blurb: 'Balanced' },
+  { id: 'galaxy', name: 'Galaxy', blurb: 'Balanced' },
   { id: 'steelie', name: 'Steelie', blurb: 'Heavy: plows through' },
   { id: 'jumbo', name: 'Jumbo', blurb: 'Big: easy to hit with' },
 ];
@@ -372,6 +376,7 @@ export default function App() {
             <div className="chips">
               {SHOOTERS.map((s) => (
                 <button key={s.id} className={shooter === s.id ? 'on' : ''} aria-pressed={shooter === s.id} onClick={() => setShooter(s.id)} title={s.blurb}>
+                  <i className={`marble-swatch look-${s.id}`} aria-hidden="true" />
                   {s.name} <small>{s.blurb}</small>
                 </button>
               ))}

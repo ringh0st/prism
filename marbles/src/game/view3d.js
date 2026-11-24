@@ -43,6 +43,70 @@ const swirl = (color, seed) =>
     }
   });
 
+/** Milky: opaque cream glass with soft wisps of its color. */
+const milky = (color, seed) =>
+  paint(256, 128, (c, w, h) => {
+    c.fillStyle = '#f8f4ec';
+    c.fillRect(0, 0, w, h);
+    c.strokeStyle = color;
+    for (let band = 0; band < 2; band++) {
+      c.globalAlpha = band ? 0.35 : 0.6;
+      c.lineWidth = band ? 26 : 12;
+      c.beginPath();
+      for (let x = -10; x <= w + 10; x += 6) {
+        const y = h / 2 + Math.sin((x / w) * Math.PI * 4 + seed + band * 2) * (h * 0.22) + (band ? 18 : -10);
+        if (x === -10) c.moveTo(x, y);
+        else c.lineTo(x, y);
+      }
+      c.stroke();
+    }
+  });
+
+/** Galaxy: deep glass of its color, speckled like stars. */
+const galaxy = (color, seed) =>
+  paint(256, 128, (c, w, h) => {
+    c.fillStyle = '#1d2230';
+    c.fillRect(0, 0, w, h);
+    c.globalAlpha = 0.55;
+    c.fillStyle = color;
+    c.fillRect(0, 0, w, h);
+    let s = Math.floor(seed * 1000) + 7;
+    const random = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 160; i++) {
+      c.globalAlpha = 0.5 + random() * 0.5;
+      c.fillStyle = i % 4 === 0 ? color : '#ffffff';
+      c.beginPath();
+      c.arc(random() * w, random() * h, 0.6 + random() * 1.8, 0, Math.PI * 2);
+      c.fill();
+    }
+  });
+
+/** The material (and anything inside it) for a marble of a look and a color. */
+function marbleLook(look, color, seed, radius) {
+  if (look === 'milky') return { material: new THREE.MeshPhysicalMaterial({ map: milky(color, seed), roughness: 0.32, clearcoat: 1, clearcoatRoughness: 0.08, envMapIntensity: 0.5 }) };
+  if (look === 'galaxy') return { material: new THREE.MeshPhysicalMaterial({ map: galaxy(color, seed), roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 0.6 }) };
+  if (look === 'clear' || look === 'cateye') {
+    // See-through glass (clear is lightly tinted, a cat's eye nearly colorless) with what floats inside it.
+    const material = new THREE.MeshPhysicalMaterial({
+      color: look === 'clear' ? color : '#eef6f4',
+      transparent: true,
+      opacity: look === 'clear' ? 0.5 : 0.32,
+      roughness: 0.02,
+      clearcoat: 1,
+      envMapIntensity: 1.1,
+      depthWrite: false,
+    });
+    const inside =
+      look === 'cateye'
+        ? new THREE.Mesh(new THREE.SphereGeometry(radius * 0.72, 24, 16), new THREE.MeshStandardMaterial({ color, roughness: 0.3, emissive: color, emissiveIntensity: 0.15 }))
+        : new THREE.Mesh(new THREE.SphereGeometry(radius * 0.28, 16, 12), new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.2, transparent: true, opacity: 0.7 }));
+    if (look === 'cateye') inside.scale.set(1, 0.22, 0.8);
+    else inside.position.set(radius * 0.25, radius * 0.2, 0);
+    return { material, inside };
+  }
+  return { material: new THREE.MeshPhysicalMaterial({ map: swirl(color, seed), roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 0.4 }) };
+}
+
 /** What each ground looks like from above. */
 const GROUND_LOOKS = {
   earth: { base: '#bd935c', light: [255, 240, 210], dark: [110, 78, 46], beyond: '#9db572' },
@@ -306,12 +370,13 @@ export function createView(canvas, yard, { flip = false } = {}) {
     if (ball && ball.kind === m.kind) return ball;
     if (ball) scene.remove(ball.mesh);
     const color = m.owner ? SIDE_COLORS[m.owner] : m.team ? TEAM_COLORS[m.team][index % 3] : TARGET_COLORS[index % TARGET_COLORS.length];
-    const material = m.gold
-      ? new THREE.MeshPhysicalMaterial({ map: swirl('#ffcf3a', 7.7), metalness: 0.25, roughness: 0.14, clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 1.2, emissive: '#c98a00', emissiveIntensity: 0.45 })
+    const { material, inside } = m.gold
+      ? { material: new THREE.MeshPhysicalMaterial({ map: swirl('#ffcf3a', 7.7), metalness: 0.25, roughness: 0.14, clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 1.2, emissive: '#c98a00', emissiveIntensity: 0.45 }) }
       : m.kind === 'steelie'
-        ? new THREE.MeshStandardMaterial({ color: '#d9dde3', metalness: 1, roughness: 0.12, envMapIntensity: 1.4 })
-        : new THREE.MeshPhysicalMaterial({ map: swirl(color, index * 2.1), roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 0.4 });
+        ? { material: new THREE.MeshStandardMaterial({ color: '#d9dde3', metalness: 1, roughness: 0.12, envMapIntensity: 1.4 }) }
+        : marbleLook(m.look ?? 'swirl', color, index * 2.1, m.r);
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(m.r, 40, 28), material);
+    if (inside) mesh.add(inside);
     mesh.castShadow = true;
     mesh.rotation.set(index, index * 0.7, 0);
     scene.add(mesh);

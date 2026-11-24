@@ -883,3 +883,39 @@ button {
   width: 9px;
   height: 9px;
 }
+/* The shooters, each shown as a little marble in its look (in your color, orange). */
+.marble-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  border-radius: 50%;
+  vertical-align: -4px;
+  box-shadow: inset -3px -3px 0 rgba(0, 0, 0, 0.12), 0 1px 2px rgba(60, 30, 10, 0.3);
+}
+.look-shooter {
+  background: radial-gradient(circle at 32% 28%, #fff 0 12%, transparent 14%), linear-gradient(135deg, #f0a030 30%, #fff6 34% 40%, #e2701c 44%);
+}
+.look-milky {
+  background: radial-gradient(circle at 32% 28%, #fff 0 12%, transparent 14%), radial-gradient(ellipse at 60% 65%, #f6a04a99 0 30%, transparent 55%), #f8f4ec;
+}
+.look-clear {
+  background: radial-gradient(circle at 32% 28%, #fff 0 12%, transparent 14%), radial-gradient(circle at 65% 60%, #fff9 0 12%, transparent 14%), #f0a03066;
+  box-shadow: inset 0 0 0 1.5px #f0a030aa, 0 1px 2px rgba(60, 30, 10, 0.3);
+}
+.look-cateye {
+  background: radial-gradient(circle at 32% 28%, #fff 0 12%, transparent 14%), radial-gradient(ellipse 45% 12% at 50% 52%, #f0a030 0 90%, transparent 100%), #e9f3f155;
+  box-shadow: inset 0 0 0 1.5px #c8d8d4, 0 1px 2px rgba(60, 30, 10, 0.3);
+}
+.look-galaxy {
+  background: radial-gradient(circle at 30% 70%, #fff 0 4%, transparent 5%), radial-gradient(circle at 70% 40%, #fff 0 5%, transparent 6%), radial-gradient(circle at 55% 75%, #fff 0 3%, transparent 4%), radial-gradient(circle at 32% 28%, #fff 0 10%, transparent 12%), radial-gradient(circle, #a3561a, #2a2230);
+}
+.look-steelie {
+  background: radial-gradient(circle at 32% 28%, #fff 0 14%, #d9dde3 30%, #8d929a);
+}
+.look-jumbo {
+  width: 22px;
+  height: 22px;
+  vertical-align: -6px;
+  background: radial-gradient(circle at 32% 28%, #fff 0 12%, transparent 14%), linear-gradient(135deg, #f0a030 30%, #fff6 34% 40%, #e2701c 44%);
+}

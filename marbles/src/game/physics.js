@@ -46,7 +46,15 @@ export const MARBLE_KINDS = {
   shooter: { r: 16, m: 1.3 },
   steelie: { r: 15, m: 2.8 },
   jumbo: { r: 19.5, m: 2.4 },
+  // The same balanced shooter in the other looks children collect (owner: "the milky ones… one completely clear…").
+  milky: { r: 16, m: 1.3, look: 'milky' },
+  clear: { r: 16, m: 1.3, look: 'clear' },
+  cateye: { r: 16, m: 1.3, look: 'cateye' },
+  galaxy: { r: 16, m: 1.3, look: 'galaxy' },
 };
+
+/** The looks a glass marble comes in: swirl, milky (opaque white), clear, cat's eye (a colored blade inside), galaxy. */
+export const LOOKS = ['swirl', 'milky', 'clear', 'cateye', 'galaxy'];
 
 export function makeMarble(id, kind, x, y, owner = null) {
   return { id, kind, owner, x, y, vx: 0, vy: 0, ...MARBLE_KINDS[kind], out: false, sunk: false, air: 0, roll: 0 };
