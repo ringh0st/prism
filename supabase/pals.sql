@@ -83,6 +83,7 @@ as $$
     when 'jade' then '{"worlds": 28}'::jsonb
     when 'tide' then '{"worlds": 32}'::jsonb
     when 'hikari' then '{"worlds": 45}'::jsonb
+    when 'basil' then '{"worlds": 38}'::jsonb
     else null
   end;
 $$;
@@ -151,6 +152,7 @@ as $$
     when 'jade' then 'Loong'
     when 'tide' then 'Kraken'
     when 'hikari' then 'Kitsune'
+    when 'basil' then 'Basilisk'
     else null
   end;
 $$;
@@ -197,7 +199,7 @@ as $$
     'kiko', 'splash', 'shroomy', 'stretch', 'bandit', 'spike', 'waddles', 'fawn', 'shelly', 'inky',
     'puff', 'twinkle', 'starla', 'ziggy', 'leo', 'koi', 'bamboo', 'aurora', 'storm', 'plume',
     'nova', 'luna', 'mooncake', 'marina', 'rumble', 'sol', 'kiri', 'gryff', 'nessa', 'dozy',
-    'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle', 'jade', 'tide', 'hikari'
+    'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle', 'jade', 'tide', 'hikari', 'basil'
   ];
 $$;
 
@@ -209,7 +211,7 @@ immutable
 as $$
   select case
     when p_pal in ('leo', 'koi', 'bamboo', 'aurora', 'storm', 'plume', 'nova', 'luna', 'mooncake', 'marina', 'rumble') then 'legendary'
-    when p_pal in ('sol', 'kiri', 'gryff', 'nessa', 'dozy', 'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle', 'jade', 'tide', 'hikari') then 'mythic'
+    when p_pal in ('sol', 'kiri', 'gryff', 'nessa', 'dozy', 'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle', 'jade', 'tide', 'hikari', 'basil') then 'mythic'
     else 'common'
   end;
 $$;

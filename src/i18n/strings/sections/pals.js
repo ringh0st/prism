@@ -350,6 +350,7 @@ export const es = {
   'palName.jade': 'Jade',
   'palName.tide': 'Marea',
   'palName.hikari': 'Hikari',
+  'palName.basil': 'Basil',
 
   'palBio.ember': 'Zorro',
   'palBio.mossy': 'Tortuga',
@@ -409,6 +410,7 @@ export const es = {
   'palBio.jade': 'Dragón oriental',
   'palBio.tide': 'Krakencito',
   'palBio.hikari': 'Kitsune',
+  'palBio.basil': 'Basilisco',
 
   'outfit.beanie': 'Gorro calentito',
   'outfit.partyHat': 'Gorro de fiesta',
@@ -638,6 +640,7 @@ export const he = {
   'palName.jade': "ג'ייד",
   'palName.tide': 'טייד',
   'palName.hikari': 'היקארי',
+  'palName.basil': 'בזיל',
 
   'palBio.ember': 'שועל',
   'palBio.mossy': 'צב',
@@ -697,6 +700,7 @@ export const he = {
   'palBio.jade': 'דרקון סיני',
   'palBio.tide': 'קרקן קטן',
   'palBio.hikari': 'קיצונה',
+  'palBio.basil': 'בסיליסק',
 
   'outfit.beanie': 'כובע גרב חמים',
   'outfit.partyHat': 'כובע מסיבה',

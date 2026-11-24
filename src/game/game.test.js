@@ -475,7 +475,7 @@ test('pals: starter choice, unlocks, growth and accessories', async () => {
   assert.equal(pals.growPartnerLocally(legend).progress, legend);
   assert.equal(pals.palStage(pals.stageOf(progress.pal.owned.mossy)).name, 'Junior');
   assert.equal(pals.palStage(4).name, 'Master');
-  assert.equal(pals.PALS.length, 58);
+  assert.equal(pals.PALS.length, 59);
   // Accessories cost sparks and must be owned to wear.
   assert.throws(() => pals.wearAccessoryLocally(progress, 'scarf', true));
   const rich = { ...progress, sparks: 100 };
@@ -909,7 +909,7 @@ test('player card stats: stars and levels from built-in levels only, worlds and 
   levels['w2-01'] = { stars: 3 };
   const stats = playerStatsOf({ levels, pal: { owned: { mossy: {}, ember: {} } } });
   assert.deepEqual(stats, { stars: 43, levelsSolved: 21, worldsFinished: 1, palsCount: 2 });
-  assert.equal(TOTAL_PALS, 58);
+  assert.equal(TOTAL_PALS, 59);
   const sql = readFileSync(new URL('../../supabase/player_cards.sql', import.meta.url), 'utf8');
   for (const key of ['palsCount', 'stars', 'levelsSolved', 'worldsFinished']) assert.match(sql, new RegExp(`'${key}'`), key);
 });

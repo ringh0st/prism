@@ -1572,5 +1572,23 @@
     "color": "#e0583b"
    }
   ]
+ },
+ {
+  "id": "basil",
+  "name": "Basil",
+  "animal": "Basilisk",
+  "parts": [
+   {
+    "kind": "stroke",
+    "color": "#86b846"
+   },
+   {
+    "kind": "stroke",
+    "color": "#f6df9c"
+   },
+   {
+    "color": "#93bd44"
+   }
+  ]
  }
 ]

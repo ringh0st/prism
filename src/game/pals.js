@@ -72,6 +72,7 @@ export const PALS = [
   { id: 'jade', power: 'undo', name: 'Jade', species: 'Eastern dragon', animal: 'Loong', rarity: 'mythic', unlock: { worlds: 28 } },
   { id: 'tide', power: 'moves', name: 'Tide', species: 'Baby kraken', animal: 'Kraken', rarity: 'mythic', unlock: { worlds: 32 } },
   { id: 'hikari', power: 'hint', name: 'Hikari', species: 'Kitsune', animal: 'Kitsune', rarity: 'mythic', unlock: { worlds: 45 } },
+  { id: 'basil', power: 'undo', name: 'Basil', species: 'Basilisk', animal: 'Basilisk', rarity: 'mythic', unlock: { worlds: 38 } },
 ];
 
 export const STARTER_PALS = PALS.filter((pal) => pal.isStarter);
