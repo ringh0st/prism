@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { SKETCH_H, SKETCH_W, drawStrokes } from '../sketches.js';
-import { drawStamp, loadPalStamps } from '../stamps.js';
+import { drawStamp, loadStickerImages } from '../stamps.js';
 import { crayonPaint } from '../crayonTexture.js';
 
 /** A free drawing as a small picture (on the walls). */
@@ -15,7 +15,7 @@ export default function SketchThumb({ sketch }) {
       drawStrokes(context, sketch.strokes, c.width, { paint: crayonPaint, stamp: (ctx, mark, scale) => drawStamp(ctx, mark, scale, crayonPaint) });
     };
     draw();
-    if (sketch.strokes.some((mark) => mark.t === 'stamp')) loadPalStamps().then(draw);
+    if (sketch.strokes.some((mark) => mark.t === 'stamp')) loadStickerImages().then(draw);
   }, [sketch]);
   return <canvas ref={canvas} width={SKETCH_W / 3} height={SKETCH_H / 3} className="sketch-thumb" aria-hidden="true" />;
 }

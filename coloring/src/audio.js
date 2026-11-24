@@ -150,6 +150,16 @@ export const sfx = {
   twinkle() {
     [2093, 2637, 3136, 2349].forEach((freq, i) => tone({ at: 0.05 + i * 0.07, freq, length: 0.35, gain: 0.025, bright: 0 }));
   },
+  /** Picking up a sticker: a light peel. */
+  peel() {
+    hiss({ length: 0.12, from: 3000, to: 5000, q: 1.5, gain: 0.05, attack: 0.01 });
+  },
+  /** The bucket: color pouring over the whole sheet, a soft splash at the end. */
+  pour(index) {
+    hiss({ length: 0.7, from: 500, to: 1400, q: 0.7, gain: 0.12, attack: 0.08, tremolo: 6 });
+    tone({ at: 0.15, freq: noteOf(index) / 2, length: 1, gain: 0.06, bright: 0 });
+    tone({ at: 0.55, freq: noteOf(index), length: 0.8, gain: 0.05, bright: 0.3 });
+  },
   /** A rubber stamp: a soft thump, then a little pop. */
   stamp() {
     tone({ freq: 140, length: 0.16, gain: 0.14, bright: 0 });

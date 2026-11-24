@@ -1466,10 +1466,6 @@ button {
   padding: 4px;
   border-radius: 12px;
 }
-.tool-rack .tool:first-child {
-  width: 48px;
-  height: 48px;
-}
 
 /* Three things on the desk fit any phone: they shrink with the screen. */
 .desk-row .mini-cover {
@@ -1492,6 +1488,86 @@ button {
 }
 .book-frame.big .book::before {
   background: #2f7352;
+}
+
+/* The tools on the blank sheet sit in two little columns: thicknesses, and stickers with the bucket. */
+.tool-rack {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 6px;
+}
+.tool-column {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.tool.big {
+  width: 46px;
+  height: 46px;
+  padding: 6px;
+}
+.stamp-group {
+  display: flex;
+  gap: 6px;
+  padding-right: 10px;
+  margin-right: 4px;
+  border-right: 2px dashed rgba(150, 110, 60, 0.3);
+}
+.stamp-group:last-child {
+  border-right: 0;
+}
+
+/* Taking pictures off a wall. */
+.icon-btn.on {
+  border-color: var(--sage-deep);
+  background: var(--sage);
+  color: #fff;
+  box-shadow: 0 4px 0 var(--sage-deep);
+}
+.gallery.removing .wall-grid li:not(.start-new) .framed {
+  animation: wiggle 0.5s ease-in-out infinite alternate;
+}
+@keyframes wiggle {
+  from {
+    transform: rotate(-1.5deg);
+  }
+  to {
+    transform: rotate(1.5deg);
+  }
+}
+.wall-grid li {
+  position: relative;
+}
+.take-off {
+  position: absolute;
+  top: -12px;
+  right: -10px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 7px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--color-terracotta, #df7458);
+  color: #fff;
+  box-shadow: 0 3px 6px rgba(60, 30, 5, 0.35);
+  z-index: 3;
+}
+.take-off svg {
+  width: 100%;
+  height: 100%;
+}
+.framed.small {
+  display: block;
+  width: 110px;
+  padding: 8px;
+}
+.framed.small .sketch-thumb {
+  position: static;
+  width: 100%;
+  height: auto;
 }
 
 @media (max-width: 360px) {

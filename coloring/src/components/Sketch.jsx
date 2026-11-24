@@ -1,21 +1,27 @@
 import { useEffect, useRef } from 'react';
 import Tape from './Tape.jsx';
 import { drawStrokes, stepsOf } from '../sketches.js';
-import { STAMP_SIZE, drawStamp, loadPalStamps } from '../stamps.js';
+import { PAL_STAMPS, STAMP_SIZE, drawStamp, loadStickerImages, stampAt } from '../stamps.js';
 import { crayonRub, sfx } from '../audio.js';
 import { crayonPaint } from '../crayonTexture.js';
 import { useCrayonLines } from '../useCrayonLines.js';
 
 const marks = { paint: crayonPaint, stamp: (context, mark, scale) => drawStamp(context, mark, scale, crayonPaint) };
 
+/** A sticker rides a little above the finger, so the child can see where it will land. */
+const LIFT = 46;
+
 /**
  * A blank sheet to draw on. With the crayon the finger draws a waxy line (thin, medium or thick), with the sound of
- * a crayon on paper that follows its speed; with a stamp a tap puts it down. Every mark is kept, so Undo takes
- * back the last one. Opened again from the wall, the drawing first replays itself mark by mark (a tap skips).
+ * a crayon on paper that follows its speed. With stickers, the chosen one follows the finger and lands where it's
+ * let go; one already on the sheet can be picked up and moved. The bucket pours a color over the whole background.
+ * Every mark is kept, so Undo takes back the last one. Opened again from the wall, the drawing first replays
+ * itself mark by mark (a tap skips).
  */
-export default function Sketch({ sketch, tool, pickColor, canvasRef, isReplaying, onReplayed, onStroke }) {
+export default function Sketch({ sketch, tool, pickColor, canvasRef, isReplaying, onReplayed, onStroke, onMoveStamp }) {
   const holder = useRef(null);
   const replay = useRef(null);
+  const carried = useRef(null); // { index (-1 for a new one), mark }
   const strokesRef = useRef(sketch.strokes);
   strokesRef.current = sketch.strokes;
 
@@ -32,24 +38,51 @@ export default function Sketch({ sketch, tool, pickColor, canvasRef, isReplaying
     canvas: canvasRef,
     size: tool.size,
     pickColor,
-    redraw: (context, width) => drawStrokes(context, strokesRef.current, width, { ...marks, limit: replay.current?.limit ?? Infinity }),
+    redraw: (context, width) => {
+      drawStrokes(context, strokesRef.current, width, { ...marks, limit: replay.current?.limit ?? Infinity, skip: carried.current?.index ?? -1 });
+      if (carried.current) drawStamp(context, carried.current.mark, width / 800, crayonPaint, true);
+    },
     onLine: onStroke,
     onTap: ([x, y]) => {
       if (replay.current) {
         endReplay();
         return true;
       }
+      if (tool.kind === 'bg') {
+        sfx.pour(4);
+        onStroke({ t: 'bg', c: pickColor() });
+        return true;
+      }
       if (tool.kind !== 'stamp') return false;
-      sfx.stamp();
-      navigator.vibrate?.(12);
-      const turn = (Math.random() - 0.5) * 0.5;
-      onStroke({ t: 'stamp', s: tool.stamp, c: pickColor(), x, y, size: Math.round(STAMP_SIZE * (0.85 + Math.random() * 0.3)), turn: +turn.toFixed(2) });
-      return true;
+      // Pick up a sticker that's already there, or take a new one from the row.
+      const index = stampAt(strokesRef.current, x, y);
+      const mark =
+        index >= 0
+          ? { ...strokesRef.current[index] }
+          : { t: 'stamp', s: tool.stamp, c: pickColor(), x, y: y - LIFT, size: PAL_STAMPS.includes(tool.stamp) ? 170 : STAMP_SIZE, turn: 0 };
+      const grip = { dx: mark.x - x, dy: mark.y - y };
+      carried.current = { index, mark };
+      sfx.peel();
+      paintNow();
+      return {
+        move: ([mx, my]) => {
+          mark.x = Math.round(mx + grip.dx);
+          mark.y = Math.round(my + grip.dy);
+          paintNow();
+        },
+        end: () => {
+          carried.current = null;
+          sfx.stamp();
+          navigator.vibrate?.(12);
+          if (index >= 0) onMoveStamp(index, mark.x, mark.y);
+          else onStroke(mark);
+        },
+      };
     },
   });
 
   useEffect(() => {
-    loadPalStamps().then(paintNow);
+    loadStickerImages().then(paintNow);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(paintNow, [sketch]); // eslint-disable-line react-hooks/exhaustive-deps
 

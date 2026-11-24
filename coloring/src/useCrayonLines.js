@@ -7,10 +7,12 @@ import { crayonPaint } from './crayonTexture.js';
  * Drawing waxy crayon lines on a canvas that covers a sheet (the blank sheet, or the paint layer over a big-book
  * page). The canvas matches the sheet on screen and is redrawn with `redraw(context, width)` when it changes size;
  * a finger draws a line with the crayon sound following its speed, and the finished line goes to `onLine`.
- * Returns the pointer handlers and `paintNow()` to redraw at once.
+ * `onTap(point)` sees every touch first: it can return true to ignore it, or { move(point), end(point) } to follow
+ * the finger itself (a sticker being carried). Returns the pointer handlers and `paintNow()` to redraw at once.
  */
 export function useCrayonLines({ holder, canvas, size, pickColor, redraw, onLine, onTap }) {
   const line = useRef(null);
+  const carry = useRef(null);
   const redrawRef = useRef(redraw);
   redrawRef.current = redraw;
 
@@ -44,7 +46,14 @@ export function useCrayonLines({ holder, canvas, size, pickColor, redraw, onLine
   const onPointerDown = (event) => {
     if (event.button > 0 || line.current) return;
     const point = toSheet(event);
-    if (onTap?.(point, event)) return;
+    const taken = onTap?.(point, event);
+    if (taken) {
+      if (typeof taken === 'object') {
+        event.currentTarget.setPointerCapture?.(event.pointerId);
+        carry.current = { id: event.pointerId, ...taken };
+      }
+      return;
+    }
     event.currentTarget.setPointerCapture?.(event.pointerId);
     line.current = { id: event.pointerId, stroke: { c: pickColor(), w: SIZES[size], p: point }, at: performance.now() };
     crayonRub.start();
@@ -52,6 +61,7 @@ export function useCrayonLines({ holder, canvas, size, pickColor, redraw, onLine
     paintNow();
   };
   const onPointerMove = (event) => {
+    if (carry.current?.id === event.pointerId) return carry.current.move(toSheet(event));
     const d = line.current;
     if (!d || d.id !== event.pointerId) return;
     const [x, y] = toSheet(event);
@@ -65,6 +75,11 @@ export function useCrayonLines({ holder, canvas, size, pickColor, redraw, onLine
     drawStroke(canvas.current.getContext('2d'), d.stroke, canvas.current.width / SKETCH_W, p.length - 2, crayonPaint);
   };
   const onPointerEnd = (event) => {
+    if (carry.current?.id === event.pointerId) {
+      const { end } = carry.current;
+      carry.current = null;
+      return end(toSheet(event));
+    }
     const d = line.current;
     if (!d || d.id !== event.pointerId) return;
     line.current = null;

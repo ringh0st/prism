@@ -8,6 +8,8 @@ import Spiral from './components/Spiral.jsx';
 import Dialog from './components/Dialog.jsx';
 import Room from './components/Room.jsx';
 import Gallery from './components/Gallery.jsx';
+import PageThumb from './components/PageThumb.jsx';
+import SketchThumb from './components/SketchThumb.jsx';
 import { StampRow, ToolRack } from './components/ToolRack.jsx';
 import Sheet from './components/Sheet.jsx';
 import Sketch from './components/Sketch.jsx';
@@ -15,7 +17,7 @@ import BackButton from './components/BackButton.jsx';
 import { PAGES } from './pages.js';
 import { BOOKS } from './books.js';
 import { CRAYONS, GLITTER, RAINBOW, canUndo, cleanPage, coloredPageIds, colorFor, isPageDone, paintPart, restoreBook, undoOnPage } from './book.js';
-import { DEFAULT_SIZE, addStroke, clearSketch, isBlank, newSketch, undoStroke } from './sketches.js';
+import { DEFAULT_SIZE, addStroke, clearSketch, isBlank, moveStamp, newSketch, undoStroke } from './sketches.js';
 import { deleteSketch, loadSketches, saveSketch } from './sketchStore.js';
 import { spreadColor } from './drawingDom.js';
 import { savePicture } from './savePicture.js';
@@ -49,6 +51,8 @@ const ICONS = {
   mute: 'M11 5 6 9H3v6h3l5 4zM16 9l5 6M21 9l-5 6',
   music: 'M9 18V6l10-2v12M9 18a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zM19 16a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z',
   undo: 'M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11',
+  remove: 'M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6',
+  done: 'M5 12.5l4.5 4.5L19 7.5',
 };
 
 /**
@@ -78,6 +82,8 @@ export default function App() {
   const [celebrate, setCelebrate] = useState(null); // { pageId, id }
   const [pinnedId, setPinnedId] = useState(null);
   const [isCleaning, setIsCleaning] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false); // the wall's pictures show a ✗ to take one off
+  const [toRemove, setToRemove] = useState(null); // the picture asked about
   const [hasStarted, setHasStarted] = useState(false);
   const taps = useRef(0);
   const svgRef = useRef(null);
@@ -173,11 +179,13 @@ export default function App() {
     start();
     sfx.turn();
     setPinnedId(null);
+    setIsRemoving(false);
     setView({ name: 'wall', kind });
   };
   /** Back to where the child came from; a new drawing or colored page is pinned on its wall as they arrive. */
   const goBack = () => {
     sfx.turn();
+    setIsRemoving(false);
     if (view.name === 'wall' || view.name === 'book') return setView({ name: 'room' });
     if (view.name === 'sketch') {
       if (isBlank(sketch)) {
@@ -277,6 +285,19 @@ export default function App() {
     else return;
     sfx.undo();
   };
+  /** Takes a picture off its wall: a drawing is thrown away, a colored page becomes clean again. */
+  const removePicture = () => {
+    const item = toRemove;
+    setToRemove(null);
+    sfx.clean();
+    if (item.sketch) {
+      setSketches((all) => all.filter((s) => s.id !== item.sketch.id));
+      deleteSketch(item.sketch.id);
+    } else {
+      setBook((now) => cleanPage(now, item.page.id));
+      if (paints[item.page.id]) setPagePaint(item.page.id, () => []);
+    }
+  };
   const clean = () => {
     sfx.clean();
     if (page) {
@@ -346,6 +367,17 @@ export default function App() {
           )}
         </div>
         <div className="bar-side">
+          {view.name === 'wall' && (view.kind === 'drawings' ? drawingItems : palItems).length > 0 && (
+            <button
+              className={`icon-btn ${isRemoving ? 'on' : ''}`}
+              onClick={() => setIsRemoving((on) => !on)}
+              aria-pressed={isRemoving}
+              aria-label={isRemoving ? 'Done taking pictures off' : 'Take pictures off the wall'}
+              title={isRemoving ? 'Done' : 'Remove pictures'}
+            >
+              <Glyph d={isRemoving ? ICONS.done : ICONS.remove} />
+            </button>
+          )}
           {isOnSheet && hasMarks && (
             <>
               <button className="icon-btn" onClick={share} aria-label="Save or share the picture" title="Save picture">
@@ -387,6 +419,8 @@ export default function App() {
             items={view.kind === 'drawings' ? drawingItems : palItems}
             pinnedId={pinnedId}
             onOpenItem={openWallItem}
+            isRemoving={isRemoving}
+            onRemove={setToRemove}
             onStart={view.kind === 'drawings' ? () => openSketch(null) : () => openBook('little')}
           />
         )}
@@ -436,6 +470,7 @@ export default function App() {
               isReplaying={Boolean(view.replay)}
               onReplayed={() => setView((v) => ({ ...v, replay: false }))}
               onStroke={(stroke) => updateSketch((s) => addStroke(s, stroke))}
+              onMoveStamp={(index, x, y) => updateSketch((s) => moveStamp(s, index, x, y))}
             />
           </div>
         )}
@@ -443,13 +478,26 @@ export default function App() {
       {isOnSheet && (
         <footer className={`tray ${sketch || canPaint ? 'with-tools' : ''}`}>
           {sketch && sketchTool.kind === 'stamp' && <StampRow tool={sketchTool} color={stampColor} onTool={chooseTool(setSketchTool)} />}
-          {sketch && <ToolRack tool={sketchTool} other="stamp" onTool={chooseTool(setSketchTool)} />}
-          {canPaint && <ToolRack tool={pageTool} other="fill" onTool={chooseTool(setPageTool)} />}
+          {sketch && <ToolRack tool={sketchTool} others={['stamp', 'bg']} onTool={chooseTool(setSketchTool)} />}
+          {canPaint && <ToolRack tool={pageTool} others={['fill']} onTool={chooseTool(setPageTool)} />}
           <CrayonBox crayonId={crayonId} onPick={pick} />
           <button className="undo" onClick={undo} disabled={!canTakeBack} aria-label="Take back the last color">
             <Glyph d={ICONS.undo} />
           </button>
         </footer>
+      )}
+      {toRemove && (
+        <Dialog
+          title="Take it off the wall?"
+          picture={
+            <span className="framed small">
+              {toRemove.page ? <PageThumb page={toRemove.page} colors={toRemove.colors} paint={toRemove.paint} /> : <SketchThumb sketch={toRemove.sketch} />}
+            </span>
+          }
+          yesLabel="Yes, take it off"
+          onYes={removePicture}
+          onNo={() => setToRemove(null)}
+        />
       )}
       {isCleaning && (
         <Dialog title="Clean this page?" picture={<div className="blank-page" />} yesLabel="Yes, clean it" onYes={clean} onNo={() => setIsCleaning(false)} />

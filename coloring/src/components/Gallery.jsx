@@ -12,12 +12,13 @@ const dayOf = (time) => new Date(time).toLocaleDateString(undefined, { day: 'num
 
 /**
  * One wall, up close: every picture taped up with the day it was made, newest first; a tap opens it again (a
- * drawing replays itself). The first frame starts a new one: a blank sheet, or the coloring book.
+ * drawing replays itself). The first frame starts a new one: a blank sheet, or the coloring book. With the
+ * remove button on, every picture wiggles with a ✗ to take it off (asked first, with ✓ and ✗).
  */
-export default function Gallery({ kind, items, pinnedId, onOpenItem, onStart }) {
+export default function Gallery({ kind, items, pinnedId, isRemoving, onOpenItem, onRemove, onStart }) {
   const isDrawings = kind === 'drawings';
   return (
-    <section className={`gallery ${kind}`} aria-label={isDrawings ? 'My Drawings' : 'My Pals'}>
+    <section className={`gallery ${kind} ${isRemoving ? 'removing' : ''}`} aria-label={isDrawings ? 'My Drawings' : 'My Pals'}>
       <h2 className="gallery-sign">
         {isDrawings ? <DrawingsSign /> : <PalsSign />}
         {isDrawings ? 'My Drawings' : 'My Pals'}
@@ -42,6 +43,13 @@ export default function Gallery({ kind, items, pinnedId, onOpenItem, onStart }) 
               {item.page ? <PageThumb page={item.page} colors={item.colors} paint={item.paint} /> : <SketchThumb sketch={item.sketch} />}
               {item.isDone && <Sticker small />}
             </button>
+            {isRemoving && (
+              <button className="take-off" onClick={() => onRemove(item)} aria-label="Take this picture off the wall">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 7l10 10M17 7 7 17" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" />
+                </svg>
+              </button>
+            )}
             <span className="made-on" aria-hidden="true">
               {dayOf(item.at)}
             </span>
