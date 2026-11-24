@@ -54,10 +54,11 @@ export const PALS = [
   { id: 'plume', power: 'hint', name: 'Plume', species: 'Peacock', animal: 'Peacock', rarity: 'legendary', unlock: { lucky: true } },
   { id: 'nova', power: 'moves', name: 'Nova', species: 'Narwhal', animal: 'Narwhal', rarity: 'legendary', unlock: { lucky: true } },
   { id: 'luna', power: 'hint', name: 'Luna', species: 'Snow leopard', animal: 'Leopard', rarity: 'legendary', unlock: { lucky: true } },
-  // Legends from old stories: the Moon Rabbit (East Asia), the hippocampus (Greece) and the shisa (Okinawa).
+  // Legends from old stories: the Moon Rabbit (East Asia), the hippocampus (Greece), the shisa (Okinawa) and Cerberus (Greece).
   { id: 'mooncake', power: 'hint', name: 'Mooncake', species: 'Moon rabbit', animal: 'Moonbunny', rarity: 'legendary', unlock: { lucky: true } },
   { id: 'marina', power: 'moves', name: 'Marina', species: 'Hippocampus', animal: 'Seapony', rarity: 'legendary', unlock: { lucky: true } },
   { id: 'rumble', power: 'undo', name: 'Rumble', species: 'Shisa lion-dog', animal: 'Shisa', rarity: 'legendary', unlock: { lucky: true } },
+  { id: 'cerby', power: 'moves', name: 'Cerby', species: 'Cerberus pup', animal: 'Cerberus', rarity: 'legendary', unlock: { lucky: true } },
   // Mythic Pals, from myths and legends around the world. They join late in the adventure.
   { id: 'sol', power: 'moves', name: 'Sol', species: 'Phoenix', animal: 'Phoenix', rarity: 'mythic', unlock: { worlds: 15 } },
   { id: 'kiri', power: 'hint', name: 'Kiri', species: 'Qilin', animal: 'Qilin', rarity: 'mythic', unlock: { worlds: 18 } },

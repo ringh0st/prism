@@ -70,6 +70,7 @@ as $$
     when 'mooncake' then '{"lucky": true}'::jsonb
     when 'marina' then '{"lucky": true}'::jsonb
     when 'rumble' then '{"lucky": true}'::jsonb
+    when 'cerby' then '{"lucky": true}'::jsonb
     when 'sol' then '{"worlds": 15}'::jsonb
     when 'kiri' then '{"worlds": 18}'::jsonb
     when 'gryff' then '{"worlds": 20}'::jsonb
@@ -139,6 +140,7 @@ as $$
     when 'mooncake' then 'Moonbunny'
     when 'marina' then 'Seapony'
     when 'rumble' then 'Shisa'
+    when 'cerby' then 'Cerberus'
     when 'sol' then 'Phoenix'
     when 'kiri' then 'Qilin'
     when 'gryff' then 'Griffin'
@@ -198,8 +200,8 @@ as $$
     'pebble', 'quartz', 'ribbit', 'cotton', 'squeak', 'tops', 'maple', 'chomp', 'otto', 'buzz',
     'kiko', 'splash', 'shroomy', 'stretch', 'bandit', 'spike', 'waddles', 'fawn', 'shelly', 'inky',
     'puff', 'twinkle', 'starla', 'ziggy', 'leo', 'koi', 'bamboo', 'aurora', 'storm', 'plume',
-    'nova', 'luna', 'mooncake', 'marina', 'rumble', 'sol', 'kiri', 'gryff', 'nessa', 'dozy',
-    'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle', 'jade', 'tide', 'hikari', 'basil'
+    'nova', 'luna', 'mooncake', 'marina', 'rumble', 'cerby', 'sol', 'kiri', 'gryff', 'nessa',
+    'dozy', 'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle', 'jade', 'tide', 'hikari', 'basil'
   ];
 $$;
 
@@ -210,7 +212,7 @@ language sql
 immutable
 as $$
   select case
-    when p_pal in ('leo', 'koi', 'bamboo', 'aurora', 'storm', 'plume', 'nova', 'luna', 'mooncake', 'marina', 'rumble') then 'legendary'
+    when p_pal in ('leo', 'koi', 'bamboo', 'aurora', 'storm', 'plume', 'nova', 'luna', 'mooncake', 'marina', 'rumble', 'cerby') then 'legendary'
     when p_pal in ('sol', 'kiri', 'gryff', 'nessa', 'dozy', 'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle', 'jade', 'tide', 'hikari', 'basil') then 'mythic'
     else 'common'
   end;

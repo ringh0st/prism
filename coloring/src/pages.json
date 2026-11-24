@@ -1169,6 +1169,46 @@
   ]
  },
  {
+  "id": "cerby",
+  "name": "Cerby",
+  "animal": "Cerberus pup",
+  "parts": [
+   {
+    "color": "#9c5f35"
+   },
+   {
+    "color": "#9c5f35"
+   },
+   {
+    "color": "#9c5f35"
+   },
+   {
+    "color": "#9c5f35"
+   },
+   {
+    "color": "#f6e2c6"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#f6e2c6"
+   }
+  ]
+ },
+ {
   "id": "sol",
   "name": "Sol",
   "animal": "Phoenix",

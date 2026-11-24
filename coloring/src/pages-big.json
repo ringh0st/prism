@@ -6290,6 +6290,154 @@
   ]
  },
  {
+  "id": "big-cerby",
+  "name": "Cerby",
+  "animal": "Cerberus pup",
+  "parts": [
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#d9d2c4"
+   },
+   {
+    "color": "#9c5f35"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#f6e2c6"
+   },
+   {
+    "color": "#9c5f35"
+   },
+   {
+    "color": "#9c5f35"
+   },
+   {
+    "color": "#9c5f35"
+   },
+   {
+    "color": "#f6e2c6"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#e8ae3a"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#f6e2c6"
+   },
+   {
+    "color": "#f08a8a"
+   },
+   {
+    "color": "#e8ae3a"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#f6e2c6"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#e8ae3a"
+   },
+   {
+    "color": "#c2814b"
+   },
+   {
+    "color": "#f6e2c6"
+   },
+   {
+    "color": "#8a5a44"
+   },
+   {
+    "color": "#e8ae3a"
+   },
+   {
+    "color": "#e8ae3a"
+   },
+   {
+    "color": "#e8ae3a"
+   },
+   {
+    "color": "#e8ae3a"
+   },
+   {
+    "color": "#e8ae3a"
+   },
+   {
+    "color": "#e8ae3a"
+   }
+  ]
+ },
+ {
   "id": "big-sol",
   "name": "Sol",
   "animal": "Phoenix",
