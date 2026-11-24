@@ -16,6 +16,7 @@ import RushButton from '../../components/game/RushButton.jsx';
 import MissionsButton from '../../components/game/MissionsButton.jsx';
 import EventButton from '../../components/game/EventButton.jsx';
 import PresentButton from '../../components/gifts/PresentButton.jsx';
+import LegendaryPresentButton from '../../components/gifts/LegendaryPresentButton.jsx';
 import PalPresent from '../../components/gifts/PalPresent.jsx';
 import { presentsWaiting } from '../../game/gifts.js';
 import PalHello from '../../components/pals/PalHello.jsx';
@@ -180,6 +181,7 @@ export default function MapScreen() {
         {/* Things to do now, each with its name. They open one at a time as the player goes (unlocks.js). */}
         <div className={styles.hudStart}>
           {isFeatureOpen('gift', solvedCount) && <DailyGift />}
+          <LegendaryPresentButton />
           <PresentButton />
           {isFeatureOpen('daily', solvedCount) && <DailyButton />}
           {isFeatureOpen('missions', solvedCount) && <MissionsButton />}

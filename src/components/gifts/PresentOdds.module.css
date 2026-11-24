@@ -104,3 +104,23 @@
   line-height: 1.1;
   color: var(--text-soft);
 }
+
+/* The sure Legendary presents: every Sunday and every 100 levels */
+.sure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 4px 0 0;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  text-align: center;
+  color: var(--reward-label);
+  background: color-mix(in srgb, var(--color-honey) 35%, transparent);
+}
+
+.sureSymbol {
+  color: #e0a400;
+  font-size: 16px;
+}

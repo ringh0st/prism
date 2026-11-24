@@ -64,6 +64,9 @@ export const adoptPalOnServer = (palId) => rpc('adopt_pal', { p_pal: palId });
 /** Collects today's free gift of sparks. */
 export const claimDailyGiftOnServer = (dateKey) => rpc('claim_daily_gift', { p_date: dateKey });
 export const claimPresentOnServer = () => rpc('claim_present');
+
+/** Opens a sure Legendary present (every 100 solved levels, or this Sunday by the player's date). */
+export const claimLegendaryPresentOnServer = (dateKey) => rpc('claim_legendary_present', { p_date: dateKey });
 export const claimGlowbugRowOnServer = (kind) => rpc('claim_glowbug_row', { p_kind: kind });
 export const claimWinGiftOnServer = (dateKey, since) => rpc('claim_win_gift', { p_date: dateKey, p_since: since });
 

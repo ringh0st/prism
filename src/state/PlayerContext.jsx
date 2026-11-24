@@ -15,6 +15,7 @@ import {
   recordEventLevelOnServer,
   claimDailyGiftOnServer,
   claimPresentOnServer,
+  claimLegendaryPresentOnServer,
   claimGlowbugRowOnServer,
   claimWinGiftOnServer,
   choosePalOnServer,
@@ -58,7 +59,7 @@ import { chestId, chestRewardFor } from '../game/surprises.js';
 import { recordPalFeats } from '../game/palRecords.js';
 import { nextWinStreak } from '../game/winStreak.js';
 import { milestoneReached, solvedLevelCount } from '../game/milestones.js';
-import { claimCalendarGiftLocally, claimWinGiftLocally, openPresentLocally, recordDailyWin } from '../game/gifts.js';
+import { claimCalendarGiftLocally, claimWinGiftLocally, openLegendaryPresentLocally, openPresentLocally, recordDailyWin } from '../game/gifts.js';
 import { nicknameProblem } from '../game/nicknames.js';
 import {
   buyAccessoryLocally,
@@ -540,6 +541,19 @@ export function PlayerProvider({ children }) {
           return gift;
         }
         const state = await claimPresentOnServer();
+        applyServerState(state);
+        return state.gift;
+      },
+
+      /** Open a sure Legendary present (every Sunday, every 100 solved levels). @returns the gift @throws EconomyError */
+      async openLegendaryPresent() {
+        const today = todayKey();
+        if (!userId) {
+          const { progress: next, gift } = openLegendaryPresentLocally(startMissionDay(progressRef.current, today), today);
+          setProgress(recordMissionPresent(next, today));
+          return gift;
+        }
+        const state = await claimLegendaryPresentOnServer(today);
         applyServerState(state);
         return state.gift;
       },

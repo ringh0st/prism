@@ -388,6 +388,30 @@ test('pal presents: one per 10 stars, odds shown, glow up by rarity, never somet
   assert.equal(drawPresent(full, { rarityRoll: 0, roll: 0.1 }).sparks, PRESENT_BASE_SPARKS + PRESENT_ODDS[1].sparks);
 });
 
+test('sure Legendary presents: every Sunday and every 100 solved levels, matches the database', async () => {
+  const { LEGENDARY_EVERY_LEVELS, isSunday, legendaryPresentsWaiting, legendaryProgress, openLegendaryPresentLocally } = await import('./gifts.js');
+  const { createEmptyProgress } = await import('./progress.js');
+  const sql = readFileSync(new URL('../../supabase/gifts.sql', import.meta.url), 'utf8');
+  assert.match(sql, new RegExp(`v_solved / ${LEGENDARY_EVERY_LEVELS} > v_profile.legendary_milestones`));
+  assert.match(sql, /extract\(isodow from p_date\) = 7/);
+  assert.match(sql, /_give_present\(v_user, 99\.9\)/, 'always Legendary');
+  assert.ok(isSunday('2026-11-29') && !isSunday('2026-11-30'));
+
+  const levels = (n) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`w${Math.floor(i / 20) + 1}-${String((i % 20) + 1).padStart(2, '0')}`, { stars: 1 }]));
+  let progress = { ...createEmptyProgress(), levels: levels(205) };
+  assert.deepEqual(legendaryProgress(progress), { have: 5, need: 100 });
+  assert.deepEqual(legendaryPresentsWaiting(progress, '2026-11-30'), { milestones: 2, sunday: false, count: 2 });
+  assert.equal(legendaryPresentsWaiting(progress, '2026-11-29').count, 3, 'plus Sunday');
+  for (let i = 0; i < 3; i += 1) {
+    const opened = openLegendaryPresentLocally(progress, '2026-11-29', { roll: 0.5 });
+    assert.equal(opened.gift.rarity, 'legendary');
+    progress = opened.progress;
+  }
+  assert.equal(legendaryPresentsWaiting(progress, '2026-11-29').count, 0, 'one Sunday present a Sunday');
+  assert.throws(() => openLegendaryPresentLocally(progress, '2026-11-29'));
+  assert.equal(legendaryPresentsWaiting(progress, '2026-12-06').count, 1, 'next Sunday brings another');
+});
+
 test('daily win gifts: 1st, 3rd and 6th different level won today, matches the database', async () => {
   const { WIN_GIFTS, claimWinGiftLocally, readyWinGift, recordDailyWin, winsToday } = await import('./gifts.js');
   const { createEmptyProgress } = await import('./progress.js');

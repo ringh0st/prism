@@ -1,6 +1,6 @@
 import Icon from '../Icon.jsx';
 import GiftBoxArt from './GiftBoxArt.jsx';
-import { PRESENT_BASE_SPARKS, PRESENT_ODDS, PRESENT_RARITIES } from '../../game/gifts.js';
+import { LEGENDARY_EVERY_LEVELS, PRESENT_BASE_SPARKS, PRESENT_ODDS, PRESENT_RARITIES } from '../../game/gifts.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './PresentOdds.module.css';
 
@@ -76,6 +76,12 @@ export default function PresentOdds() {
           </li>
         ))}
       </ul>
+      <p className={`game-title ${styles.sure}`}>
+        <span className={styles.sureSymbol} aria-hidden="true">
+          ✦
+        </span>
+        {t('present.odds.sure', { n: LEGENDARY_EVERY_LEVELS })}
+      </p>
       <p className={styles.note}>{t('present.odds.short')}</p>
     </section>
   );

@@ -6,6 +6,9 @@
 alter table public.profiles
   add column if not exists gift_days integer not null default 0,
   add column if not exists presents_opened integer not null default 0,
+  -- Sure Legendary presents: those for every 100 solved levels opened, and the last Sunday one (player's date).
+  add column if not exists legendary_milestones integer not null default 0,
+  add column if not exists legendary_sunday date,
   add column if not exists win_gift_date date,
   add column if not exists win_gifts_opened integer not null default 0,
   -- Glowbug rows whose diamond was collected (see glowbugs.sql).
@@ -32,6 +35,8 @@ as $$
     'lastGiftDate', p.last_gift_date,
     'giftDays', p.gift_days,
     'presentsOpened', p.presents_opened,
+    'legendaryMilestones', p.legendary_milestones,
+    'legendarySunday', p.legendary_sunday,
     'winGiftDate', p.win_gift_date,
     'winGiftsOpened', p.win_gifts_opened,
     'sparkPurchasesToday', case when p.spark_purchase_date = current_date then p.spark_purchases_today else 0 end,
@@ -148,17 +153,17 @@ as $$
                'decor:logBench', 'decor:flowerPatch', 'decor:fireflyJar', 'decor:berryBush', 'decor:glowShrooms', 'decor:kites'];
 $$;
 
-create or replace function public.claim_present()
+-- Puts one present into the player's profile: p_rarity_roll (0-100) decides how special it is.
+-- Returns the gift. Callers check and count what was opened.
+create or replace function public._give_present(p_user uuid, p_rarity_roll double precision)
 returns jsonb
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
-  v_user uuid := public._require_user();
   v_profile public.profiles;
-  v_stars integer;
-  v_rarity_roll double precision := random() * 100;
+  v_rarity_roll double precision := p_rarity_roll;
   v_roll double precision := random() * 100;
   v_rarity text;
   v_bonus integer;
@@ -169,13 +174,7 @@ declare
   v_sparks integer := 20;
   v_gift jsonb;
 begin
-  select * into v_profile from public.profiles where id = v_user for update;
-  select coalesce(sum(stars), 0)::integer into v_stars from public.progress
-    where user_id = v_user and level_id ~ '^w[0-9]+-[0-9]{2}$';
-  if v_stars / 10 <= v_profile.presents_opened then
-    raise exception using message = 'No present yet.';
-  end if;
-
+  select * into v_profile from public.profiles where id = p_user;
   if v_rarity_roll < 65 then v_rarity := 'plain'; v_bonus := 0; v_sure_item := false;
   elsif v_rarity_roll < 88 then v_rarity := 'rare'; v_bonus := 20; v_sure_item := false;
   elsif v_rarity_roll < 97 then v_rarity := 'epic'; v_bonus := 40; v_sure_item := true;
@@ -197,13 +196,13 @@ begin
   if v_helper is not null then
     v_gift := v_gift || jsonb_build_object('helper', v_helper);
     update public.profiles set helpers = jsonb_set(helpers, array[v_helper], to_jsonb(coalesce((helpers ->> v_helper)::integer, 0) + 1))
-      where id = v_user;
+      where id = p_user;
   elsif v_item is not null then
     v_gift := v_gift || jsonb_build_object('item', jsonb_build_object('type', split_part(v_item, ':', 1), 'id', split_part(v_item, ':', 2)));
     if split_part(v_item, ':', 1) = 'outfit' then
-      update public.profiles set pal_accessories = array_append(pal_accessories, split_part(v_item, ':', 2)) where id = v_user;
+      update public.profiles set pal_accessories = array_append(pal_accessories, split_part(v_item, ':', 2)) where id = p_user;
     else
-      update public.profiles set grove_items = array_append(grove_items, split_part(v_item, ':', 2)) where id = v_user;
+      update public.profiles set grove_items = array_append(grove_items, split_part(v_item, ':', 2)) where id = p_user;
     end if;
   else
     v_sparks := v_sparks + 40; -- the bag of sparks
@@ -213,12 +212,64 @@ begin
     v_gift := v_gift || jsonb_build_object('diamonds', v_diamonds);
   end if;
   v_gift := v_gift || jsonb_build_object('sparks', v_sparks);
+  update public.profiles set sparks = sparks + v_sparks, diamonds = diamonds + v_diamonds where id = p_user;
+  return v_gift;
+end;
+$$;
 
-  update public.profiles set
-    sparks = sparks + v_sparks,
-    diamonds = diamonds + v_diamonds,
-    presents_opened = presents_opened + 1
-  where id = v_user;
+create or replace function public.claim_present()
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user uuid := public._require_user();
+  v_profile public.profiles;
+  v_stars integer;
+  v_gift jsonb;
+begin
+  select * into v_profile from public.profiles where id = v_user for update;
+  select coalesce(sum(stars), 0)::integer into v_stars from public.progress
+    where user_id = v_user and level_id ~ '^w[0-9]+-[0-9]{2}$';
+  if v_stars / 10 <= v_profile.presents_opened then
+    raise exception using message = 'No present yet.';
+  end if;
+  v_gift := public._give_present(v_user, random() * 100);
+  update public.profiles set presents_opened = presents_opened + 1 where id = v_user;
+  return public._economy_state(v_user) || jsonb_build_object('gift', v_gift);
+end;
+$$;
+
+-- Sure Legendary presents (a 3% chance felt like "never"): one for every 100 solved built-in levels, and one
+-- every Sunday by the player's own date (p_date). A 100-level one opens first. Must match LEGENDARY_* in gifts.js.
+create or replace function public.claim_legendary_present(p_date date)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user uuid := public._require_user();
+  v_profile public.profiles;
+  v_solved integer;
+  v_gift jsonb;
+begin
+  select * into v_profile from public.profiles where id = v_user for update;
+  if v_profile.pal_id is null then
+    raise exception using message = 'No present yet.';
+  end if;
+  select count(*)::integer into v_solved from public.progress
+    where user_id = v_user and stars > 0 and level_id ~ '^w[0-9]+-[0-9]{2}$';
+  if v_solved / 100 > v_profile.legendary_milestones then
+    update public.profiles set legendary_milestones = legendary_milestones + 1 where id = v_user;
+  elsif p_date between current_date - 1 and current_date + 1 and extract(isodow from p_date) = 7
+    and v_profile.legendary_sunday is distinct from p_date then
+    update public.profiles set legendary_sunday = p_date where id = v_user;
+  else
+    raise exception using message = 'No present yet.';
+  end if;
+  v_gift := public._give_present(v_user, 99.9);
   return public._economy_state(v_user) || jsonb_build_object('gift', v_gift);
 end;
 $$;
@@ -289,5 +340,8 @@ revoke all on function public.claim_daily_gift(date) from public, anon;
 grant execute on function public.claim_daily_gift(date) to authenticated;
 revoke all on function public.claim_present() from public, anon;
 grant execute on function public.claim_present() to authenticated;
+revoke all on function public._give_present(uuid, double precision) from public, anon, authenticated;
+revoke all on function public.claim_legendary_present(date) from public, anon;
+grant execute on function public.claim_legendary_present(date) to authenticated;
 revoke all on function public.claim_win_gift(date, timestamptz) from public, anon;
 grant execute on function public.claim_win_gift(date, timestamptz) to authenticated;

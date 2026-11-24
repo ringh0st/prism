@@ -39,8 +39,9 @@ export function createEmptyProgress() {
     giftDate: null,
     // Calendar gifts opened (the day in the 7-day gift calendar; see gifts.js).
     giftDays: 0,
-    // The partner Pal's presents opened (one per 10 stars; see gifts.js).
-    presents: { opened: 0 },
+    // The partner Pal's presents opened (one per 10 stars), the sure Legendary ones for every 100 levels, and the
+    // last Sunday one (see gifts.js).
+    presents: { opened: 0, milestones: 0, sundayDate: null },
     // Different levels won today and today's win gifts opened (see gifts.js).
     winsToday: { date: null, levels: [] },
     winGifts: { date: null, opened: 0 },
@@ -250,7 +251,11 @@ export function withServerState(progress, state, today) {
     glowbugRowsClaimed: state.glowbugRowsClaimed ?? progress.glowbugRowsClaimed,
     giftDate: state.lastGiftDate ?? progress.giftDate,
     giftDays: state.giftDays ?? progress.giftDays,
-    presents: { opened: state.presentsOpened ?? progress.presents.opened },
+    presents: {
+      opened: state.presentsOpened ?? progress.presents.opened,
+      milestones: state.legendaryMilestones ?? progress.presents.milestones,
+      sundayDate: 'legendarySunday' in state ? state.legendarySunday : progress.presents.sundayDate,
+    },
     winGifts: state.winGiftDate !== undefined ? { date: state.winGiftDate, opened: state.winGiftsOpened ?? 0 } : progress.winGifts,
     pal: palFromServer(progress.pal, state.pal),
     grove: state.grove ?? progress.grove,

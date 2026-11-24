@@ -152,11 +152,49 @@ export function drawPresent(progress, { rarityRoll = Math.random(), roll = Math.
 export function openPresentLocally(progress, rolls) {
   if (presentsWaiting(progress) < 1) throw new EconomyError('No present yet.');
   const gift = drawPresent(progress, rolls);
-  const next = { ...progress, sparks: progress.sparks + gift.sparks, presents: { opened: progress.presents.opened + 1 } };
+  return { progress: giveLocally({ ...progress, presents: { ...progress.presents, opened: progress.presents.opened + 1 } }, gift), gift };
+}
+
+// ---------------------------------------------------------------------------
+// Sure Legendary presents (owner: a nephew "never gets a Legendary"; 3% is about 1 in 33 presents)
+// ---------------------------------------------------------------------------
+
+/** Every Sunday, and every 100 solved levels, the partner Pal brings a present that is always Legendary. */
+export const LEGENDARY_EVERY_LEVELS = 100;
+const LEGENDARY_ROLL = 0.999;
+const solvedLevelCount = (levels) => Object.entries(levels).filter(([id, entry]) => /^w\d+-\d{2}$/.test(id) && entry.stars > 0).length;
+
+/** Is this day ("YYYY-MM-DD", the player's own date) a Sunday? */
+export const isSunday = (dateKey) => new Date(`${dateKey}T12:00:00`).getDay() === 0;
+
+/** Sure Legendary presents ready now: { milestones, sunday } (the 100-level ones and today's Sunday one). */
+export function legendaryPresentsWaiting(progress, today) {
+  const milestones = Math.max(0, Math.floor(solvedLevelCount(progress.levels) / LEGENDARY_EVERY_LEVELS) - (progress.presents.milestones ?? 0));
+  const sunday = isSunday(today) && progress.presents.sundayDate !== today;
+  return { milestones, sunday, count: milestones + (sunday ? 1 : 0) };
+}
+
+/** Solved levels toward the next 100-level Legendary present: { have, need }. */
+export function legendaryProgress(progress) {
+  return { have: solvedLevelCount(progress.levels) % LEGENDARY_EVERY_LEVELS, need: LEGENDARY_EVERY_LEVELS };
+}
+
+/** Opens one sure Legendary present on this device (guests): a 100-level one first, then Sunday's. @throws EconomyError */
+export function openLegendaryPresentLocally(progress, today, rolls = {}) {
+  const { milestones, sunday } = legendaryPresentsWaiting(progress, today);
+  if (!milestones && !sunday) throw new EconomyError('No present yet.');
+  const gift = drawPresent(progress, { ...rolls, rarityRoll: LEGENDARY_ROLL });
+  const presents = milestones ? { ...progress.presents, milestones: (progress.presents.milestones ?? 0) + 1 } : { ...progress.presents, sundayDate: today };
+  return { progress: giveLocally({ ...progress, presents }, gift), gift };
+}
+
+/** Puts what a present holds into this device's progress. */
+function giveLocally(progress, gift) {
+  const next = { ...progress, sparks: progress.sparks + gift.sparks };
   if (gift.helper) next.helpers = { ...progress.helpers, [gift.helper]: (progress.helpers[gift.helper] ?? 0) + 1 };
   if (gift.item?.type === 'outfit') next.pal = { ...progress.pal, accessories: [...progress.pal.accessories, gift.item.id] };
   if (gift.item?.type === 'decor') next.grove = { ...progress.grove, items: [...progress.grove.items, gift.item.id] };
-  return { progress: next, gift };
+  return next;
 }
 
 // ---------------------------------------------------------------------------
