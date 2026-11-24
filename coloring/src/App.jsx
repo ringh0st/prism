@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Book from './components/Book.jsx';
 import Cover from './components/Cover.jsx';
 import Contents from './components/Contents.jsx';
+import Bookmark from './components/Bookmark.jsx';
 import PageFace from './components/PageFace.jsx';
 import CrayonBox from './components/CrayonBox.jsx';
 import Spiral from './components/Spiral.jsx';
@@ -338,7 +339,7 @@ export default function App() {
     const isOpen = isTop && isCoverOpen;
     if (i === 0)
       return (
-        <Contents pages={pages} book={book} doneIds={doneIds} isOpen={isOpen} onOpenPage={(n) => openPage(pages[n - 1].id, 'book')} onNext={() => turnTo(1)} />
+        <Contents pages={pages} book={book} doneIds={doneIds} isOpen={isOpen} isReduced={isReduced} onOpenPage={(n) => openPage(pages[n - 1].id, 'book')} onNext={() => turnTo(1)} />
       );
     const p = pages[i - 1];
     return (
@@ -458,6 +459,7 @@ export default function App() {
             />
             {!isCoverOpen && <Cover bookId={view.bookId} />}
             <Spiral />
+            {isCoverOpen && <Bookmark isOut={indexes[view.bookId] > 0} onClick={() => turnTo(0)} />}
           </div>
         )}
         {page && (

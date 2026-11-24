@@ -48,7 +48,16 @@ const assert = (ok, what) => {
   // 1. Little book: open from the desk, choose from the contents, color, back
   await p.getByRole('button', { name: /^Open Little Pals/ }).tap();
   await p.waitForTimeout(1400);
-  assert((await p.locator('.thumbs button').count()) === 48, 'little book contents shows 48 Pals');
+  const palCount = require('../src/pages.json').length;
+  assert((await p.locator('.thumbs button').count()) === palCount, `little book contents shows all ${palCount} Pals`);
+  assert(await p.locator('.scroll-arrow.down').isVisible(), 'an arrow shows there are more friends below');
+  await p.waitForTimeout(1400); // the list peeks down and back first
+  await p.locator('.scroll-arrow.down').tap({ force: true });
+  await p.waitForTimeout(900);
+  assert((await p.locator('.thumbs').evaluate((e) => e.scrollTop)) > 100, 'the arrow scrolls the list on');
+  assert(await p.locator('.scroll-arrow.up').isVisible(), 'an arrow up shows once scrolled');
+  await p.locator('.thumbs').evaluate((e) => e.scrollTo(0, 0));
+  await p.waitForTimeout(400);
   await p.locator('.thumbs button').nth(38).tap();
   await p.waitForTimeout(900);
   assert((await p.locator('.sheet-frame svg').count()) === 1, 'a little-book page opens as a sheet');
@@ -71,6 +80,13 @@ const assert = (ok, what) => {
   assert((await p.locator('.sheet-frame svg').count()) === 1, 'a page opens from inside the book too');
   await p.getByRole('button', { name: 'Back to the book' }).tap();
   await p.waitForTimeout(500);
+  // the ribbon bookmark goes back to every friend from any page
+  await p.getByRole('button', { name: 'Turn the page' }).tap();
+  await p.waitForTimeout(900);
+  await p.getByRole('button', { name: 'All my friends' }).tap();
+  await p.waitForTimeout(1600);
+  assert(await p.locator('.thumbs').first().isVisible(), 'the ribbon goes back to My friends');
+  assert((await p.getByRole('button', { name: 'All my friends' }).count()) === 0, 'on My friends the ribbon is tucked in');
   await p.getByRole('button', { name: 'Back to my room' }).tap();
   await p.waitForTimeout(500);
 
