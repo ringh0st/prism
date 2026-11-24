@@ -16,6 +16,7 @@ import {
   claimDailyGiftOnServer,
   claimPresentOnServer,
   combineGuestSaveOnServer,
+  claimGiftPalsOnServer,
   claimLegendaryPresentOnServer,
   claimGlowbugRowOnServer,
   claimWinGiftOnServer,
@@ -67,6 +68,8 @@ import {
   buyAccessoryLocally,
   choosePalLocally,
   claimLuckyPalLocally,
+  claimGiftPalsLocally,
+  giftPalsWaiting,
   growPartnerLocally,
   luckyPalsWaiting,
   seedFor,
@@ -172,6 +175,28 @@ export function PlayerProvider({ children }) {
     if (opened.length) setLuckyGifts((queue) => [...queue, ...opened]);
   }, [userId, setProgress, applyServerState]);
 
+  /** Gift Pals every player gets (GIFT_PALS), each shown with the same reveal as a Lucky Pal. */
+  const openGiftPals = useCallback(async () => {
+    if (!giftPalsWaiting(progressRef.current).length) return;
+    let given;
+    if (!userId) {
+      const claimed = claimGiftPalsLocally(progressRef.current);
+      setProgress(claimed.progress);
+      given = claimed.given;
+    } else {
+      const state = await claimGiftPalsOnServer().catch(() => null);
+      if (!state) return;
+      applyServerState(state);
+      given = state.giftPals ?? [];
+    }
+    if (given.length) setLuckyGifts((queue) => [...queue, ...given.map((palId) => ({ palId, sparks: 0, isGift: true }))]);
+  }, [userId, setProgress, applyServerState]);
+
+  // Guests get gift Pals once they have a first Pal (accounts get them in the sync below).
+  useEffect(() => {
+    if (!userId && progress.pal.id) openGiftPals();
+  }, [userId, progress.pal.id, openGiftPals]);
+
   useEffect(() => {
     writeJson(SETTINGS_KEY, settings);
     sfx.configure(settings);
@@ -255,10 +280,11 @@ export function PlayerProvider({ children }) {
         setWeeklyReward(claimed.reward);
       }
       await openLuckyPals();
+      await openGiftPals();
     } catch {
       setSyncStatus('error');
     }
-  }, [userId, setProgress, applyServerState, openLuckyPals, savePendingPal, refreshMissions, bringGuestGame]);
+  }, [userId, setProgress, applyServerState, openLuckyPals, openGiftPals, savePendingPal, refreshMissions, bringGuestGame]);
 
   useEffect(() => {
     if (userId) syncWithServer();

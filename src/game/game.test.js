@@ -1407,3 +1407,19 @@ test('guest save: packed for the account, and the account asks only when it has 
   const sql = readFileSync(new URL('../../supabase/guest_save.sql', import.meta.url), 'utf8');
   for (const key of Object.keys(save)) assert.ok(sql.includes(`'${key}'`), `guest_save.sql reads ${key}`);
 });
+
+test('gift Pals: every player with a first Pal gets them once, the same on the server', async () => {
+  const { GIFT_PALS, claimGiftPalsLocally, giftPalsWaiting, palById } = await import('./pals.js');
+  const { createEmptyProgress } = await import('./progress.js');
+  GIFT_PALS.forEach((id) => assert.ok(palById(id), id));
+  const fresh = createEmptyProgress();
+  assert.deepEqual(giftPalsWaiting(fresh), [], 'not before the first Pal');
+  const withPal = { ...fresh, pal: { ...fresh.pal, id: 'ember', owned: { ember: { stage: 0 } } } };
+  const { progress, given } = claimGiftPalsLocally(withPal);
+  assert.deepEqual(given, GIFT_PALS);
+  assert.ok(progress.pal.owned.rumble);
+  assert.equal(progress.pal.id, 'ember', 'the partner stays');
+  assert.deepEqual(claimGiftPalsLocally(progress).given, [], 'only once');
+  const sql = readFileSync(new URL('../../supabase/guest_save.sql', import.meta.url), 'utf8');
+  assert.ok(sql.includes(`foreach v_id in array array[${GIFT_PALS.map((id) => `'${id}'`).join(', ')}]`), 'claim_gift_pals gives the same Pals');
+});

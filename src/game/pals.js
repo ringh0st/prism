@@ -240,6 +240,23 @@ export function claimLuckyPalLocally(progress, roll = Math.random(), pick = Math
   return { progress: { ...progress, luckyPals, pal: { ...progress.pal, id: progress.pal.id ?? pal.id, owned } }, palId: pal.id, sparks: 0 };
 }
 
+/**
+ * Pals given to every player once they have found their first Pal (owner: "just give Rumble to everyone"). Pals
+ * are never taken away, so whoever doesn't own one gets it. Must match claim_gift_pals in supabase/guest_save.sql.
+ */
+export const GIFT_PALS = ['rumble'];
+
+/** Gift Pals this player doesn't own yet (none before the first Pal is found). */
+export const giftPalsWaiting = (progress) => (progress.pal.id ? GIFT_PALS.filter((id) => !progress.pal.owned[id]) : []);
+
+/** Gives the waiting gift Pals on this device (guests). @returns { progress, given } */
+export function claimGiftPalsLocally(progress) {
+  const given = giftPalsWaiting(progress);
+  if (!given.length) return { progress, given };
+  const owned = { ...progress.pal.owned, ...Object.fromEntries(given.map((id) => [id, { stage: 0 }])) };
+  return { progress: { ...progress, pal: { ...progress.pal, owned } }, given };
+}
+
 /** Every outfit piece: the regular ones plus the weekly theme collections'. */
 export const ALL_OUTFITS = [...PAL_ACCESSORIES, ...THEME_OUTFITS];
 

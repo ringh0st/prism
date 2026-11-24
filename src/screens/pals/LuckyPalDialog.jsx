@@ -11,7 +11,7 @@ import styles from './LuckyPal.module.css';
 import { palName, palWithSpecies } from '../../i18n/palText.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 
-/** A Lucky Pal gift (every 200 levels): tap to open the box, then meet who came out. */
+/** A Lucky Pal gift (every 200 levels), or a Pal given to everyone (GIFT_PALS): tap to open the box, then meet who came out. */
 export default function LuckyPalDialog() {
   const { luckyGift, dismissLuckyGift, choosePal } = usePlayer();
   const [isOpen, setIsOpen] = useState(false);
@@ -32,7 +32,7 @@ export default function LuckyPalDialog() {
 
   return (
     <Dialog
-      title={isOpen ? (pal ? t('pals.lucky.joined', { name: palName(lang, pal) }) : t('pals.lucky.sparksTitle')) : t('pals.lucky.giftTitle')}
+      title={isOpen ? (pal ? t('pals.lucky.joined', { name: palName(lang, pal) }) : t('pals.lucky.sparksTitle')) : t(luckyGift.isGift ? 'pals.gift.title' : 'pals.lucky.giftTitle')}
       tone="celebrate"
       onClose={close}
     >

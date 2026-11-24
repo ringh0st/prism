@@ -37,6 +37,9 @@ export const mergeGuestProgress = (levels) =>
 /** Combines this device's guest save (Pals, outfits, Grove, sparks, helpers…) with the account, once, at sign-in. */
 export const combineGuestSaveOnServer = (save) => rpc('combine_guest_save', { p_save: save });
 
+/** Gives the account any gift Pal it doesn't have yet (GIFT_PALS); `giftPals` lists the ones given now. */
+export const claimGiftPalsOnServer = () => rpc('claim_gift_pals');
+
 export const recordDailyOnServer = (dateKey) => rpc('record_daily', { p_date: dateKey });
 
 export const buyStoreItemOnServer = (itemId, currency) => rpc('buy_store_item', { p_item_id: itemId, p_currency: currency });

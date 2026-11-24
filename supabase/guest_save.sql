@@ -1,4 +1,4 @@
--- Lumipals: bringing a guest's save into an account at sign-in.
+-- Lumipals: bringing a guest's save into an account at sign-in, and the Pals every player is given.
 -- Run in Supabase → SQL Editor AFTER gifts.sql (and again after re-running it). Safe to run more than once.
 --
 -- Signing in used to move only the guest's levels and stars into the account; the account's Pals, outfits,
@@ -97,3 +97,34 @@ $$;
 
 revoke all on function public.combine_guest_save(jsonb) from public, anon;
 grant execute on function public.combine_guest_save(jsonb) to authenticated;
+
+-- Pals given to every player once they have a first Pal (owner: "just give Rumble to everyone"). Pals are never
+-- taken away, so whoever doesn't own one gets it; `giftPals` lists the ones given now, for the reveal.
+-- Must match GIFT_PALS in src/game/pals.js.
+create or replace function public.claim_gift_pals()
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_user uuid := public._require_user();
+  v_profile public.profiles;
+  v_id text;
+  v_given text[] := '{}';
+begin
+  select * into v_profile from public.profiles where id = v_user for update;
+  if v_profile.pal_id is not null then
+    foreach v_id in array array['rumble'] loop
+      if not (v_profile.pals ? v_id) then
+        update public.profiles set pals = pals || jsonb_build_object(v_id, jsonb_build_object('stage', 0)) where id = v_user;
+        v_given := v_given || v_id;
+      end if;
+    end loop;
+  end if;
+  return public._economy_state(v_user) || jsonb_build_object('giftPals', to_jsonb(v_given));
+end;
+$$;
+
+revoke all on function public.claim_gift_pals() from public, anon;
+grant execute on function public.claim_gift_pals() to authenticated;
