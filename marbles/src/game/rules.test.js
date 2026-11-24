@@ -234,12 +234,13 @@ test('fair turns: one bonus shot at most, and the side that shot second always g
   assert.ok(line(game, 'you').again);
   assert.ok(!line(game, 'you').again, 'no third shot in one turn');
   assert.equal(game.turn, 'foe');
-  // 'you' reach the target of three in the next turn; 'foe' have had one turn fewer, so the game goes on.
-  game.bag.you = 2;
+  // 'you' reach the target in the next turn; 'foe' have had one turn fewer, so the game goes on.
+  const target = MODES.chase.toWin;
+  game.bag.you = target - 1;
   game.turn = 'you';
   game.turns = { you: 1, foe: 0 };
   line(game, 'you');
-  assert.equal(game.bag.you, 3);
+  assert.equal(game.bag.you, target);
   assert.equal(game.winner, null, 'the other side still answers');
   assert.equal(game.turn, 'foe');
   // 'foe' miss their answer: now the round is over and 'you' win.
@@ -297,8 +298,9 @@ test('the yard marks what each side is after: the other side in the Ring, every 
   const { aimsOf } = await import('./rules.js');
   const ring = newGame('ring', { seed: 4, terrain: false });
   const mine = aimsOf(ring, 'you');
-  assert.ok(mine.length > 0 && mine.every((m) => m.team === 'foe'));
-  assert.ok(aimsOf(ring, 'foe').every((m) => m.team === 'you'));
+  assert.ok(mine.length > 0 && mine.every((m) => m.team === 'foe' || m.gold));
+  assert.ok(aimsOf(ring, 'foe').every((m) => m.team === 'you' || m.gold));
+  assert.ok(mine.some((m) => m.gold), 'both sides are after the golden marble');
   const hole = newGame('hole', { seed: 4, terrain: false });
   assert.equal(aimsOf(hole, 'you').length, hole.world.marbles.filter((m) => !m.owner).length);
   const chase = newGame('chase', { seed: 4, terrain: false });

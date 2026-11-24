@@ -33,6 +33,10 @@ export function tellShot(result, side, names, mode) {
       head: `${who} fell into the Mor: one marble given back.`,
       gain: { side, text: '−1' },
     };
+  if (result.gold && result.won) {
+    const verb = mode === 'hole' ? 'sank' : 'knocked out';
+    return { head: `${who} ${verb} the golden marble! It's worth ${result.won >= 3 ? 'two, plus more' : 'two'}.`, gain: { side, text: `+${result.won}` } };
+  }
   if (result.won && mode === 'chase') {
     return {
       head: `${who} hit ${whose(names[them])} shooter! It goes back to its line.`,

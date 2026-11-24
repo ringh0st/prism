@@ -9,10 +9,17 @@ import { GROUNDS, cloneWorld, depthInRing, flick, isLive, makeMarble, settle } f
 
 export const YARD = { w: 360, h: 560 };
 export const MODES = {
-  ring: { name: 'Ring', blurb: 'Knock their marbles out of the ring, not your own', toWin: 4 },
+  ring: { name: 'Ring', blurb: 'Knock their marbles out of the ring, not your own', toWin: 6 },
   hole: { name: 'Mor', blurb: 'Push marbles into the Mor, the little hole', toWin: 4 },
-  chase: { name: 'Chase', blurb: 'Hit the other shooter', toWin: 3 },
+  chase: { name: 'Chase', blurb: 'Hit the other shooter', toWin: 4 },
 };
+
+/**
+ * The golden marble (owner: the game felt short, "more marbles or a twist"): one shiny gold marble lies in the
+ * Ring and in the Mor. It belongs to nobody, both sides are after it, and it's worth two.
+ */
+export const GOLD_WORTH = 2;
+const worthOf = (m) => (m.gold ? GOLD_WORTH : 1);
 export const SIDES = ['you', 'foe'];
 /** How many extra shots a turn can earn: win a marble and shoot once more, then the turn passes anyway. */
 export const BONUS_SHOTS = 1;
@@ -54,10 +61,14 @@ export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'sho
     // Sometimes the ring isn't a circle (as children drew it): a triangle or a square, about as roomy.
     const shape = terrain ? ['circle', 'circle', 'triangle', 'square'][Math.floor(rnd() * 4)] : 'circle';
     world.ring = { x: cx, y: cy, r: 150, shape };
-    // A cross of marbles in the middle, as children lay them out, with a few loose ones.
-    // Each side puts six marbles in, mixed together: a shot has to pick the other side's out of the pack, because
+    // A cross of marbles in the middle, as children lay them out, with the golden one at its heart.
+    // Each side puts eight marbles in, mixed together: a shot has to pick the other side's out of the pack, because
     // knocking out one of your own gives it to them.
-    const spots = [[31, 0], [-31, 0], [0, 31], [0, -31], [62, 0], [-62, 0], [0, 62], [0, -62], [39, 39], [-39, 39], [39, -39], [-39, -39]];
+    world.marbles.push({ ...makeMarble('gold', 'glass', cx, cy), gold: true, r: 15.5 });
+    const spots = [
+      [31, 0], [-31, 0], [0, 31], [0, -31], [62, 0], [-62, 0], [0, 62], [0, -62],
+      [39, 39], [-39, 39], [39, -39], [-39, -39], [92, 0], [-92, 0], [0, 92], [0, -92],
+    ];
     const teams = spots.map((_, i) => (i % 2 ? 'you' : 'foe'));
     for (let i = teams.length - 1; i > 0; i--) {
       const j = Math.floor(rnd() * (i + 1));
@@ -70,11 +81,14 @@ export function newGame(mode, { seed = 1, shooters = { you: 'shooter', foe: 'sho
     });
   } else if (mode === 'hole') {
     world.hole = { x: cx, y: cy, r: 28 };
-    for (let i = 0; i < 7; i++) {
-      const angle = (i / 7) * Math.PI * 2 + rnd() * 0.5;
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2 + rnd() * 0.5;
       const far = 70 + rnd() * 50;
       world.marbles.push(makeMarble(`t${id++}`, 'glass', cx + Math.cos(angle) * far, cy + Math.sin(angle) * far));
     }
+    // The golden one lies a little further out, so it has to be worked toward the hole.
+    const angle = rnd() * Math.PI * 2;
+    world.marbles.push({ ...makeMarble('gold', 'glass', cx + Math.cos(angle) * 135, cy + Math.sin(angle) * 135), gold: true, r: 15.5 });
   }
   if (terrain) {
     // The yard's own shape: one or two of a mound, a dip, a puddle and a pair of gates, the same for both sides.
@@ -143,7 +157,7 @@ const targetsLeft = (world) => world.marbles.filter((m) => !m.owner && isLive(m)
 export function aimsOf(game, side) {
   const { world, mode } = game;
   if (mode === 'chase') return world.marbles.filter((m) => m.owner && m.id !== side && isLive(m));
-  if (mode === 'ring') return targetsLeft(world).filter((m) => m.team && m.team !== side);
+  if (mode === 'ring') return targetsLeft(world).filter((m) => m.gold || (m.team && m.team !== side));
   return targetsLeft(world);
 }
 
@@ -171,13 +185,15 @@ export function judge(game, side, events) {
   let foul = null;
   let knocked = false;
   let lost = 0;
+  let gold = false;
   if (mode === 'ring') {
     for (const m of targetsLeft(world)) {
       if (depthInRing(world.ring, m.x, m.y) < -m.r * 0.2) {
         m.out = true;
-        // One of your own knocked out goes to the other side.
+        // One of your own knocked out goes to the other side; the golden one is worth two to whoever knocks it out.
         if (m.team === side) lost++;
-        else won++;
+        else won += worthOf(m);
+        if (m.gold) gold = true;
       }
     }
     // A shooter left inside the ring is fair game: knock it out and you take one of its side's marbles.
@@ -197,7 +213,8 @@ export function judge(game, side, events) {
     for (const m of world.marbles) {
       if (!m.owner && m.sunk && !m.counted) {
         m.counted = true;
-        won++;
+        won += worthOf(m);
+        if (m.gold) gold = true;
       }
     }
     for (const who of SIDES) {
@@ -231,14 +248,14 @@ export function judge(game, side, events) {
     if (game.bag.you >= game.challenge.need) game.winner = 'you';
     else if (game.shots >= game.challenge.shots) game.winner = 'foe';
     game.last = { side, won, lost, foul, again: false };
-    return { events, won, lost, foul, again: false, hits: events.filter((e) => e.type === 'clack').length };
+    return { events, won, lost, foul, gold, again: false, hits: events.filter((e) => e.type === 'clack').length };
   }
   // A good shot earns one more, not a run of them; reaching the target ends the turn too.
   const keeps = again && game.run < BONUS_SHOTS && game.bag[side] < MODES[mode].toWin;
   if (keeps) game.run++;
   else endTurn(game);
   game.last = { side, won, lost, foul, again: keeps, knocked };
-  return { events, won, lost, foul, again: keeps, knocked, hits: events.filter((e) => e.type === 'clack').length };
+  return { events, won, lost, foul, gold, again: keeps, knocked, hits: events.filter((e) => e.type === 'clack').length };
 }
 
 /**

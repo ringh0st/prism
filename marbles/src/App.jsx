@@ -415,7 +415,7 @@ export default function App() {
   const AimHint = ({ side }) => {
     if (challenge) return null;
     const other = side === 'you' ? 'foe' : 'you';
-    const label = { ring: `Knock out the ${other === 'foe' ? 'cool' : 'warm'} marbles`, hole: 'Push any marble into the Mor', chase: 'Hit the other shooter' }[game.mode];
+    const label = { ring: `Knock out the ${other === 'foe' ? 'cool' : 'warm'} marbles and the golden one (worth 2)`, hole: 'Push any marble into the Mor; the golden one is worth 2', chase: 'Hit the other shooter' }[game.mode];
     return (
       <span className="aim-hint" aria-label={label} title={label}>
         <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -423,6 +423,7 @@ export default function App() {
           <circle cx="8" cy="8" r="2.4" fill="currentColor" />
         </svg>
         {game.mode === 'ring' && TEAM_COLORS[other].map((c) => <i key={c} style={{ background: c }} />)}
+        {game.mode !== 'chase' && game.world.marbles.some((m) => m.gold && !m.out && !m.sunk) && <i className="gold" title="The golden marble: worth 2" />}
         {game.mode === 'chase' && <i style={{ background: SIDE_COLORS[other] }} />}
         {game.mode === 'hole' && <i className="hole" />}
       </span>

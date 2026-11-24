@@ -5,7 +5,7 @@ import { SIDE_COLORS, TEAM_COLORS } from './colors.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { isLive, ringCorners } from './physics.js';
 
-const TARGET_COLORS = ['#e2574c', '#3fa7d6', '#59cd90', '#f6ae2d', '#b565d8', '#ee6c9c', '#2ec4b6', '#ff8c42', '#7d8cf8'];
+const TARGET_COLORS = ['#e2574c', '#3fa7d6', '#59cd90', '#ee8f6c', '#b565d8', '#ee6c9c', '#2ec4b6', '#ff8c42', '#7d8cf8'];
 // In the ring game each side's marbles wear its own colors: warm for the near side, cool for the far side.
 const AIR_TIME = 0.38;
 
@@ -285,8 +285,9 @@ export function createView(canvas, yard, { flip = false } = {}) {
     if (ball && ball.kind === m.kind) return ball;
     if (ball) scene.remove(ball.mesh);
     const color = m.owner ? SIDE_COLORS[m.owner] : m.team ? TEAM_COLORS[m.team][index % 3] : TARGET_COLORS[index % TARGET_COLORS.length];
-    const material =
-      m.kind === 'steelie'
+    const material = m.gold
+      ? new THREE.MeshPhysicalMaterial({ map: swirl('#ffcf3a', 7.7), metalness: 0.25, roughness: 0.14, clearcoat: 1, clearcoatRoughness: 0.03, envMapIntensity: 1.2, emissive: '#c98a00', emissiveIntensity: 0.45 })
+      : m.kind === 'steelie'
         ? new THREE.MeshStandardMaterial({ color: '#d9dde3', metalness: 1, roughness: 0.12, envMapIntensity: 1.4 })
         : new THREE.MeshPhysicalMaterial({ map: swirl(color, index * 2.1), roughness: 0.1, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 0.4 });
     const mesh = new THREE.Mesh(new THREE.SphereGeometry(m.r, 40, 28), material);
@@ -402,6 +403,7 @@ export function createView(canvas, yard, { flip = false } = {}) {
         ring.scale.setScalar((m.r + 4) * (1.05 + 0.12 * Math.sin(now * 0.005 + i)));
         ring.position.set(m.x, 0.55, m.y);
         ring.material.opacity = 0.55 + 0.3 * Math.sin(now * 0.005 + i);
+        ring.material.color.set(m.gold ? '#ffcf3a' : '#fffbe8');
       });
       for (let i = aims.length; i < aimRings.length; i++) aimRings[i].visible = false;
 
