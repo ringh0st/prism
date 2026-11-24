@@ -26,6 +26,9 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
   // What is going on right now, outside React (it changes every frame).
   const live = useRef({ aim: null, pull: null, moving: false, events: [], side: null, high: false, last: 0, acc: 0 });
   const [isHigh, setIsHigh] = useState(false);
+  // Tinur: 0 for a plain flick, -1 to curve left, 1 to curve right (as this player sees the yard).
+  const [tinur, setTinur] = useState(0);
+  const isFlipped = net?.side === 'foe';
   const [, redraw] = useState(0);
   const gameRef = useRef(game);
   gameRef.current = game;
@@ -129,17 +132,19 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
   };
 
   /** Lets the shooter go. A shot of this phone's own in a live game is sent to the other phone first. */
-  const fire = (angle, power, high, isFromFriend = false) => {
+  const fire = (angle, power, high, isFromFriend = false, spin = 0) => {
     const state = live.current;
     const g = gameRef.current;
     if (state.moving || g.winner) return;
-    if (netRef.current && !isFromFriend) netRef.current.send({ t: 'shot', angle, power, high });
+    if (netRef.current && !isFromFriend) netRef.current.send({ t: 'shot', angle, power, high, spin });
     const shooter = g.world.marbles.find((m) => m.id === g.turn);
     if (high) g.calls[g.turn].bagova--;
-    flick(shooter, angle, power, { high });
+    flick(shooter, angle, power, { high, spin });
     Object.assign(state, { moving: true, events: [], side: g.turn, time: 0, acc: 0, aim: null, pull: null });
     sfx.flick(power);
     setIsHigh(false);
+    setTinur(0);
+    if (spin) sfx.spin?.();
     redraw((n) => n + 1);
   };
 
@@ -149,7 +154,7 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
     return net.listen((message) => {
       const g = gameRef.current;
       const state = live.current;
-      if (message.t === 'shot') fire(message.angle, message.power, message.high, true);
+      if (message.t === 'shot') fire(message.angle, message.power, message.high, true, message.spin ?? 0);
       else if (message.t === 'pass') passTurn();
       else if (message.t === 'sweep') {
         if (callBakol(g, g.turn)) sfx.sweep();
@@ -183,7 +188,7 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
     const dy = state.pull.y - at.y;
     const far = Math.hypot(dx, dy);
     const power = Math.min(1, far / FULL_PULL);
-    state.aim = far < 6 ? null : { angle: Math.atan2(dy, dx), power, stray: strayOf(power), high: isHigh };
+    state.aim = far < 6 ? null : { angle: Math.atan2(dy, dx), power, stray: strayOf(power), high: isHigh, spin: isFlipped ? -tinur : tinur };
   };
   const onDown = (event) => {
     if (!canShoot || live.current.moving) return;
@@ -203,7 +208,7 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
     live.current.pull = null;
     live.current.aim = null;
     // A real flick is never perfectly true, and a hard one least of all: it strays a little inside the fan shown.
-    if (aim && aim.power >= MIN_POWER && canShoot) fire(aim.angle + (Math.random() * 2 - 1) * aim.stray, aim.power, isHigh);
+    if (aim && aim.power >= MIN_POWER && canShoot) fire(aim.angle + (Math.random() * 2 - 1) * aim.stray, aim.power, isHigh, false, aim.spin);
   };
 
   const calls = game.calls[side];
@@ -232,6 +237,24 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
           <button className={isHigh ? 'on' : ''} aria-pressed={isHigh} onClick={() => setIsHigh((on) => !on)} disabled={calls.bagova < 1}>
             <b>High shot!</b>
             <small>fly over · {calls.bagova}</small>
+          </button>
+          {/* Tinur: a spinning flick that curves. A tap goes off → curve left → curve right → off. */}
+          <button
+            className={`tinur ${tinur ? 'on' : ''}`}
+            aria-pressed={tinur !== 0}
+            aria-label={tinur === 0 ? 'Tinur: spin the marble so it curves' : tinur < 0 ? 'Tinur: curves left (tap for right)' : 'Tinur: curves right (tap to stop spinning)'}
+            onClick={() => {
+              sfx.click?.();
+              setTinur((t) => (t === 0 ? -1 : t < 0 ? 1 : 0));
+            }}
+          >
+            <b>Tinur!</b>
+            <small>
+              <svg viewBox="0 0 24 24" aria-hidden="true" className={tinur > 0 ? 'right' : ''}>
+                <path d="M17 20c-6 0-10-5-10-11V5M3 9l4-4 4 4" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              {tinur === 0 ? 'spin it' : tinur < 0 ? 'curve left' : 'curve right'}
+            </small>
           </button>
         </div>
       )}

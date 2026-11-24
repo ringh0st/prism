@@ -309,3 +309,31 @@ test('the yard marks what each side is after: the other side in the Ring, every 
     ['foe'],
   );
 });
+
+test('rounded corners: a marble sent into a corner comes back out instead of staying stuck there', async () => {
+  const { makeMarble, settle, CORNER } = await import('./physics.js');
+  const world = { ...YARD, ground: GROUNDS.earth, marbles: [], stones: [], sand: [], puddles: [], terrain: [], hole: null, ring: null };
+  const m = makeMarble('t', 'glass', 40, 40);
+  m.vx = -400;
+  m.vy = -400;
+  world.marbles.push(m);
+  settle(world, 12);
+  const inCorner = m.x < CORNER && m.y < CORNER;
+  assert.ok(Math.hypot(m.x - CORNER, m.y - CORNER) <= CORNER - m.r + 0.01, 'it stays inside the rounded corner');
+  assert.ok(!inCorner || Math.min(m.x, m.y) > m.r + 6, `it doesn't rest against the kerb (${m.x.toFixed(0)}, ${m.y.toFixed(0)})`);
+});
+
+test('tinur: a spinning marble curves to the side it was spun, a plain one goes straight', async () => {
+  const { makeMarble, settle } = await import('./physics.js');
+  const run = (spin) => {
+    const world = { ...YARD, ground: GROUNDS.earth, marbles: [], stones: [], sand: [], puddles: [], terrain: [], hole: null, ring: null };
+    const m = makeMarble('you', 'shooter', 180, 500, 'you');
+    world.marbles.push(m);
+    flick(m, -Math.PI / 2, 0.55, { spin });
+    settle(world, 12);
+    return m.x;
+  };
+  assert.ok(Math.abs(run(0) - 180) < 1, 'straight');
+  assert.ok(run(1) > 200, 'curves right');
+  assert.ok(run(-1) < 160, 'curves left');
+});

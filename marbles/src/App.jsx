@@ -415,7 +415,7 @@ export default function App() {
   const AimHint = ({ side }) => {
     if (challenge) return null;
     const other = side === 'you' ? 'foe' : 'you';
-    const label = { ring: `Knock out the ${other === 'foe' ? 'cool' : 'warm'} marbles and the golden one (worth 2)`, hole: 'Push any marble into the Mor; the golden one is worth 2', chase: 'Hit the other shooter' }[game.mode];
+    const label = { ring: `Knock out the ${other === 'foe' ? 'teal' : 'orange'} marbles and the golden one (worth 2)`, hole: 'Push any marble into the Mor; the golden one is worth 2', chase: 'Hit the other shooter' }[game.mode];
     return (
       <span className="aim-hint" aria-label={label} title={label}>
         <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -432,7 +432,10 @@ export default function App() {
   const Bag = ({ side }) => (
     <div className={`bag ${side} ${game.turn === side && !game.winner ? 'turn' : ''}`}>
       <span className="bag-who">
-        <b>{names[side]}</b>
+        <b>
+          <i className="side-dot" aria-hidden="true" style={{ background: SIDE_COLORS[side] }} />
+          {names[side]}
+        </b>
         <AimHint side={side} />
       </span>
       {note?.gain?.side === side && (
@@ -478,8 +481,8 @@ export default function App() {
               ? challenge.tip
               : game.mode === 'ring'
                 ? match.rival === 'two'
-                  ? `Player 1 has the warm marbles, Player 2 the cool ones. Knock the other's out.`
-                  : `${mySide === 'you' ? 'Warm' : 'Cool'} marbles are yours: knock the ${mySide === 'you' ? 'cool' : 'warm'} ones out. First to ${toWin}.`
+                  ? `Player 1 has the orange marbles, Player 2 the teal ones. Knock the other's out.`
+                  : `${mySide === 'you' ? 'Orange' : 'Teal'} marbles are yours: knock the ${mySide === 'you' ? 'teal' : 'orange'} ones out. First to ${toWin}.`
                 : `${MODES[game.mode].blurb}. First to ${toWin}.`}
             {!challenge && yardLine(game.world)}
           </p>

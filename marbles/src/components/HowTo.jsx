@@ -66,6 +66,15 @@ export default function HowTo({ onClose }) {
             <p>A high shot: tap it, then shoot. The shooter flies over pebbles and marbles and lands farther on.</p>
           </div>
         </section>
+        <section>
+          <span className="badge" aria-hidden="true">
+            ↷
+          </span>
+          <div>
+            <h3>Tinur!</h3>
+            <p>Flick it with a spin: tap once to curve left, twice to curve right, then shoot. The golden dots show the bend, and it bends most as it slows down. Good for going round a pebble.</p>
+          </div>
+        </section>
 
         <h3 className="part">With a friend, live</h3>
         <section>
@@ -99,7 +108,7 @@ export default function HowTo({ onClose }) {
 }
 
 const RULES = {
-  ring: `Both players' marbles lie mixed in the chalk ring: yours are the warm colors (orange, pink, red), theirs the cool ones (teal, blue, green). Knock theirs out of the ring to win them. Knock out one of your own and it goes to them. Your shooter stays where it stops and you shoot from there next time. If it stops inside the ring, the other player can knock it out for a marble. The golden marble in the middle belongs to nobody and is worth two. First to ${MODES.ring.toWin} wins.`,
+  ring: `Both players' marbles lie mixed in the chalk ring: yours are orange, theirs teal. Knock theirs out of the ring to win them. Knock out one of your own and it goes to them. Your shooter stays where it stops and you shoot from there next time. If it stops inside the ring, the other player can knock it out for a marble. The golden marble in the middle belongs to nobody and is worth two. First to ${MODES.ring.toWin} wins.`,
   hole: `The Mor is the little hole in the middle of the yard. Push marbles into it. If your own shooter falls in, your turn ends and you give one marble back. The golden marble is worth two. First to ${MODES.hole.toWin} wins.`,
   chase: `Hit the other player's shooter with yours to win one of their marbles; the shooter that was hit goes back to its line. Careful with wild shots: if your shooter crashes into the kerb without a hit, it is out and they take a marble. First to ${MODES.chase.toWin} wins.`,
 };

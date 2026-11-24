@@ -166,12 +166,12 @@ export function aimsOf(game, side) {
  * Changes `game` and returns what happened: { events, won, foul, again, hits } (`events` are the physics events
  * with their times, for sounds; pass `onStep` to watch the marbles move).
  */
-export function shoot(game, angle, power, { high = false, onStep = null } = {}) {
+export function shoot(game, angle, power, { high = false, spin = 0, onStep = null } = {}) {
   const side = game.turn;
   const { world } = game;
   const shooter = world.marbles.find((m) => m.id === side);
   if (high) game.calls[side].bagova--;
-  flick(shooter, angle, power, { high });
+  flick(shooter, angle, power, { high, spin });
   const events = settle(world, 12, onStep);
   return judge(game, side, events);
 }

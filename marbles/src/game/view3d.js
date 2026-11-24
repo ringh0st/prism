@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { SIDE_COLORS, TEAM_COLORS } from './colors.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import { isLive, ringCorners } from './physics.js';
+import { CORNER, CURVE, isLive, ringCorners } from './physics.js';
 
 const TARGET_COLORS = ['#e2574c', '#3fa7d6', '#59cd90', '#ee8f6c', '#b565d8', '#ee6c9c', '#2ec4b6', '#ff8c42', '#7d8cf8'];
 // In the ring game each side's marbles wear its own colors: warm for the near side, cool for the far side.
@@ -174,6 +174,27 @@ export function createView(canvas, yard, { flip = false } = {}) {
     kerb.castShadow = true;
     kerb.receiveShadow = true;
     scene.add(kerb);
+  }
+  // The rounded corners: the kerb fills the corner outside a quarter circle.
+  for (const [px, pz] of [[0, 0], [yard.w, 0], [0, yard.h], [yard.w, yard.h]]) {
+    const cx = px === 0 ? CORNER : yard.w - CORNER;
+    const cz = pz === 0 ? CORNER : yard.h - CORNER;
+    const a1 = Math.atan2(pz - cz, 0);
+    const a2 = Math.atan2(0, px - cx);
+    const turn = Math.atan2(Math.sin(a2 - a1), Math.cos(a2 - a1));
+    const shape = new THREE.Shape();
+    shape.moveTo(px, pz);
+    for (let i = 0; i <= 16; i++) {
+      const a = a1 + (turn * i) / 16;
+      shape.lineTo(cx + Math.cos(a) * CORNER, cz + Math.sin(a) * CORNER);
+    }
+    shape.lineTo(px, pz);
+    const fill = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: 12, bevelEnabled: false }), kerbMat);
+    fill.rotation.x = Math.PI / 2;
+    fill.position.y = 12;
+    fill.castShadow = true;
+    fill.receiveShadow = true;
+    scene.add(fill);
   }
 
   // What lies on the yard (rebuilt when the yard changes): ring, hole, sand, pebbles.
@@ -415,14 +436,36 @@ export function createView(canvas, yard, { flip = false } = {}) {
         glow.position.set(shooter.x, 0.6, shooter.y);
         glow.material.color.set(SIDE_COLORS[turn]);
       }
+      // With a spin (tinur) the dots bend the way the marble will, more as it slows down.
+      let path = null;
+      if (aim && shooter) {
+        path = [];
+        let heading = aim.angle;
+        let x = shooter.x;
+        let y = shooter.y;
+        let travelled = 0;
+        const v0 = 170 + 730 * aim.power;
+        const gap = 10 + aim.power * 16;
+        for (let i = 0; i < dots.length; i++) {
+          const ds = i === 0 ? shooter.r + 12 : gap;
+          for (let k = 0; k < 4; k++) {
+            const speedSq = Math.max(60 * 60, v0 * v0 - 2 * 640 * travelled);
+            heading += (aim.spin ?? 0) * (CURVE / speedSq) * (ds / 4);
+            x += Math.cos(heading) * (ds / 4);
+            y += Math.sin(heading) * (ds / 4);
+            travelled += ds / 4;
+          }
+          path.push([x, y]);
+        }
+      }
       dots.forEach((dot, i) => {
-        dot.visible = Boolean(aim && shooter);
+        dot.visible = Boolean(path);
         if (!dot.visible) return;
-        const far = shooter.r + 12 + i * (10 + aim.power * 16);
-        dot.position.set(shooter.x + Math.cos(aim.angle) * far, aim.high ? 0.7 + Math.sin((i / 8) * Math.PI) * 30 : 0.7, shooter.y + Math.sin(aim.angle) * far);
+        const [px, py] = path[i];
+        dot.position.set(px, aim.high ? 0.7 + Math.sin((i / 8) * Math.PI) * 30 : 0.7, py);
         dot.scale.setScalar(4.2 - i * 0.28);
         dot.material.opacity = (i / 9 < aim.power + 0.15 ? 0.95 : 0.25) * (1 - i * 0.05);
-        dot.material.color.set(aim.high ? '#8fe3ff' : '#ffffff');
+        dot.material.color.set(aim.high ? '#8fe3ff' : aim.spin ? '#ffd76a' : '#ffffff');
       });
       // How far a flick this hard may stray: two faint lines that open like a fan.
       fan.forEach((line, i) => {

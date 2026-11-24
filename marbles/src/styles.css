@@ -825,3 +825,61 @@ button {
   min-width: 0;
   padding: 8px 10px;
 }
+/* One color per side, everywhere: the bag is tinted with it and its name carries a marble of it. */
+.bag.you {
+  background: #fff1e2;
+}
+.bag.foe {
+  background: #e4f5f2;
+}
+.side-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 5px;
+  border-radius: 50%;
+  vertical-align: -1px;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.18);
+}
+/* Tinur: a spinning flick that curves. */
+.calls .tinur small {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.calls .tinur svg {
+  width: 14px;
+  height: 14px;
+}
+.calls .tinur svg.right {
+  transform: scaleX(-1);
+}
+/* Three calls in one row on any phone, and the dots on one line. */
+.calls {
+  gap: 6px;
+}
+.calls button {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 130px;
+  padding: 6px 8px;
+}
+.calls b {
+  font-size: 15px;
+  white-space: nowrap;
+}
+.calls small {
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+.calls .tinur.on {
+  box-shadow: inset 0 0 0 2.5px #f0a030, 0 8px 16px -8px #f0a030;
+}
+.pips {
+  flex-wrap: nowrap;
+  gap: 2px;
+}
+.pips i {
+  width: 9px;
+  height: 9px;
+}

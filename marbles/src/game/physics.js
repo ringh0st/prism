@@ -98,12 +98,25 @@ export const isAtRest = (world) => world.marbles.every((m) => !isLive(m) || (spe
  * Flick a marble: angle in radians, power 0…1. A high shot ("bagova") flies over everything for the first part of
  * its way and lands with less speed.
  */
-export function flick(marble, angle, power, { high = false } = {}) {
+export function flick(marble, angle, power, { high = false, spin = 0 } = {}) {
   const speed = 170 + 730 * Math.max(0.05, Math.min(1, power));
   marble.vx = Math.cos(angle) * speed * (high ? 0.8 : 1);
   marble.vy = Math.sin(angle) * speed * (high ? 0.8 : 1);
   marble.air = high ? 0.38 : 0;
+  marble.spin = spin;
 }
+
+/**
+ * "Tinur" (owner: the finger flick that makes a marble spin, from her childhood): a spinning marble curves to
+ * one side as it rolls, more as it slows, until it hits something (the spin goes into the knock). `spin` is -1
+ * (curves left) or 1 (curves right) as the shooter sees it; CURVE is the sideways pull in units/s².
+ */
+export const CURVE = 520;
+
+/** The yard's corners are rounded (owner: a marble got stuck in a square corner), with this radius. */
+export const CORNER = 70;
+/** A low lip along the kerb gently rolls a slow marble back off it, so none comes to rest against it. */
+const LIP = { width: 20, push: 700 };
 
 /**
  * One step of STEP seconds. Returns what happened, for sounds and rules:
@@ -140,6 +153,23 @@ export function step(world) {
           const steep = Math.sin((d / t.r) * Math.PI) * t.push * STEP;
           m.vx += (dx / d) * steep;
           m.vy += (dy / d) * steep;
+        }
+        // Spin bends its way sideways (the faster it rolls, the less it bends).
+        if (m.spin) {
+          const side = (m.spin * CURVE * STEP) / Math.max(v, 60);
+          const vx = m.vx;
+          m.vx += -m.vy * side;
+          m.vy += vx * side;
+        }
+        // The lip along the kerb rolls it back toward the yard.
+        const edge = Math.min(m.x, world.w - m.x, m.y, world.h - m.y) - m.r;
+        if (edge < LIP.width) {
+          const toMiddleX = world.w / 2 - m.x;
+          const toMiddleY = world.h / 2 - m.y;
+          const d = Math.hypot(toMiddleX, toMiddleY) || 1;
+          const lift = (1 - Math.max(0, edge) / LIP.width) * LIP.push * STEP;
+          m.vx += (toMiddleX / d) * lift;
+          m.vy += (toMiddleY / d) * lift;
         }
         // A slope pulls a rolling marble downhill; uneven ground bends its way sideways.
         m.vy += ground.slope * STEP;
@@ -179,6 +209,8 @@ export function step(world) {
       const closing = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
       if (closing <= 0) continue;
       const impulse = ((1 + BOUNCE.marble) * closing) / (1 / a.m + 1 / b.m);
+      a.spin = 0;
+      b.spin = 0;
       a.vx -= (impulse / a.m) * nx;
       a.vy -= (impulse / a.m) * ny;
       b.vx += (impulse / b.m) * nx;
@@ -202,18 +234,40 @@ export function step(world) {
       m.y = s.y + ny * reach;
       const into = m.vx * nx + m.vy * ny;
       if (into < 0) {
+        m.spin = 0;
         m.vx -= (1 + BOUNCE.stone) * into * nx;
         m.vy -= (1 + BOUNCE.stone) * into * ny;
         events.push({ type: 'stone', a: m.id, force: -into });
       }
     }
-    // The kerb round the yard.
+    // The kerb round the yard, with rounded corners.
     for (const [axis, vel, low, high] of [['x', 'vx', m.r, world.w - m.r], ['y', 'vy', m.r, world.h - m.r]]) {
       if (m[axis] < low || m[axis] > high) {
         const force = Math.abs(m[vel]);
         m[axis] = m[axis] < low ? low : high;
         m[vel] = -m[vel] * ground.kerb;
+        m.spin = 0;
         if (force > 40) events.push({ type: 'kerb', a: m.id, force });
+      }
+    }
+    const cornerX = m.x < CORNER ? CORNER : m.x > world.w - CORNER ? world.w - CORNER : null;
+    const cornerY = m.y < CORNER ? CORNER : m.y > world.h - CORNER ? world.h - CORNER : null;
+    if (cornerX !== null && cornerY !== null) {
+      const dx = m.x - cornerX;
+      const dy = m.y - cornerY;
+      const d = Math.hypot(dx, dy);
+      if (d > CORNER - m.r) {
+        const nx = dx / d;
+        const ny = dy / d;
+        m.x = cornerX + nx * (CORNER - m.r);
+        m.y = cornerY + ny * (CORNER - m.r);
+        const out = m.vx * nx + m.vy * ny;
+        if (out > 0) {
+          if (out > 40) events.push({ type: 'kerb', a: m.id, force: out });
+          m.vx -= (1 + ground.kerb) * out * nx;
+          m.vy -= (1 + ground.kerb) * out * ny;
+          m.spin = 0;
+        }
       }
     }
     // The hole: a slow marble drops in, a fast one skips over, one that passes close is pulled a little.

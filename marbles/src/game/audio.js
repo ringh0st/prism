@@ -114,6 +114,11 @@ export const sfx = {
     hiss(0.05, { freq: 3000 + power * 2000, vol: 0.08 + power * 0.1 });
     tone(1400, 2000, 0.03, { vol: 0.05 });
   },
+  /** Tinur: the marble leaves the finger spinning, a quick rising whirr. */
+  spin() {
+    tone(600, 1500, 0.18, { vol: 0.06, type: 'triangle' });
+    hiss(0.12, { freq: 2600, vol: 0.06 });
+  },
   /** Marbles rolling on earth: a soft hiss that follows how fast they go (0…1). Call every frame. */
   roll(level, hiss = 0.5) {
     const a = ac();
