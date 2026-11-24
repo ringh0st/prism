@@ -161,6 +161,7 @@ export default function App() {
     start();
     sfx.openCover();
     setIsCoverOpen(isReduced);
+    setRequest(null); // a page turn asked for in the other book must not carry over
     setView({ name: 'book', bookId });
     if (!isReduced) setTimeout(() => setIsCoverOpen(true), COVER_MS);
   };

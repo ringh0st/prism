@@ -40,6 +40,7 @@ A coloring book for little ones (3 and up) with the Pals, published at https://l
 - **Day and night** (`theme.js`; owner: "a night switch button, the same as the other apps"): a moon/sun button in the room and on the walls; night is a dark walnut desk under a soft lamp with dark walls and buttons, and the paper stays light so colors look true. Starts from the device setting, remembers the child's choice (`coloring.theme`).
 - **Sounds** (`audio.js`, all made in code, gentle): paper turning, flicking through pages, the cover opening, crayon pick, scribble, eraser, music box, and a quiet lullaby with its own switch. Nothing is stored but on the device (`coloring.*` keys).
 - On a landscape tablet the crayon box lies on its side next to the book.
+- **Check after every change** (owner: "test after you finish everything"): `npm run coloring:check [address]` walks both books, filling, painting (and that paint stays), drawing with the bucket and stickers, undo, the walls, removing, night and a reload on an emulated iPhone, and fails on any page error. Deploy first so the owner can try it too, then run it.
 
 ## Product requirements (from the owner, apply to all work)
 

@@ -22,7 +22,7 @@ export function useCrayonLines({ holder, surface = holder, canvas, size, pickCol
   redrawRef.current = redraw;
 
   const paintNow = () => {
-    const c = canvas.current;
+    const c = canvas?.current;
     if (!c) return;
     const context = c.getContext('2d');
     context.setTransform(1, 0, 0, 1, 0, 0);
@@ -34,25 +34,60 @@ export function useCrayonLines({ holder, surface = holder, canvas, size, pickCol
   };
 
   useEffect(() => {
+    // No canvas (a little-book page has nothing to paint by hand): nothing to fit.
+    if (!canvas?.current) return undefined;
+    // Measured from the layout, not the screen, so the sheet's tilt and its sliding-in don't throw the paint off.
     const fit = () => {
-      const area = surface.current.getBoundingClientRect();
-      const box = holder.current.getBoundingClientRect();
+      const c = canvas.current;
+      const area = surface.current;
+      const box = holder.current;
+      if (!c || !area || !box || box.offsetWidth < 10) return;
+      let x = 0;
+      let y = 0;
+      for (let el = box; el && el !== area; el = el.offsetParent) {
+        x += el.offsetLeft;
+        y += el.offsetTop;
+      }
       const ratio = Math.min(2.5, window.devicePixelRatio || 1);
-      canvas.current.width = Math.round(area.width * ratio);
-      canvas.current.height = Math.round(area.height * ratio);
-      geometry.current = { x: (box.left - area.left) * ratio, y: (box.top - area.top) * ratio, width: box.width * ratio };
+      const width = Math.round(area.offsetWidth * ratio);
+      const height = Math.round(area.offsetHeight * ratio);
+      if (c.width !== width || c.height !== height) {
+        c.width = width;
+        c.height = height;
+      }
+      geometry.current = { x: x * ratio, y: y * ratio, width: box.offsetWidth * ratio };
       paintNow();
     };
     const observer = new ResizeObserver(fit);
     observer.observe(surface.current);
     observer.observe(holder.current);
-    return () => observer.disconnect();
+    // Phones sometimes drop a canvas's picture while the page is hidden or after an animation: draw it again.
+    const again = () => document.visibilityState === 'visible' && fit();
+    document.addEventListener('visibilitychange', again);
+    surface.current.addEventListener('animationend', fit);
+    window.addEventListener('pageshow', fit);
+    const area = surface.current;
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', again);
+      area.removeEventListener('animationend', fit);
+      window.removeEventListener('pageshow', fit);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toSheet = (event) => {
+    // Where the finger is on the holder, undoing the sheet's small tilt.
     const box = holder.current.getBoundingClientRect();
-    const scale = SKETCH_W / box.width;
-    return [Math.round((event.clientX - box.left) * scale), Math.round((event.clientY - box.top) * scale)];
+    const cx = box.left + box.width / 2;
+    const cy = box.top + box.height / 2;
+    const tilt = (getComputedStyle(surface.current).transform.match(/matrix\(([^,]+),\s*([^,]+)/) ?? []).slice(1).map(Number);
+    const angle = tilt.length ? Math.atan2(tilt[1], tilt[0]) : 0;
+    const dx = event.clientX - cx;
+    const dy = event.clientY - cy;
+    const ux = dx * Math.cos(-angle) - dy * Math.sin(-angle);
+    const uy = dx * Math.sin(-angle) + dy * Math.cos(-angle);
+    const scale = SKETCH_W / holder.current.offsetWidth;
+    return [Math.round((ux + holder.current.offsetWidth / 2) * scale), Math.round((uy + holder.current.offsetHeight / 2) * scale)];
   };
   const onPointerDown = (event) => {
     if (event.button > 0 || line.current) return;

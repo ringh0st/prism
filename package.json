@@ -15,7 +15,8 @@
     "pals:fit": "node scripts/fit-pals.cjs",
     "marbles": "vite --config marbles/vite.config.js",
     "coloring": "vite --config coloring/vite.config.js",
-    "coloring:pages": "node coloring/scripts/make-pages.mjs"
+    "coloring:pages": "node coloring/scripts/make-pages.mjs",
+    "coloring:check": "node coloring/scripts/check.cjs"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.2",
