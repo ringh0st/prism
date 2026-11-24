@@ -1,8 +1,9 @@
 /**
  * Free drawings on a blank sheet: each is a list of marks on a 800×1000 sheet (so it can be redrawn at any size,
  * replayed, taken back mark by mark, and stays small to keep). A mark is a crayon line { c, w, p }, a sticker
- * { t: 'stamp', s, c, x, y, size, turn }, or the whole background poured in one color { t: 'bg', c } (the newest
- * one shows, under everything). Pure functions, no DOM.
+ * { t: 'stamp', s, c, x, y, w, h } (older ones have one `size`), a bucket fill from a point { t: 'fill', c, x, y }
+ * (it fills up to the lines drawn before it), or, in older drawings, a whole background { t: 'bg', c }.
+ * Pure functions, no DOM.
  */
 export const SKETCH_W = 800;
 export const SKETCH_H = 1000;
@@ -33,7 +34,7 @@ export const moveStamp = (sketch, index, x, y) => ({
  * `paint(context, color)` gives the fill for a color (the crayon texture in the app); `stamp(context, mark,
  * scale)` draws a stamp.
  */
-export function drawStrokes(context, strokes, width, { paint = (_, color) => color, stamp = () => {}, limit = Infinity, skip = -1 } = {}) {
+export function drawStrokes(context, strokes, width, { paint = (_, color) => color, stamp = () => {}, fill = () => {}, limit = Infinity, skip = -1 } = {}) {
   const scale = width / SKETCH_W;
   // The background first: the newest one poured so far.
   let reached = 0;
@@ -56,6 +57,7 @@ export function drawStrokes(context, strokes, width, { paint = (_, color) => col
       continue;
     }
     if (mark.t === 'stamp') stamp(context, mark, scale);
+    else if (mark.t === 'fill') fill(context, mark, scale, strokes.slice(0, i));
     else drawStroke(context, steps <= left ? mark : { ...mark, p: mark.p.slice(0, Math.max(2, Math.floor(left) * 2)) }, scale, 0, paint);
     left -= steps;
   }

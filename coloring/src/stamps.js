@@ -1,10 +1,10 @@
 /**
- * Stickers for the blank sheet, in three kinds (the owner loved being able to pick the sun's color):
- * - shapes in the crayon's color (and glitter), with the plain ones a child builds with: a square and a triangle
- *   make a house, a rectangle a door, circles wheels and windows;
- * - pictures in their own colors (trees, a rainbow, a car…);
- * - little Pals in their own colors.
- * A sticker follows the finger and lands where it's let go; one already on the sheet can be picked up and moved.
+ * Stickers for the blank sheet, in two lists (owner: shapes stay where they're put, Pals can be moved):
+ * - shapes in the crayon's color (and glitter), with the plain ones a child builds with (a square and a triangle
+ *   make a house, a rectangle a door, circles wheels and windows), and pictures in their own colors (trees, a
+ *   rainbow, a car…). Drag to make one as big or small as you like (a tap puts down the usual size); it stays.
+ * - little Pals in their own colors: one follows the finger and lands where it's let go, and can be picked up
+ *   and moved again later.
  */
 const SHAPES = {
   square: 'M10 10h80v80H10z',
@@ -37,8 +37,8 @@ const PICTURES = {
 export const SHAPE_STAMPS = Object.keys(SHAPES);
 export const PICTURE_STAMPS = Object.keys(PICTURES);
 export const PAL_STAMPS = ['waffles', 'mochi', 'ribbit', 'peep', 'bruno', 'coral', 'bamboo', 'buzz'];
-export const STAMP_GROUPS = [SHAPE_STAMPS, PICTURE_STAMPS, PAL_STAMPS];
-export const STAMP_SIZE = 150; // on the 800-wide sheet
+export const STAMP_SIZE = 150; // a sticker put down with a tap, on the 800-wide sheet
+export const PAL_SIZE = 170;
 
 const pathCache = new Map();
 const shapePath = (name) => {
@@ -71,7 +71,7 @@ export function loadStickerImages() {
 }
 
 /** Draws one sticker. `paint(context, color)` gives the crayon fill for shapes; `isLifted` adds a shadow under it. */
-export function drawStamp(context, { s, c, x, y, size, turn = 0 }, scale, paint, isLifted = false) {
+export function drawStamp(context, { s, c, x, y, size, w = size, h = size, turn = 0 }, scale, paint, isLifted = false) {
   context.save();
   context.translate(x * scale, y * scale);
   context.rotate(turn);
@@ -80,23 +80,24 @@ export function drawStamp(context, { s, c, x, y, size, turn = 0 }, scale, paint,
     context.shadowBlur = 14 * scale * 4;
     context.shadowOffsetY = 8 * scale * 4;
   }
-  const px = size * scale;
+  const pw = w * scale;
+  const ph = h * scale;
   if (SHAPES[s]) {
-    context.scale(px / 100, px / 100);
+    context.scale(pw / 100, ph / 100);
     context.translate(-50, -50);
     context.fillStyle = paint(context, c);
     context.fill(shapePath(s));
   } else if (images.get(s)?.complete) {
-    context.drawImage(images.get(s), -px / 2, -px / 2, px, px);
+    context.drawImage(images.get(s), -pw / 2, -ph / 2, pw, ph);
   }
   context.restore();
 }
 
-/** The sticker under a point on the sheet, newest first (to pick it up and move it), or -1. */
-export function stampAt(marks, x, y) {
+/** The Pal sticker under a point on the sheet, newest first (to pick it up and move it), or -1. Shapes and pictures stay put. */
+export function palAt(marks, x, y) {
   for (let i = marks.length - 1; i >= 0; i--) {
     const m = marks[i];
-    if (m.t === 'stamp' && Math.hypot(m.x - x, m.y - y) < m.size * 0.45) return i;
+    if (m.t === 'stamp' && PAL_STAMPS.includes(m.s) && Math.hypot(m.x - x, m.y - y) < (m.w ?? m.size) * 0.45) return i;
   }
   return -1;
 }

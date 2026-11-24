@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { SKETCH_H, SKETCH_W, drawStrokes } from '../sketches.js';
 import { drawStamp, loadStickerImages } from '../stamps.js';
 import { crayonPaint } from '../crayonTexture.js';
+import { drawFill } from '../fillMarks.js';
 
 /** A free drawing as a small picture (on the walls). */
 export default function SketchThumb({ sketch }) {
@@ -12,7 +13,11 @@ export default function SketchThumb({ sketch }) {
       if (!c) return;
       const context = c.getContext('2d');
       context.clearRect(0, 0, c.width, c.height);
-      drawStrokes(context, sketch.strokes, c.width, { paint: crayonPaint, stamp: (ctx, mark, scale) => drawStamp(ctx, mark, scale, crayonPaint) });
+      drawStrokes(context, sketch.strokes, c.width, {
+        paint: crayonPaint,
+        stamp: (ctx, mark, scale) => drawStamp(ctx, mark, scale, crayonPaint),
+        fill: drawFill,
+      });
     };
     draw();
     if (sketch.strokes.some((mark) => mark.t === 'stamp')) loadStickerImages().then(draw);

@@ -1,20 +1,22 @@
 import { useEffect, useRef } from 'react';
 import Tape from './Tape.jsx';
 import { drawStrokes, stepsOf } from '../sketches.js';
-import { PAL_STAMPS, STAMP_SIZE, drawStamp, loadStickerImages, stampAt } from '../stamps.js';
+import { PAL_SIZE, PICTURE_STAMPS, STAMP_SIZE, drawStamp, loadStickerImages, palAt } from '../stamps.js';
+import { drawFill } from '../fillMarks.js';
 import { crayonRub, sfx } from '../audio.js';
 import { crayonPaint } from '../crayonTexture.js';
 import { useCrayonLines } from '../useCrayonLines.js';
 
-const marks = { paint: crayonPaint, stamp: (context, mark, scale) => drawStamp(context, mark, scale, crayonPaint) };
+const marks = { paint: crayonPaint, stamp: (context, mark, scale) => drawStamp(context, mark, scale, crayonPaint), fill: drawFill };
 
 /** A sticker rides a little above the finger, so the child can see where it will land. */
 const LIFT = 46;
 
 /**
  * A blank sheet to draw on. With the crayon the finger draws a waxy line (thin, medium or thick), with the sound of
- * a crayon on paper that follows its speed. With stickers, the chosen one follows the finger and lands where it's
- * let go; one already on the sheet can be picked up and moved. The bucket pours a color over the whole background.
+ * a crayon on paper that follows its speed. A shape or picture sticker is dragged out to the size wanted (a tap
+ * puts down the usual size) and stays; a Pal follows the finger, lands where it's let go and can be moved again.
+ * The bucket fills the area under the finger up to the lines: a closed shape, or the whole background.
  * Every mark is kept, so Undo takes back the last one. Opened again from the wall, the drawing first replays
  * itself mark by mark (a tap skips).
  */
@@ -48,18 +50,16 @@ export default function Sketch({ sketch, tool, pickColor, canvasRef, isReplaying
         endReplay();
         return true;
       }
-      if (tool.kind === 'bg') {
+      if (tool.kind === 'bucket') {
         sfx.pour(4);
-        onStroke({ t: 'bg', c: pickColor() });
+        onStroke({ t: 'fill', c: pickColor(), x, y });
         return true;
       }
-      if (tool.kind !== 'stamp') return false;
-      // Pick up a sticker that's already there, or take a new one from the row.
-      const index = stampAt(strokesRef.current, x, y);
-      const mark =
-        index >= 0
-          ? { ...strokesRef.current[index] }
-          : { t: 'stamp', s: tool.stamp, c: pickColor(), x, y: y - LIFT, size: PAL_STAMPS.includes(tool.stamp) ? 170 : STAMP_SIZE, turn: 0 };
+      if (tool.kind === 'shape') return dragOutShape(x, y);
+      if (tool.kind !== 'pal') return false;
+      // Pick up a Pal that's already there, or take a new one from the row.
+      const index = palAt(strokesRef.current, x, y);
+      const mark = index >= 0 ? { ...strokesRef.current[index] } : { t: 'stamp', s: tool.pal, c: '#000000', x, y: y - LIFT, w: PAL_SIZE, h: PAL_SIZE };
       const grip = { dx: mark.x - x, dy: mark.y - y };
       carried.current = { index, mark };
       sfx.peel();
@@ -80,6 +80,34 @@ export default function Sketch({ sketch, tool, pickColor, canvasRef, isReplaying
       };
     },
   });
+
+  /** A shape grows from where the finger went down to where it is (pictures keep their proportions). */
+  function dragOutShape(x0, y0) {
+    const isPicture = PICTURE_STAMPS.includes(tool.shape);
+    const mark = { t: 'stamp', s: tool.shape, c: pickColor(), x: x0, y: y0, w: STAMP_SIZE, h: STAMP_SIZE };
+    carried.current = { index: -1, mark };
+    sfx.peel();
+    paintNow();
+    return {
+      move: ([x, y]) => {
+        let w = Math.abs(x - x0);
+        let h = Math.abs(y - y0);
+        if (Math.max(w, h) < 16) return;
+        if (isPicture) w = h = Math.max(w, h);
+        mark.w = Math.max(24, Math.round(w));
+        mark.h = Math.max(24, Math.round(h));
+        mark.x = Math.round(x0 + (Math.sign(x - x0) || 1) * (mark.w / 2));
+        mark.y = Math.round(y0 + (Math.sign(y - y0) || 1) * (mark.h / 2));
+        paintNow();
+      },
+      end: () => {
+        carried.current = null;
+        sfx.stamp();
+        navigator.vibrate?.(12);
+        onStroke(mark);
+      },
+    };
+  }
 
   useEffect(() => {
     loadStickerImages().then(paintNow);
@@ -112,7 +140,7 @@ export default function Sketch({ sketch, tool, pickColor, canvasRef, isReplaying
   }, [isReplaying]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div ref={holder} className={`sheet-paper lifted blank ${tool.kind === 'stamp' ? 'stamping' : ''}`} {...handlers}>
+    <div ref={holder} className={`sheet-paper lifted blank ${tool.kind === 'draw' ? '' : 'stamping'}`} {...handlers}>
       <Tape color="#9fd3c7" />
       <canvas ref={canvasRef} className="sketch-canvas" aria-label="A blank sheet to draw on" />
       <div className="grain" aria-hidden="true" />

@@ -1,17 +1,19 @@
 import { SIZES } from '../sketches.js';
-import { STAMP_GROUPS, shapeOf, stickerUrl } from '../stamps.js';
+import { PAL_STAMPS, PICTURE_STAMPS, SHAPE_STAMPS, shapeOf, stickerUrl } from '../stamps.js';
 
 const SIZE_NAMES = ['thin', 'medium', 'thick'];
 const OTHER_TOOLS = {
   fill: ['Fill: tap a part', <PaintPot key="fill" />],
-  stamp: ['Stickers', <StarPicture key="stamp" />],
-  bg: ['Bucket: color the whole background', <Bucket key="bg" />],
+  shape: ['Shapes: drag to make one big or small', <ShapesPicture key="shape" />],
+  pal: ['Pal stickers: put one down and move it', <img key="pal" src={stickerUrl('waffles')} alt="" />],
+  bucket: ['Bucket: fill a shape or the background', <Bucket key="bucket" />],
 };
 
 /**
  * The tools beside the crayon box, as pictures: three crayon thicknesses (a dot each), and the other tools of
- * this sheet (`others`): the fill (a paint pot: tap a part to fill it, on big-book pages), or the stickers and the
- * bucket that pours a color over the whole background (on the blank sheet).
+ * this sheet (`others`): the fill (a paint pot: tap a part to fill it, on big-book pages), or on the blank sheet the
+ * shapes (a little house: they stay where they're put), the Pal stickers (a Pal's face: they can be moved) and the
+ * bucket (fills a closed shape, or the background).
  */
 export function ToolRack({ tool, others, onTool }) {
   return (
@@ -76,28 +78,34 @@ function Bucket() {
   );
 }
 
-function StarPicture() {
+function ShapesPicture() {
   return (
-    <svg viewBox="0 0 100 100" aria-hidden="true">
-      <path d={shapeOf('star')} fill="#f4c443" stroke="#d99a1e" strokeWidth="5" strokeLinejoin="round" />
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M8 22 24 8l16 14z" fill="#e8524f" stroke="#4a3426" strokeWidth="2.5" strokeLinejoin="round" />
+      <rect x="11" y="22" width="26" height="20" fill="#f7c39c" stroke="#4a3426" strokeWidth="2.5" />
+      <rect x="21" y="29" width="7" height="13" fill="#9a6440" />
     </svg>
   );
 }
 
-/** The sticker row: shapes in the crayon's color, then pictures, then Pals, with a little gap between kinds. */
-export function StampRow({ tool, color, onTool }) {
+/**
+ * The row above the crayons for the chosen list: the shapes (in the crayon's color) and pictures, or the Pals.
+ * `kind` is 'shape' or 'pal'; the chosen one is kept in the tool under that name.
+ */
+export function StampRow({ tool, kind, color, onTool }) {
+  const groups = kind === 'pal' ? [PAL_STAMPS] : [SHAPE_STAMPS, PICTURE_STAMPS];
   return (
-    <div className="stamp-row" role="radiogroup" aria-label="Stickers">
-      {STAMP_GROUPS.map((group, g) => (
+    <div className="stamp-row" role="radiogroup" aria-label={kind === 'pal' ? 'Pal stickers' : 'Shapes'}>
+      {groups.map((group, g) => (
         <span key={g} className="stamp-group">
           {group.map((name) => (
             <button
               key={name}
-              className={`stamp ${tool.stamp === name ? 'on' : ''}`}
+              className={`stamp ${tool[kind] === name ? 'on' : ''}`}
               role="radio"
-              aria-checked={tool.stamp === name}
+              aria-checked={tool[kind] === name}
               aria-label={name}
-              onClick={() => onTool({ ...tool, kind: 'stamp', stamp: name })}
+              onClick={() => onTool({ ...tool, kind, [kind]: name })}
             >
               {shapeOf(name) ? (
                 <svg viewBox="0 0 100 100" aria-hidden="true">

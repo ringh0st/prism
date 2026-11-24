@@ -4,7 +4,15 @@
  * painted by hand with a thin, medium or thick crayon.
  */
 export const BOOKS = {
-  little: { id: 'little', title: 'My Pals', subtitle: 'Coloring Book', cover: 'little', canPaint: false, coverPals: ['bamboo', 'waffles', 'ribbit'], form: 1 },
+  little: {
+    id: 'little',
+    title: 'Little Pals',
+    subtitle: 'Coloring Book',
+    cover: 'little',
+    canPaint: false,
+    coverPals: ['bamboo', 'waffles', 'ribbit'],
+    form: 1,
+  },
   big: { id: 'big', title: 'Big Pals', subtitle: 'Fill it or paint it', cover: 'big', canPaint: true, coverPals: ['storm', 'aurora', 'leo'], form: 5 },
 };
 export const BOOK_IDS = Object.keys(BOOKS);

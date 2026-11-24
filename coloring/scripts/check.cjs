@@ -46,7 +46,7 @@ const assert = (ok, what) => {
   };
 
   // 1. Little book: open from the desk, choose from the contents, color, back
-  await p.getByRole('button', { name: /^Open My Pals/ }).tap();
+  await p.getByRole('button', { name: /^Open Little Pals/ }).tap();
   await p.waitForTimeout(1400);
   assert((await p.locator('.thumbs button').count()) === 48, 'little book contents shows 48 Pals');
   await p.locator('.thumbs button').nth(38).tap();
@@ -105,27 +105,32 @@ const assert = (ok, what) => {
   await p.getByRole('button', { name: 'Back to my room' }).tap();
   await p.waitForTimeout(500);
 
-  // 3. Free drawing: crayon, bucket, sticker carried, undo, back to the wall
+  // 3. Free drawing: crayon, a closed shape filled by the bucket, shapes dragged to size stay, Pals move, undo.
+  // Spots are given as parts of the sheet (0 to 1) and the sheet is measured again each time: it shrinks when a sticker row opens.
   await p.getByRole('button', { name: 'A blank sheet to draw on' }).tap();
   await p.waitForTimeout(900);
-  const db = await p.locator('.sheet-frame .sheet-paper').boundingBox();
-  await pick('Green');
-  await p.mouse.move(db.x + 40, db.y + 300);
-  await p.mouse.down();
-  await p.mouse.move(db.x + 250, db.y + 320, { steps: 8 });
-  await p.mouse.up();
-  await p.getByRole('radio', { name: /Bucket/ }).tap();
-  await pick('Sky blue');
-  await p.mouse.click(db.x + 100, db.y + 100);
-  await p.waitForTimeout(200);
-  await p.getByRole('radio', { name: 'Stickers' }).tap();
-  await p.waitForTimeout(200);
-  await pick('tree');
-  await p.mouse.move(db.x + 100, db.y + 100);
-  await p.mouse.down();
-  await p.mouse.move(db.x + 200, db.y + 250, { steps: 6 });
-  await p.mouse.up();
-  await p.waitForTimeout(300);
+  const sheet = () => p.locator('.sheet-frame .sheet-paper').boundingBox();
+  const drag = async (pts) => {
+    const db = await sheet();
+    const at = ([fx, fy]) => [db.x + db.width * fx, db.y + db.height * fy];
+    await p.mouse.move(...at(pts[0]));
+    await p.mouse.down();
+    for (const pt of pts.slice(1)) await p.mouse.move(...at(pt), { steps: 8 });
+    await p.mouse.up();
+    await p.waitForTimeout(300);
+  };
+  // the average color of a little patch of the drawing (crayon wax has tiny speckles)
+  const patch = async ([fx, fy]) =>
+    p.evaluate(
+      ([fx, fy]) => {
+        const c = document.querySelector('.sketch-canvas');
+        const d = c.getContext('2d').getImageData(Math.round(c.width * fx) - 10, Math.round(c.height * fy) - 10, 20, 20).data;
+        const sum = [0, 0, 0, 0];
+        for (let i = 0; i < d.length; i++) sum[i % 4] += d[i];
+        return sum.map((v) => Math.round(v / (d.length / 4)));
+      },
+      [fx, fy],
+    );
   const marks = () =>
     p.evaluate(
       () =>
@@ -133,20 +138,72 @@ const assert = (ok, what) => {
           const r = indexedDB.open('coloring');
           r.onsuccess = () => {
             const q = r.result.transaction('sketches').objectStore('sketches').getAll();
-            q.onsuccess = () => res(q.result.filter((s) => !s.id.startsWith('paint-')).map((s) => s.strokes.map((m) => m.t ?? 'line')));
+            q.onsuccess = () => res(q.result.filter((s) => !s.id.startsWith('paint-')).map((s) => s.strokes)[0]);
           };
         }),
     );
-  assert(JSON.stringify(await marks()) === JSON.stringify([['line', 'bg', 'stamp']]), 'drawing keeps a line, a background and a sticker');
+  await pick('Green');
+  await drag([
+    [0.15, 0.1],
+    [0.55, 0.1],
+    [0.55, 0.35],
+    [0.15, 0.35],
+    [0.15, 0.1],
+  ]);
+  await p.getByRole('radio', { name: /^Bucket/ }).tap();
+  await pick('Red');
+  await drag([[0.35, 0.22]]);
+  const inside = await patch([0.35, 0.22]);
+  const outside = await patch([0.8, 0.22]);
+  assert(inside[3] > 200 && inside[0] > 150 && inside[1] < 140, `the bucket fills inside a closed shape (${inside})`);
+  assert(outside[3] < 30, `...and not outside it (${outside})`);
+  await p.getByRole('radio', { name: /^Shapes/ }).tap();
+  await p.waitForTimeout(300);
+  await pick('square');
+  await pick('Peach');
+  await drag([
+    [0.15, 0.5],
+    [0.75, 0.75],
+  ]);
+  let m = await marks();
+  assert(JSON.stringify(m.map((x) => x.t ?? 'line')) === JSON.stringify(['line', 'fill', 'stamp']), 'drawing keeps a line, a fill and a shape');
+  assert(m[2].w > 300 && m[2].h > 150 && m[2].w !== m[2].h, `a shape is as big as it was dragged (${m[2].w}×${m[2].h})`);
+  const square = m[2];
+  // starting on the square makes a new shape; the square stays
+  await drag([
+    [0.45, 0.62],
+    [0.6, 0.68],
+  ]);
+  m = await marks();
+  assert(m.length === 4 && m[2].x === square.x && m[2].y === square.y, 'a shape stays where it was put');
   await p.getByRole('button', { name: 'Take back the last color' }).tap();
   await p.waitForTimeout(300);
-  assert(JSON.stringify(await marks()) === JSON.stringify([['line', 'bg']]), 'undo takes the sticker back');
+  await p.getByRole('radio', { name: /^Pal stickers/ }).tap();
+  await p.waitForTimeout(300);
+  await pick('ribbit');
+  await drag([
+    [0.5, 0.5],
+    [0.75, 0.5],
+  ]);
+  m = await marks();
+  const pal = m.at(-1);
+  const db = await sheet();
+  const k = db.width / 800;
+  await p.mouse.move(db.x + pal.x * k, db.y + pal.y * k);
+  await p.mouse.down();
+  await p.mouse.move(db.x + db.width * 0.3, db.y + db.height * 0.85, { steps: 6 });
+  await p.mouse.up();
+  await p.waitForTimeout(300);
+  m = await marks();
+  assert(m.length === 4 && m.at(-1).s === 'ribbit' && m.at(-1).x < pal.x - 100, 'a Pal can be picked up and moved');
   await p.getByRole('button', { name: 'Back to My Drawings' }).tap();
   await p.waitForTimeout(800);
   assert((await p.locator('.wall-grid li:not(.start-new)').count()) === 1, 'the drawing hangs on My Drawings');
   await p.locator('.wall-grid li:not(.start-new) .framed').first().tap();
   await p.waitForTimeout(5000);
   assert((await p.locator('.sketch-canvas').count()) === 1, 'a drawing opens again from the wall (and replays)');
+  const again = await patch([0.35, 0.22]);
+  assert(again[3] > 200 && again[0] > 150, `the bucket fill is still there when it opens again (${again})`);
   await p.getByRole('button', { name: 'Back to My Drawings' }).tap();
   await p.waitForTimeout(500);
   await p.getByRole('button', { name: 'Back to my room' }).tap();

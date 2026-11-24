@@ -75,7 +75,7 @@ export default function App() {
   const [bigPages, setBigPages] = useState(null);
   const [indexes, setIndexes] = useState(() => ({ little: store.get('coloring.page', 0), big: store.get('coloring.page.big', 0) }));
   const [view, setView] = useState({ name: 'room' }); // room | wall { kind } | book { bookId } | page { pageId, from } | sketch { id, from, replay }
-  const [sketchTool, setSketchTool] = useState({ kind: 'draw', size: DEFAULT_SIZE, stamp: 'star' });
+  const [sketchTool, setSketchTool] = useState({ kind: 'draw', size: DEFAULT_SIZE, shape: 'square', pal: 'waffles' });
   const [pageTool, setPageTool] = useState({ kind: 'fill', size: 0 });
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [crayonId, setCrayonId] = useState(() => store.get('coloring.crayon', 'red'));
@@ -497,8 +497,10 @@ export default function App() {
       </main>
       {isOnSheet && (
         <footer className={`tray ${sketch || canPaint ? 'with-tools' : ''}`}>
-          {sketch && sketchTool.kind === 'stamp' && <StampRow tool={sketchTool} color={stampColor} onTool={chooseTool(setSketchTool)} />}
-          {sketch && <ToolRack tool={sketchTool} others={['stamp', 'bg']} onTool={chooseTool(setSketchTool)} />}
+          {sketch && (sketchTool.kind === 'shape' || sketchTool.kind === 'pal') && (
+            <StampRow tool={sketchTool} kind={sketchTool.kind} color={stampColor} onTool={chooseTool(setSketchTool)} />
+          )}
+          {sketch && <ToolRack tool={sketchTool} others={['shape', 'pal', 'bucket']} onTool={chooseTool(setSketchTool)} />}
           {canPaint && <ToolRack tool={pageTool} others={['fill']} onTool={chooseTool(setPageTool)} />}
           <CrayonBox crayonId={crayonId} onPick={pick} />
           <button className="undo" onClick={undo} disabled={!canTakeBack} aria-label="Take back the last color">
