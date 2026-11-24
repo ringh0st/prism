@@ -136,6 +136,18 @@ export function callBakol(game, side) {
 const targetsLeft = (world) => world.marbles.filter((m) => !m.owner && isLive(m));
 
 /**
+ * The marbles a side is after right now, so the yard can mark them (owner: "how can I know which color I need?
+ * It should be in the board game"): in the Ring the other side's marbles, in the Mor every marble, in the Chase
+ * the other shooter.
+ */
+export function aimsOf(game, side) {
+  const { world, mode } = game;
+  if (mode === 'chase') return world.marbles.filter((m) => m.owner && m.id !== side && isLive(m));
+  if (mode === 'ring') return targetsLeft(world).filter((m) => m.team && m.team !== side);
+  return targetsLeft(world);
+}
+
+/**
  * The shot of the side whose turn it is: flicks its shooter, lets everything come to rest and applies the rules.
  * Changes `game` and returns what happened: { events, won, foul, again, hits } (`events` are the physics events
  * with their times, for sounds; pass `onStep` to watch the marbles move).

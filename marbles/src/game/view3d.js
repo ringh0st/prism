@@ -1,13 +1,12 @@
 // The yard in 3D (three.js): real glass marbles that roll, a chalk ring, the hole, pebbles and soft shadows, seen
 // from above at a slight tilt. It only draws: the physics (physics.js) says where everything is.
 import * as THREE from 'three';
+import { SIDE_COLORS, TEAM_COLORS } from './colors.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { isLive, ringCorners } from './physics.js';
 
 const TARGET_COLORS = ['#e2574c', '#3fa7d6', '#59cd90', '#f6ae2d', '#b565d8', '#ee6c9c', '#2ec4b6', '#ff8c42', '#7d8cf8'];
 // In the ring game each side's marbles wear its own colors: warm for the near side, cool for the far side.
-const TEAM_COLORS = { you: ['#f08a24', '#e8b422', '#e2574c'], foe: ['#1fa898', '#3f8fd6', '#3fb46a'] };
-const SIDE_COLORS = { you: '#f0a030', foe: '#2bb3a3' };
 const AIR_TIME = 0.38;
 
 /** A small picture drawn in code, as a texture. */
@@ -301,6 +300,17 @@ export function createView(canvas, yard, { flip = false } = {}) {
 
   // Whose turn: a soft ring of light under that shooter. Aiming: a row of dots that grows with the power.
   const glow = new THREE.Mesh(new THREE.RingGeometry(1, 1.35, 48), new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.8 }));
+  // Rings under the marbles the side whose turn it is is after, breathing gently.
+  const aimRings = [];
+  const aimRing = (i) => {
+    if (!aimRings[i]) {
+      const ring = new THREE.Mesh(new THREE.RingGeometry(1, 1.42, 40), new THREE.MeshBasicMaterial({ color: '#fffbe8', transparent: true, opacity: 0.85, depthWrite: false }));
+      ring.rotation.x = -Math.PI / 2;
+      scene.add(ring);
+      aimRings[i] = ring;
+    }
+    return aimRings[i];
+  };
   glow.rotation.x = -Math.PI / 2;
   scene.add(glow);
   const dots = Array.from({ length: 9 }, () => {
@@ -343,7 +353,7 @@ export function createView(canvas, yard, { flip = false } = {}) {
     },
 
     /** Draws the yard. `aim` is { angle, power, high } while the player pulls back; `turn` whose shooter glows. */
-    render(world, { aim = null, turn = null, now = 0, dt = 16 } = {}) {
+    render(world, { aim = null, turn = null, aims = [], now = 0, dt = 16 } = {}) {
       layFixtures(world);
       const seen = new Set();
       world.marbles.forEach((m, index) => {
@@ -385,6 +395,15 @@ export function createView(canvas, yard, { flip = false } = {}) {
           balls.delete(id);
         }
       }
+
+      aims.forEach((m, i) => {
+        const ring = aimRing(i);
+        ring.visible = true;
+        ring.scale.setScalar((m.r + 4) * (1.05 + 0.12 * Math.sin(now * 0.005 + i)));
+        ring.position.set(m.x, 0.55, m.y);
+        ring.material.opacity = 0.55 + 0.3 * Math.sin(now * 0.005 + i);
+      });
+      for (let i = aims.length; i < aimRings.length; i++) aimRings[i].visible = false;
 
       const shooter = turn && world.marbles.find((m) => m.id === turn);
       glow.visible = Boolean(shooter) && isLive(shooter);

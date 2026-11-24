@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { STEP, flick, isAtRest, speedOf, step, strayOf } from '../game/physics.js';
-import { YARD, callBakol, endTurn, judge } from '../game/rules.js';
+import { YARD, aimsOf, callBakol, endTurn, judge } from '../game/rules.js';
 import { TURN_SECONDS, applySnapshot, snapshotOf } from '../live.js';
 import { pickShot } from '../game/ai.js';
 import { createView } from '../game/view3d.js';
@@ -102,7 +102,8 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
           passTurn();
         }
       }
-      view.render(g.world, { aim: state.aim, turn: g.winner || state.moving ? null : g.turn, now, dt });
+      const turn = g.winner || state.moving ? null : g.turn;
+      view.render(g.world, { aim: state.aim, turn, aims: turn ? aimsOf(g, turn) : [], now, dt });
     };
     frame = requestAnimationFrame(loop);
     return () => {

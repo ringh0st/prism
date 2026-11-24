@@ -292,3 +292,18 @@ test('every yard is laid out from its seed: the same seed gives the same shape, 
   assert.deepEqual([...kinds].sort(), ['dip', 'gates', 'mound', 'puddle']);
   assert.deepEqual([...shapes].sort(), ['circle', 'square', 'triangle']);
 });
+
+test('the yard marks what each side is after: the other side in the Ring, every marble in the Mor, the other shooter in the Chase', async () => {
+  const { aimsOf } = await import('./rules.js');
+  const ring = newGame('ring', { seed: 4, terrain: false });
+  const mine = aimsOf(ring, 'you');
+  assert.ok(mine.length > 0 && mine.every((m) => m.team === 'foe'));
+  assert.ok(aimsOf(ring, 'foe').every((m) => m.team === 'you'));
+  const hole = newGame('hole', { seed: 4, terrain: false });
+  assert.equal(aimsOf(hole, 'you').length, hole.world.marbles.filter((m) => !m.owner).length);
+  const chase = newGame('chase', { seed: 4, terrain: false });
+  assert.deepEqual(
+    aimsOf(chase, 'you').map((m) => m.id),
+    ['foe'],
+  );
+});

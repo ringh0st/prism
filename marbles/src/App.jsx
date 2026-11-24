@@ -4,6 +4,7 @@ import Yard from './components/Yard.jsx';
 import HowTo from './components/HowTo.jsx';
 import { MODES, newGame } from './game/rules.js';
 import { tellShot, turnStatus } from './game/story.js';
+import { SIDE_COLORS, TEAM_COLORS } from './game/colors.js';
 import { GROUNDS } from './game/physics.js';
 import { CHALLENGES, newChallenge, starsFor } from './game/challenges.js';
 import { sfx } from './game/audio.js';
@@ -410,9 +411,29 @@ export default function App() {
   const isCpu = match.rival && match.rival !== 'two' && match.rival !== 'live';
   const hasFriendLeft = match.rival === 'live' && live?.status === 'left';
   const toWin = challenge ? challenge.need : MODES[game.mode].toWin;
+  /** What this side shoots at, as pictures: the other side's colors in the Ring, the hole in the Mor, the other shooter in the Chase. */
+  const AimHint = ({ side }) => {
+    if (challenge) return null;
+    const other = side === 'you' ? 'foe' : 'you';
+    const label = { ring: `Knock out the ${other === 'foe' ? 'cool' : 'warm'} marbles`, hole: 'Push any marble into the Mor', chase: 'Hit the other shooter' }[game.mode];
+    return (
+      <span className="aim-hint" aria-label={label} title={label}>
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.6" />
+          <circle cx="8" cy="8" r="2.4" fill="currentColor" />
+        </svg>
+        {game.mode === 'ring' && TEAM_COLORS[other].map((c) => <i key={c} style={{ background: c }} />)}
+        {game.mode === 'chase' && <i style={{ background: SIDE_COLORS[other] }} />}
+        {game.mode === 'hole' && <i className="hole" />}
+      </span>
+    );
+  };
   const Bag = ({ side }) => (
     <div className={`bag ${side} ${game.turn === side && !game.winner ? 'turn' : ''}`}>
-      <b>{names[side]}</b>
+      <span className="bag-who">
+        <b>{names[side]}</b>
+        <AimHint side={side} />
+      </span>
       {note?.gain?.side === side && (
         <span className={`gain ${note.gain.text.startsWith('+') ? '' : 'minus'}`} key={note.id} aria-hidden="true">
           {note.gain.text}
