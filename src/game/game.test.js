@@ -411,8 +411,16 @@ test('sure Legendary presents: every Sunday and every 100 solved levels, matches
 
   const levels = (n) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`w${Math.floor(i / 20) + 1}-${String((i % 20) + 1).padStart(2, '0')}`, { stars: 1 }]));
   let progress = { ...createEmptyProgress(), levels: levels(205) };
+  // The one-time Pal gift comes first: just a Legendary Pal.
+  assert.equal(legendaryPresentsWaiting(progress, '2026-11-30').palGift, true);
+  const palGift = openLegendaryPresentLocally(progress, '2026-11-30');
+  assert.deepEqual(Object.keys(palGift.gift).sort(), ['pal', 'rarity', 'sparks']);
+  assert.equal(rarityOf(PALS.find((pal) => pal.id === palGift.gift.pal)), 'legendary');
+  progress = palGift.progress;
+  assert.equal(legendaryPresentsWaiting(progress, '2026-11-30').palGift, false, 'only once');
+  assert.match(sql, /if not v_profile\.legendary_pal_gift then/);
   assert.deepEqual(legendaryProgress(progress), { have: 5, need: 100 });
-  assert.deepEqual(legendaryPresentsWaiting(progress, '2026-11-30'), { milestones: 2, sunday: false, count: 2 });
+  assert.deepEqual(legendaryPresentsWaiting(progress, '2026-11-30'), { palGift: false, milestones: 2, sunday: false, count: 2 });
   assert.equal(legendaryPresentsWaiting(progress, '2026-11-29').count, 3, 'plus Sunday');
   for (let i = 0; i < 3; i += 1) {
     const opened = openLegendaryPresentLocally(progress, '2026-11-29');

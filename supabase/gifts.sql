@@ -9,6 +9,8 @@ alter table public.profiles
   -- Sure Legendary presents: those for every 100 solved levels opened, and the last Sunday one (player's date).
   add column if not exists legendary_milestones integer not null default 0,
   add column if not exists legendary_sunday date,
+  -- The one-time Legendary Pal gift every player gets once.
+  add column if not exists legendary_pal_gift boolean not null default false,
   add column if not exists win_gift_date date,
   add column if not exists win_gifts_opened integer not null default 0,
   -- Glowbug rows whose diamond was collected (see glowbugs.sql).
@@ -37,6 +39,7 @@ as $$
     'presentsOpened', p.presents_opened,
     'legendaryMilestones', p.legendary_milestones,
     'legendarySunday', p.legendary_sunday,
+    'legendaryPalGift', p.legendary_pal_gift,
     'winGiftDate', p.win_gift_date,
     'winGiftsOpened', p.win_gifts_opened,
     'sparkPurchasesToday', case when p.spark_purchase_date = current_date then p.spark_purchases_today else 0 end,
@@ -275,6 +278,20 @@ begin
   if v_profile.pal_id is null then
     raise exception using message = 'No present yet.';
   end if;
+  -- The one-time Pal gift first: just a Legendary Pal (150 sparks when they have every one).
+  if not v_profile.legendary_pal_gift then
+    select pal into v_pal from unnest(public._all_pals()) as pal
+      where public._pal_rarity(pal) = 'legendary' and not (v_profile.pals ? pal)
+      order by random() limit 1;
+    if v_pal is null then
+      update public.profiles set legendary_pal_gift = true, sparks = sparks + 150 where id = v_user;
+      return public._economy_state(v_user) || jsonb_build_object('gift', jsonb_build_object('rarity', 'legendary', 'sparks', 150));
+    end if;
+    update public.profiles set legendary_pal_gift = true, pals = pals || jsonb_build_object(v_pal, jsonb_build_object('stage', 0))
+      where id = v_user;
+    return public._economy_state(v_user) || jsonb_build_object('gift', jsonb_build_object('rarity', 'legendary', 'sparks', 0, 'pal', v_pal));
+  end if;
+
   select count(*)::integer into v_solved from public.progress
     where user_id = v_user and stars > 0 and level_id ~ '^w[0-9]+-[0-9]{2}$';
   if v_solved / 100 > v_profile.legendary_milestones then

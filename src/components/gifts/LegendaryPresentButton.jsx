@@ -16,13 +16,19 @@ export default function LegendaryPresentButton() {
   const { progress, openLegendaryPresent } = usePlayer();
   const { t } = useI18n();
   const [opening, setOpening] = useState(0);
+  const [hasPalGift, setHasPalGift] = useState(false);
   if (!palById(progress.pal.id)) return null;
-  const { count } = legendaryPresentsWaiting(progress, todayKey());
+  const { count, palGift } = legendaryPresentsWaiting(progress, todayKey());
+  // The one-time Pal gift opens first and greets the player by their own name.
+  const greeting = progress.nickname ? t('legendary.palGift', { name: progress.nickname }) : t('legendary.palGiftAnon');
   if (!count && !opening) return null;
   return (
     <>
       {count > 0 && (
-        <button type="button" className={styles.button} onClick={() => setOpening(count)} aria-label={t('legendary.buttonLabel')}>
+        <button type="button" className={styles.button} onClick={() => {
+            setHasPalGift(palGift);
+            setOpening(count);
+          }} aria-label={t('legendary.buttonLabel')}>
           <span className={styles.symbol} aria-hidden="true">
             ✦
           </span>
@@ -38,7 +44,7 @@ export default function LegendaryPresentButton() {
       )}
       {opening > 0 && (
         <GiftReveal
-          title={t('legendary.title', { count: opening })}
+          title={hasPalGift ? greeting : t('legendary.title', { count: opening })}
           count={opening}
           charges
           doneTitle={t('present.doneTitle')}
@@ -47,6 +53,7 @@ export default function LegendaryPresentButton() {
           partner={palById(progress.pal.id)}
           onClose={() => setOpening(0)}
         >
+          {hasPalGift && <p className={`game-title ${styles.greeting}`}>{greeting}</p>}
           <p className={styles.why}>{t('legendary.why', { n: LEGENDARY_EVERY_LEVELS })}</p>
         </GiftReveal>
       )}

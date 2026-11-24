@@ -168,11 +168,15 @@ const solvedLevelCount = (levels) => Object.entries(levels).filter(([id, entry])
 /** Is this day ("YYYY-MM-DD", the player's own date) a Sunday? */
 export const isSunday = (dateKey) => new Date(`${dateKey}T12:00:00`).getDay() === 0;
 
-/** Sure Legendary presents ready now: { milestones, sunday } (the 100-level ones and today's Sunday one). */
+/**
+ * Sure Legendary presents ready now: { palGift, milestones, sunday, count }: the one-time Pal gift every player
+ * gets once (owner's ask, after the box first went out without a Pal), the 100-level ones and today's Sunday one.
+ */
 export function legendaryPresentsWaiting(progress, today) {
+  const palGift = !progress.presents.palGift;
   const milestones = Math.max(0, Math.floor(solvedLevelCount(progress.levels) / LEGENDARY_EVERY_LEVELS) - (progress.presents.milestones ?? 0));
   const sunday = isSunday(today) && progress.presents.sundayDate !== today;
-  return { milestones, sunday, count: milestones + (sunday ? 1 : 0) };
+  return { palGift, milestones, sunday, count: (palGift ? 1 : 0) + milestones + (sunday ? 1 : 0) };
 }
 
 /** Solved levels toward the next 100-level Legendary present: { have, need }. */
@@ -191,8 +195,14 @@ export const LEGENDARY_ITEMS = [...THEME_OUTFITS, ...THEME_DECOR]
   .filter((item) => item.currency === 'diamonds')
   .map((item) => ({ id: item.id, type: item.kind }));
 
-export function drawLegendaryBox(progress, { pick = Math.random(), palPick = Math.random(), isSignedIn = false } = {}) {
+export function drawLegendaryBox(progress, { pick = Math.random(), palPick = Math.random(), isSignedIn = false, palOnly = false } = {}) {
   const pals = PALS.filter((pal) => rarityOf(pal) === 'legendary' && !progress.pal.owned[pal.id]);
+  if (palOnly) {
+    // The one-time Pal gift: just a Legendary Pal (sparks only when every one is already yours).
+    return pals.length
+      ? { rarity: 'legendary', sparks: 0, pal: pals[Math.floor(palPick * pals.length)].id }
+      : { rarity: 'legendary', sparks: LEGENDARY_BOX.noPalSparks };
+  }
   const showpieces = LEGENDARY_ITEMS.filter((item) => !ownsItem(progress, item));
   const items = showpieces.length ? showpieces : PRESENT_ITEMS.filter((item) => !ownsItem(progress, item));
   const pal = pals.length ? pals[Math.floor(palPick * pals.length)].id : null;
@@ -205,12 +215,16 @@ export function drawLegendaryBox(progress, { pick = Math.random(), palPick = Mat
   return { rarity: 'legendary', sparks, ...(isSignedIn ? { diamonds: 1 } : {}), ...(item ? { item } : {}), ...(pal ? { pal } : {}) };
 }
 
-/** Opens one sure Legendary present on this device (guests): a 100-level one first, then Sunday's. @throws EconomyError */
+/** Opens one sure Legendary present on this device (guests): the one-time Pal gift first, then 100-level ones, then Sunday's. @throws EconomyError */
 export function openLegendaryPresentLocally(progress, today, rolls = {}) {
-  const { milestones, sunday } = legendaryPresentsWaiting(progress, today);
-  if (!milestones && !sunday) throw new EconomyError('No present yet.');
-  const gift = drawLegendaryBox(progress, rolls);
-  const presents = milestones ? { ...progress.presents, milestones: (progress.presents.milestones ?? 0) + 1 } : { ...progress.presents, sundayDate: today };
+  const { palGift, milestones, sunday } = legendaryPresentsWaiting(progress, today);
+  if (!palGift && !milestones && !sunday) throw new EconomyError('No present yet.');
+  const gift = drawLegendaryBox(progress, { ...rolls, palOnly: palGift });
+  const presents = palGift
+    ? { ...progress.presents, palGift: true }
+    : milestones
+      ? { ...progress.presents, milestones: (progress.presents.milestones ?? 0) + 1 }
+      : { ...progress.presents, sundayDate: today };
   return { progress: giveLocally({ ...progress, presents }, gift), gift };
 }
 
