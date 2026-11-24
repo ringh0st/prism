@@ -26,13 +26,17 @@ export const PALS = [
   { id: 'ribbit', power: 'moves', name: 'Ribbit', species: 'Frog', animal: 'Frog', unlock: { worlds: 3 } },
   { id: 'cotton', power: 'undo', name: 'Cotton', species: 'Lamb', animal: 'Lamb', unlock: { stars: 350 } },
   { id: 'squeak', power: 'moves', name: 'Squeak', species: 'Mouse', animal: 'Mouse', unlock: { stars: 400 } },
+  { id: 'tops', power: 'undo', name: 'Tops', species: 'Triceratops', animal: 'Trike', unlock: { stars: 450 } },
   { id: 'maple', power: 'moves', name: 'Maple', species: 'Red panda', animal: 'Panda', unlock: { worlds: 5 } },
+  { id: 'chomp', power: 'moves', name: 'Chomp', species: 'T-rex', animal: 'Rex', unlock: { worlds: 6 } },
   { id: 'otto', power: 'moves', name: 'Otto', species: 'Otter', animal: 'Otter', unlock: { stars: 500 } },
   { id: 'buzz', power: 'moves', name: 'Buzz', species: 'Bee', animal: 'Bee', unlock: { streak: 14 } },
   { id: 'kiko', power: 'undo', name: 'Kiko', species: 'Koala', animal: 'Koala', unlock: { stars: 600 } },
   { id: 'splash', power: 'moves', name: 'Splash', species: 'Seal', animal: 'Seal', unlock: { stars: 700 } },
   { id: 'shroomy', power: 'hint', name: 'Shroomy', species: 'Mushroom sprite', animal: 'Sprite', unlock: { worlds: 8 } },
+  { id: 'stretch', power: 'hint', name: 'Stretch', species: 'Brachiosaurus', animal: 'Longneck', unlock: { worlds: 10 } },
   { id: 'bandit', power: 'hint', name: 'Bandit', species: 'Raccoon', animal: 'Raccoon', unlock: { stars: 800 } },
+  { id: 'spike', power: 'undo', name: 'Spike', species: 'Stegosaurus', animal: 'Stego', unlock: { stars: 900 } },
   { id: 'waddles', power: 'undo', name: 'Waddles', species: 'Penguin', animal: 'Penguin', unlock: { stars: 1000 } },
   { id: 'fawn', power: 'hint', name: 'Fawn', species: 'Deer', animal: 'Deer', unlock: { stars: 1200 } },
   { id: 'shelly', power: 'undo', name: 'Shelly', species: 'Snail', animal: 'Snail', unlock: { streak: 30 } },
@@ -50,6 +54,10 @@ export const PALS = [
   { id: 'plume', power: 'hint', name: 'Plume', species: 'Peacock', animal: 'Peacock', rarity: 'legendary', unlock: { lucky: true } },
   { id: 'nova', power: 'moves', name: 'Nova', species: 'Narwhal', animal: 'Narwhal', rarity: 'legendary', unlock: { lucky: true } },
   { id: 'luna', power: 'hint', name: 'Luna', species: 'Snow leopard', animal: 'Leopard', rarity: 'legendary', unlock: { lucky: true } },
+  // Legends from old stories: the Moon Rabbit (East Asia), the hippocampus (Greece) and the shisa (Okinawa).
+  { id: 'mooncake', power: 'hint', name: 'Mooncake', species: 'Moon rabbit', animal: 'Moonbunny', rarity: 'legendary', unlock: { lucky: true } },
+  { id: 'marina', power: 'moves', name: 'Marina', species: 'Hippocampus', animal: 'Seapony', rarity: 'legendary', unlock: { lucky: true } },
+  { id: 'rumble', power: 'undo', name: 'Rumble', species: 'Shisa lion-dog', animal: 'Shisa', rarity: 'legendary', unlock: { lucky: true } },
   // Mythic Pals, from myths and legends around the world. They join late in the adventure.
   { id: 'sol', power: 'moves', name: 'Sol', species: 'Phoenix', animal: 'Phoenix', rarity: 'mythic', unlock: { worlds: 15 } },
   { id: 'kiri', power: 'hint', name: 'Kiri', species: 'Qilin', animal: 'Qilin', rarity: 'mythic', unlock: { worlds: 18 } },
@@ -61,6 +69,9 @@ export const PALS = [
   { id: 'frosty', power: 'undo', name: 'Frosty', species: 'Yeti', animal: 'Yeti', rarity: 'mythic', unlock: { worlds: 30 } },
   { id: 'fen', power: 'moves', name: 'Fen', species: 'Fenrir wolf pup', animal: 'Wolf', rarity: 'mythic', unlock: { worlds: 35 } },
   { id: 'riddle', power: 'hint', name: 'Riddle', species: 'Sphinx kitten', animal: 'Sphinx', rarity: 'mythic', unlock: { worlds: 40 } },
+  { id: 'jade', power: 'undo', name: 'Jade', species: 'Eastern dragon', animal: 'Loong', rarity: 'mythic', unlock: { worlds: 28 } },
+  { id: 'tide', power: 'moves', name: 'Tide', species: 'Baby kraken', animal: 'Kraken', rarity: 'mythic', unlock: { worlds: 32 } },
+  { id: 'hikari', power: 'hint', name: 'Hikari', species: 'Kitsune', animal: 'Kitsune', rarity: 'mythic', unlock: { worlds: 45 } },
 ];
 
 export const STARTER_PALS = PALS.filter((pal) => pal.isStarter);

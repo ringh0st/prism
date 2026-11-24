@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="480" height="480"><defs>
+<linearGradient id="hikari-f3-fur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffdfa"/><stop offset="1" stop-color="#f4e5dc"/></linearGradient>
+<linearGradient id="hikari-f3-tail" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#f0d6c8"/><stop offset=".55" stop-color="#fbeee5"/><stop offset="1" stop-color="#fffaf6"/></linearGradient>
+<linearGradient id="hikari-f3-belly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#fbf1ea"/></linearGradient>
+<linearGradient id="hikari-f3-tip" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffc2a6"/><stop offset="1" stop-color="#f28d74"/></linearGradient>
+<linearGradient id="hikari-f3-ear" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc0ad"/><stop offset="1" stop-color="#ffe4d8"/></linearGradient>
+<linearGradient id="hikari-f3-mark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7894f"/><stop offset="1" stop-color="#e0583b"/></linearGradient>
+<linearGradient id="hikari-f3-fire" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a0"/><stop offset="1" stop-color="#f6a57a"/></linearGradient>
+<linearGradient id="hikari-f3-gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#e5a93a"/></linearGradient>
+<radialGradient id="hikari-f3-glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff0b8" stop-opacity=".9"/><stop offset="1" stop-color="#ffd9a0" stop-opacity="0"/></radialGradient>
+<clipPath id="hikari-f3-tc1"><path d="M-3.6 0C-6.6 -13.39 -11.16 -23.21 -9.6 -33.04C-8.04 -40.18 0 -44.2 4.8 -44.64C12 -43.3 16.08 -40.18 14.4 -32.14C14.16 -23.21 6.6 -13.39 3.6 0Z"/></clipPath>
+<clipPath id="hikari-f3-tc2"><path d="M-3.6 0C-6.6 -13.39 -14.04 -23.21 -14.4 -33.04C-14.76 -40.18 -9.6 -44.2 -4.8 -44.64C2.4 -43.3 9.36 -40.18 9.6 -32.14C11.28 -23.21 6.6 -13.39 3.6 0Z"/></clipPath>
+<clipPath id="hikari-f3-tc3"><path d="M-3.6 0C-6.6 -20.8 -11.16 -36.06 -9.6 -51.31C-8.04 -62.41 0 -68.65 4.8 -69.34C12 -67.26 16.08 -62.41 14.4 -49.92C14.16 -36.06 6.6 -20.8 3.6 0Z"/></clipPath>
+<clipPath id="hikari-f3-tc4"><path d="M-3.6 0C-6.6 -20.8 -14.04 -36.06 -14.4 -51.31C-14.76 -62.41 -9.6 -68.65 -4.8 -69.34C2.4 -67.26 9.36 -62.41 9.6 -49.92C11.28 -36.06 6.6 -20.8 3.6 0Z"/></clipPath>
+<clipPath id="hikari-f3-tc5"><path d="M-3.6 0C-6.6 -24.6 -12.6 -42.64 -12 -60.68C-11.4 -73.8 -4.8 -81.18 0 -82C7.2 -79.54 12.72 -73.8 12 -59.04C12.72 -42.64 6.6 -24.6 3.6 0Z"/></clipPath>
+<clipPath id="hikari-f3-el"><path d="M24.4 45C19.6 33.6 19.4 20 24.2 8.6 25.2 6.6 27 6.4 28.8 7.6 36 12.4 42.4 19.6 46 28Z"/></clipPath><clipPath id="hikari-f3-er"><path d="M75.6 45C80.4 33.6 80.6 20 75.8 8.6 74.8 6.6 73 6.4 71.2 7.6 64 12.4 57.6 19.6 54 28Z"/></clipPath>
+</defs>
+<g>
+<g transform="translate(50 84) rotate(74.41)">
+<path d="M-3.6 0C-6.6 -13.39 -11.16 -23.21 -9.6 -33.04C-8.04 -40.18 0 -44.2 4.8 -44.64C12 -43.3 16.08 -40.18 14.4 -32.14C14.16 -23.21 6.6 -13.39 3.6 0Z" fill="url(#hikari-f3-tail)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-19.2 -58.04L-19.2 -38 -12.8 -33.69 -6.4 -36.98 0 -32.67 6.4 -35.96 12.8 -31.64 19.2 -34.93 19.2 -58.04Z" fill="url(#hikari-f3-tip)" clip-path="url(#hikari-f3-tc1)"/>
+<path d="M-3.6 0C-6.6 -13.39 -11.16 -23.21 -9.6 -33.04C-8.04 -40.18 0 -44.2 4.8 -44.64C12 -43.3 16.08 -40.18 14.4 -32.14C14.16 -23.21 6.6 -13.39 3.6 0Z" fill="none" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-7.44 -9.82C-9.84 -18.75 -9.36 -25 -7.2 -28.57" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/>
+<path d="M4.2 -13.39c2.16 -4.46 2.64 -8.93 1.92 -13.39" stroke="#ead7cc" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+</g>
+<g transform="translate(50 84) rotate(-74.41)">
+<path d="M-3.6 0C-6.6 -13.39 -14.04 -23.21 -14.4 -33.04C-14.76 -40.18 -9.6 -44.2 -4.8 -44.64C2.4 -43.3 9.36 -40.18 9.6 -32.14C11.28 -23.21 6.6 -13.39 3.6 0Z" fill="url(#hikari-f3-tail)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-19.2 -58.04L-19.2 -34.93 -12.8 -31.64 -6.4 -35.96 0 -32.67 6.4 -36.98 12.8 -33.69 19.2 -38 19.2 -58.04Z" fill="url(#hikari-f3-tip)" clip-path="url(#hikari-f3-tc2)"/>
+<path d="M-3.6 0C-6.6 -13.39 -14.04 -23.21 -14.4 -33.04C-14.76 -40.18 -9.6 -44.2 -4.8 -44.64C2.4 -43.3 9.36 -40.18 9.6 -32.14C11.28 -23.21 6.6 -13.39 3.6 0Z" fill="none" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-7.44 -9.82C-9.84 -18.75 -9.36 -25 -7.2 -28.57" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/>
+<path d="M4.2 -13.39c2.16 -4.46 2.64 -8.93 1.92 -13.39" stroke="#ead7cc" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+</g>
+<g transform="translate(50 84) rotate(33.23)">
+<path d="M-3.6 0C-6.6 -20.8 -11.16 -36.06 -9.6 -51.31C-8.04 -62.41 0 -68.65 4.8 -69.34C12 -67.26 16.08 -62.41 14.4 -49.92C14.16 -36.06 6.6 -20.8 3.6 0Z" fill="url(#hikari-f3-tail)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-19.2 -90.14L-19.2 -57.51 -12.8 -53.2 -6.4 -56.49 0 -52.18 6.4 -55.47 12.8 -51.15 19.2 -54.44 19.2 -90.14Z" fill="url(#hikari-f3-tip)" clip-path="url(#hikari-f3-tc3)"/>
+<path d="M-3.6 0C-6.6 -20.8 -11.16 -36.06 -9.6 -51.31C-8.04 -62.41 0 -68.65 4.8 -69.34C12 -67.26 16.08 -62.41 14.4 -49.92C14.16 -36.06 6.6 -20.8 3.6 0Z" fill="none" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-7.44 -15.25C-9.84 -29.12 -9.36 -38.83 -7.2 -44.38" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/>
+<path d="M4.2 -20.8c2.16 -6.93 2.64 -13.87 1.92 -20.8" stroke="#ead7cc" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+</g>
+<g transform="translate(50 84) rotate(-33.23)">
+<path d="M-3.6 0C-6.6 -20.8 -14.04 -36.06 -14.4 -51.31C-14.76 -62.41 -9.6 -68.65 -4.8 -69.34C2.4 -67.26 9.36 -62.41 9.6 -49.92C11.28 -36.06 6.6 -20.8 3.6 0Z" fill="url(#hikari-f3-tail)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-19.2 -90.14L-19.2 -54.44 -12.8 -51.15 -6.4 -55.47 0 -52.18 6.4 -56.49 12.8 -53.2 19.2 -57.51 19.2 -90.14Z" fill="url(#hikari-f3-tip)" clip-path="url(#hikari-f3-tc4)"/>
+<path d="M-3.6 0C-6.6 -20.8 -14.04 -36.06 -14.4 -51.31C-14.76 -62.41 -9.6 -68.65 -4.8 -69.34C2.4 -67.26 9.36 -62.41 9.6 -49.92C11.28 -36.06 6.6 -20.8 3.6 0Z" fill="none" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-7.44 -15.25C-9.84 -29.12 -9.36 -38.83 -7.2 -44.38" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/>
+<path d="M4.2 -20.8c2.16 -6.93 2.64 -13.87 1.92 -20.8" stroke="#ead7cc" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+</g>
+<g transform="translate(50 84) rotate(0)">
+<path d="M-3.6 0C-6.6 -24.6 -12.6 -42.64 -12 -60.68C-11.4 -73.8 -4.8 -81.18 0 -82C7.2 -79.54 12.72 -73.8 12 -59.04C12.72 -42.64 6.6 -24.6 3.6 0Z" fill="url(#hikari-f3-tail)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-19.2 -106.6L-19.2 -65.98 -12.8 -62.18 -6.4 -65.98 0 -62.18 6.4 -65.98 12.8 -62.18 19.2 -65.98 19.2 -106.6Z" fill="url(#hikari-f3-tip)" clip-path="url(#hikari-f3-tc5)"/>
+<path d="M-3.6 0C-6.6 -24.6 -12.6 -42.64 -12 -60.68C-11.4 -73.8 -4.8 -81.18 0 -82C7.2 -79.54 12.72 -73.8 12 -59.04C12.72 -42.64 6.6 -24.6 3.6 0Z" fill="none" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M-7.44 -18.04C-9.84 -34.44 -9.36 -45.92 -7.2 -52.48" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/>
+<path d="M4.2 -24.6c2.16 -8.2 2.64 -16.4 1.92 -24.6" stroke="#ead7cc" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+</g>
+<path d="M24.4 45C19.6 33.6 19.4 20 24.2 8.6 25.2 6.6 27 6.4 28.8 7.6 36 12.4 42.4 19.6 46 28Z" fill="url(#hikari-f3-fur)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M28 40C25.8 32 25.6 23.6 27.8 16 33.4 19.4 38.4 24.6 41.8 30Z" fill="url(#hikari-f3-ear)" stroke="#e7a08e" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M0 0H100V18C36 20 28 15 0 24Z" fill="url(#hikari-f3-tip)" clip-path="url(#hikari-f3-el)"/>
+<path d="M24.4 45C19.6 33.6 19.4 20 24.2 8.6 25.2 6.6 27 6.4 28.8 7.6 36 12.4 42.4 19.6 46 28Z" fill="none" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M75.6 45C80.4 33.6 80.6 20 75.8 8.6 74.8 6.6 73 6.4 71.2 7.6 64 12.4 57.6 19.6 54 28Z" fill="url(#hikari-f3-fur)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M72 40C74.2 32 74.4 23.6 72.2 16 66.6 19.4 61.6 24.6 58.2 30Z" fill="url(#hikari-f3-ear)" stroke="#e7a08e" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M0 0H100V18C64 16 72 21 0 12Z" fill="url(#hikari-f3-tip)" clip-path="url(#hikari-f3-er)"/>
+<path d="M75.6 45C80.4 33.6 80.6 20 75.8 8.6 74.8 6.6 73 6.4 71.2 7.6 64 12.4 57.6 19.6 54 28Z" fill="none" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M24 88C22 80 26 74 33 74 40 74 43 81 41 88 40 92 36 94 31 94 27 94 25 92 24 88Z" fill="url(#hikari-f3-fur)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M76 88C78 80 74 74 67 74 60 74 57 81 59 88 60 92 64 94 69 94 73 94 75 92 76 88Z" fill="url(#hikari-f3-fur)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M31 91C27 80 33 68 50 67 67 68 73 80 69 91 67 94 63 94 58 94H42C37 94 33 94 31 91Z" fill="url(#hikari-f3-fur)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M31 67C35 71 38 72 41 70 41.6 73 44 74.6 46.2 72.6 47.4 75.4 49 76 50 74 51 76 52.6 75.4 53.8 72.6 56 74.6 58.4 73 59 70 62 72 65 71 69 67 68.2 75 63.4 79 58.4 80 57 83.2 53.4 82 50 85.4 46.6 82 43 83.2 41.6 80 36.6 79 31.8 75 31 67Z" fill="url(#hikari-f3-belly)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M37.6 79V91.4C37.6 94.4 49 94.4 49 91.4V79ZM51 79V91.4C51 94.4 62.4 94.4 62.4 91.4V79Z" fill="url(#hikari-f3-fur)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M37.8 89.4C37.8 87.6 49 87.6 49 89.4V91.4C49 94.4 37.8 94.4 37.8 91.4ZM51.2 89.4C51.2 87.6 62.2 87.6 62.2 89.4V91.4C62.2 94.4 51.2 94.4 51.2 91.4Z" fill="url(#hikari-f3-tip)" opacity=".75"/>
+<path d="M37.6 79V91.4C37.6 94.4 49 94.4 49 91.4V79M51 79V91.4C51 94.4 62.4 94.4 62.4 91.4V79" fill="none" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M40.6 93v-2.4M43.3 93.4v-2.6M46 93v-2.4M54 93v-2.4M56.7 93.4v-2.6M59.4 93v-2.4" stroke="#d98270" stroke-width="1" stroke-linecap="round"/>
+<path d="M50 25C66 25 78 35 79.4 46L86.4 50.4 80.6 54.4 84.8 59.4 76.2 61.2C70 67 61 70 50 70S30 67 23.8 61.2L15.2 59.4 19.4 54.4 13.6 50.4 20.6 46C22 35 34 25 50 25Z" fill="url(#hikari-f3-fur)" stroke="#c49486" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M29 31c2-2 4-3 6-3M71 31c-2-2-4-3-6-3" stroke="#fff" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+<path d="M29 42c4-8 11-12 17-13" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" opacity=".9"/>
+<path d="M50 30.2C47.6 33.2 46.4 35.6 46.4 37.6 46.4 39.8 48 41.2 50 41.2S53.6 39.8 53.6 37.6C53.6 36 52.8 34.6 51.6 33.4 51.4 34.6 50.8 35.4 50 35.6 50.6 34 50.6 32.2 50 30.2Z" fill="url(#hikari-f3-mark)" stroke="#c8472f" stroke-width="1.1" stroke-linejoin="round"/>
+<circle cx="39" cy="51" r="5.8" fill="#3a1e12"/>
+<path d="M34.8 53.4A4.6 4.6 0 0 0 43.2 53.4 5.6 2.8 0 0 1 34.8 53.4Z" fill="#8a5a44" opacity=".6"/>
+<circle cx="41.1" cy="48.6" r="2.3" fill="#fff"/><circle cx="36.8" cy="53.2" r=".9" fill="#fff"/>
+<circle cx="61" cy="51" r="5.8" fill="#3a1e12"/>
+<path d="M56.8 53.4A4.6 4.6 0 0 0 65.2 53.4 5.6 2.8 0 0 1 56.8 53.4Z" fill="#8a5a44" opacity=".6"/>
+<circle cx="63.1" cy="48.6" r="2.3" fill="#fff"/><circle cx="58.8" cy="53.2" r=".9" fill="#fff"/>
+<ellipse cx="28.4" cy="59.2" rx="5" ry="3" fill="#f79a86" opacity=".65"/><ellipse cx="71.6" cy="59.2" rx="5" ry="3" fill="#f79a86" opacity=".65"/>
+<path d="M47.6 57.4h4.8c.8 0 1.1.8.6 1.4L51 60.8c-.5.5-1.5.5-2 0l-2-2c-.5-.6-.2-1.4.6-1.4z" fill="#4a2a1e"/>
+<path d="M50 61v1.2M46.4 62.4c1.2 1.8 2.8 1.8 3.6 0 .8 1.8 2.4 1.8 3.6 0" fill="none" stroke="#4a2a1e" stroke-width="1.3" stroke-linecap="round"/>
+<path d="M62 86c5-2 8-5 9-9M27 80c1-2 3-3 5-3.4" stroke="#ead7cc" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+</g>
+<circle cx="9" cy="10" r="7.2" fill="url(#hikari-f3-glow)"/>
+<g transform="translate(9 9)"><path d="M0 -5.94C-1.44 -3.24 -3.96 -1.62 -3.96 1.26C-3.96 3.78 -2.16 5.22 0 5.22S3.96 3.78 3.96 1.26C3.96 -0.72 2.7 -1.8 2.16 -3.06C1.62 -1.8 0.9 -1.26 0.36 -1.26C0.81 -2.7 0.72 -4.32 0 -5.94Z" fill="url(#hikari-f3-fire)" stroke="#e48c58" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M0 0.36C-1.44 1.62 -1.62 3.06 -0.72 3.78 -0.27 4.14 0.27 4.14 0.72 3.78 1.62 3.06 1.44 1.62 0 0.36Z" fill="#fff8e4"/></g>
+<circle cx="91" cy="10" r="7.2" fill="url(#hikari-f3-glow)"/>
+<g transform="translate(91 9)"><path d="M0 -5.94C-1.44 -3.24 -3.96 -1.62 -3.96 1.26C-3.96 3.78 -2.16 5.22 0 5.22S3.96 3.78 3.96 1.26C3.96 -0.72 2.7 -1.8 2.16 -3.06C1.62 -1.8 0.9 -1.26 0.36 -1.26C0.81 -2.7 0.72 -4.32 0 -5.94Z" fill="url(#hikari-f3-fire)" stroke="#e48c58" stroke-width="1.1" stroke-linejoin="round"/>
+<path d="M0 0.36C-1.44 1.62 -1.62 3.06 -0.72 3.78 -0.27 4.14 0.27 4.14 0.72 3.78 1.62 3.06 1.44 1.62 0 0.36Z" fill="#fff8e4"/></g>
+<path d="M92 30.11C92.34 31.43 92.57 31.66 93.89 32C92.57 32.34 92.34 32.57 92 33.89C91.66 32.57 91.43 32.34 90.11 32C91.43 31.66 91.66 31.43 92 30.11Z" fill="#ffd66b" stroke="#e3a33a" stroke-width="1" stroke-linejoin="round"/></svg>

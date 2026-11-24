@@ -1,1260 +1,1576 @@
 [
-  {
-    "id": "ember",
-    "name": "Ember",
-    "animal": "Fox",
-    "parts": [
-      {
-        "color": "#ec8448"
-      },
-      {
-        "color": "#ec8448"
-      },
-      {
-        "color": "#fbe3c8"
-      },
-      {
-        "color": "#ec8448"
-      },
-      {
-        "color": "#ec8448"
-      },
-      {
-        "color": "#ec8448"
-      },
-      {
-        "color": "#fbe3c8"
-      }
-    ]
-  },
-  {
-    "id": "mossy",
-    "name": "Mossy",
-    "animal": "Turtle",
-    "parts": [
-      {
-        "color": "#4e8c4b"
-      },
-      {
-        "color": "#f0d18a"
-      },
-      {
-        "color": "#a9cc72"
-      },
-      {
-        "color": "#a9cc72"
-      },
-      {
-        "color": "#a9cc72"
-      }
-    ]
-  },
-  {
-    "id": "coral",
-    "name": "Coral",
-    "animal": "Axolotl",
-    "parts": [
-      {
-        "color": "#f6a09e"
-      },
-      {
-        "color": "#ffdcd6"
-      },
-      {
-        "color": "#f6a09e"
-      }
-    ]
-  },
-  {
-    "id": "mochi",
-    "name": "Mochi",
-    "animal": "Kitten",
-    "parts": [
-      {
-        "kind": "stroke",
-        "color": "#f4bf98"
-      },
-      {
-        "color": "#f4bf98"
-      },
-      {
-        "color": "#f4bf98"
-      },
-      {
-        "color": "#fbe6d2"
-      }
-    ]
-  },
-  {
-    "id": "hoot",
-    "name": "Hoot",
-    "animal": "Owl",
-    "parts": [
-      {
-        "color": "#ab7350"
-      },
-      {
-        "color": "#ab7350"
-      },
-      {
-        "color": "#ab7350"
-      },
-      {
-        "color": "#e6bf90"
-      },
-      {
-        "color": "#8a5434"
-      },
-      {
-        "color": "#8a5434"
-      },
-      {
-        "color": "#f6e2c6"
-      }
-    ]
-  },
-  {
-    "id": "waffles",
-    "name": "Waffles",
-    "animal": "Puppy",
-    "parts": [
-      {
-        "color": "#e5b574"
-      },
-      {
-        "color": "#e5b574"
-      },
-      {
-        "color": "#e5b574"
-      },
-      {
-        "color": "#e5b574"
-      },
-      {
-        "color": "#d79a5a"
-      },
-      {
-        "color": "#f8e6cc"
-      },
-      {
-        "color": "#f8e6cc"
-      },
-      {
-        "color": "#f8e6cc"
-      },
-      {
-        "color": "#e5b574"
-      },
-      {
-        "color": "#dba266"
-      },
-      {
-        "color": "#ad6c36"
-      },
-      {
-        "color": "#ad6c36"
-      },
-      {
-        "color": "#f8e6cc"
-      }
-    ]
-  },
-  {
-    "id": "peep",
-    "name": "Peep",
-    "animal": "Chick",
-    "parts": [
-      {
-        "color": "#f5c443"
-      },
-      {
-        "color": "#efe0c2"
-      }
-    ]
-  },
-  {
-    "id": "bruno",
-    "name": "Bruno",
-    "animal": "Bear cub",
-    "parts": [
-      {
-        "color": "#a96c43"
-      },
-      {
-        "color": "#a96c43"
-      },
-      {
-        "color": "#a96c43"
-      },
-      {
-        "color": "#a96c43"
-      },
-      {
-        "color": "#e8bf92"
-      }
-    ]
-  },
-  {
-    "id": "biscuit",
-    "name": "Biscuit",
-    "animal": "Bunny",
-    "parts": [
-      {
-        "color": "#f6b0a2"
-      },
-      {
-        "color": "#f8e8d4"
-      },
-      {
-        "color": "#e8cba2"
-      },
-      {
-        "color": "#f8e8d4"
-      },
-      {
-        "color": "#f8e8d4"
-      },
-      {
-        "color": "#e8cba2"
-      },
-      {
-        "color": "#e8cba2"
-      },
-      {
-        "color": "#e8cba2"
-      },
-      {
-        "color": "#f8e8d4"
-      }
-    ]
-  },
-  {
-    "id": "truffle",
-    "name": "Truffle",
-    "animal": "Piglet",
-    "parts": [
-      {
-        "color": "#f3aea8"
-      },
-      {
-        "color": "#f3aea8"
-      },
-      {
-        "color": "#f3aea8"
-      },
-      {
-        "color": "#f3aea8"
-      },
-      {
-        "color": "#ee9a94"
-      }
-    ]
-  },
-  {
-    "id": "pebble",
-    "name": "Pebble",
-    "animal": "Hedgehog",
-    "parts": [
-      {
-        "color": "#c49a70"
-      },
-      {
-        "color": "#f1d6b2"
-      },
-      {
-        "color": "#c99a72"
-      },
-      {
-        "color": "#c99a72"
-      },
-      {
-        "color": "#c99a72"
-      },
-      {
-        "color": "#c99a72"
-      },
-      {
-        "color": "#f1d6b2"
-      }
-    ]
-  },
-  {
-    "id": "quartz",
-    "name": "Quartz",
-    "animal": "Gem",
-    "parts": [
-      {
-        "color": "#f0b24c"
-      },
-      {
-        "color": "#fff6dc"
-      }
-    ]
-  },
-  {
-    "id": "ribbit",
-    "name": "Ribbit",
-    "animal": "Frog",
-    "parts": [
-      {
-        "color": "#58a463"
-      },
-      {
-        "color": "#58a463"
-      },
-      {
-        "color": "#58a463"
-      },
-      {
-        "color": "#58a463"
-      },
-      {
-        "color": "#58a463"
-      },
-      {
-        "color": "#58a463"
-      },
-      {
-        "color": "#dcecb4"
-      },
-      {
-        "color": "#58a463"
-      },
-      {
-        "color": "#58a463"
-      },
-      {
-        "color": "#58a463"
-      },
-      {
-        "color": "#7a5a44"
-      }
-    ]
-  },
-  {
-    "id": "cotton",
-    "name": "Cotton",
-    "animal": "Lamb",
-    "parts": [
-      {
-        "color": "#f0e0c6"
-      },
-      {
-        "color": "#f4c9ab"
-      },
-      {
-        "color": "#f4c9ab"
-      },
-      {
-        "color": "#f4c9ab"
-      },
-      {
-        "color": "#f0e0c6"
-      },
-      {
-        "color": "#f4c9ab"
-      },
-      {
-        "color": "#f0e0c6"
-      }
-    ]
-  },
-  {
-    "id": "squeak",
-    "name": "Squeak",
-    "animal": "Mouse",
-    "parts": [
-      {
-        "color": "#cbbba7"
-      },
-      {
-        "color": "#f2e6d6"
-      },
-      {
-        "color": "#f0a49a"
-      },
-      {
-        "color": "#f0a49a"
-      },
-      {
-        "color": "#cbbba7"
-      },
-      {
-        "color": "#f0a49a"
-      },
-      {
-        "color": "#cbbba7"
-      },
-      {
-        "color": "#f0a49a"
-      },
-      {
-        "color": "#cbbba7"
-      },
-      {
-        "color": "#f2e6d6"
-      }
-    ]
-  },
-  {
-    "id": "maple",
-    "name": "Maple",
-    "animal": "Red panda",
-    "parts": [
-      {
-        "color": "#de7a44"
-      },
-      {
-        "color": "#a54e2a"
-      },
-      {
-        "color": "#de7a44"
-      },
-      {
-        "color": "#de7a44"
-      },
-      {
-        "color": "#f6e4d2"
-      },
-      {
-        "color": "#f6e4d2"
-      }
-    ]
-  },
-  {
-    "id": "otto",
-    "name": "Otto",
-    "animal": "Otter",
-    "parts": [
-      {
-        "color": "#a8704b"
-      },
-      {
-        "color": "#f1dcc2"
-      },
-      {
-        "color": "#a8704b"
-      },
-      {
-        "color": "#f1dcc2"
-      },
-      {
-        "color": "#a99f93"
-      }
-    ]
-  },
-  {
-    "id": "buzz",
-    "name": "Buzz",
-    "animal": "Bee",
-    "parts": [
-      {
-        "color": "#f3ece0"
-      },
-      {
-        "color": "#f3ece0"
-      },
-      {
-        "color": "#f2bb45"
-      }
-    ]
-  },
-  {
-    "id": "kiko",
-    "name": "Kiko",
-    "animal": "Koala",
-    "parts": [
-      {
-        "color": "#f2d8cc"
-      },
-      {
-        "color": "#f2d8cc"
-      },
-      {
-        "color": "#aba297"
-      },
-      {
-        "color": "#efe5d8"
-      },
-      {
-        "color": "#aba297"
-      },
-      {
-        "color": "#efe5d8"
-      },
-      {
-        "color": "#aba297"
-      }
-    ]
-  },
-  {
-    "id": "splash",
-    "name": "Splash",
-    "animal": "Seal",
-    "parts": [
-      {
-        "color": "#ebe5db"
-      },
-      {
-        "color": "#ebe5db"
-      },
-      {
-        "color": "#ebe5db"
-      },
-      {
-        "color": "#ebe5db"
-      },
-      {
-        "color": "#ebe5db"
-      },
-      {
-        "color": "#f3e8d8"
-      },
-      {
-        "color": "#f3e8d8"
-      }
-    ]
-  },
-  {
-    "id": "shroomy",
-    "name": "Shroomy",
-    "animal": "Mushroom sprite",
-    "parts": [
-      {
-        "color": "#f1dfc6"
-      },
-      {
-        "color": "#f1dfc6"
-      },
-      {
-        "color": "#d9644f"
-      },
-      {
-        "color": "#fffaf1"
-      },
-      {
-        "color": "#fffaf1"
-      },
-      {
-        "color": "#fffaf1"
-      }
-    ]
-  },
-  {
-    "id": "bandit",
-    "name": "Bandit",
-    "animal": "Raccoon",
-    "parts": [
-      {
-        "color": "#b9ada0"
-      },
-      {
-        "color": "#b9ada0"
-      },
-      {
-        "color": "#efe5d8"
-      },
-      {
-        "color": "#6a5a4f"
-      },
-      {
-        "color": "#b9ada0"
-      },
-      {
-        "color": "#8c7d71"
-      },
-      {
-        "color": "#efe5d8"
-      }
-    ]
-  },
-  {
-    "id": "waddles",
-    "name": "Waddles",
-    "animal": "Penguin",
-    "parts": [
-      {
-        "color": "#aea59c"
-      },
-      {
-        "color": "#aea59c"
-      },
-      {
-        "color": "#ebe4da"
-      },
-      {
-        "color": "#ebe4da"
-      },
-      {
-        "color": "#aea59c"
-      }
-    ]
-  },
-  {
-    "id": "fawn",
-    "name": "Fawn",
-    "animal": "Deer",
-    "parts": [
-      {
-        "color": "#d59a6c"
-      },
-      {
-        "color": "#f6e2cb"
-      },
-      {
-        "kind": "stroke",
-        "color": "#d59a6c"
-      },
-      {
-        "color": "#d59a6c"
-      },
-      {
-        "color": "#f6e2cb"
-      }
-    ]
-  },
-  {
-    "id": "shelly",
-    "name": "Shelly",
-    "animal": "Snail",
-    "parts": [
-      {
-        "color": "#a9cd8f"
-      },
-      {
-        "color": "#ec9a72"
-      },
-      {
-        "color": "#a9cd8f"
-      },
-      {
-        "color": "#e2efcb"
-      }
-    ]
-  },
-  {
-    "id": "inky",
-    "name": "Inky",
-    "animal": "Octopus",
-    "parts": [
-      {
-        "kind": "stroke",
-        "color": "#f5a59d"
-      },
-      {
-        "kind": "stroke",
-        "color": "#f5a59d"
-      },
-      {
-        "color": "#f29790"
-      }
-    ]
-  },
-  {
-    "id": "puff",
-    "name": "Puff",
-    "animal": "Cloud",
-    "parts": [
-      {
-        "color": "#f6fbf9"
-      },
-      {
-        "color": "#f6fbf9"
-      },
-      {
-        "color": "#f6fbf9"
-      },
-      {
-        "color": "#8a5a44"
-      }
-    ]
-  },
-  {
-    "id": "twinkle",
-    "name": "Twinkle",
-    "animal": "Star",
-    "parts": [
-      {
-        "color": "#f6c548"
-      },
-      {
-        "color": "#fde58a"
-      },
-      {
-        "color": "#8a5a44"
-      }
-    ]
-  },
-  {
-    "id": "starla",
-    "name": "Starla",
-    "animal": "Unicorn",
-    "parts": [
-      {
-        "color": "#f3a5c2"
-      },
-      {
-        "color": "#f1e4dc"
-      },
-      {
-        "color": "#f1e4dc"
-      },
-      {
-        "color": "#f1e4dc"
-      },
-      {
-        "color": "#f1e4dc"
-      },
-      {
-        "color": "#f1e4dc"
-      },
-      {
-        "color": "#f8c9cf"
-      },
-      {
-        "color": "#f8c9cf"
-      },
-      {
-        "color": "#f1e4dc"
-      },
-      {
-        "color": "#fbdcd8"
-      },
-      {
-        "color": "#f3a5c2"
-      },
-      {
-        "color": "#8a5a44"
-      }
-    ]
-  },
-  {
-    "id": "ziggy",
-    "name": "Ziggy",
-    "animal": "Dragon",
-    "parts": [
-      {
-        "kind": "stroke",
-        "color": "#f3a47c"
-      },
-      {
-        "color": "#fcdcb6"
-      },
-      {
-        "color": "#f3a47c"
-      },
-      {
-        "color": "#f3a47c"
-      },
-      {
-        "color": "#f3a47c"
-      },
-      {
-        "color": "#f3a47c"
-      },
-      {
-        "color": "#f3a47c"
-      },
-      {
-        "color": "#fcdcb6"
-      },
-      {
-        "color": "#8a5a44"
-      }
-    ]
-  },
-  {
-    "id": "leo",
-    "name": "Leo",
-    "animal": "Lion cub",
-    "parts": [
-      {
-        "color": "#e2863f"
-      },
-      {
-        "color": "#f2b95a"
-      },
-      {
-        "color": "#f2b95a"
-      },
-      {
-        "color": "#f2b95a"
-      },
-      {
-        "color": "#fbe5c4"
-      },
-      {
-        "color": "#f2b95a"
-      },
-      {
-        "color": "#f2b95a"
-      },
-      {
-        "color": "#fbe5c4"
-      }
-    ]
-  },
-  {
-    "id": "koi",
-    "name": "Koi",
-    "animal": "Lucky koi",
-    "parts": [
-      {
-        "color": "#f3e6da"
-      },
-      {
-        "color": "#ec8656"
-      },
-      {
-        "color": "#8a5a44"
-      }
-    ]
-  },
-  {
-    "id": "bamboo",
-    "name": "Bamboo",
-    "animal": "Giant panda",
-    "parts": [
-      {
-        "color": "#f1e8de"
-      },
-      {
-        "color": "#f7eadc"
-      },
-      {
-        "color": "#f1e8de"
-      },
-      {
-        "color": "#f7eadc"
-      }
-    ]
-  },
-  {
-    "id": "aurora",
-    "name": "Aurora",
-    "animal": "Arctic fox",
-    "parts": [
-      {
-        "color": "#efe2d2"
-      },
-      {
-        "color": "#efe2d2"
-      },
-      {
-        "color": "#efe2d2"
-      }
-    ]
-  },
-  {
-    "id": "storm",
-    "name": "Storm",
-    "animal": "Tiger cub",
-    "parts": [
-      {
-        "kind": "stroke",
-        "color": "#f1a172"
-      },
-      {
-        "color": "#f1a172"
-      },
-      {
-        "color": "#f1a172"
-      },
-      {
-        "color": "#f1a172"
-      },
-      {
-        "color": "#fbe6d2"
-      },
-      {
-        "color": "#f1a172"
-      },
-      {
-        "color": "#f1a172"
-      },
-      {
-        "color": "#f1a172"
-      },
-      {
-        "color": "#fbe6d2"
-      }
-    ]
-  },
-  {
-    "id": "plume",
-    "name": "Plume",
-    "animal": "Peacock",
-    "parts": [
-      {
-        "color": "#62b89c"
-      },
-      {
-        "color": "#62b89c"
-      },
-      {
-        "color": "#62b89c"
-      },
-      {
-        "color": "#62b89c"
-      },
-      {
-        "color": "#5cbca8"
-      },
-      {
-        "color": "#d9f0df"
-      }
-    ]
-  },
-  {
-    "id": "nova",
-    "name": "Nova",
-    "animal": "Narwhal",
-    "parts": [
-      {
-        "color": "#7cc3a3"
-      },
-      {
-        "color": "#e6f2dc"
-      },
-      {
-        "color": "#5fae8c"
-      }
-    ]
-  },
-  {
-    "id": "luna",
-    "name": "Luna",
-    "animal": "Snow leopard",
-    "parts": [
-      {
-        "kind": "stroke",
-        "color": "#b2a090"
-      },
-      {
-        "color": "#ddd2c4"
-      },
-      {
-        "color": "#ddd2c4"
-      },
-      {
-        "color": "#f3ece2"
-      },
-      {
-        "color": "#ddd2c4"
-      },
-      {
-        "color": "#f3ece2"
-      }
-    ]
-  },
-  {
-    "id": "sol",
-    "name": "Sol",
-    "animal": "Phoenix",
-    "parts": [
-      {
-        "color": "#f6a46c"
-      },
-      {
-        "color": "#fde0c0"
-      },
-      {
-        "color": "#8a5a44"
-      }
-    ]
-  },
-  {
-    "id": "kiri",
-    "name": "Kiri",
-    "animal": "Qilin",
-    "parts": [
-      {
-        "color": "#86d4c0"
-      },
-      {
-        "color": "#ecc98a"
-      },
-      {
-        "color": "#ecc98a"
-      },
-      {
-        "color": "#ecc98a"
-      },
-      {
-        "color": "#f9ead0"
-      },
-      {
-        "color": "#ecc98a"
-      },
-      {
-        "color": "#ecc98a"
-      },
-      {
-        "color": "#ecc98a"
-      },
-      {
-        "color": "#f9ead0"
-      },
-      {
-        "color": "#8a5a44"
-      }
-    ]
-  },
-  {
-    "id": "gryff",
-    "name": "Gryff",
-    "animal": "Griffin",
-    "parts": [
-      {
-        "color": "#e9ae52"
-      },
-      {
-        "color": "#e9ae52"
-      },
-      {
-        "color": "#f8e6c8"
-      },
-      {
-        "color": "#f8e6c8"
-      },
-      {
-        "color": "#f1dfc0"
-      },
-      {
-        "color": "#8a5a44"
-      },
-      {
-        "color": "#f0a03c"
-      }
-    ]
-  },
-  {
-    "id": "nessa",
-    "name": "Nessa",
-    "animal": "Loch Ness monster",
-    "parts": [
-      {
-        "color": "#a9dccd"
-      },
-      {
-        "kind": "stroke",
-        "color": "#72c19a"
-      },
-      {
-        "color": "#72c19a"
-      },
-      {
-        "color": "#dcf1d3"
-      },
-      {
-        "color": "#9fd6b2"
-      },
-      {
-        "color": "#9fd6b2"
-      },
-      {
-        "color": "#72c19a"
-      },
-      {
-        "color": "#dcf1d3"
-      },
-      {
-        "color": "#8a5a44"
-      }
-    ]
-  },
-  {
-    "id": "dozy",
-    "name": "Dozy",
-    "animal": "Baku dream-eater",
-    "parts": [
-      {
-        "color": "#8f7662"
-      },
-      {
-        "color": "#b19782"
-      },
-      {
-        "color": "#b19782"
-      },
-      {
-        "color": "#b19782"
-      },
-      {
-        "color": "#b19782"
-      },
-      {
-        "color": "#b19782"
-      },
-      {
-        "color": "#a88c76"
-      },
-      {
-        "color": "#f1c0b0"
-      },
-      {
-        "color": "#a88c76"
-      },
-      {
-        "color": "#b19782"
-      },
-      {
-        "color": "#b19782"
-      }
-    ]
-  },
-  {
-    "id": "nimbus",
-    "name": "Nimbus",
-    "animal": "Pegasus",
-    "parts": [
-      {
-        "color": "#efe2d2"
-      },
-      {
-        "color": "#efe2d2"
-      },
-      {
-        "color": "#efe2d2"
-      },
-      {
-        "color": "#efe2d2"
-      },
-      {
-        "color": "#efe2d2"
-      },
-      {
-        "color": "#efe2d2"
-      },
-      {
-        "color": "#f6e4d4"
-      },
-      {
-        "color": "#80d2be"
-      }
-    ]
-  },
-  {
-    "id": "hopscotch",
-    "name": "Hopscotch",
-    "animal": "Jackalope",
-    "parts": [
-      {
-        "color": "#f7e4cb"
-      },
-      {
-        "color": "#dcae7a"
-      },
-      {
-        "color": "#f7e4cb"
-      },
-      {
-        "color": "#f7e4cb"
-      },
-      {
-        "color": "#f7e4cb"
-      },
-      {
-        "color": "#dcae7a"
-      },
-      {
-        "color": "#dcae7a"
-      },
-      {
-        "color": "#dcae7a"
-      },
-      {
-        "color": "#f7e4cb"
-      }
-    ]
-  },
-  {
-    "id": "frosty",
-    "name": "Frosty",
-    "animal": "Yeti",
-    "parts": [
-      {
-        "color": "#d6dbd6"
-      },
-      {
-        "color": "#f6e6d6"
-      },
-      {
-        "color": "#c2cac3"
-      },
-      {
-        "color": "#c2cac3"
-      },
-      {
-        "color": "#f6e6d6"
-      }
-    ]
-  },
-  {
-    "id": "fen",
-    "name": "Fen",
-    "animal": "Fenrir wolf pup",
-    "parts": [
-      {
-        "color": "#8f8780"
-      },
-      {
-        "color": "#8f8780"
-      },
-      {
-        "color": "#b3aca5"
-      },
-      {
-        "color": "#b3aca5"
-      },
-      {
-        "kind": "stroke",
-        "color": "#c9c3bd"
-      },
-      {
-        "color": "#b3aca5"
-      },
-      {
-        "color": "#f3e3cf"
-      },
-      {
-        "color": "#fffaf3"
-      }
-    ]
-  },
-  {
-    "id": "riddle",
-    "name": "Riddle",
-    "animal": "Sphinx kitten",
-    "parts": [
-      {
-        "kind": "stroke",
-        "color": "#e5bb7a"
-      },
-      {
-        "color": "#e5bb7a"
-      },
-      {
-        "color": "#f7e6c9"
-      },
-      {
-        "color": "#f7e6c9"
-      },
-      {
-        "color": "#f7e6c9"
-      },
-      {
-        "color": "#f7e6c9"
-      },
-      {
-        "color": "#e5bb7a"
-      },
-      {
-        "color": "#e8b240"
-      },
-      {
-        "color": "#f7e6c9"
-      }
-    ]
-  }
+ {
+  "id": "ember",
+  "name": "Ember",
+  "animal": "Fox",
+  "parts": [
+   {
+    "color": "#ec8448"
+   },
+   {
+    "color": "#ec8448"
+   },
+   {
+    "color": "#fbe3c8"
+   },
+   {
+    "color": "#ec8448"
+   },
+   {
+    "color": "#ec8448"
+   },
+   {
+    "color": "#ec8448"
+   },
+   {
+    "color": "#fbe3c8"
+   }
+  ]
+ },
+ {
+  "id": "mossy",
+  "name": "Mossy",
+  "animal": "Turtle",
+  "parts": [
+   {
+    "color": "#4e8c4b"
+   },
+   {
+    "color": "#f0d18a"
+   },
+   {
+    "color": "#a9cc72"
+   },
+   {
+    "color": "#a9cc72"
+   },
+   {
+    "color": "#a9cc72"
+   }
+  ]
+ },
+ {
+  "id": "coral",
+  "name": "Coral",
+  "animal": "Axolotl",
+  "parts": [
+   {
+    "color": "#f6a09e"
+   },
+   {
+    "color": "#ffdcd6"
+   },
+   {
+    "color": "#f6a09e"
+   }
+  ]
+ },
+ {
+  "id": "mochi",
+  "name": "Mochi",
+  "animal": "Kitten",
+  "parts": [
+   {
+    "kind": "stroke",
+    "color": "#f4bf98"
+   },
+   {
+    "color": "#f4bf98"
+   },
+   {
+    "color": "#f4bf98"
+   },
+   {
+    "color": "#fbe6d2"
+   }
+  ]
+ },
+ {
+  "id": "hoot",
+  "name": "Hoot",
+  "animal": "Owl",
+  "parts": [
+   {
+    "color": "#ab7350"
+   },
+   {
+    "color": "#ab7350"
+   },
+   {
+    "color": "#ab7350"
+   },
+   {
+    "color": "#e6bf90"
+   },
+   {
+    "color": "#8a5434"
+   },
+   {
+    "color": "#8a5434"
+   },
+   {
+    "color": "#f6e2c6"
+   }
+  ]
+ },
+ {
+  "id": "waffles",
+  "name": "Waffles",
+  "animal": "Puppy",
+  "parts": [
+   {
+    "color": "#e5b574"
+   },
+   {
+    "color": "#e5b574"
+   },
+   {
+    "color": "#e5b574"
+   },
+   {
+    "color": "#e5b574"
+   },
+   {
+    "color": "#d79a5a"
+   },
+   {
+    "color": "#f8e6cc"
+   },
+   {
+    "color": "#f8e6cc"
+   },
+   {
+    "color": "#f8e6cc"
+   },
+   {
+    "color": "#e5b574"
+   },
+   {
+    "color": "#dba266"
+   },
+   {
+    "color": "#ad6c36"
+   },
+   {
+    "color": "#ad6c36"
+   },
+   {
+    "color": "#f8e6cc"
+   }
+  ]
+ },
+ {
+  "id": "peep",
+  "name": "Peep",
+  "animal": "Chick",
+  "parts": [
+   {
+    "color": "#f5c443"
+   },
+   {
+    "color": "#efe0c2"
+   }
+  ]
+ },
+ {
+  "id": "bruno",
+  "name": "Bruno",
+  "animal": "Bear cub",
+  "parts": [
+   {
+    "color": "#a96c43"
+   },
+   {
+    "color": "#a96c43"
+   },
+   {
+    "color": "#a96c43"
+   },
+   {
+    "color": "#a96c43"
+   },
+   {
+    "color": "#e8bf92"
+   }
+  ]
+ },
+ {
+  "id": "biscuit",
+  "name": "Biscuit",
+  "animal": "Bunny",
+  "parts": [
+   {
+    "color": "#f6b0a2"
+   },
+   {
+    "color": "#f8e8d4"
+   },
+   {
+    "color": "#e8cba2"
+   },
+   {
+    "color": "#f8e8d4"
+   },
+   {
+    "color": "#f8e8d4"
+   },
+   {
+    "color": "#e8cba2"
+   },
+   {
+    "color": "#e8cba2"
+   },
+   {
+    "color": "#e8cba2"
+   },
+   {
+    "color": "#f8e8d4"
+   }
+  ]
+ },
+ {
+  "id": "truffle",
+  "name": "Truffle",
+  "animal": "Piglet",
+  "parts": [
+   {
+    "color": "#f3aea8"
+   },
+   {
+    "color": "#f3aea8"
+   },
+   {
+    "color": "#f3aea8"
+   },
+   {
+    "color": "#f3aea8"
+   },
+   {
+    "color": "#ee9a94"
+   }
+  ]
+ },
+ {
+  "id": "pebble",
+  "name": "Pebble",
+  "animal": "Hedgehog",
+  "parts": [
+   {
+    "color": "#c49a70"
+   },
+   {
+    "color": "#f1d6b2"
+   },
+   {
+    "color": "#c99a72"
+   },
+   {
+    "color": "#c99a72"
+   },
+   {
+    "color": "#c99a72"
+   },
+   {
+    "color": "#c99a72"
+   },
+   {
+    "color": "#f1d6b2"
+   }
+  ]
+ },
+ {
+  "id": "quartz",
+  "name": "Quartz",
+  "animal": "Gem",
+  "parts": [
+   {
+    "color": "#f0b24c"
+   },
+   {
+    "color": "#fff6dc"
+   }
+  ]
+ },
+ {
+  "id": "ribbit",
+  "name": "Ribbit",
+  "animal": "Frog",
+  "parts": [
+   {
+    "color": "#58a463"
+   },
+   {
+    "color": "#58a463"
+   },
+   {
+    "color": "#58a463"
+   },
+   {
+    "color": "#58a463"
+   },
+   {
+    "color": "#58a463"
+   },
+   {
+    "color": "#58a463"
+   },
+   {
+    "color": "#dcecb4"
+   },
+   {
+    "color": "#58a463"
+   },
+   {
+    "color": "#58a463"
+   },
+   {
+    "color": "#58a463"
+   },
+   {
+    "color": "#7a5a44"
+   }
+  ]
+ },
+ {
+  "id": "cotton",
+  "name": "Cotton",
+  "animal": "Lamb",
+  "parts": [
+   {
+    "color": "#f0e0c6"
+   },
+   {
+    "color": "#f4c9ab"
+   },
+   {
+    "color": "#f4c9ab"
+   },
+   {
+    "color": "#f4c9ab"
+   },
+   {
+    "color": "#f0e0c6"
+   },
+   {
+    "color": "#f4c9ab"
+   },
+   {
+    "color": "#f0e0c6"
+   }
+  ]
+ },
+ {
+  "id": "squeak",
+  "name": "Squeak",
+  "animal": "Mouse",
+  "parts": [
+   {
+    "color": "#cbbba7"
+   },
+   {
+    "color": "#f2e6d6"
+   },
+   {
+    "color": "#f0a49a"
+   },
+   {
+    "color": "#f0a49a"
+   },
+   {
+    "color": "#cbbba7"
+   },
+   {
+    "color": "#f0a49a"
+   },
+   {
+    "color": "#cbbba7"
+   },
+   {
+    "color": "#f0a49a"
+   },
+   {
+    "color": "#cbbba7"
+   },
+   {
+    "color": "#f2e6d6"
+   }
+  ]
+ },
+ {
+  "id": "tops",
+  "name": "Tops",
+  "animal": "Triceratops",
+  "parts": [
+   {
+    "color": "#fcdab0"
+   },
+   {
+    "color": "#f1e2c6"
+   },
+   {
+    "color": "#f29a5a"
+   },
+   {
+    "color": "#f29a5a"
+   },
+   {
+    "color": "#e57f42"
+   },
+   {
+    "color": "#f29a5a"
+   },
+   {
+    "color": "#fcdab0"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "maple",
+  "name": "Maple",
+  "animal": "Red panda",
+  "parts": [
+   {
+    "color": "#de7a44"
+   },
+   {
+    "color": "#a54e2a"
+   },
+   {
+    "color": "#de7a44"
+   },
+   {
+    "color": "#de7a44"
+   },
+   {
+    "color": "#f6e4d2"
+   },
+   {
+    "color": "#f6e4d2"
+   }
+  ]
+ },
+ {
+  "id": "chomp",
+  "name": "Chomp",
+  "animal": "T-rex",
+  "parts": [
+   {
+    "color": "#72bf5c"
+   },
+   {
+    "color": "#72bf5c"
+   },
+   {
+    "color": "#f6e6a8"
+   },
+   {
+    "color": "#efe3c8"
+   },
+   {
+    "color": "#72bf5c"
+   },
+   {
+    "color": "#f6e6a8"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "otto",
+  "name": "Otto",
+  "animal": "Otter",
+  "parts": [
+   {
+    "color": "#a8704b"
+   },
+   {
+    "color": "#f1dcc2"
+   },
+   {
+    "color": "#a8704b"
+   },
+   {
+    "color": "#f1dcc2"
+   },
+   {
+    "color": "#a99f93"
+   }
+  ]
+ },
+ {
+  "id": "buzz",
+  "name": "Buzz",
+  "animal": "Bee",
+  "parts": [
+   {
+    "color": "#f3ece0"
+   },
+   {
+    "color": "#f3ece0"
+   },
+   {
+    "color": "#f2bb45"
+   }
+  ]
+ },
+ {
+  "id": "kiko",
+  "name": "Kiko",
+  "animal": "Koala",
+  "parts": [
+   {
+    "color": "#f2d8cc"
+   },
+   {
+    "color": "#f2d8cc"
+   },
+   {
+    "color": "#aba297"
+   },
+   {
+    "color": "#efe5d8"
+   },
+   {
+    "color": "#aba297"
+   },
+   {
+    "color": "#efe5d8"
+   },
+   {
+    "color": "#aba297"
+   }
+  ]
+ },
+ {
+  "id": "splash",
+  "name": "Splash",
+  "animal": "Seal",
+  "parts": [
+   {
+    "color": "#ebe5db"
+   },
+   {
+    "color": "#ebe5db"
+   },
+   {
+    "color": "#ebe5db"
+   },
+   {
+    "color": "#ebe5db"
+   },
+   {
+    "color": "#ebe5db"
+   },
+   {
+    "color": "#f3e8d8"
+   },
+   {
+    "color": "#f3e8d8"
+   }
+  ]
+ },
+ {
+  "id": "shroomy",
+  "name": "Shroomy",
+  "animal": "Mushroom sprite",
+  "parts": [
+   {
+    "color": "#f1dfc6"
+   },
+   {
+    "color": "#f1dfc6"
+   },
+   {
+    "color": "#d9644f"
+   },
+   {
+    "color": "#fffaf1"
+   },
+   {
+    "color": "#fffaf1"
+   },
+   {
+    "color": "#fffaf1"
+   }
+  ]
+ },
+ {
+  "id": "stretch",
+  "name": "Stretch",
+  "animal": "Brachiosaurus",
+  "parts": [
+   {
+    "color": "#6cc29c"
+   },
+   {
+    "kind": "stroke",
+    "color": "#6cc29c"
+   },
+   {
+    "kind": "stroke",
+    "color": "#f4e2b8"
+   },
+   {
+    "color": "#efe1c4"
+   },
+   {
+    "color": "#6cc29c"
+   },
+   {
+    "color": "#cdeed2"
+   }
+  ]
+ },
+ {
+  "id": "bandit",
+  "name": "Bandit",
+  "animal": "Raccoon",
+  "parts": [
+   {
+    "color": "#b9ada0"
+   },
+   {
+    "color": "#b9ada0"
+   },
+   {
+    "color": "#efe5d8"
+   },
+   {
+    "color": "#6a5a4f"
+   },
+   {
+    "color": "#b9ada0"
+   },
+   {
+    "color": "#8c7d71"
+   },
+   {
+    "color": "#efe5d8"
+   }
+  ]
+ },
+ {
+  "id": "spike",
+  "name": "Spike",
+  "animal": "Stegosaurus",
+  "parts": [
+   {
+    "color": "#f4e6c2"
+   },
+   {
+    "color": "#a3b86f"
+   },
+   {
+    "kind": "stroke",
+    "color": "#a3b86f"
+   },
+   {
+    "color": "#efe3c8"
+   },
+   {
+    "color": "#a3b86f"
+   },
+   {
+    "color": "#f4e6c2"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "waddles",
+  "name": "Waddles",
+  "animal": "Penguin",
+  "parts": [
+   {
+    "color": "#aea59c"
+   },
+   {
+    "color": "#aea59c"
+   },
+   {
+    "color": "#ebe4da"
+   },
+   {
+    "color": "#ebe4da"
+   },
+   {
+    "color": "#aea59c"
+   }
+  ]
+ },
+ {
+  "id": "fawn",
+  "name": "Fawn",
+  "animal": "Deer",
+  "parts": [
+   {
+    "color": "#d59a6c"
+   },
+   {
+    "color": "#f6e2cb"
+   },
+   {
+    "kind": "stroke",
+    "color": "#d59a6c"
+   },
+   {
+    "color": "#d59a6c"
+   },
+   {
+    "color": "#f6e2cb"
+   }
+  ]
+ },
+ {
+  "id": "shelly",
+  "name": "Shelly",
+  "animal": "Snail",
+  "parts": [
+   {
+    "color": "#a9cd8f"
+   },
+   {
+    "color": "#ec9a72"
+   },
+   {
+    "color": "#a9cd8f"
+   },
+   {
+    "color": "#e2efcb"
+   }
+  ]
+ },
+ {
+  "id": "inky",
+  "name": "Inky",
+  "animal": "Octopus",
+  "parts": [
+   {
+    "kind": "stroke",
+    "color": "#f5a59d"
+   },
+   {
+    "kind": "stroke",
+    "color": "#f5a59d"
+   },
+   {
+    "color": "#f29790"
+   }
+  ]
+ },
+ {
+  "id": "puff",
+  "name": "Puff",
+  "animal": "Cloud",
+  "parts": [
+   {
+    "color": "#f6fbf9"
+   },
+   {
+    "color": "#f6fbf9"
+   },
+   {
+    "color": "#f6fbf9"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "twinkle",
+  "name": "Twinkle",
+  "animal": "Star",
+  "parts": [
+   {
+    "color": "#f6c548"
+   },
+   {
+    "color": "#fde58a"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "starla",
+  "name": "Starla",
+  "animal": "Unicorn",
+  "parts": [
+   {
+    "color": "#f3a5c2"
+   },
+   {
+    "color": "#f1e4dc"
+   },
+   {
+    "color": "#f1e4dc"
+   },
+   {
+    "color": "#f1e4dc"
+   },
+   {
+    "color": "#f1e4dc"
+   },
+   {
+    "color": "#f1e4dc"
+   },
+   {
+    "color": "#f8c9cf"
+   },
+   {
+    "color": "#f8c9cf"
+   },
+   {
+    "color": "#f1e4dc"
+   },
+   {
+    "color": "#fbdcd8"
+   },
+   {
+    "color": "#f3a5c2"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "ziggy",
+  "name": "Ziggy",
+  "animal": "Dragon",
+  "parts": [
+   {
+    "kind": "stroke",
+    "color": "#f3a47c"
+   },
+   {
+    "color": "#fcdcb6"
+   },
+   {
+    "color": "#f3a47c"
+   },
+   {
+    "color": "#f3a47c"
+   },
+   {
+    "color": "#f3a47c"
+   },
+   {
+    "color": "#f3a47c"
+   },
+   {
+    "color": "#f3a47c"
+   },
+   {
+    "color": "#fcdcb6"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "leo",
+  "name": "Leo",
+  "animal": "Lion cub",
+  "parts": [
+   {
+    "color": "#e2863f"
+   },
+   {
+    "color": "#f2b95a"
+   },
+   {
+    "color": "#f2b95a"
+   },
+   {
+    "color": "#f2b95a"
+   },
+   {
+    "color": "#fbe5c4"
+   },
+   {
+    "color": "#f2b95a"
+   },
+   {
+    "color": "#f2b95a"
+   },
+   {
+    "color": "#fbe5c4"
+   }
+  ]
+ },
+ {
+  "id": "koi",
+  "name": "Koi",
+  "animal": "Lucky koi",
+  "parts": [
+   {
+    "color": "#f3e6da"
+   },
+   {
+    "color": "#ec8656"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "bamboo",
+  "name": "Bamboo",
+  "animal": "Giant panda",
+  "parts": [
+   {
+    "color": "#f1e8de"
+   },
+   {
+    "color": "#f7eadc"
+   },
+   {
+    "color": "#f1e8de"
+   },
+   {
+    "color": "#f7eadc"
+   }
+  ]
+ },
+ {
+  "id": "aurora",
+  "name": "Aurora",
+  "animal": "Arctic fox",
+  "parts": [
+   {
+    "color": "#efe2d2"
+   },
+   {
+    "color": "#efe2d2"
+   },
+   {
+    "color": "#efe2d2"
+   }
+  ]
+ },
+ {
+  "id": "storm",
+  "name": "Storm",
+  "animal": "Tiger cub",
+  "parts": [
+   {
+    "kind": "stroke",
+    "color": "#f1a172"
+   },
+   {
+    "color": "#f1a172"
+   },
+   {
+    "color": "#f1a172"
+   },
+   {
+    "color": "#f1a172"
+   },
+   {
+    "color": "#fbe6d2"
+   },
+   {
+    "color": "#f1a172"
+   },
+   {
+    "color": "#f1a172"
+   },
+   {
+    "color": "#f1a172"
+   },
+   {
+    "color": "#fbe6d2"
+   }
+  ]
+ },
+ {
+  "id": "plume",
+  "name": "Plume",
+  "animal": "Peacock",
+  "parts": [
+   {
+    "color": "#62b89c"
+   },
+   {
+    "color": "#62b89c"
+   },
+   {
+    "color": "#62b89c"
+   },
+   {
+    "color": "#62b89c"
+   },
+   {
+    "color": "#5cbca8"
+   },
+   {
+    "color": "#d9f0df"
+   }
+  ]
+ },
+ {
+  "id": "nova",
+  "name": "Nova",
+  "animal": "Narwhal",
+  "parts": [
+   {
+    "color": "#7cc3a3"
+   },
+   {
+    "color": "#e6f2dc"
+   },
+   {
+    "color": "#5fae8c"
+   }
+  ]
+ },
+ {
+  "id": "luna",
+  "name": "Luna",
+  "animal": "Snow leopard",
+  "parts": [
+   {
+    "kind": "stroke",
+    "color": "#b2a090"
+   },
+   {
+    "color": "#ddd2c4"
+   },
+   {
+    "color": "#ddd2c4"
+   },
+   {
+    "color": "#f3ece2"
+   },
+   {
+    "color": "#ddd2c4"
+   },
+   {
+    "color": "#f3ece2"
+   }
+  ]
+ },
+ {
+  "id": "mooncake",
+  "name": "Mooncake",
+  "animal": "Moon rabbit",
+  "parts": [
+   {
+    "color": "#fff6e2"
+   },
+   {
+    "color": "#fbf3e4"
+   },
+   {
+    "color": "#fff6e2"
+   },
+   {
+    "color": "#fff6e2"
+   },
+   {
+    "color": "#fff6e2"
+   },
+   {
+    "color": "#fbf3e4"
+   },
+   {
+    "color": "#fbf3e4"
+   },
+   {
+    "color": "#fbf3e4"
+   },
+   {
+    "color": "#fff6e2"
+   }
+  ]
+ },
+ {
+  "id": "marina",
+  "name": "Marina",
+  "animal": "Hippocampus",
+  "parts": [
+   {
+    "color": "#f5a77f"
+   },
+   {
+    "color": "#f5a77f"
+   },
+   {
+    "color": "#fde2cf"
+   },
+   {
+    "color": "#f5a77f"
+   },
+   {
+    "color": "#e5b465"
+   },
+   {
+    "color": "#f5a77f"
+   },
+   {
+    "color": "#e5b465"
+   },
+   {
+    "color": "#f5a77f"
+   },
+   {
+    "color": "#fcd9c4"
+   }
+  ]
+ },
+ {
+  "id": "rumble",
+  "name": "Rumble",
+  "animal": "Shisa lion-dog",
+  "parts": [
+   {
+    "kind": "stroke",
+    "color": "#d96a4b"
+   },
+   {
+    "color": "#62b795"
+   },
+   {
+    "color": "#d96a4b"
+   },
+   {
+    "color": "#d96a4b"
+   },
+   {
+    "color": "#d96a4b"
+   },
+   {
+    "color": "#f9dcc5"
+   },
+   {
+    "color": "#d96a4b"
+   },
+   {
+    "color": "#d96a4b"
+   },
+   {
+    "color": "#d96a4b"
+   },
+   {
+    "color": "#f9dcc5"
+   }
+  ]
+ },
+ {
+  "id": "sol",
+  "name": "Sol",
+  "animal": "Phoenix",
+  "parts": [
+   {
+    "color": "#f6a46c"
+   },
+   {
+    "color": "#fde0c0"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "kiri",
+  "name": "Kiri",
+  "animal": "Qilin",
+  "parts": [
+   {
+    "color": "#86d4c0"
+   },
+   {
+    "color": "#ecc98a"
+   },
+   {
+    "color": "#ecc98a"
+   },
+   {
+    "color": "#ecc98a"
+   },
+   {
+    "color": "#f9ead0"
+   },
+   {
+    "color": "#ecc98a"
+   },
+   {
+    "color": "#ecc98a"
+   },
+   {
+    "color": "#ecc98a"
+   },
+   {
+    "color": "#f9ead0"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "gryff",
+  "name": "Gryff",
+  "animal": "Griffin",
+  "parts": [
+   {
+    "color": "#e9ae52"
+   },
+   {
+    "color": "#e9ae52"
+   },
+   {
+    "color": "#f8e6c8"
+   },
+   {
+    "color": "#f8e6c8"
+   },
+   {
+    "color": "#f1dfc0"
+   },
+   {
+    "color": "#8a5a44"
+   },
+   {
+    "color": "#f0a03c"
+   }
+  ]
+ },
+ {
+  "id": "nessa",
+  "name": "Nessa",
+  "animal": "Loch Ness monster",
+  "parts": [
+   {
+    "color": "#a9dccd"
+   },
+   {
+    "kind": "stroke",
+    "color": "#72c19a"
+   },
+   {
+    "color": "#72c19a"
+   },
+   {
+    "color": "#dcf1d3"
+   },
+   {
+    "color": "#9fd6b2"
+   },
+   {
+    "color": "#9fd6b2"
+   },
+   {
+    "color": "#72c19a"
+   },
+   {
+    "color": "#dcf1d3"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "dozy",
+  "name": "Dozy",
+  "animal": "Baku dream-eater",
+  "parts": [
+   {
+    "color": "#8f7662"
+   },
+   {
+    "color": "#b19782"
+   },
+   {
+    "color": "#b19782"
+   },
+   {
+    "color": "#b19782"
+   },
+   {
+    "color": "#b19782"
+   },
+   {
+    "color": "#b19782"
+   },
+   {
+    "color": "#a88c76"
+   },
+   {
+    "color": "#f1c0b0"
+   },
+   {
+    "color": "#a88c76"
+   },
+   {
+    "color": "#b19782"
+   },
+   {
+    "color": "#b19782"
+   }
+  ]
+ },
+ {
+  "id": "nimbus",
+  "name": "Nimbus",
+  "animal": "Pegasus",
+  "parts": [
+   {
+    "color": "#efe2d2"
+   },
+   {
+    "color": "#efe2d2"
+   },
+   {
+    "color": "#efe2d2"
+   },
+   {
+    "color": "#efe2d2"
+   },
+   {
+    "color": "#efe2d2"
+   },
+   {
+    "color": "#efe2d2"
+   },
+   {
+    "color": "#f6e4d4"
+   },
+   {
+    "color": "#80d2be"
+   }
+  ]
+ },
+ {
+  "id": "hopscotch",
+  "name": "Hopscotch",
+  "animal": "Jackalope",
+  "parts": [
+   {
+    "color": "#f7e4cb"
+   },
+   {
+    "color": "#dcae7a"
+   },
+   {
+    "color": "#f7e4cb"
+   },
+   {
+    "color": "#f7e4cb"
+   },
+   {
+    "color": "#f7e4cb"
+   },
+   {
+    "color": "#dcae7a"
+   },
+   {
+    "color": "#dcae7a"
+   },
+   {
+    "color": "#dcae7a"
+   },
+   {
+    "color": "#f7e4cb"
+   }
+  ]
+ },
+ {
+  "id": "frosty",
+  "name": "Frosty",
+  "animal": "Yeti",
+  "parts": [
+   {
+    "color": "#d6dbd6"
+   },
+   {
+    "color": "#f6e6d6"
+   },
+   {
+    "color": "#c2cac3"
+   },
+   {
+    "color": "#c2cac3"
+   },
+   {
+    "color": "#f6e6d6"
+   }
+  ]
+ },
+ {
+  "id": "fen",
+  "name": "Fen",
+  "animal": "Fenrir wolf pup",
+  "parts": [
+   {
+    "color": "#8f8780"
+   },
+   {
+    "color": "#8f8780"
+   },
+   {
+    "color": "#b3aca5"
+   },
+   {
+    "color": "#b3aca5"
+   },
+   {
+    "kind": "stroke",
+    "color": "#c9c3bd"
+   },
+   {
+    "color": "#b3aca5"
+   },
+   {
+    "color": "#f3e3cf"
+   },
+   {
+    "color": "#fffaf3"
+   }
+  ]
+ },
+ {
+  "id": "riddle",
+  "name": "Riddle",
+  "animal": "Sphinx kitten",
+  "parts": [
+   {
+    "kind": "stroke",
+    "color": "#e5bb7a"
+   },
+   {
+    "color": "#e5bb7a"
+   },
+   {
+    "color": "#f7e6c9"
+   },
+   {
+    "color": "#f7e6c9"
+   },
+   {
+    "color": "#f7e6c9"
+   },
+   {
+    "color": "#f7e6c9"
+   },
+   {
+    "color": "#e5bb7a"
+   },
+   {
+    "color": "#e8b240"
+   },
+   {
+    "color": "#f7e6c9"
+   }
+  ]
+ },
+ {
+  "id": "jade",
+  "name": "Jade",
+  "animal": "Eastern dragon",
+  "parts": [
+   {
+    "kind": "stroke",
+    "color": "#74bf8c"
+   },
+   {
+    "color": "#f6e2b8"
+   },
+   {
+    "color": "#74bf8c"
+   },
+   {
+    "color": "#74bf8c"
+   },
+   {
+    "color": "#74bf8c"
+   },
+   {
+    "color": "#74bf8c"
+   },
+   {
+    "color": "#74bf8c"
+   },
+   {
+    "color": "#f6e2b8"
+   },
+   {
+    "color": "#8a5a44"
+   }
+  ]
+ },
+ {
+  "id": "tide",
+  "name": "Tide",
+  "animal": "Baby kraken",
+  "parts": [
+   {
+    "kind": "stroke",
+    "color": "#40a28e"
+   },
+   {
+    "kind": "stroke",
+    "color": "#40a28e"
+   },
+   {
+    "kind": "stroke",
+    "color": "#40a28e"
+   },
+   {
+    "kind": "stroke",
+    "color": "#40a28e"
+   },
+   {
+    "color": "#3aa08d"
+   },
+   {
+    "color": "#d4efdc"
+   }
+  ]
+ },
+ {
+  "id": "hikari",
+  "name": "Hikari",
+  "animal": "Kitsune",
+  "parts": [
+   {
+    "color": "#fbeee5"
+   },
+   {
+    "color": "#f28d74"
+   },
+   {
+    "color": "#f4e5dc"
+   },
+   {
+    "color": "#f4e5dc"
+   },
+   {
+    "color": "#f4e5dc"
+   },
+   {
+    "color": "#fbf1ea"
+   },
+   {
+    "color": "#f4e5dc"
+   },
+   {
+    "color": "#e0583b"
+   }
+  ]
+ }
 ]

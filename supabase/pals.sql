@@ -40,13 +40,17 @@ as $$
     when 'ribbit' then '{"worlds": 3}'::jsonb
     when 'cotton' then '{"stars": 350}'::jsonb
     when 'squeak' then '{"stars": 400}'::jsonb
+    when 'tops' then '{"stars": 450}'::jsonb
     when 'maple' then '{"worlds": 5}'::jsonb
+    when 'chomp' then '{"worlds": 6}'::jsonb
     when 'otto' then '{"stars": 500}'::jsonb
     when 'buzz' then '{"streak": 14}'::jsonb
     when 'kiko' then '{"stars": 600}'::jsonb
     when 'splash' then '{"stars": 700}'::jsonb
     when 'shroomy' then '{"worlds": 8}'::jsonb
+    when 'stretch' then '{"worlds": 10}'::jsonb
     when 'bandit' then '{"stars": 800}'::jsonb
+    when 'spike' then '{"stars": 900}'::jsonb
     when 'waddles' then '{"stars": 1000}'::jsonb
     when 'fawn' then '{"stars": 1200}'::jsonb
     when 'shelly' then '{"streak": 30}'::jsonb
@@ -63,6 +67,9 @@ as $$
     when 'plume' then '{"lucky": true}'::jsonb
     when 'nova' then '{"lucky": true}'::jsonb
     when 'luna' then '{"lucky": true}'::jsonb
+    when 'mooncake' then '{"lucky": true}'::jsonb
+    when 'marina' then '{"lucky": true}'::jsonb
+    when 'rumble' then '{"lucky": true}'::jsonb
     when 'sol' then '{"worlds": 15}'::jsonb
     when 'kiri' then '{"worlds": 18}'::jsonb
     when 'gryff' then '{"worlds": 20}'::jsonb
@@ -73,6 +80,9 @@ as $$
     when 'frosty' then '{"worlds": 30}'::jsonb
     when 'fen' then '{"worlds": 35}'::jsonb
     when 'riddle' then '{"worlds": 40}'::jsonb
+    when 'jade' then '{"worlds": 28}'::jsonb
+    when 'tide' then '{"worlds": 32}'::jsonb
+    when 'hikari' then '{"worlds": 45}'::jsonb
     else null
   end;
 $$;
@@ -98,13 +108,17 @@ as $$
     when 'ribbit' then 'Frog'
     when 'cotton' then 'Lamb'
     when 'squeak' then 'Mouse'
+    when 'tops' then 'Trike'
     when 'maple' then 'Panda'
+    when 'chomp' then 'Rex'
     when 'otto' then 'Otter'
     when 'buzz' then 'Bee'
     when 'kiko' then 'Koala'
     when 'splash' then 'Seal'
     when 'shroomy' then 'Sprite'
+    when 'stretch' then 'Longneck'
     when 'bandit' then 'Raccoon'
+    when 'spike' then 'Stego'
     when 'waddles' then 'Penguin'
     when 'fawn' then 'Deer'
     when 'shelly' then 'Snail'
@@ -121,6 +135,9 @@ as $$
     when 'plume' then 'Peacock'
     when 'nova' then 'Narwhal'
     when 'luna' then 'Leopard'
+    when 'mooncake' then 'Moonbunny'
+    when 'marina' then 'Seapony'
+    when 'rumble' then 'Shisa'
     when 'sol' then 'Phoenix'
     when 'kiri' then 'Qilin'
     when 'gryff' then 'Griffin'
@@ -131,6 +148,9 @@ as $$
     when 'frosty' then 'Yeti'
     when 'fen' then 'Wolf'
     when 'riddle' then 'Sphinx'
+    when 'jade' then 'Loong'
+    when 'tide' then 'Kraken'
+    when 'hikari' then 'Kitsune'
     else null
   end;
 $$;
@@ -173,10 +193,11 @@ immutable
 as $$
   select array[
     'ember', 'mossy', 'coral', 'mochi', 'hoot', 'waffles', 'peep', 'bruno', 'biscuit', 'truffle',
-    'pebble', 'quartz', 'ribbit', 'cotton', 'squeak', 'maple', 'otto', 'buzz', 'kiko', 'splash',
-    'shroomy', 'bandit', 'waddles', 'fawn', 'shelly', 'inky', 'puff', 'twinkle', 'starla', 'ziggy',
-    'leo', 'koi', 'bamboo', 'aurora', 'storm', 'plume', 'nova', 'luna', 'sol', 'kiri',
-    'gryff', 'nessa', 'dozy', 'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle'
+    'pebble', 'quartz', 'ribbit', 'cotton', 'squeak', 'tops', 'maple', 'chomp', 'otto', 'buzz',
+    'kiko', 'splash', 'shroomy', 'stretch', 'bandit', 'spike', 'waddles', 'fawn', 'shelly', 'inky',
+    'puff', 'twinkle', 'starla', 'ziggy', 'leo', 'koi', 'bamboo', 'aurora', 'storm', 'plume',
+    'nova', 'luna', 'mooncake', 'marina', 'rumble', 'sol', 'kiri', 'gryff', 'nessa', 'dozy',
+    'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle', 'jade', 'tide', 'hikari'
   ];
 $$;
 
@@ -187,8 +208,8 @@ language sql
 immutable
 as $$
   select case
-    when p_pal in ('leo', 'koi', 'bamboo', 'aurora', 'storm', 'plume', 'nova', 'luna') then 'legendary'
-    when p_pal in ('sol', 'kiri', 'gryff', 'nessa', 'dozy', 'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle') then 'mythic'
+    when p_pal in ('leo', 'koi', 'bamboo', 'aurora', 'storm', 'plume', 'nova', 'luna', 'mooncake', 'marina', 'rumble') then 'legendary'
+    when p_pal in ('sol', 'kiri', 'gryff', 'nessa', 'dozy', 'nimbus', 'hopscotch', 'frosty', 'fen', 'riddle', 'jade', 'tide', 'hikari') then 'mythic'
     else 'common'
   end;
 $$;
