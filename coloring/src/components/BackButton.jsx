@@ -1,12 +1,22 @@
+import { DrawingsSign, PalsSign } from './Signs.jsx';
+
 /**
- * The one way back, always at the top left: a picture of where it goes (the book, or the room with the wall),
+ * The one way back, always at the top left: a picture of where it goes (the book, a wall, or the room),
  * because a 3-year-old knows a picture before a word or an arrow. It glows and bounces when a page is finished,
  * as if saying "pick another one".
  */
+const WHERE = {
+  book: ['Back to the book', <BookPicture key="book" />],
+  room: ['Back to my room', <WallPicture key="room" />],
+  drawings: ['Back to My Drawings', <DrawingsSign key="drawings" />],
+  pals: ['Back to My Pals', <PalsSign key="pals" />],
+};
+
 export default function BackButton({ to, isBeckoning = false, onClick }) {
+  const [label, picture] = WHERE[to];
   return (
-    <button className={`back-btn ${isBeckoning ? 'beckon' : ''}`} onClick={onClick} aria-label={to === 'book' ? 'Back to the book' : 'Back to my wall'}>
-      {to === 'book' ? <BookPicture /> : <WallPicture />}
+    <button className={`back-btn ${isBeckoning ? 'beckon' : ''}`} onClick={onClick} aria-label={label}>
+      {picture}
     </button>
   );
 }

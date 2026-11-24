@@ -146,6 +146,16 @@ export const sfx = {
     [523.3, 659.3, 784, 1046.5, 784, 1046.5, 1318.5].forEach((freq, i) => tone({ at: i * 0.13, freq, length: 1.4, gain: 0.06, type: 'triangle', bright: 0.4 }));
     for (let i = 0; i < 6; i++) tone({ at: 0.9 + i * 0.07, freq: 2093 * (1 + (i % 3) * 0.25), length: 0.4, gain: 0.02, bright: 0 });
   },
+  /** Glitter: a few tiny bells on top of the paint. */
+  twinkle() {
+    [2093, 2637, 3136, 2349].forEach((freq, i) => tone({ at: 0.05 + i * 0.07, freq, length: 0.35, gain: 0.025, bright: 0 }));
+  },
+  /** A rubber stamp: a soft thump, then a little pop. */
+  stamp() {
+    tone({ freq: 140, length: 0.16, gain: 0.14, bright: 0 });
+    hiss({ length: 0.06, from: 1800, q: 1.4, gain: 0.08, attack: 0.004 });
+    tone({ at: 0.06, freq: 880, length: 0.25, gain: 0.04, bright: 0 });
+  },
   sticker() {
     hiss({ length: 0.08, from: 2400, q: 1.2, gain: 0.1, attack: 0.004 });
     tone({ freq: 660, length: 0.22, gain: 0.06, bright: 0 });

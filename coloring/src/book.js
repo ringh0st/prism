@@ -16,11 +16,14 @@ export const CRAYONS = [
   { id: 'pink', color: '#f284b5', name: 'Pink' },
   { id: 'peach', color: '#f7c39c', name: 'Peach' },
   { id: 'brown', color: '#9a6440', name: 'Brown' },
-  { id: 'grey', color: '#9a9a9a', name: 'Grey' },
+  { id: 'glitter', color: 'glitter', name: 'Glitter' },
   { id: 'black', color: '#3b3634', name: 'Black' },
   { id: 'white', color: '#ffffff', name: 'White' },
   { id: 'rainbow', color: null, name: 'Rainbow' },
 ];
+
+/** The glitter crayon leaves gold with sparkles in it (a color of its own, drawn as a pattern). */
+export const GLITTER = 'glitter';
 
 /** The rainbow crayon gives each tap the next color of the rainbow. */
 export const RAINBOW = ['#e8524f', '#f5923e', '#f7cf3d', '#a5d046', '#2fb3a6', '#3f6fd8', '#9466d4', '#f284b5'];

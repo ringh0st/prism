@@ -7,12 +7,14 @@ import CrayonBox from './components/CrayonBox.jsx';
 import Spiral from './components/Spiral.jsx';
 import Dialog from './components/Dialog.jsx';
 import Room from './components/Room.jsx';
+import Gallery from './components/Gallery.jsx';
+import { StampRow, ToolRack } from './components/ToolRack.jsx';
 import Sheet from './components/Sheet.jsx';
 import Sketch from './components/Sketch.jsx';
 import BackButton from './components/BackButton.jsx';
 import { PAGES } from './pages.js';
-import { CRAYONS, canUndo, cleanPage, coloredPageIds, colorFor, isPageDone, paintPart, restoreBook, undoOnPage } from './book.js';
-import { addStroke, clearSketch, isBlank, newSketch, undoStroke } from './sketches.js';
+import { CRAYONS, GLITTER, RAINBOW, canUndo, cleanPage, coloredPageIds, colorFor, isPageDone, paintPart, restoreBook, undoOnPage } from './book.js';
+import { DEFAULT_SIZE, addStroke, clearSketch, isBlank, newSketch, undoStroke } from './sketches.js';
 import { deleteSketch, loadSketches, saveSketch } from './sketchStore.js';
 import { spreadColor } from './drawingDom.js';
 import { savePicture } from './savePicture.js';
@@ -49,18 +51,20 @@ const ICONS = {
 };
 
 /**
- * My Pals Coloring Book, for little ones (3 years and up). Three places, one way back from each (a picture of
- * where it goes, top left):
- * - the room: a wall with every picture the child made, and on the desk the coloring book and a blank pad;
+ * My Pals Coloring Book, for 3 to 7 (easy to start, with more to find: glitter, stamps, crayon sizes, replays).
+ * Places, each with one way back (a picture of where it goes, top left):
+ * - the room: two walls, My Drawings and My Pals, and on the desk the coloring book and a blank pad;
+ * - a wall up close: every picture with its day; a tap opens it again (a drawing replays itself first);
  * - the book: only for choosing, so turning pages never gets in the way of coloring; a tap on a Pal takes it out;
  * - the sheet: the Pal (or a blank page) big on the desk, with the crayon box. Nothing moves there: tap or slide
- *   a finger to color, or draw freely on the blank page.
+ *   a finger to color, or draw and stamp freely on the blank page.
  */
 export default function App() {
   const [book, setBook] = useState(() => restoreBook(store.get('coloring.book', null)));
   const [sketches, setSketches] = useState([]);
   const [index, setIndex] = useState(() => Math.min(store.get('coloring.page', 0), PAGES.length));
-  const [view, setView] = useState({ name: 'room' }); // room | book | page { pageId, from } | sketch { id, from }
+  const [view, setView] = useState({ name: 'room' }); // room | wall { kind } | book | page { pageId, from } | sketch { id, from, replay }
+  const [tool, setTool] = useState({ kind: 'draw', size: DEFAULT_SIZE, stamp: 'star' }); // room | book | page { pageId, from } | sketch { id, from }
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [crayonId, setCrayonId] = useState(() => store.get('coloring.crayon', 'red'));
   const [isSoundOn, setIsSoundOn] = useState(() => store.get('coloring.sound', true));
@@ -80,14 +84,24 @@ export default function App() {
   const page = view.name === 'page' ? PAGES.find((p) => p.id === view.pageId) : null;
   const sketch = view.name === 'sketch' ? sketches.find((s) => s.id === view.id) : null;
   const doneIds = useMemo(() => new Set(PAGES.filter((p) => isPageDone(book, p)).map((p) => p.id)), [book]);
-  const wallItems = useMemo(() => {
-    const pages = coloredPageIds(book).map((id) => {
-      const p = PAGES.find((x) => x.id === id);
-      return p && { id: `page-${id}`, page: p, colors: book.colors[id], isDone: doneIds.has(id), at: book.touched[id] ?? 0 };
-    });
-    const drawings = sketches.filter((s) => !isBlank(s)).map((s) => ({ id: s.id, sketch: s, at: s.updated }));
-    return [...pages.filter(Boolean), ...drawings].sort((a, b) => b.at - a.at);
-  }, [book, sketches, doneIds]);
+  const palItems = useMemo(
+    () =>
+      coloredPageIds(book)
+        .map((id) => {
+          const p = PAGES.find((x) => x.id === id);
+          return p && { id: `page-${id}`, page: p, colors: book.colors[id], isDone: doneIds.has(id), at: book.touched[id] ?? 0 };
+        })
+        .filter(Boolean),
+    [book, doneIds],
+  );
+  const drawingItems = useMemo(
+    () =>
+      sketches
+        .filter((s) => !isBlank(s))
+        .map((s) => ({ id: s.id, sketch: s, at: s.created ?? s.updated }))
+        .sort((a, b) => b.at - a.at),
+    [sketches],
+  );
 
   useEffect(() => {
     loadSketches().then((saved) => setSketches((now) => (now.length ? now : saved)));
@@ -132,25 +146,33 @@ export default function App() {
     sfx.turn();
     const s = existing ?? newSketch();
     if (!existing) setSketches((all) => [...all, s]);
-    setView({ name: 'sketch', id: s.id, from: 'room' });
+    setView({ name: 'sketch', id: s.id, from: 'drawings', replay: Boolean(existing) });
   };
+  const openWall = (kind) => {
+    start();
+    sfx.turn();
+    setPinnedId(null);
+    setView({ name: 'wall', kind });
+  };
+  /** Back to where the child came from; a new drawing or colored page is pinned on its wall as they arrive. */
   const goBack = () => {
     sfx.turn();
+    if (view.name === 'wall' || view.name === 'book') return setView({ name: 'room' });
     if (view.name === 'sketch') {
       if (isBlank(sketch)) {
         setSketches((all) => all.filter((s) => s.id !== sketch.id));
         deleteSketch(sketch.id);
       } else setPinnedId(sketch.id);
+      return setView({ name: 'wall', kind: 'drawings' });
     }
-    if (view.name === 'page' && view.from === 'room') setPinnedId(`page-${view.pageId}`);
-    if (view.name === 'page' && view.from === 'book') {
+    if (view.from === 'book') {
       setIsCoverOpen(true);
-      setView({ name: 'book' });
-      return;
+      return setView({ name: 'book' });
     }
-    setView({ name: 'room' });
+    setPinnedId(`page-${view.pageId}`);
+    return setView({ name: 'wall', kind: 'pals' });
   };
-  const openWallItem = (item) => (item.page ? openPage(item.page.id, 'room') : openSketch(item.sketch));
+  const openWallItem = (item) => (item.page ? openPage(item.page.id, 'pals') : openSketch(item.sketch));
 
   const turnTo = useCallback((to) => setRequest({ to, id: performance.now() }), []);
   const onTurned = useCallback((to) => setIndex(to), []);
@@ -166,6 +188,7 @@ export default function App() {
       CRAYONS.findIndex((c) => c.id === crayonId),
       PAINT_SECONDS,
     );
+    if (color === GLITTER) sfx.twinkle();
     navigator.vibrate?.(8);
     await spreadColor(svg, part, color, x, y, isReduced ? 0 : PAINT_SECONDS);
     const next = paintPart(bookRef.current, page.id, part, color);
@@ -191,7 +214,13 @@ export default function App() {
     );
   };
   const pickStrokeColor = () => {
-    return colorFor(crayonId, taps.current++);
+    const color = colorFor(crayonId, taps.current++);
+    if (color === GLITTER) sfx.twinkle();
+    return color;
+  };
+  const chooseTool = (next) => {
+    sfx.pick(next.kind === 'stamp' ? 9 : next.size * 2);
+    setTool(next);
   };
 
   // --- The tray and the top bar --------------------------------------------------------------------------
@@ -258,6 +287,8 @@ export default function App() {
   };
 
   const isOnSheet = view.name === 'page' || view.name === 'sketch';
+  const backTo = { wall: 'room', book: 'room', sketch: 'drawings', page: view.from === 'book' ? 'book' : 'pals' }[view.name];
+  const stampColor = crayonId === 'rainbow' ? RAINBOW[0] : crayonId === 'glitter' ? '#f2c14a' : CRAYONS.find((c) => c.id === crayonId)?.color;
   return (
     <div className={`desk at-${view.name}`}>
       <header className="bar">
@@ -267,7 +298,7 @@ export default function App() {
               <Glyph d={ICONS.games} />
             </a>
           ) : (
-            <BackButton to={view.name === 'page' && view.from === 'book' ? 'book' : 'room'} isBeckoning={Boolean(page && celebrate)} onClick={goBack} />
+            <BackButton to={backTo} isBeckoning={Boolean(page && celebrate)} onClick={goBack} />
           )}
         </div>
         <div className="bar-side">
@@ -297,7 +328,16 @@ export default function App() {
       </header>
       <main className="stage">
         {view.name === 'room' && (
-          <Room items={wallItems} pinnedId={pinnedId} onOpenBook={openBook} onNewSketch={() => openSketch(null)} onOpenItem={openWallItem} />
+          <Room drawings={drawingItems} pals={palItems} onOpenWall={openWall} onOpenBook={openBook} onNewSketch={() => openSketch(null)} />
+        )}
+        {view.name === 'wall' && (
+          <Gallery
+            kind={view.kind}
+            items={view.kind === 'drawings' ? drawingItems : palItems}
+            pinnedId={pinnedId}
+            onOpenItem={openWallItem}
+            onStart={view.kind === 'drawings' ? () => openSketch(null) : openBook}
+          />
         )}
         {view.name === 'book' && (
           <div className="book-frame">
@@ -320,12 +360,22 @@ export default function App() {
         )}
         {sketch && (
           <div className="sheet-frame" key={sketch.id}>
-            <Sketch sketch={sketch} pickColor={pickStrokeColor} canvasRef={canvasRef} onStroke={(stroke) => updateSketch((s) => addStroke(s, stroke))} />
+            <Sketch
+              sketch={sketch}
+              tool={tool}
+              pickColor={pickStrokeColor}
+              canvasRef={canvasRef}
+              isReplaying={Boolean(view.replay)}
+              onReplayed={() => setView((v) => ({ ...v, replay: false }))}
+              onStroke={(stroke) => updateSketch((s) => addStroke(s, stroke))}
+            />
           </div>
         )}
       </main>
       {isOnSheet && (
-        <footer className="tray">
+        <footer className={`tray ${sketch ? 'with-tools' : ''}`}>
+          {sketch && tool.kind === 'stamp' && <StampRow tool={tool} color={stampColor} onTool={chooseTool} />}
+          {sketch && <ToolRack tool={tool} onTool={chooseTool} />}
           <CrayonBox crayonId={crayonId} onPick={pick} />
           <button className="undo" onClick={undo} disabled={!canTakeBack} aria-label="Take back the last color">
             <Glyph d={ICONS.undo} />

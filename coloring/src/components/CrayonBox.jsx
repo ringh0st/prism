@@ -27,8 +27,9 @@ export default function CrayonBox({ crayonId, onPick }) {
 
 function Crayon({ crayon, isOn, onPick }) {
   const isRainbow = crayon.id === 'rainbow';
+  const isGlitter = crayon.id === 'glitter';
   const isWhite = crayon.id === 'white';
-  const fill = isRainbow ? `url(#rainbow-wrap)` : crayon.color;
+  const fill = isRainbow ? 'url(#rainbow-wrap)' : isGlitter ? '#f2c14a' : crayon.color;
   return (
     <button className={`crayon ${isOn ? 'on' : ''}`} role="radio" aria-checked={isOn} aria-label={crayon.name} onClick={onPick}>
       <svg viewBox="0 0 30 120" aria-hidden="true">
@@ -41,12 +42,26 @@ function Crayon({ crayon, isOn, onPick }) {
             </linearGradient>
           </defs>
         )}
-        <path d="M8 30 15 4 22 30Z" fill={isRainbow ? '#f284b5' : crayon.color} stroke={isWhite ? '#d8cbb4' : 'none'} />
+        <path d="M8 30 15 4 22 30Z" fill={isRainbow ? '#f284b5' : fill} stroke={isWhite ? '#d8cbb4' : 'none'} />
         <path d="M13 9 15 4 17 9Z" fill={isWhite ? '#e8ddc8' : '#000'} opacity=".18" />
         <rect x="6" y="28" width="18" height="92" rx="3" fill={fill} stroke={isWhite ? '#d8cbb4' : 'none'} />
         <rect x="6" y="40" width="18" height="70" fill="#000" opacity={isWhite ? 0.05 : 0.14} />
         <path d="M6 46h18M6 104h18" stroke="#fff" strokeOpacity=".7" strokeWidth="2.5" />
         <path d="M9 30v88" stroke="#fff" strokeOpacity=".35" strokeWidth="2.5" strokeLinecap="round" />
+        {isGlitter && (
+          <g fill="#fff">
+            {[
+              [12, 34, 1.6],
+              [19, 52, 1.2],
+              [11, 66, 1.4],
+              [18, 84, 1.7],
+              [13, 98, 1.1],
+              [15, 14, 1.2],
+            ].map(([x, y, r]) => (
+              <circle key={y} cx={x} cy={y} r={r} />
+            ))}
+          </g>
+        )}
       </svg>
     </button>
   );

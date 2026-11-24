@@ -78,3 +78,9 @@ test('the wall shows colored pages newest first', async () => {
   const book = { colors: { a: { 0: '#fff' }, b: { 1: '#000' }, c: {} }, history: [], touched: { a: 1, b: 5 } };
   assert.deepEqual(coloredPageIds(book), ['b', 'a']);
 });
+
+test('a replay counts a line by its points and a stamp as one step', async () => {
+  const { stepsOf } = await import('./sketches.js');
+  assert.equal(stepsOf({ c: '#000', w: 12, p: [0, 0, 10, 10, 20, 20] }), 3);
+  assert.equal(stepsOf({ t: 'stamp', s: 'star', c: '#000', x: 1, y: 1, size: 150, turn: 0 }), 1);
+});

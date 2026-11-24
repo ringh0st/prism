@@ -3,11 +3,36 @@
  * forgiving, so a small finger near a line or on an eye still colors the part around it) and the fill that
  * spreads out from the finger like wet paint, kept inside the part's lines.
  */
+import { GLITTER } from './book.js';
+
 const NS = 'http://www.w3.org/2000/svg';
 const UNPAINTED = '#ffffff';
 
 const membersOf = (svg, part) => [...svg.querySelectorAll(`[data-r="${part}"]`)];
-const paintColor = (el, color) => el.setAttribute(el.dataset.kind === 'stroke' ? 'stroke' : 'fill', color);
+
+/** Glitter is gold with sparkles: a pattern put into the drawing the first time it's used. */
+function glitterIn(svg) {
+  if (!svg.querySelector('#glitter-fill')) {
+    let defs = svg.querySelector('defs');
+    if (!defs) {
+      defs = document.createElementNS(NS, 'defs');
+      svg.prepend(defs);
+    }
+    const pattern = document.createElementNS(NS, 'pattern');
+    pattern.id = 'glitter-fill';
+    pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+    pattern.setAttribute('width', '9');
+    pattern.setAttribute('height', '9');
+    pattern.innerHTML =
+      '<rect width="9" height="9" fill="#f2c14a"/><circle cx="2" cy="2" r=".9" fill="#fff8d6"/><circle cx="6.5" cy="4" r=".6" fill="#fff"/>' +
+      '<circle cx="3.5" cy="7" r=".7" fill="#ffe9a8"/><circle cx="7.5" cy="8" r=".45" fill="#f7a8c8"/><circle cx="5" cy="1" r=".4" fill="#bfe3ff"/>' +
+      '<path d="M6.5 5.6v1.8M5.6 6.5h1.8" stroke="#fff" stroke-width=".35"/>';
+    defs.append(pattern);
+  }
+  return 'url(#glitter-fill)';
+}
+const shown = (svg, color) => (color === GLITTER ? glitterIn(svg) : color);
+const paintColor = (el, color) => el.setAttribute(el.dataset.kind === 'stroke' ? 'stroke' : 'fill', shown(el.ownerSVGElement, color));
 
 /** Shows the page's colors (white where nothing is painted yet). */
 export function applyColors(svg, colors = {}) {
@@ -115,7 +140,7 @@ export function spreadColor(svg, part, color, x, y, seconds = 0.5) {
   blot.setAttribute('cx', start.x);
   blot.setAttribute('cy', start.y);
   blot.setAttribute('r', 0);
-  blot.setAttribute('fill', color);
+  blot.setAttribute('fill', shown(svg, color));
   blot.setAttribute('mask', `url(#${maskFor(svg, part)})`);
   blot.setAttribute('pointer-events', 'none');
   anchor.after(blot);
