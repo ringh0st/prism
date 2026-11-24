@@ -34,6 +34,9 @@ export const mergeGuestProgress = (levels) =>
     p_levels: Object.entries(levels).map(([levelId, entry]) => ({ levelId, stars: entry.stars, bestMoves: entry.bestMoves })),
   });
 
+/** Combines this device's guest save (Pals, outfits, Grove, sparks, helpers…) with the account, once, at sign-in. */
+export const combineGuestSaveOnServer = (save) => rpc('combine_guest_save', { p_save: save });
+
 export const recordDailyOnServer = (dateKey) => rpc('record_daily', { p_date: dateKey });
 
 export const buyStoreItemOnServer = (itemId, currency) => rpc('buy_store_item', { p_item_id: itemId, p_currency: currency });

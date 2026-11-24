@@ -1388,3 +1388,22 @@ test('darkness levels can be won in a safe order and every new piece is introduc
     }
   }
 });
+
+test('guest save: packed for the account, and the account asks only when it has a game of its own', async () => {
+  const { accountHasGame, hasGuestSave, saveForAccount, saveSummary } = await import('./guestSave.js');
+  const { createEmptyProgress } = await import('./progress.js');
+  const fresh = createEmptyProgress();
+  assert.equal(hasGuestSave(fresh), false);
+  const played = { ...fresh, sparks: 340, levels: { 'w1-01': { stars: 3 }, 'w1-02': { stars: 2 }, 'daily-2026-11-01': { stars: 3 } }, pal: { ...fresh.pal, id: 'ember', owned: { ember: { stage: 1, growth: 4 } } } };
+  assert.equal(hasGuestSave(played), true);
+  const save = saveForAccount(played);
+  assert.deepEqual(save.pals, { ember: { stage: 1, growth: 4 } });
+  assert.equal(save.palId, 'ember');
+  assert.equal(save.sparks, 340);
+  assert.deepEqual(saveSummary(played.levels, played.pal.owned, 340), { levels: 2, stars: 5, pals: 1, sparks: 340 });
+  assert.equal(accountHasGame(saveSummary({}, {}, 0)), false);
+  assert.equal(accountHasGame(saveSummary({ 'w1-01': { stars: 1 } }, {}, 0)), true);
+  // the server reads every field the game sends
+  const sql = readFileSync(new URL('../../supabase/guest_save.sql', import.meta.url), 'utf8');
+  for (const key of Object.keys(save)) assert.ok(sql.includes(`'${key}'`), `guest_save.sql reads ${key}`);
+});

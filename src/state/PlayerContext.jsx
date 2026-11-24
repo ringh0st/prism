@@ -15,6 +15,7 @@ import {
   recordEventLevelOnServer,
   claimDailyGiftOnServer,
   claimPresentOnServer,
+  combineGuestSaveOnServer,
   claimLegendaryPresentOnServer,
   claimGlowbugRowOnServer,
   claimWinGiftOnServer,
@@ -59,6 +60,7 @@ import { chestId, chestRewardFor } from '../game/surprises.js';
 import { recordPalFeats } from '../game/palRecords.js';
 import { nextWinStreak } from '../game/winStreak.js';
 import { milestoneReached, solvedLevelCount } from '../game/milestones.js';
+import { accountHasGame, hasGuestSave, saveForAccount, saveSummary } from '../game/guestSave.js';
 import { claimCalendarGiftLocally, claimWinGiftLocally, openLegendaryPresentLocally, openPresentLocally, recordDailyWin } from '../game/gifts.js';
 import { nicknameProblem } from '../game/nicknames.js';
 import {
@@ -79,6 +81,9 @@ import { APPLE_PURCHASES_ENABLED } from '../lib/config.js';
 
 const PROGRESS_KEY = 'prism.progress.v1';
 const SETTINGS_KEY = 'prism.settings.v1';
+/** The account this device's game was last brought into, and a copy of the guest game taken before that. */
+const LINKED_KEY = 'prism.linkedTo.v1';
+const GUEST_BACKUP_KEY = 'prism.guestBackup.v1';
 // language: null follows the device's language (see src/i18n/translate.js).
 // themedBoard: the 3D rooms are a choice; the flat board is what everyone starts with (playtest: a 9-year-old found
 // the flat board far easier). It replaced `board3d`, which was on by default, so nobody is left in 3D by an old save.
@@ -107,6 +112,9 @@ export function PlayerProvider({ children }) {
   const [weeklyReward, setWeeklyReward] = useState(null);
   /** Lucky Pal gifts opened and not shown yet: { palId, sparks }[] */
   const [luckyGifts, setLuckyGifts] = useState([]);
+  /** When the account already has its own game: { phone, account } summaries waiting for the player's choice. */
+  const [saveChoice, setSaveChoice] = useState(null);
+  const choiceResolver = useRef(null);
   const progressRef = useRef(progress);
 
   const setProgress = useCallback((next) => {
@@ -170,13 +178,59 @@ export function PlayerProvider({ children }) {
     music.configure(settings);
   }, [settings]);
 
+  /** Asks the player which game to keep; resolves with 'combine' or 'account'. */
+  const askSaveChoice = useCallback(
+    (summaries) =>
+      new Promise((resolve) => {
+        choiceResolver.current = resolve;
+        setSaveChoice(summaries);
+      }),
+    [],
+  );
+
+  /**
+   * The first sign-in on this device brings the guest game into the account (guestSave.js): levels and stars,
+   * and also Pals, outfits, Grove, sparks and helpers, which the account used to replace. When the account has a
+   * game of its own and the phone holds something it doesn't, the player chooses: both together, or only the
+   * account. A copy of the guest game is kept on the device either way.
+   */
+  const bringGuestGame = useCallback(async () => {
+    // A guest game that couldn't be brought over yet (offline, or the server didn't know how) is tried again.
+    const waiting = readJson(GUEST_BACKUP_KEY, null);
+    const local = waiting && !waiting.done ? upgradeProgress(waiting.progress) : progressRef.current;
+    const account = await fetchEconomyState();
+    const remote = await fetchRemoteLevels(userId);
+    const phoneHasMore =
+      Object.keys(local.levels).some((id) => !remote[id] || remote[id].stars < local.levels[id].stars) ||
+      Object.keys(local.pal.owned).some((id) => !account.pal?.owned?.[id]);
+    if (!phoneHasMore) return account;
+    writeJson(GUEST_BACKUP_KEY, { savedAt: Date.now(), progress: local, done: false });
+    const accountSummary = saveSummary(remote, account.pal?.owned, account.sparks);
+    const keep = accountHasGame(accountSummary) ? await askSaveChoice({ phone: saveSummary(local.levels, local.pal.owned, local.sparks), account: accountSummary }) : 'combine';
+    if (keep !== 'combine') {
+      writeJson(GUEST_BACKUP_KEY, { savedAt: Date.now(), progress: local, done: true });
+      return account;
+    }
+    const merged = Object.keys(local.levels).length ? await mergeGuestProgress(local.levels) : account;
+    try {
+      const state = await combineGuestSaveOnServer(saveForAccount(local));
+      writeJson(GUEST_BACKUP_KEY, { savedAt: Date.now(), progress: local, done: true });
+      return state;
+    } catch {
+      return merged; // the copy stays waiting and is brought over at the next sync
+    }
+  }, [userId, askSaveChoice]);
+
   // Signing in moves guest stars into the account, then loads the account.
   const syncWithServer = useCallback(async () => {
     if (!userId) return;
     setSyncStatus('syncing');
     try {
       const local = progressRef.current.levels;
-      const state = Object.keys(local).length ? await mergeGuestProgress(local) : await fetchEconomyState();
+      const waiting = readJson(GUEST_BACKUP_KEY, null);
+      const isFirstHere = (readJson(LINKED_KEY, null) !== userId && hasGuestSave(progressRef.current)) || Boolean(waiting && !waiting.done);
+      const state = isFirstHere ? await bringGuestGame() : Object.keys(local).length ? await mergeGuestProgress(local) : await fetchEconomyState();
+      writeJson(LINKED_KEY, userId);
       const levels = await fetchRemoteLevels(userId);
       setProgress({ ...withServerState(progressRef.current, state, todayKey()), levels });
       setSyncStatus('synced');
@@ -204,7 +258,7 @@ export function PlayerProvider({ children }) {
     } catch {
       setSyncStatus('error');
     }
-  }, [userId, setProgress, applyServerState, openLuckyPals, savePendingPal, refreshMissions]);
+  }, [userId, setProgress, applyServerState, openLuckyPals, savePendingPal, refreshMissions, bringGuestGame]);
 
   useEffect(() => {
     if (userId) syncWithServer();
@@ -230,6 +284,13 @@ export function PlayerProvider({ children }) {
       /** Last week's top-10 reward that was just collected, shown once. */
       weeklyReward,
       dismissWeeklyReward: () => setWeeklyReward(null),
+      /** { phone, account } while the player picks which game to keep at sign-in; chooseSave('combine' | 'account'). */
+      saveChoice,
+      chooseSave(kind) {
+        setSaveChoice(null);
+        choiceResolver.current?.(kind);
+        choiceResolver.current = null;
+      },
       /** The next Lucky Pal gift to reveal, if any. */
       luckyGift: luckyGifts[0] ?? null,
       dismissLuckyGift: () => setLuckyGifts((queue) => queue.slice(1)),
@@ -593,6 +654,7 @@ export function PlayerProvider({ children }) {
       syncStatus,
       userId,
       weeklyReward,
+      saveChoice,
       luckyGifts,
       setProgress,
       applyServerState,

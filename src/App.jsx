@@ -20,6 +20,7 @@ import EventScreen from './screens/event/EventScreen.jsx';
 import GlowbugGarden from './screens/glowbugs/GlowbugGarden.jsx';
 import StickerAlbum from './screens/stickers/StickerAlbum.jsx';
 import EventLevelRoute from './screens/event/EventLevelRoute.jsx';
+import SaveChoiceDialog from './components/SaveChoiceDialog.jsx';
 import WeeklyRewardDialog from './screens/leaderboard/WeeklyRewardDialog.jsx';
 import FriendFoundDialog from './screens/pals/FriendFoundDialog.jsx';
 import { isFriendDue } from './game/firstFriend.js';
@@ -47,6 +48,12 @@ function BeamThemeStyle() {
     document.documentElement.style.setProperty('--beam-sun', theme.color);
   }, [progress.beamTheme]);
   return null;
+}
+
+/** At sign-in, when the account already has its own game: keep both, or only the account. */
+function SaveChoiceNotice() {
+  const { saveChoice, chooseSave } = usePlayer();
+  return saveChoice ? <SaveChoiceDialog choice={saveChoice} onChoose={chooseSave} /> : null;
 }
 
 /** Pops up once when last week's top-10 reward has just been collected. */
@@ -180,6 +187,7 @@ export default function App() {
             ) : (
               <>
                 <WeeklyRewardNotice />
+        <SaveChoiceNotice />
                 <PalNotices />
                 {route.name === 'map' && <FirstLaunch />}
               </>

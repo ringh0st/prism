@@ -240,7 +240,7 @@ async function makePage({ id, svg, minArea, thin, size, dropGlows }) {
   // A brush stroke's outline pass stays a line wherever the stroke on top of it is a part to color, so a coloured
   // coil keeps its outline (it used to become a white part of its own and the lines vanished).
   const groupOf = new Map(list.flatMap((group, i) => group.members.map((el) => [el, i])));
-  list.forEach((group, i) => {
+  list.forEach((group) => {
     if (group.kind !== 'stroke') return;
     group.members = group.members.filter((el) => {
       const top = strokeOnTop(el);
