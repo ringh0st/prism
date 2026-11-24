@@ -340,7 +340,7 @@ test('pal presents: one per 10 stars, odds shown, glow up by rarity, never somet
     if (i < PRESENT_RARITIES.length - 1) assert.ok(sql.includes(`v_rarity_roll < ${edge} then ${bonus}`), `${rarity.id} edge`);
   });
   assert.deepEqual(
-    [...sql.match(/'(outfit|decor):(\w+)'/g)].map((entry) => entry.slice(1, -1)),
+    [...sql.slice(sql.indexOf('_present_items()')).match(/array\[[^\]]*\]/)[0].match(/'(outfit|decor):(\w+)'/g)].map((entry) => entry.slice(1, -1)),
     PRESENT_ITEMS.map((item) => `${item.type}:${item.id}`),
   );
   PRESENT_ITEMS.forEach((item) => assert.ok(item.type === 'outfit' ? accessoryById(item.id) : groveItemById(item.id), item.id));
@@ -389,12 +389,24 @@ test('pal presents: one per 10 stars, odds shown, glow up by rarity, never somet
 });
 
 test('sure Legendary presents: every Sunday and every 100 solved levels, matches the database', async () => {
-  const { LEGENDARY_EVERY_LEVELS, isSunday, legendaryPresentsWaiting, legendaryProgress, openLegendaryPresentLocally } = await import('./gifts.js');
+  const { LEGENDARY_BOX, LEGENDARY_EVERY_LEVELS, LEGENDARY_ITEMS, drawLegendaryBox, isSunday, legendaryPresentsWaiting, legendaryProgress, openLegendaryPresentLocally } =
+    await import('./gifts.js');
+  const { PALS, rarityOf } = await import('./pals.js');
   const { createEmptyProgress } = await import('./progress.js');
   const sql = readFileSync(new URL('../../supabase/gifts.sql', import.meta.url), 'utf8');
   assert.match(sql, new RegExp(`v_solved / ${LEGENDARY_EVERY_LEVELS} > v_profile.legendary_milestones`));
   assert.match(sql, /extract\(isodow from p_date\) = 7/);
-  assert.match(sql, /_give_present\(v_user, 99\.9\)/, 'always Legendary');
+  // The box: a Legendary Pal, a diamond and a Legendary item (a diamond showpiece), the same on the server.
+  assert.deepEqual(
+    [...sql.slice(sql.indexOf('_legendary_items()')).match(/array\[[^\]]*\]/)[0].matchAll(/'(\w+):(\w+)'/g)].map((m) => `${m[1]}:${m[2]}`),
+    LEGENDARY_ITEMS.map((item) => `${item.type}:${item.id}`),
+  );
+  assert.equal(LEGENDARY_ITEMS.length, 12);
+  assert.match(sql, new RegExp(`v_sparks integer := ${LEGENDARY_BOX.sparks};`));
+  assert.match(sql, new RegExp(`v_sparks := v_sparks \\+ ${LEGENDARY_BOX.noPalSparks};`));
+  const box = drawLegendaryBox({ ...createEmptyProgress() }, { pick: 0, palPick: 0, isSignedIn: true });
+  assert.deepEqual(box, { rarity: 'legendary', sparks: LEGENDARY_BOX.sparks, diamonds: 1, item: LEGENDARY_ITEMS[0], pal: PALS.find((pal) => rarityOf(pal) === 'legendary').id });
+  assert.equal(drawLegendaryBox(createEmptyProgress(), {}).sparks, LEGENDARY_BOX.sparks + LEGENDARY_BOX.guestSparks, 'guests: sparks for the diamond');
   assert.ok(isSunday('2026-11-29') && !isSunday('2026-11-30'));
 
   const levels = (n) => Object.fromEntries(Array.from({ length: n }, (_, i) => [`w${Math.floor(i / 20) + 1}-${String((i % 20) + 1).padStart(2, '0')}`, { stars: 1 }]));
@@ -403,8 +415,10 @@ test('sure Legendary presents: every Sunday and every 100 solved levels, matches
   assert.deepEqual(legendaryPresentsWaiting(progress, '2026-11-30'), { milestones: 2, sunday: false, count: 2 });
   assert.equal(legendaryPresentsWaiting(progress, '2026-11-29').count, 3, 'plus Sunday');
   for (let i = 0; i < 3; i += 1) {
-    const opened = openLegendaryPresentLocally(progress, '2026-11-29', { roll: 0.5 });
+    const opened = openLegendaryPresentLocally(progress, '2026-11-29');
     assert.equal(opened.gift.rarity, 'legendary');
+    assert.ok(opened.progress.pal.owned[opened.gift.pal], 'the Legendary Pal joins');
+    assert.ok([...opened.progress.pal.accessories, ...opened.progress.grove.items].includes(opened.gift.item.id), 'the item is yours');
     progress = opened.progress;
   }
   assert.equal(legendaryPresentsWaiting(progress, '2026-11-29').count, 0, 'one Sunday present a Sunday');

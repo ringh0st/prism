@@ -1,5 +1,7 @@
 import { EconomyError } from './progress.js';
 import { INVENTORY_CAP } from './catalog.js';
+import { THEME_DECOR, THEME_OUTFITS } from './themes.js';
+import { PALS, rarityOf } from './pals.js';
 
 /*
  * Gifts: the 7-day gift calendar and the partner Pal's presents. Every gift here is free and earned by playing;
@@ -161,7 +163,6 @@ export function openPresentLocally(progress, rolls) {
 
 /** Every Sunday, and every 100 solved levels, the partner Pal brings a present that is always Legendary. */
 export const LEGENDARY_EVERY_LEVELS = 100;
-const LEGENDARY_ROLL = 0.999;
 const solvedLevelCount = (levels) => Object.entries(levels).filter(([id, entry]) => /^w\d+-\d{2}$/.test(id) && entry.stars > 0).length;
 
 /** Is this day ("YYYY-MM-DD", the player's own date) a Sunday? */
@@ -179,11 +180,36 @@ export function legendaryProgress(progress) {
   return { have: solvedLevelCount(progress.levels) % LEGENDARY_EVERY_LEVELS, need: LEGENDARY_EVERY_LEVELS };
 }
 
+/**
+ * What a sure Legendary present (the gold ✦ box) holds (owner's ask): a Legendary Pal you don't have, a diamond
+ * and a Legendary item (one of the weekly themes' diamond showpieces you don't own), plus its sparks. Guests get
+ * sparks for the diamond (diamonds need an account); with every Legendary Pal owned it holds sparks instead, and
+ * with every showpiece owned a regular present item (or a bag of sparks). Must match claim_legendary_present.
+ */
+export const LEGENDARY_BOX = { sparks: 100, guestSparks: LEGENDARY_GUEST_SPARKS, noPalSparks: 150, noItemSparks: 40 };
+export const LEGENDARY_ITEMS = [...THEME_OUTFITS, ...THEME_DECOR]
+  .filter((item) => item.currency === 'diamonds')
+  .map((item) => ({ id: item.id, type: item.kind }));
+
+export function drawLegendaryBox(progress, { pick = Math.random(), palPick = Math.random(), isSignedIn = false } = {}) {
+  const pals = PALS.filter((pal) => rarityOf(pal) === 'legendary' && !progress.pal.owned[pal.id]);
+  const showpieces = LEGENDARY_ITEMS.filter((item) => !ownsItem(progress, item));
+  const items = showpieces.length ? showpieces : PRESENT_ITEMS.filter((item) => !ownsItem(progress, item));
+  const pal = pals.length ? pals[Math.floor(palPick * pals.length)].id : null;
+  const item = items.length ? items[Math.floor(pick * items.length)] : null;
+  const sparks =
+    LEGENDARY_BOX.sparks +
+    (isSignedIn ? 0 : LEGENDARY_BOX.guestSparks) +
+    (pal ? 0 : LEGENDARY_BOX.noPalSparks) +
+    (item ? 0 : LEGENDARY_BOX.noItemSparks);
+  return { rarity: 'legendary', sparks, ...(isSignedIn ? { diamonds: 1 } : {}), ...(item ? { item } : {}), ...(pal ? { pal } : {}) };
+}
+
 /** Opens one sure Legendary present on this device (guests): a 100-level one first, then Sunday's. @throws EconomyError */
 export function openLegendaryPresentLocally(progress, today, rolls = {}) {
   const { milestones, sunday } = legendaryPresentsWaiting(progress, today);
   if (!milestones && !sunday) throw new EconomyError('No present yet.');
-  const gift = drawPresent(progress, { ...rolls, rarityRoll: LEGENDARY_ROLL });
+  const gift = drawLegendaryBox(progress, rolls);
   const presents = milestones ? { ...progress.presents, milestones: (progress.presents.milestones ?? 0) + 1 } : { ...progress.presents, sundayDate: today };
   return { progress: giveLocally({ ...progress, presents }, gift), gift };
 }
@@ -194,6 +220,7 @@ function giveLocally(progress, gift) {
   if (gift.helper) next.helpers = { ...progress.helpers, [gift.helper]: (progress.helpers[gift.helper] ?? 0) + 1 };
   if (gift.item?.type === 'outfit') next.pal = { ...progress.pal, accessories: [...progress.pal.accessories, gift.item.id] };
   if (gift.item?.type === 'decor') next.grove = { ...progress.grove, items: [...progress.grove.items, gift.item.id] };
+  if (gift.pal) next.pal = { ...next.pal, id: next.pal.id ?? gift.pal, owned: { ...next.pal.owned, [gift.pal]: { stage: 0 } } };
   return next;
 }
 
@@ -258,5 +285,6 @@ export function mergeGifts(gifts) {
     diamonds: gifts.reduce((sum, gift) => sum + (gift.diamonds ?? 0), 0),
     helpers: gifts.map((gift) => gift.helper).filter(Boolean),
     items: gifts.map((gift) => gift.item).filter(Boolean),
+    pals: gifts.map((gift) => gift.pal).filter(Boolean),
   };
 }

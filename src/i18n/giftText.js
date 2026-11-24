@@ -2,12 +2,12 @@ import { translate } from './translate.js';
 import { helperText } from './gameText.js';
 import { outfitName, palName } from './palText.js';
 import { decorName } from './groveText.js';
-import { accessoryById } from '../game/pals.js';
+import { accessoryById, palById } from '../game/pals.js';
 import { groveItemById } from '../game/grove.js';
 
 /**
  * What came out of a gift, in the player's language, one entry per thing:
- * { key, text, art } where art is { kind: 'shop', id } (sparks, helpers, diamonds) or { kind: 'outfit' | 'decor', id }.
+ * { key, text, art } where art is { kind: 'shop', id } (sparks, helpers, diamonds) or { kind: 'outfit' | 'decor' | 'pal', id }.
  * `gift` is { sparks, diamonds?, helper? | helpers[], item? | items[] } (several gifts merged list them all);
  * `partner` names who an outfit is for.
  */
@@ -32,6 +32,10 @@ export function giftItems(lang, gift, partner = null) {
       text: count > 1 ? translate(lang, 'gift.helperMany', { count, name }) : translate(lang, 'gift.helper', { name }),
       art: { kind: 'shop', id: helper },
     });
+  });
+  const pals = gift.pals ?? (gift.pal ? [gift.pal] : []);
+  pals.forEach((id) => {
+    entries.push({ key: `pal-${id}`, text: translate(lang, 'gift.pal', { name: palName(lang, palById(id)) }), art: { kind: 'pal', id } });
   });
   const items = gift.items ?? (gift.item ? [gift.item] : []);
   items.forEach((item) => {

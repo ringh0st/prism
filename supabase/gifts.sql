@@ -241,8 +241,21 @@ begin
 end;
 $$;
 
+-- Legendary items: the weekly themes' diamond showpieces (themed_shop.sql). Must match LEGENDARY_ITEMS in gifts.js.
+create or replace function public._legendary_items()
+returns text[]
+language sql
+immutable
+as $$
+  select array['outfit:moonCirclet', 'outfit:elvenCloak', 'outfit:strawHat', 'outfit:appleBasket', 'outfit:iceCrown',
+               'outfit:snowGlobe', 'outfit:captainHat', 'outfit:captainCoat', 'decor:elvenTower', 'decor:jackLanterns',
+               'decor:snowCabin', 'decor:littleShip'];
+$$;
+
 -- Sure Legendary presents (a 3% chance felt like "never"): one for every 100 solved built-in levels, and one
--- every Sunday by the player's own date (p_date). A 100-level one opens first. Must match LEGENDARY_* in gifts.js.
+-- every Sunday by the player's own date (p_date). A 100-level one opens first. Each holds 100 sparks, a diamond,
+-- a Legendary Pal you don't have (150 sparks when you have them all) and a Legendary item you don't own (a regular
+-- present item when you own them all, else 40 sparks). Must match LEGENDARY_* and drawLegendaryBox in gifts.js.
 create or replace function public.claim_legendary_present(p_date date)
 returns jsonb
 language plpgsql
@@ -253,7 +266,10 @@ declare
   v_user uuid := public._require_user();
   v_profile public.profiles;
   v_solved integer;
-  v_gift jsonb;
+  v_sparks integer := 100;
+  v_pal text;
+  v_item text;
+  v_gift jsonb := jsonb_build_object('rarity', 'legendary', 'diamonds', 1);
 begin
   select * into v_profile from public.profiles where id = v_user for update;
   if v_profile.pal_id is null then
@@ -269,7 +285,40 @@ begin
   else
     raise exception using message = 'No present yet.';
   end if;
-  v_gift := public._give_present(v_user, 99.9);
+
+  select pal into v_pal from unnest(public._all_pals()) as pal
+    where public._pal_rarity(pal) = 'legendary' and not (v_profile.pals ? pal)
+    order by random() limit 1;
+  if v_pal is null then
+    v_sparks := v_sparks + 150;
+  else
+    v_gift := v_gift || jsonb_build_object('pal', v_pal);
+    update public.profiles set pals = pals || jsonb_build_object(v_pal, jsonb_build_object('stage', 0)) where id = v_user;
+  end if;
+
+  select i into v_item from unnest(public._legendary_items()) as i
+    where not (split_part(i, ':', 1) = 'outfit' and split_part(i, ':', 2) = any (v_profile.pal_accessories))
+      and not (split_part(i, ':', 1) = 'decor' and split_part(i, ':', 2) = any (v_profile.grove_items))
+    order by random() limit 1;
+  if v_item is null then
+    select i into v_item from unnest(public._present_items()) as i
+      where not (split_part(i, ':', 1) = 'outfit' and split_part(i, ':', 2) = any (v_profile.pal_accessories))
+        and not (split_part(i, ':', 1) = 'decor' and split_part(i, ':', 2) = any (v_profile.grove_items))
+      order by random() limit 1;
+  end if;
+  if v_item is null then
+    v_sparks := v_sparks + 40;
+  else
+    v_gift := v_gift || jsonb_build_object('item', jsonb_build_object('type', split_part(v_item, ':', 1), 'id', split_part(v_item, ':', 2)));
+    if split_part(v_item, ':', 1) = 'outfit' then
+      update public.profiles set pal_accessories = array_append(pal_accessories, split_part(v_item, ':', 2)) where id = v_user;
+    else
+      update public.profiles set grove_items = array_append(grove_items, split_part(v_item, ':', 2)) where id = v_user;
+    end if;
+  end if;
+
+  v_gift := v_gift || jsonb_build_object('sparks', v_sparks);
+  update public.profiles set sparks = sparks + v_sparks, diamonds = diamonds + 1 where id = v_user;
   return public._economy_state(v_user) || jsonb_build_object('gift', v_gift);
 end;
 $$;
