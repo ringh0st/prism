@@ -1,6 +1,10 @@
+import { drawStrokes } from './sketches.js';
+import { crayonPaint } from './crayonTexture.js';
+
 /**
- * Makes a picture of a colored page (the drawing on paper with the Pal's name, and any crayon painted over it,
- * `paint`) or of a free drawing (a canvas) and offers it to share or save, for a parent to keep or send to grandma.
+ * Makes a picture of a colored page (the drawing on paper with the Pal's name, and the crayon painted over the
+ * sheet, `paint` marks measured from the picture's square) or of a free drawing (a canvas) and offers it to share
+ * or save, for a parent to keep or send to grandma.
  */
 export async function savePicture(source, name, paint = null) {
   const size = 1200;
@@ -21,9 +25,15 @@ export async function savePicture(source, name, paint = null) {
     image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(copy))}`;
     await image.decode();
     c.drawImage(image, 0, size * 0.15, size, size);
-    if (paint) {
+    if (paint?.length) {
+      const layer = document.createElement('canvas');
+      layer.width = canvas.width;
+      layer.height = canvas.height;
+      const l = layer.getContext('2d');
+      l.translate(0, size * 0.15);
+      drawStrokes(l, paint, size, { paint: crayonPaint });
       c.globalCompositeOperation = 'multiply';
-      c.drawImage(paint, 0, size * 0.15, size, size);
+      c.drawImage(layer, 0, 0);
       c.globalCompositeOperation = 'source-over';
     }
   }

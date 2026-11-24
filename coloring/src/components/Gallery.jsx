@@ -40,7 +40,9 @@ export default function Gallery({ kind, items, pinnedId, isRemoving, onOpenItem,
               aria-label={item.page ? `${item.page.name}, colored on ${dayOf(item.at)}` : `My drawing from ${dayOf(item.at)}`}
             >
               <Tape single color={TAPES[tiltOf(item.id) + 3]} />
-              {item.page ? <PageThumb page={item.page} colors={item.colors} paint={item.paint} /> : <SketchThumb sketch={item.sketch} />}
+              <span className="frame-paper">
+                {item.page ? <PageThumb page={item.page} colors={item.colors} paint={item.paint} /> : <SketchThumb sketch={item.sketch} />}
+              </span>
               {item.isDone && <Sticker small />}
             </button>
             {isRemoving && (

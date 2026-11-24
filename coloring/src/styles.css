@@ -1570,6 +1570,105 @@ button {
   height: auto;
 }
 
+/* A picture in a frame: its paper clips it (paint can reach past the drawing), the tape stays on top. */
+.frame-paper {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-items: center;
+  padding: inherit;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.frame-paper .sketch-thumb {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.framed.small {
+  position: relative;
+  aspect-ratio: 0.8;
+}
+
+/* Night: a dark walnut desk under a soft lamp; the paper stays light so colors look true. */
+[data-theme='night'] {
+  --paper: #f1e8d6;
+  --paper-edge: #ddd0b8;
+  --cream: #3b2d22;
+  --cream-deep: #5a4533;
+  --ink-soft: #c9b59a;
+  color-scheme: dark;
+}
+[data-theme='night'] body {
+  background: #2a1f17;
+}
+[data-theme='night'] .desk {
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 32%, rgba(255, 196, 120, 0.22), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.12) 0 2px, transparent 2px 7px),
+    repeating-linear-gradient(
+      90deg,
+      #4a3526 0 34%,
+      #2f2218 34% calc(34% + 2px),
+      #46321f calc(34% + 2px) 67%,
+      #2f2218 67% calc(67% + 2px),
+      #4b3727 calc(67% + 2px) 100%
+    );
+}
+[data-theme='night'] .icon-btn,
+[data-theme='night'] .back-btn,
+[data-theme='night'] .tool,
+[data-theme='night'] .stamp,
+[data-theme='night'] .round:not(.yes) {
+  color: #f6e7cf;
+  box-shadow:
+    0 4px 0 #1e1610,
+    0 6px 10px rgba(0, 0, 0, 0.35);
+}
+[data-theme='night'] .stamp {
+  background: rgba(70, 54, 40, 0.9);
+}
+[data-theme='night'] .tool.on,
+[data-theme='night'] .icon-btn.on {
+  background: var(--sage-deep);
+}
+[data-theme='night'] .size-dot {
+  background: #f6e7cf;
+}
+[data-theme='night'] .board,
+[data-theme='night'] .gallery {
+  background: linear-gradient(#3e3026, #33271e);
+  color: #f6e7cf;
+}
+[data-theme='night'] .board {
+  box-shadow:
+    inset 0 0 0 4px #57412f,
+    0 6px 0 #1e1610,
+    0 14px 22px -10px rgba(0, 0, 0, 0.6);
+}
+[data-theme='night'] .board-sign,
+[data-theme='night'] .gallery-sign {
+  color: #f6e7cf;
+}
+[data-theme='night'] .mini-frame,
+[data-theme='night'] .framed,
+[data-theme='night'] .sheet-paper,
+[data-theme='night'] .pad-sheet {
+  background-color: #f1e8d6;
+}
+[data-theme='night'] .framed.new {
+  background: rgba(255, 245, 225, 0.08);
+}
+[data-theme='night'] .mini-frame.empty,
+[data-theme='night'] .wall-grid li.empty {
+  background: none;
+  border-color: rgba(246, 231, 207, 0.18);
+}
+[data-theme='night'] .dialog {
+  color: var(--ink);
+}
+
 @media (max-width: 360px) {
   .icon-btn {
     width: 40px;

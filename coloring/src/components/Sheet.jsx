@@ -13,10 +13,12 @@ import { useCrayonLines } from '../useCrayonLines.js';
  * Filling: a tap colors the part under the finger (or the nearest one), and a finger sliding over the picture
  * colors every part it passes, which is what a small child tries first. Painting (the big book): the finger lays
  * crayon by hand, thin, medium or thick, on a layer over the picture that blends like wax (the lines stay dark).
- * Paint is kept in the drawing's own square (800×800), so it lines up the same on the wall and in a saved picture.
+ * Paint covers the whole sheet but is measured from the drawing's square (800 units wide), so it lines up the same
+ * on the wall and in a saved picture.
  */
 export default function Sheet({ page, colors, isDone, celebrate, svgRef, onPaint, tool, paint = [], pickColor, paintRef, onPaintLine }) {
   const art = useRef(null);
+  const paper = useRef(null);
   const stroke = useRef(null);
   const paintStrokes = useRef(paint);
   paintStrokes.current = paint;
@@ -24,6 +26,7 @@ export default function Sheet({ page, colors, isDone, celebrate, svgRef, onPaint
 
   const { handlers: paintHandlers, paintNow } = useCrayonLines({
     holder: art,
+    surface: paper,
     canvas: paintRef,
     size: tool?.size ?? 1,
     pickColor,
@@ -54,6 +57,7 @@ export default function Sheet({ page, colors, isDone, celebrate, svgRef, onPaint
 
   return (
     <div
+      ref={paper}
       className={`sheet-paper lifted ${page.book === 'big' ? 'detailed' : ''} ${isPainting ? 'painting' : ''}`}
       {...(isPainting ? paintHandlers : fillHandlers)}
     >
@@ -61,8 +65,8 @@ export default function Sheet({ page, colors, isDone, celebrate, svgRef, onPaint
       <h2 className="page-name">{page.name}</h2>
       <div ref={art} className={`art ${celebrate ? 'hop' : ''}`}>
         <Drawing page={page} colors={colors} svgRef={svgRef} isLabelled />
-        {paintRef && <canvas ref={paintRef} className="paint-layer" aria-hidden="true" />}
       </div>
+      {paintRef && <canvas ref={paintRef} className="paint-layer" aria-hidden="true" />}
       <div className="grain" aria-hidden="true" />
       {isDone && <Sticker isNew={Boolean(celebrate)} />}
       {celebrate && <Confetti key={celebrate} />}

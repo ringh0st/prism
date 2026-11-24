@@ -50,7 +50,9 @@ function Board({ kind, title, sign, items, onOpen }) {
         {newest.map((item, i) => (
           <span key={item.id} className="mini-frame" style={{ '--tilt': `${[-5, 4, 3, -3][i]}deg` }}>
             <Tape single color={['#f2a67e', '#9fd3c7', '#f4c443', '#f5a8c8'][i]} />
-            {item.page ? <PageThumb page={item.page} colors={item.colors} paint={item.paint} /> : <SketchThumb sketch={item.sketch} />}
+            <span className="frame-paper">
+              {item.page ? <PageThumb page={item.page} colors={item.colors} paint={item.paint} /> : <SketchThumb sketch={item.sketch} />}
+            </span>
           </span>
         ))}
         {Array.from({ length: 4 - newest.length }, (_, i) => (

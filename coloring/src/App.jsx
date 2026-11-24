@@ -23,6 +23,7 @@ import { spreadColor } from './drawingDom.js';
 import { savePicture } from './savePicture.js';
 import { music, sfx } from './audio.js';
 import { store } from './storage.js';
+import { currentTheme, saveTheme } from './theme.js';
 
 const PAINT_SECONDS = 0.55;
 const COVER_MS = 950;
@@ -53,6 +54,8 @@ const ICONS = {
   undo: 'M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11',
   remove: 'M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v6M14 11v6',
   done: 'M5 12.5l4.5 4.5L19 7.5',
+  moon: 'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z',
+  sun: 'M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zM12 1.5V4M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8',
 };
 
 /**
@@ -82,6 +85,7 @@ export default function App() {
   const [celebrate, setCelebrate] = useState(null); // { pageId, id }
   const [pinnedId, setPinnedId] = useState(null);
   const [isCleaning, setIsCleaning] = useState(false);
+  const [theme, setTheme] = useState(currentTheme);
   const [isRemoving, setIsRemoving] = useState(false); // the wall's pictures show a ✗ to take one off
   const [toRemove, setToRemove] = useState(null); // the picture asked about
   const [hasStarted, setHasStarted] = useState(false);
@@ -309,7 +313,7 @@ export default function App() {
     setIsCleaning(false);
   };
   const hasMarks = page ? Boolean(Object.keys(book.colors[page.id] ?? {}).length || pagePaint.length) : Boolean(sketch?.strokes.length);
-  const share = () => (page ? savePicture(svgRef.current, page.name, pagePaint.length ? paintRef.current : null) : savePicture(canvasRef.current, ''));
+  const share = () => (page ? savePicture(svgRef.current, page.name, pagePaint) : savePicture(canvasRef.current, ''));
 
   // Keyboard: arrows turn the book's pages; Enter or Space on a part of the sheet colors it.
   useEffect(() => {
@@ -387,6 +391,21 @@ export default function App() {
                 <Glyph d={ICONS.clean} />
               </button>
             </>
+          )}
+          {(view.name === 'room' || view.name === 'wall') && (
+            <button
+              className="icon-btn"
+              onClick={() => {
+                const next = theme === 'night' ? 'day' : 'night';
+                sfx.pick(next === 'night' ? 2 : 7);
+                saveTheme(next);
+                setTheme(next);
+              }}
+              aria-label={theme === 'night' ? 'Day' : 'Night'}
+              title={theme === 'night' ? 'Day' : 'Night'}
+            >
+              <Glyph d={theme === 'night' ? ICONS.sun : ICONS.moon} />
+            </button>
           )}
           <button
             className={`icon-btn ${isMusicOn ? '' : 'off'}`}
@@ -491,7 +510,9 @@ export default function App() {
           title="Take it off the wall?"
           picture={
             <span className="framed small">
-              {toRemove.page ? <PageThumb page={toRemove.page} colors={toRemove.colors} paint={toRemove.paint} /> : <SketchThumb sketch={toRemove.sketch} />}
+              <span className="frame-paper">
+                {toRemove.page ? <PageThumb page={toRemove.page} colors={toRemove.colors} paint={toRemove.paint} /> : <SketchThumb sketch={toRemove.sketch} />}
+              </span>
             </span>
           }
           yesLabel="Yes, take it off"
