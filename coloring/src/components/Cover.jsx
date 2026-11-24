@@ -1,15 +1,19 @@
 import { APP_VERSION } from '../appInfo.js';
-import waffles from '../../../src/assets/pals/drawn/waffles-1.svg?raw';
-import ribbit from '../../../src/assets/pals/drawn/ribbit-1.svg?raw';
-import bamboo from '../../../src/assets/pals/drawn/bamboo-1.svg?raw';
+import { BOOKS } from '../books.js';
+
+const coverDrawings = import.meta.glob('../../../src/assets/pals/drawn/{bamboo,waffles,ribbit}-1.svg', { query: '?raw', import: 'default', eager: true });
+const bigCoverDrawings = import.meta.glob('../../../src/assets/pals/drawn/{storm,aurora,leo}-5.svg', { query: '?raw', import: 'default', eager: true });
+export const coverPal = (book, id) => (book.form === 1 ? coverDrawings : bigCoverDrawings)[`../../../src/assets/pals/drawn/${id}-${book.form}.svg`];
 
 /**
- * The hard cover: three Pals in full color, the title, crayon scribbles, and the studio with the version at the
- * bottom. It swings open around the spiral as the book is taken from the desk.
+ * A book's hard cover: three Pals in full color, the title, crayon scribbles, and the studio with the version at
+ * the bottom. It swings open around the spiral as the book is taken from the desk.
  */
-export default function Cover() {
+export default function Cover({ bookId }) {
+  const book = BOOKS[bookId];
+  const [left, middle, right] = book.coverPals;
   return (
-    <div className="cover opening" aria-hidden="true">
+    <div className={`cover opening ${book.cover}`} aria-hidden="true">
       <div className="cover-face">
         <svg className="scribbles" viewBox="0 0 300 400" preserveAspectRatio="none" aria-hidden="true">
           <path d="M18 60c30-22 52 18 80-4s40-20 60 2" stroke="#f7cf3d" strokeWidth="9" fill="none" strokeLinecap="round" />
@@ -20,13 +24,13 @@ export default function Cover() {
           <circle cx="34" cy="118" r="5" fill="#fff6dc" />
         </svg>
         <span className="label">
-          <span className="title">My Pals</span>
-          <span className="subtitle">Coloring Book</span>
+          <span className="title">{book.title}</span>
+          <span className="subtitle">{book.subtitle}</span>
         </span>
         <span className="cover-pals" aria-hidden="true">
-          <span className="pal left" dangerouslySetInnerHTML={{ __html: bamboo }} />
-          <span className="pal middle" dangerouslySetInnerHTML={{ __html: waffles }} />
-          <span className="pal right" dangerouslySetInnerHTML={{ __html: ribbit }} />
+          <span className="pal left" dangerouslySetInnerHTML={{ __html: coverPal(book, left) }} />
+          <span className="pal middle" dangerouslySetInnerHTML={{ __html: coverPal(book, middle) }} />
+          <span className="pal right" dangerouslySetInnerHTML={{ __html: coverPal(book, right) }} />
         </span>
         <span className="studio">
           Rinny’s Games <small>v{APP_VERSION}</small>

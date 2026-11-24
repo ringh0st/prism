@@ -1,14 +1,16 @@
-import Drawing from './Drawing.jsx';
+import PageThumb from './PageThumb.jsx';
 import SketchThumb from './SketchThumb.jsx';
 import Tape from './Tape.jsx';
 import { DrawingsSign, PalsSign } from './Signs.jsx';
-import waffles from '../../../src/assets/pals/drawn/waffles-1.svg?raw';
+import { coverPal } from './Cover.jsx';
+import { BOOKS, BOOK_IDS } from '../books.js';
 
 /**
  * The child's room: two walls, "My Drawings" (what they drew on blank paper) and "My Pals" (the pictures they
- * colored), each showing its newest little pictures; and on the desk the coloring book and a pad of blank paper.
+ * colored), each showing its newest little pictures; and on the desk the two coloring books (the little one and
+ * the big one, told apart by size, color and their Pals) and a pad of blank paper.
  */
-export default function Room({ drawings, pals, onOpenWall, onOpenBook, onNewSketch }) {
+export default function Room({ drawings, pals, isBigReady, onOpenWall, onOpenBook, onNewSketch }) {
   return (
     <div className="room">
       <div className="boards">
@@ -16,13 +18,17 @@ export default function Room({ drawings, pals, onOpenWall, onOpenBook, onNewSket
         <Board kind="pals" title="My Pals" sign={<PalsSign />} items={pals} onOpen={() => onOpenWall('pals')} />
       </div>
       <div className="desk-row">
-        <button className="desk-item desk-book" onClick={onOpenBook} aria-label="Open the coloring book">
-          <span className="mini-cover">
-            <span className="mini-spiral" />
-            <span className="mini-label">My Pals</span>
-            <span className="mini-pal" dangerouslySetInnerHTML={{ __html: waffles }} />
-          </span>
-        </button>
+        {BOOK_IDS.map((id) => (
+          <button
+            key={id}
+            className={`desk-item desk-book ${id}`}
+            onClick={() => onOpenBook(id)}
+            disabled={id === 'big' && !isBigReady}
+            aria-label={`Open ${BOOKS[id].title}${id === 'big' ? ', the big book' : ''}`}
+          >
+            <MiniCover bookId={id} />
+          </button>
+        ))}
         <button className="desk-item desk-pad" onClick={onNewSketch} aria-label="A blank sheet to draw on">
           <BlankPad />
         </button>
@@ -44,7 +50,7 @@ function Board({ kind, title, sign, items, onOpen }) {
         {newest.map((item, i) => (
           <span key={item.id} className="mini-frame" style={{ '--tilt': `${[-5, 4, 3, -3][i]}deg` }}>
             <Tape single color={['#f2a67e', '#9fd3c7', '#f4c443', '#f5a8c8'][i]} />
-            {item.page ? <Drawing page={item.page} colors={item.colors} /> : <SketchThumb sketch={item.sketch} />}
+            {item.page ? <PageThumb page={item.page} colors={item.colors} paint={item.paint} /> : <SketchThumb sketch={item.sketch} />}
           </span>
         ))}
         {Array.from({ length: 4 - newest.length }, (_, i) => (
@@ -52,6 +58,18 @@ function Board({ kind, title, sign, items, onOpen }) {
         ))}
       </span>
     </button>
+  );
+}
+
+/** A book on the desk: its cover color, its title and its middle Pal. */
+export function MiniCover({ bookId }) {
+  const book = BOOKS[bookId];
+  return (
+    <span className={`mini-cover ${book.cover}`}>
+      <span className="mini-spiral" />
+      <span className="mini-label">{book.title}</span>
+      <span className="mini-pal" dangerouslySetInnerHTML={{ __html: coverPal(book, book.coverPals[1]) }} />
+    </span>
   );
 }
 

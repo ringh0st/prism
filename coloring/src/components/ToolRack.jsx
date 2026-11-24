@@ -1,28 +1,56 @@
 import { SIZES } from '../sketches.js';
 import { STAMPS, palStampUrl, shapeOf } from '../stamps.js';
 
+const SIZE_NAMES = ['thin', 'medium', 'thick'];
+
 /**
- * The tools beside the crayon box on the blank sheet: the crayon (tap again for thin, medium or fat; the dot
- * shows which) and the stamps. With stamps chosen, a row of stamps opens above the crayons: shapes take the
- * crayon's color, the Pals come in their own.
+ * The tools beside the crayon box, as pictures: three crayon thicknesses (a dot each) and one more tool, either
+ * the fill (a paint pot: tap a part to fill it, on big-book pages) or the stamps (on the blank sheet).
  */
-export function ToolRack({ tool, onTool }) {
-  const isStamp = tool.kind === 'stamp';
+export function ToolRack({ tool, other, onTool }) {
   return (
-    <div className="tool-rack">
+    <div className="tool-rack" role="radiogroup" aria-label="Tools">
       <button
-        className={`tool ${isStamp ? '' : 'on'}`}
-        onClick={() => onTool(isStamp ? { ...tool, kind: 'draw' } : { ...tool, size: (tool.size + 1) % SIZES.length })}
-        aria-label={`Crayon, ${['thin', 'medium', 'fat'][tool.size]}`}
+        className={`tool ${tool.kind === other ? 'on' : ''}`}
+        role="radio"
+        aria-checked={tool.kind === other}
+        onClick={() => onTool({ ...tool, kind: other })}
+        aria-label={other === 'fill' ? 'Fill: tap a part' : 'Stamps'}
       >
-        <span className="size-dot" style={{ '--dot': `${8 + tool.size * 7}px` }} />
+        {other === 'fill' ? <PaintPot /> : <StarPicture />}
       </button>
-      <button className={`tool ${isStamp ? 'on' : ''}`} onClick={() => onTool({ ...tool, kind: 'stamp' })} aria-label="Stamps">
-        <svg viewBox="0 0 100 100" aria-hidden="true">
-          <path d={shapeOf('star')} fill="#f4c443" stroke="#d99a1e" strokeWidth="5" strokeLinejoin="round" />
-        </svg>
-      </button>
+      {SIZES.map((_, size) => (
+        <button
+          key={size}
+          className={`tool size ${tool.kind === 'draw' && tool.size === size ? 'on' : ''}`}
+          role="radio"
+          aria-checked={tool.kind === 'draw' && tool.size === size}
+          onClick={() => onTool({ ...tool, kind: 'draw', size })}
+          aria-label={`Crayon, ${SIZE_NAMES[size]}`}
+        >
+          <span className="size-dot" style={{ '--dot': `${6 + size * 6}px` }} />
+        </button>
+      ))}
     </div>
+  );
+}
+
+function PaintPot() {
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M10 18h28l-3 22a4 4 0 0 1-4 3.5H17a4 4 0 0 1-4-3.5z" fill="#f5923e" stroke="#4a3426" strokeWidth="2.5" strokeLinejoin="round" />
+      <ellipse cx="24" cy="18" rx="14" ry="4.5" fill="#f7cf3d" stroke="#4a3426" strokeWidth="2.5" />
+      <path d="M33 19c2 4 0 7-1 10" stroke="#f7cf3d" strokeWidth="4" strokeLinecap="round" fill="none" />
+      <path d="M16 6c3 2 3 6 0 8" stroke="#4a3426" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    </svg>
+  );
+}
+
+function StarPicture() {
+  return (
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <path d={shapeOf('star')} fill="#f4c443" stroke="#d99a1e" strokeWidth="5" strokeLinejoin="round" />
+    </svg>
   );
 }
 

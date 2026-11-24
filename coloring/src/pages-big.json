@@ -1,0 +1,6746 @@
+[
+  {
+    "id": "big-ember",
+    "name": "Ember",
+    "animal": "Fox",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#ec8448"
+      },
+      {
+        "color": "#fff6e6"
+      },
+      {
+        "color": "#f2a83a"
+      },
+      {
+        "color": "#ec8448"
+      },
+      {
+        "color": "#ec8448"
+      },
+      {
+        "color": "#ec8448"
+      },
+      {
+        "color": "#fbe3c8"
+      },
+      {
+        "color": "#ec8448"
+      },
+      {
+        "color": "#ec8448"
+      },
+      {
+        "color": "#f2a83a"
+      },
+      {
+        "color": "#f2a83a"
+      },
+      {
+        "color": "#fbe3c8"
+      },
+      {
+        "color": "#fbe3c8"
+      },
+      {
+        "color": "#ec8448"
+      },
+      {
+        "color": "#fbe3c8"
+      },
+      {
+        "color": "#f2a83a"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#ffd66b"
+      }
+    ]
+  },
+  {
+    "id": "big-mossy",
+    "name": "Mossy",
+    "animal": "Turtle",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#4e8c4b"
+      },
+      {
+        "color": "#f0d18a"
+      },
+      {
+        "color": "#a9cc72"
+      },
+      {
+        "color": "#a9cc72"
+      },
+      {
+        "color": "#9cc565"
+      },
+      {
+        "color": "#7fb446"
+      },
+      {
+        "color": "#7fb446"
+      },
+      {
+        "color": "#7fb446"
+      },
+      {
+        "color": "#7fb446"
+      },
+      {
+        "color": "#f0c14e"
+      },
+      {
+        "color": "#f0c14e"
+      },
+      {
+        "color": "#f0c14e"
+      },
+      {
+        "color": "#f0c14e"
+      },
+      {
+        "color": "#f0c14e"
+      },
+      {
+        "color": "#f2a67e"
+      },
+      {
+        "color": "#a9cc72"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-coral",
+    "name": "Coral",
+    "animal": "Axolotl",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f29896"
+      },
+      {
+        "color": "#f6a09e"
+      },
+      {
+        "color": "#ffdcd6"
+      },
+      {
+        "color": "#f6a09e"
+      },
+      {
+        "color": "#f6a09e"
+      },
+      {
+        "color": "#f6a09e"
+      },
+      {
+        "color": "#f6a09e"
+      },
+      {
+        "color": "#c04f4e"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#f6a09e"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-mochi",
+    "name": "Mochi",
+    "animal": "Kitten",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c27a52"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f4bf98"
+      },
+      {
+        "color": "#f4bf98"
+      },
+      {
+        "color": "#f4bf98"
+      },
+      {
+        "color": "#f4bf98"
+      },
+      {
+        "color": "#fbe6d2"
+      },
+      {
+        "color": "#fbe6d2"
+      },
+      {
+        "color": "#fbe6d2"
+      },
+      {
+        "color": "#f2a67e"
+      },
+      {
+        "color": "#f2a67e"
+      },
+      {
+        "color": "#f2a67e"
+      },
+      {
+        "color": "#f4bf98"
+      },
+      {
+        "color": "#f4bf98"
+      },
+      {
+        "color": "#f6b0a2"
+      },
+      {
+        "color": "#f6b0a2"
+      },
+      {
+        "color": "#f4bf98"
+      },
+      {
+        "color": "#fbe6d2"
+      },
+      {
+        "color": "#fff3c4"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-hoot",
+    "name": "Hoot",
+    "animal": "Owl",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#9c6440"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#e6bf90"
+      },
+      {
+        "color": "#8a5434"
+      },
+      {
+        "color": "#c48a5c"
+      },
+      {
+        "color": "#8a5434"
+      },
+      {
+        "color": "#c48a5c"
+      },
+      {
+        "color": "#f6e2c6"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#f0a35a"
+      }
+    ]
+  },
+  {
+    "id": "big-waffles",
+    "name": "Waffles",
+    "animal": "Puppy",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#e5b574"
+      },
+      {
+        "color": "#e5b574"
+      },
+      {
+        "color": "#e5b574"
+      },
+      {
+        "color": "#e5b574"
+      },
+      {
+        "color": "#d79a5a"
+      },
+      {
+        "color": "#f8e6cc"
+      },
+      {
+        "color": "#f8e6cc"
+      },
+      {
+        "color": "#f8e6cc"
+      },
+      {
+        "color": "#e5b574"
+      },
+      {
+        "color": "#dba266"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#ad6c36"
+      },
+      {
+        "color": "#ad6c36"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#f8e6cc"
+      },
+      {
+        "color": "#f8e6cc"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#f08a8a"
+      }
+    ]
+  },
+  {
+    "id": "big-peep",
+    "name": "Peep",
+    "animal": "Chick",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#eeb53a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c0702a"
+      },
+      {
+        "color": "#f5c443"
+      },
+      {
+        "color": "#fde9a8"
+      },
+      {
+        "color": "#eeb53a"
+      },
+      {
+        "color": "#eeb53a"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#f2945e"
+      }
+    ]
+  },
+  {
+    "id": "big-bruno",
+    "name": "Bruno",
+    "animal": "Bear cub",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#a96c43"
+      },
+      {
+        "color": "#f3c9a8"
+      },
+      {
+        "color": "#a96c43"
+      },
+      {
+        "color": "#f3c9a8"
+      },
+      {
+        "color": "#e8bf92"
+      },
+      {
+        "color": "#a96c43"
+      },
+      {
+        "color": "#e8bf92"
+      },
+      {
+        "color": "#a96c43"
+      },
+      {
+        "color": "#e8bf92"
+      },
+      {
+        "color": "#a96c43"
+      },
+      {
+        "color": "#a96c43"
+      },
+      {
+        "color": "#a96c43"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#e8bf92"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-biscuit",
+    "name": "Biscuit",
+    "animal": "Bunny",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#e8cba2"
+      },
+      {
+        "color": "#f6b0a2"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#e8cba2"
+      },
+      {
+        "color": "#f6b0a2"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#f8e8d4"
+      },
+      {
+        "color": "#e8cba2"
+      },
+      {
+        "color": "#f8e8d4"
+      },
+      {
+        "color": "#f8e8d4"
+      },
+      {
+        "color": "#f8e8d4"
+      },
+      {
+        "color": "#e8cba2"
+      },
+      {
+        "color": "#e8cba2"
+      },
+      {
+        "color": "#e8cba2"
+      },
+      {
+        "color": "#e8cba2"
+      },
+      {
+        "color": "#f8e8d4"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-truffle",
+    "name": "Truffle",
+    "animal": "Piglet",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c4726e"
+      },
+      {
+        "color": "#f3aea8"
+      },
+      {
+        "color": "#fcd9d0"
+      },
+      {
+        "color": "#f3aea8"
+      },
+      {
+        "color": "#e7a19b"
+      },
+      {
+        "color": "#f3aea8"
+      },
+      {
+        "color": "#e7a19b"
+      },
+      {
+        "color": "#f3aea8"
+      },
+      {
+        "color": "#f3aea8"
+      },
+      {
+        "color": "#f3aea8"
+      },
+      {
+        "color": "#f7b5ae"
+      },
+      {
+        "color": "#f3aea8"
+      },
+      {
+        "color": "#f7b5ae"
+      },
+      {
+        "color": "#f3aea8"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c9922c"
+      },
+      {
+        "color": "#ee9a94"
+      },
+      {
+        "color": "#a85a56"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-pebble",
+    "name": "Pebble",
+    "animal": "Hedgehog",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#704629"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#f1d6b2"
+      },
+      {
+        "color": "#c99a72"
+      },
+      {
+        "color": "#c99a72"
+      },
+      {
+        "color": "#c99a72"
+      },
+      {
+        "color": "#c99a72"
+      },
+      {
+        "color": "#f1d6b2"
+      },
+      {
+        "color": "#704629"
+      },
+      {
+        "color": "#f1d6b2"
+      },
+      {
+        "color": "#f6b0a2"
+      },
+      {
+        "color": "#f1d6b2"
+      },
+      {
+        "color": "#f6b0a2"
+      },
+      {
+        "color": "#6fae55"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-quartz",
+    "name": "Quartz",
+    "animal": "Gem",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#f7cf7a"
+      },
+      {
+        "color": "#f7cf7a"
+      },
+      {
+        "color": "#f7cf7a"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#df9638"
+      },
+      {
+        "color": "#df9638"
+      },
+      {
+        "color": "#f0b24c"
+      },
+      {
+        "color": "#fff6dc"
+      },
+      {
+        "color": "#df9638"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#f7cf7a"
+      },
+      {
+        "color": "#f7cf7a"
+      },
+      {
+        "color": "#4fbfad"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#ffffff"
+      }
+    ]
+  },
+  {
+    "id": "big-ribbit",
+    "name": "Ribbit",
+    "animal": "Frog",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#58a463"
+      },
+      {
+        "color": "#58a463"
+      },
+      {
+        "color": "#58a463"
+      },
+      {
+        "color": "#58a463"
+      },
+      {
+        "color": "#58a463"
+      },
+      {
+        "color": "#dcecb4"
+      },
+      {
+        "color": "#58a463"
+      },
+      {
+        "color": "#58a463"
+      },
+      {
+        "color": "#58a463"
+      },
+      {
+        "color": "#58a463"
+      },
+      {
+        "color": "#58a463"
+      },
+      {
+        "color": "#7a5a44"
+      },
+      {
+        "color": "#7cc07a"
+      },
+      {
+        "color": "#f7b6c8"
+      },
+      {
+        "color": "#e5a93a"
+      }
+    ]
+  },
+  {
+    "id": "big-cotton",
+    "name": "Cotton",
+    "animal": "Lamb",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f0e0c6"
+      },
+      {
+        "color": "#f0e0c6"
+      },
+      {
+        "color": "#f4c9ab"
+      },
+      {
+        "color": "#83614d"
+      },
+      {
+        "color": "#f4c9ab"
+      },
+      {
+        "color": "#83614d"
+      },
+      {
+        "color": "#f4c9ab"
+      },
+      {
+        "color": "#83614d"
+      },
+      {
+        "color": "#f0e0c6"
+      },
+      {
+        "kind": "stroke",
+        "color": "#e9b443"
+      },
+      {
+        "color": "#f4c9ab"
+      },
+      {
+        "color": "#f4c9ab"
+      },
+      {
+        "color": "#f4c9ab"
+      },
+      {
+        "color": "#f0e0c6"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-squeak",
+    "name": "Squeak",
+    "animal": "Mouse",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#8fcca6"
+      },
+      {
+        "color": "#8fcca6"
+      },
+      {
+        "color": "#cbbba7"
+      },
+      {
+        "color": "#f2e6d6"
+      },
+      {
+        "color": "#f0a49a"
+      },
+      {
+        "color": "#f0a49a"
+      },
+      {
+        "color": "#f0a49a"
+      },
+      {
+        "color": "#f0a49a"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#cbbba7"
+      },
+      {
+        "color": "#f0a49a"
+      },
+      {
+        "color": "#cbbba7"
+      },
+      {
+        "color": "#f0a49a"
+      },
+      {
+        "color": "#cbbba7"
+      },
+      {
+        "color": "#f2e6d6"
+      },
+      {
+        "color": "#cbbba7"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-maple",
+    "name": "Maple",
+    "animal": "Red panda",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#de7a44"
+      },
+      {
+        "color": "#a54e2a"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#de7a44"
+      },
+      {
+        "color": "#de7a44"
+      },
+      {
+        "color": "#f6e4d2"
+      },
+      {
+        "color": "#de7a44"
+      },
+      {
+        "color": "#f6e4d2"
+      },
+      {
+        "color": "#de7a44"
+      },
+      {
+        "color": "#f6e4d2"
+      },
+      {
+        "color": "#f6e4d2"
+      },
+      {
+        "color": "#a8532c"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-otto",
+    "name": "Otto",
+    "animal": "Otter",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#a8704b"
+      },
+      {
+        "color": "#a8704b"
+      },
+      {
+        "color": "#f1dcc2"
+      },
+      {
+        "color": "#7a4a2f"
+      },
+      {
+        "color": "#7a4a2f"
+      },
+      {
+        "color": "#a8704b"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#fff8de"
+      },
+      {
+        "color": "#f1dcc2"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#a99f93"
+      },
+      {
+        "color": "#a8704b"
+      },
+      {
+        "color": "#a8704b"
+      }
+    ]
+  },
+  {
+    "id": "big-buzz",
+    "name": "Buzz",
+    "animal": "Bee",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f3ece0"
+      },
+      {
+        "color": "#f3ece0"
+      },
+      {
+        "color": "#f3ece0"
+      },
+      {
+        "color": "#f3ece0"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#f2bb45"
+      },
+      {
+        "color": "#fffdf6"
+      },
+      {
+        "color": "#fffdf6"
+      },
+      {
+        "color": "#fffdf6"
+      },
+      {
+        "color": "#fffdf6"
+      },
+      {
+        "color": "#fffdf6"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-kiko",
+    "name": "Kiko",
+    "animal": "Koala",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#aba297"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#f2d8cc"
+      },
+      {
+        "color": "#aba297"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#f2d8cc"
+      },
+      {
+        "color": "#aba297"
+      },
+      {
+        "color": "#efe5d8"
+      },
+      {
+        "color": "#aba297"
+      },
+      {
+        "color": "#aba297"
+      },
+      {
+        "color": "#aba297"
+      },
+      {
+        "color": "#efe5d8"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#6fae78"
+      },
+      {
+        "color": "#6fae78"
+      },
+      {
+        "color": "#6fae78"
+      },
+      {
+        "color": "#aba297"
+      }
+    ]
+  },
+  {
+    "id": "big-splash",
+    "name": "Splash",
+    "animal": "Seal",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#bfb09a"
+      },
+      {
+        "color": "#bfb09a"
+      },
+      {
+        "color": "#d2c6b4"
+      },
+      {
+        "color": "#f3e8d8"
+      },
+      {
+        "color": "#c4b49e"
+      },
+      {
+        "color": "#d7cab7"
+      },
+      {
+        "color": "#f08e6c"
+      },
+      {
+        "color": "#bfb09a"
+      },
+      {
+        "color": "#d2c6b4"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#bfb09a"
+      },
+      {
+        "color": "#f3e8d8"
+      },
+      {
+        "color": "#f3e8d8"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-shroomy",
+    "name": "Shroomy",
+    "animal": "Mushroom sprite",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f1dfc6"
+      },
+      {
+        "color": "#f1dfc6"
+      },
+      {
+        "color": "#f1dfc6"
+      },
+      {
+        "color": "#f1dfc6"
+      },
+      {
+        "color": "#f1dfc6"
+      },
+      {
+        "color": "#f1dfc6"
+      },
+      {
+        "color": "#ecc3a2"
+      },
+      {
+        "color": "#d9644f"
+      },
+      {
+        "color": "#fffaf1"
+      },
+      {
+        "color": "#fffaf1"
+      },
+      {
+        "color": "#fffaf1"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#6fae78"
+      },
+      {
+        "color": "#6fae78"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#fffaf1"
+      },
+      {
+        "color": "#e9b443"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-bandit",
+    "name": "Bandit",
+    "animal": "Raccoon",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#b9ada0"
+      },
+      {
+        "kind": "stroke",
+        "color": "#76665a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#76665a"
+      },
+      {
+        "color": "#b9ada0"
+      },
+      {
+        "color": "#efe5d8"
+      },
+      {
+        "color": "#6a5a4f"
+      },
+      {
+        "color": "#6a5a4f"
+      },
+      {
+        "color": "#6a5a4f"
+      },
+      {
+        "color": "#b9ada0"
+      },
+      {
+        "color": "#eeb84a"
+      },
+      {
+        "color": "#5f5047"
+      },
+      {
+        "color": "#b9ada0"
+      },
+      {
+        "color": "#5f5047"
+      },
+      {
+        "color": "#b9ada0"
+      },
+      {
+        "color": "#eeb84a"
+      },
+      {
+        "color": "#6a5a4f"
+      },
+      {
+        "color": "#efe5d8"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-waddles",
+    "name": "Waddles",
+    "animal": "Penguin",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#eb9a6e"
+      },
+      {
+        "color": "#eb9a6e"
+      },
+      {
+        "color": "#eeb84a"
+      },
+      {
+        "color": "#f3e6d3"
+      },
+      {
+        "color": "#eeb84a"
+      },
+      {
+        "color": "#eeb84a"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#eb9a6e"
+      }
+    ]
+  },
+  {
+    "id": "big-fawn",
+    "name": "Fawn",
+    "animal": "Deer",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f6e2cb"
+      },
+      {
+        "color": "#c3875a"
+      },
+      {
+        "color": "#d59a6c"
+      },
+      {
+        "color": "#d59a6c"
+      },
+      {
+        "color": "#f6e2cb"
+      },
+      {
+        "kind": "stroke",
+        "color": "#a46a44"
+      },
+      {
+        "kind": "stroke",
+        "color": "#d59a6c"
+      },
+      {
+        "kind": "stroke",
+        "color": "#b78a5c"
+      },
+      {
+        "kind": "stroke",
+        "color": "#e8c493"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f0b845"
+      },
+      {
+        "color": "#d59a6c"
+      },
+      {
+        "color": "#f6b8a6"
+      },
+      {
+        "color": "#d59a6c"
+      },
+      {
+        "color": "#f6b8a6"
+      },
+      {
+        "color": "#d59a6c"
+      },
+      {
+        "color": "#f0b845"
+      },
+      {
+        "color": "#f6e2cb"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-shelly",
+    "name": "Shelly",
+    "animal": "Snail",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#a9cd8f"
+      },
+      {
+        "color": "#7fbf6a"
+      },
+      {
+        "color": "#7fbf6a"
+      },
+      {
+        "color": "#ec9a72"
+      },
+      {
+        "color": "#f0b845"
+      },
+      {
+        "color": "#f0b845"
+      },
+      {
+        "color": "#a9cd8f"
+      },
+      {
+        "color": "#e2efcb"
+      },
+      {
+        "color": "#a9cd8f"
+      },
+      {
+        "color": "#a9cd8f"
+      },
+      {
+        "color": "#bcd9a2"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-inky",
+    "name": "Inky",
+    "animal": "Octopus",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c65e5a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c65e5a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c65e5a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c65e5a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c65e5a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f5a59d"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f5a59d"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f5a59d"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f5a59d"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f5a59d"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f5a59d"
+      },
+      {
+        "color": "#f29790"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c4913a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f0b845"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-puff",
+    "name": "Puff",
+    "animal": "Cloud",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f5ab8e"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f6d47a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#9fdcc4"
+      },
+      {
+        "kind": "stroke",
+        "color": "#86b8ab"
+      },
+      {
+        "color": "#f6fbf9"
+      },
+      {
+        "color": "#6fcdb9"
+      },
+      {
+        "kind": "stroke",
+        "color": "#4f9e8d"
+      },
+      {
+        "kind": "stroke",
+        "color": "#6fcdb9"
+      },
+      {
+        "color": "#f6fbf9"
+      },
+      {
+        "color": "#f6fbf9"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#6fcdb9"
+      }
+    ]
+  },
+  {
+    "id": "big-twinkle",
+    "name": "Twinkle",
+    "animal": "Star",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f6c548"
+      },
+      {
+        "color": "#fde58a"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-starla",
+    "name": "Starla",
+    "animal": "Unicorn",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f3a5c2"
+      },
+      {
+        "color": "#f1e4dc"
+      },
+      {
+        "color": "#f1e4dc"
+      },
+      {
+        "color": "#f1e4dc"
+      },
+      {
+        "color": "#f1e4dc"
+      },
+      {
+        "color": "#f1e4dc"
+      },
+      {
+        "color": "#f4b9a8"
+      },
+      {
+        "color": "#f4b9a8"
+      },
+      {
+        "color": "#f3a5c2"
+      },
+      {
+        "color": "#f3a5c2"
+      },
+      {
+        "color": "#f1e4dc"
+      },
+      {
+        "color": "#f1e4dc"
+      },
+      {
+        "color": "#f8c9cf"
+      },
+      {
+        "color": "#f8c9cf"
+      },
+      {
+        "color": "#f1e4dc"
+      },
+      {
+        "color": "#fbdcd8"
+      },
+      {
+        "color": "#eebf4f"
+      },
+      {
+        "color": "#f3a5c2"
+      },
+      {
+        "color": "#bfe9dc"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-ziggy",
+    "name": "Ziggy",
+    "animal": "Dragon",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f6b08c"
+      },
+      {
+        "color": "#f6b08c"
+      },
+      {
+        "color": "#eeb945"
+      },
+      {
+        "color": "#eeb945"
+      },
+      {
+        "color": "#eeb945"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c46c4a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f3a47c"
+      },
+      {
+        "color": "#eeb945"
+      },
+      {
+        "color": "#f3a47c"
+      },
+      {
+        "color": "#fcdcb6"
+      },
+      {
+        "color": "#f3a47c"
+      },
+      {
+        "color": "#f3a47c"
+      },
+      {
+        "color": "#f3a47c"
+      },
+      {
+        "color": "#f3a47c"
+      },
+      {
+        "color": "#eeb945"
+      },
+      {
+        "color": "#eeb945"
+      },
+      {
+        "color": "#eeb945"
+      },
+      {
+        "color": "#eeb945"
+      },
+      {
+        "color": "#eeb945"
+      },
+      {
+        "color": "#eeb945"
+      },
+      {
+        "color": "#f3a47c"
+      },
+      {
+        "color": "#fcdcb6"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-leo",
+    "name": "Leo",
+    "animal": "Lion cub",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d27434"
+      },
+      {
+        "color": "#e2863f"
+      },
+      {
+        "color": "#f0a75c"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c0832e"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f2b95a"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#f2b95a"
+      },
+      {
+        "color": "#f2b95a"
+      },
+      {
+        "color": "#f2b95a"
+      },
+      {
+        "color": "#fbe5c4"
+      },
+      {
+        "color": "#f2b95a"
+      },
+      {
+        "color": "#f2b95a"
+      },
+      {
+        "color": "#f2b95a"
+      },
+      {
+        "color": "#f9c9a8"
+      },
+      {
+        "color": "#f2b95a"
+      },
+      {
+        "color": "#f9c9a8"
+      },
+      {
+        "color": "#f2b95a"
+      },
+      {
+        "color": "#fbe5c4"
+      },
+      {
+        "color": "#b5674a"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#e2863f"
+      }
+    ]
+  },
+  {
+    "id": "big-koi",
+    "name": "Koi",
+    "animal": "Lucky koi",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f5ab84"
+      },
+      {
+        "color": "#dfa53a"
+      },
+      {
+        "color": "#f5ab84"
+      },
+      {
+        "color": "#f5ab84"
+      },
+      {
+        "color": "#f5ab84"
+      },
+      {
+        "color": "#f5ab84"
+      },
+      {
+        "color": "#f3e6da"
+      },
+      {
+        "color": "#ec8656"
+      },
+      {
+        "color": "#dfa53a"
+      },
+      {
+        "color": "#f5ab84"
+      },
+      {
+        "color": "#f5ab84"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-bamboo",
+    "name": "Bamboo",
+    "animal": "Giant panda",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f1e8de"
+      },
+      {
+        "color": "#f7eadc"
+      },
+      {
+        "color": "#8f746a"
+      },
+      {
+        "color": "#e3ad3f"
+      },
+      {
+        "color": "#f1e8de"
+      },
+      {
+        "color": "#f7eadc"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#7dbb63"
+      },
+      {
+        "color": "#e3ad3f"
+      },
+      {
+        "color": "#dfa53a"
+      }
+    ]
+  },
+  {
+    "id": "big-aurora",
+    "name": "Aurora",
+    "animal": "Arctic fox",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#5cbfac"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#7fd0bf"
+      },
+      {
+        "color": "#f6ede2"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#5cbfac"
+      },
+      {
+        "color": "#5cbfac"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#ddfaf2"
+      },
+      {
+        "color": "#4f8f8a"
+      }
+    ]
+  },
+  {
+    "id": "big-storm",
+    "name": "Storm",
+    "animal": "Tiger cub",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c06c45"
+      },
+      {
+        "kind": "stroke",
+        "color": "#f1a172"
+      },
+      {
+        "kind": "stroke",
+        "color": "#b9603a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#8a4a2c"
+      },
+      {
+        "color": "#f1a172"
+      },
+      {
+        "color": "#f1a172"
+      },
+      {
+        "color": "#f1a172"
+      },
+      {
+        "color": "#fbe6d2"
+      },
+      {
+        "color": "#f1a172"
+      },
+      {
+        "color": "#fbe6d2"
+      },
+      {
+        "color": "#f1a172"
+      },
+      {
+        "color": "#fbe6d2"
+      },
+      {
+        "color": "#f1a172"
+      },
+      {
+        "color": "#f1a172"
+      },
+      {
+        "color": "#8a4a2c"
+      },
+      {
+        "color": "#8a4a2c"
+      },
+      {
+        "color": "#f6b0a2"
+      },
+      {
+        "color": "#f6b0a2"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#f1a172"
+      },
+      {
+        "color": "#fbe6d2"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#c4624c"
+      }
+    ]
+  },
+  {
+    "id": "big-plume",
+    "name": "Plume",
+    "animal": "Peacock",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#62b89c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#4fb3a2"
+      },
+      {
+        "color": "#24685c"
+      },
+      {
+        "color": "#62b89c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#62b89c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#62b89c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#62b89c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#62b89c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#62b89c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#62b89c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#62b89c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#62b89c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#62b89c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#5cbca8"
+      },
+      {
+        "color": "#d9f0df"
+      },
+      {
+        "color": "#3fa08e"
+      },
+      {
+        "color": "#3fa08e"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#f2a65a"
+      }
+    ]
+  },
+  {
+    "id": "big-nova",
+    "name": "Nova",
+    "animal": "Narwhal",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#7cc3a3"
+      },
+      {
+        "color": "#5fae8c"
+      },
+      {
+        "color": "#e7ae3e"
+      },
+      {
+        "color": "#7cc3a3"
+      },
+      {
+        "color": "#e6f2dc"
+      },
+      {
+        "color": "#5fae8c"
+      },
+      {
+        "color": "#5fae8c"
+      },
+      {
+        "color": "#5fae8c"
+      },
+      {
+        "color": "#e0a63a"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-luna",
+    "name": "Luna",
+    "animal": "Snow leopard",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "kind": "stroke",
+        "color": "#a8927d"
+      },
+      {
+        "kind": "stroke",
+        "color": "#ddd2c4"
+      },
+      {
+        "color": "#efe6da"
+      },
+      {
+        "color": "#efe6da"
+      },
+      {
+        "color": "#8c7a6c"
+      },
+      {
+        "kind": "stroke",
+        "color": "#b2a090"
+      },
+      {
+        "color": "#ddd2c4"
+      },
+      {
+        "color": "#ddd2c4"
+      },
+      {
+        "color": "#ddd2c4"
+      },
+      {
+        "color": "#f3ece2"
+      },
+      {
+        "color": "#f3ece2"
+      },
+      {
+        "color": "#f3ece2"
+      },
+      {
+        "color": "#ddd2c4"
+      },
+      {
+        "color": "#ddd2c4"
+      },
+      {
+        "color": "#f2c3b8"
+      },
+      {
+        "color": "#f2c3b8"
+      },
+      {
+        "color": "#ddd2c4"
+      },
+      {
+        "color": "#f3ece2"
+      },
+      {
+        "color": "#4f8088"
+      }
+    ]
+  },
+  {
+    "id": "big-sol",
+    "name": "Sol",
+    "animal": "Phoenix",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f08c56"
+      },
+      {
+        "color": "#f3b03c"
+      },
+      {
+        "color": "#f3b03c"
+      },
+      {
+        "color": "#ffd46a"
+      },
+      {
+        "color": "#f08c56"
+      },
+      {
+        "color": "#f08c56"
+      },
+      {
+        "color": "#f6a46c"
+      },
+      {
+        "color": "#fde0c0"
+      },
+      {
+        "color": "#f3b03c"
+      },
+      {
+        "color": "#f3b03c"
+      },
+      {
+        "color": "#f3b03c"
+      },
+      {
+        "color": "#f08c56"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#f3b03c"
+      }
+    ]
+  },
+  {
+    "id": "big-kiri",
+    "name": "Kiri",
+    "animal": "Qilin",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "kind": "stroke",
+        "color": "#b8873f"
+      },
+      {
+        "color": "#86d4c0"
+      },
+      {
+        "color": "#86d4c0"
+      },
+      {
+        "kind": "stroke",
+        "color": "#a97424"
+      },
+      {
+        "kind": "stroke",
+        "color": "#e9a83a"
+      },
+      {
+        "color": "#ecc98a"
+      },
+      {
+        "color": "#ecc98a"
+      },
+      {
+        "color": "#ecc98a"
+      },
+      {
+        "color": "#f9ead0"
+      },
+      {
+        "color": "#ecc98a"
+      },
+      {
+        "color": "#e9a83a"
+      },
+      {
+        "color": "#86d4c0"
+      },
+      {
+        "color": "#86d4c0"
+      },
+      {
+        "color": "#ecc98a"
+      },
+      {
+        "color": "#e9a83a"
+      },
+      {
+        "color": "#ecc98a"
+      },
+      {
+        "color": "#ecc98a"
+      },
+      {
+        "color": "#f6b0a2"
+      },
+      {
+        "color": "#f6b0a2"
+      },
+      {
+        "color": "#ecc98a"
+      },
+      {
+        "color": "#e9a83a"
+      },
+      {
+        "color": "#fff6c9"
+      },
+      {
+        "color": "#86d4c0"
+      },
+      {
+        "color": "#f9ead0"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-gryff",
+    "name": "Gryff",
+    "animal": "Griffin",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#e0ae6e"
+      },
+      {
+        "color": "#f3d9a8"
+      },
+      {
+        "color": "#f0a03c"
+      },
+      {
+        "color": "#e0ae6e"
+      },
+      {
+        "color": "#f3d9a8"
+      },
+      {
+        "color": "#f0a03c"
+      },
+      {
+        "kind": "stroke",
+        "color": "#b8782e"
+      },
+      {
+        "color": "#d79a4a"
+      },
+      {
+        "color": "#e9ae52"
+      },
+      {
+        "color": "#e9ae52"
+      },
+      {
+        "color": "#e9ae52"
+      },
+      {
+        "color": "#f8e6c8"
+      },
+      {
+        "color": "#f8e6c8"
+      },
+      {
+        "color": "#f8e6c8"
+      },
+      {
+        "color": "#e0ae6e"
+      },
+      {
+        "color": "#e0ae6e"
+      },
+      {
+        "color": "#e0ae6e"
+      },
+      {
+        "color": "#e0ae6e"
+      },
+      {
+        "color": "#e9ae52"
+      },
+      {
+        "color": "#f0a03c"
+      },
+      {
+        "color": "#f0a03c"
+      },
+      {
+        "color": "#f0a03c"
+      },
+      {
+        "color": "#f1dfc0"
+      },
+      {
+        "color": "#f1dfc0"
+      },
+      {
+        "color": "#f3d9a8"
+      },
+      {
+        "color": "#f3d9a8"
+      },
+      {
+        "color": "#f1dfc0"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#f0a03c"
+      }
+    ]
+  },
+  {
+    "id": "big-nessa",
+    "name": "Nessa",
+    "animal": "Loch Ness monster",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#a9dccd"
+      },
+      {
+        "color": "#72c19a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#3d8a66"
+      },
+      {
+        "kind": "stroke",
+        "color": "#72c19a"
+      },
+      {
+        "color": "#9fd6b2"
+      },
+      {
+        "color": "#72c19a"
+      },
+      {
+        "color": "#9fd6b2"
+      },
+      {
+        "color": "#9fd6b2"
+      },
+      {
+        "color": "#9fd6b2"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#72c19a"
+      },
+      {
+        "color": "#dcf1d3"
+      },
+      {
+        "color": "#5fae86"
+      },
+      {
+        "color": "#9fd6b2"
+      },
+      {
+        "color": "#9fd6b2"
+      },
+      {
+        "color": "#72c19a"
+      },
+      {
+        "color": "#fffbf0"
+      },
+      {
+        "color": "#dcf1d3"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#e9fbf6"
+      }
+    ]
+  },
+  {
+    "id": "big-dozy",
+    "name": "Dozy",
+    "animal": "Baku dream-eater",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#8f7662"
+      },
+      {
+        "color": "#b19782"
+      },
+      {
+        "color": "#b19782"
+      },
+      {
+        "color": "#b19782"
+      },
+      {
+        "color": "#f3e6d6"
+      },
+      {
+        "color": "#b19782"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#b19782"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#a88c76"
+      },
+      {
+        "color": "#f1c0b0"
+      },
+      {
+        "color": "#a88c76"
+      },
+      {
+        "color": "#b19782"
+      },
+      {
+        "color": "#e5a93a"
+      },
+      {
+        "color": "#fffaf0"
+      },
+      {
+        "color": "#fffaf0"
+      },
+      {
+        "color": "#b19782"
+      },
+      {
+        "color": "#fffdf8"
+      },
+      {
+        "color": "#e5a93a"
+      }
+    ]
+  },
+  {
+    "id": "big-nimbus",
+    "name": "Nimbus",
+    "animal": "Pegasus",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#e9fbf5"
+      },
+      {
+        "color": "#80d2be"
+      },
+      {
+        "color": "#e9fbf5"
+      },
+      {
+        "color": "#80d2be"
+      },
+      {
+        "color": "#80d2be"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#ddb46c"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#ddb46c"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#f6c4b6"
+      },
+      {
+        "color": "#f6c4b6"
+      },
+      {
+        "color": "#80d2be"
+      },
+      {
+        "color": "#efe2d2"
+      },
+      {
+        "color": "#f6e4d4"
+      },
+      {
+        "color": "#80d2be"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-hopscotch",
+    "name": "Hopscotch",
+    "animal": "Jackalope",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#f7e4cb"
+      },
+      {
+        "color": "#dcae7a"
+      },
+      {
+        "color": "#f3a596"
+      },
+      {
+        "color": "#dcae7a"
+      },
+      {
+        "color": "#f3a596"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c98a2e"
+      },
+      {
+        "color": "#dcae7a"
+      },
+      {
+        "color": "#f7e4cb"
+      },
+      {
+        "color": "#f7e4cb"
+      },
+      {
+        "color": "#f7e4cb"
+      },
+      {
+        "color": "#dcae7a"
+      },
+      {
+        "color": "#dcae7a"
+      },
+      {
+        "color": "#dcae7a"
+      },
+      {
+        "color": "#eebc45"
+      },
+      {
+        "color": "#f7e4cb"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#f6cf62"
+      }
+    ]
+  },
+  {
+    "id": "big-frosty",
+    "name": "Frosty",
+    "animal": "Yeti",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#eadfc9"
+      },
+      {
+        "color": "#7fd0bf"
+      },
+      {
+        "color": "#eadfc9"
+      },
+      {
+        "color": "#7fd0bf"
+      },
+      {
+        "color": "#d6dbd6"
+      },
+      {
+        "color": "#d6dbd6"
+      },
+      {
+        "color": "#7fd0bf"
+      },
+      {
+        "color": "#7fd0bf"
+      },
+      {
+        "color": "#7fd0bf"
+      },
+      {
+        "color": "#f6e6d6"
+      },
+      {
+        "color": "#d6dbd6"
+      },
+      {
+        "color": "#d6dbd6"
+      },
+      {
+        "color": "#a9e2d5"
+      },
+      {
+        "color": "#c2cac3"
+      },
+      {
+        "color": "#c2cac3"
+      },
+      {
+        "color": "#f6e6d6"
+      },
+      {
+        "color": "#4f8a86"
+      },
+      {
+        "color": "#7a8a86"
+      }
+    ]
+  },
+  {
+    "id": "big-fen",
+    "name": "Fen",
+    "animal": "Fenrir wolf pup",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#b3aca5"
+      },
+      {
+        "color": "#f3e3cf"
+      },
+      {
+        "color": "#8f8780"
+      },
+      {
+        "color": "#8f8780"
+      },
+      {
+        "color": "#f0a092"
+      },
+      {
+        "color": "#f0a092"
+      },
+      {
+        "color": "#e9b54c"
+      },
+      {
+        "color": "#e9b54c"
+      },
+      {
+        "color": "#b3aca5"
+      },
+      {
+        "color": "#b3aca5"
+      },
+      {
+        "color": "#b3aca5"
+      },
+      {
+        "color": "#f3e3cf"
+      },
+      {
+        "color": "#f3e3cf"
+      },
+      {
+        "kind": "stroke",
+        "color": "#7a716a"
+      },
+      {
+        "kind": "stroke",
+        "color": "#c9c3bd"
+      },
+      {
+        "color": "#f3e3cf"
+      },
+      {
+        "color": "#b3aca5"
+      },
+      {
+        "color": "#f3e3cf"
+      },
+      {
+        "color": "#fffaf3"
+      },
+      {
+        "color": "#8a5a44"
+      }
+    ]
+  },
+  {
+    "id": "big-riddle",
+    "name": "Riddle",
+    "animal": "Sphinx kitten",
+    "parts": [
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "color": "#d9d2c4"
+      },
+      {
+        "kind": "stroke",
+        "color": "#b07a35"
+      },
+      {
+        "kind": "stroke",
+        "color": "#e5bb7a"
+      },
+      {
+        "color": "#e5bb7a"
+      },
+      {
+        "color": "#e8b240"
+      },
+      {
+        "color": "#f7e6c9"
+      },
+      {
+        "color": "#e8b240"
+      },
+      {
+        "color": "#f7e6c9"
+      },
+      {
+        "color": "#f7e6c9"
+      },
+      {
+        "color": "#f7e6c9"
+      },
+      {
+        "color": "#e5bb7a"
+      },
+      {
+        "color": "#e5bb7a"
+      },
+      {
+        "color": "#f3a596"
+      },
+      {
+        "color": "#f3a596"
+      },
+      {
+        "color": "#e8b240"
+      },
+      {
+        "color": "#6cc3b0"
+      },
+      {
+        "color": "#e5bb7a"
+      },
+      {
+        "color": "#f7e6c9"
+      },
+      {
+        "color": "#8a5a44"
+      },
+      {
+        "color": "#e8b240"
+      }
+    ]
+  }
+]

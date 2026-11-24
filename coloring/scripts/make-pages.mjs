@@ -1,16 +1,68 @@
-// Turns each Pal's Baby drawing into a coloring page: every part a child can fill becomes white with a soft ink
+// Turns each Pal's drawing into a coloring page for each book: the little book uses the Baby drawings with big
+// parts; the big book (8 to 10) the Master drawings, with their small details kept paintable.
+// For each page: every part a child can fill becomes white with a soft ink
 // outline, eyes and noses stay as they are, glows and shading go, and any part too small for a little finger is
 // left in its own color, so every page can really be finished.
-// Writes coloring/src/pages/<id>.svg and coloring/src/pages.json. Run: npm run coloring:pages (needs Playwright).
-import { readFileSync, writeFileSync } from 'node:fs';
+// Writes coloring/src/pages/<id>.svg and pages.json (little book), pages-big/<id>.svg and pages-big.json. Run: npm run coloring:pages (needs Playwright).
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { PALS } from '../../src/game/pals.js';
 
 const { chromium } = createRequire(import.meta.url)('playwright'); // the global Playwright, as pals:fit uses
 
 const DRAWINGS = new URL('../../src/assets/pals/drawn/', import.meta.url);
-const OUT = new URL('../src/pages/', import.meta.url);
-const MIN_AREA = 5; // stage units² left after thinning: a part about 4×4 units, a fingertip on a phone page with tap snapping
+/**
+ * minArea: stage units² left after thinning that still count as a part (5: about 4×4 units, a fingertip on a
+ * phone page with tap snapping); thin: how far a part is thinned to tell outlines from parts.
+ */
+const BOOKS = [
+  { form: 1, prefix: '', out: 'pages', list: 'pages.json', minArea: 5, thin: 1 },
+  { form: 5, prefix: 'big-', out: 'pages-big', list: 'pages-big.json', minArea: 1.5, thin: 0.5, backdrop: true },
+];
+
+/**
+ * The big book's pages get a mandala behind the Pal (rings of wedges or petals, and stars in the corners), a
+ * different one on every page, so an 8-to-10-year-old has fine, patient work around the Pal too. The shapes go in
+ * before the drawing is measured, so whatever the Pal hides is left out like any hidden part.
+ */
+function backdropFor(id) {
+  let seed = [...id].reduce((sum, ch) => (sum * 31 + ch.charCodeAt(0)) % 2147483647, 11);
+  const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const cx = 50;
+  const cy = 52;
+  const at = (r, a) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy + r * Math.sin(a)).toFixed(2)}`;
+  const wedge = (r0, r1, a0, a1) => `M${at(r1, a0)}A${r1} ${r1} 0 0 1 ${at(r1, a1)}L${at(r0, a1)}A${r0} ${r0} 0 0 0 ${at(r0, a0)}Z`;
+  const petal = (r0, r1, a, w) => `M${at(r0, a - w)}Q${at(r1 + 4, a - w * 0.4)} ${at(r1 + 2, a)}Q${at(r1 + 4, a + w * 0.4)} ${at(r0, a + w)}Z`;
+  const shapes = [];
+  const style = Math.floor(random() * 3);
+  const n = [14, 16, 18, 20][Math.floor(random() * 4)];
+  const turn = random() * Math.PI;
+  for (let i = 0; i < n; i++) {
+    const a0 = turn + (i / n) * Math.PI * 2;
+    const a1 = turn + ((i + 1) / n) * Math.PI * 2;
+    if (style === 0) {
+      shapes.push(wedge(40, 49, a0, a1), wedge(32, 40, a0 + Math.PI / n, a1 + Math.PI / n));
+    } else if (style === 1) {
+      shapes.push(petal(34, 47, (a0 + a1) / 2, Math.PI / n), wedge(28, 34, a0, a1));
+    } else {
+      shapes.push(petal(38, 48, (a0 + a1) / 2, (Math.PI / n) * 0.9), petal(30, 40, a1, (Math.PI / n) * 0.9));
+    }
+  }
+  const star = (x, y, r) =>
+    `M${Array.from({ length: 10 }, (_, i) => {
+      const a = -Math.PI / 2 + (i * Math.PI) / 5;
+      const k = i % 2 ? r * 0.45 : r;
+      return `${(x + k * Math.cos(a)).toFixed(2)} ${(y + k * Math.sin(a)).toFixed(2)}`;
+    }).join('L')}Z`;
+  for (const [x, y] of [
+    [7, 7],
+    [93, 7],
+    [7, 95],
+    [93, 95],
+  ])
+    shapes.push(star(x, y, 6));
+  return `<g class="backdrop" stroke="#8a7a6a" stroke-width="1.1" stroke-linejoin="round">${shapes.map((d) => `<path d="${d}" fill="#d9d2c4"/>`).join('')}</g>`;
+}
 const RENDER = 600;
 
 /**
@@ -21,8 +73,8 @@ const RENDER = 600;
  * shows after thinning it by THIN units on every side) becomes one paintable part; a thin one is an outline and
  * turns to ink; a tiny one keeps its color.
  */
-async function makePage({ id, svg, minArea, size }) {
-  const THIN = 1; // stage units
+async function makePage({ id, svg, minArea, thin, size, dropGlows }) {
+  const THIN = thin; // stage units
   const holder = document.createElement('div');
   holder.innerHTML = svg;
   document.body.append(holder);
@@ -88,6 +140,11 @@ async function makePage({ id, svg, minArea, size }) {
       else if (lum(stroke) > 0.7)
         el.dataset.keep = '1'; // pale sparkles and glints stay as drawn
       else el.dataset.ink = 'line';
+      continue;
+    }
+    // The Master's round glow behind the Pal (a soft radial gradient) would cover the big book's mandala.
+    if (dropGlows && !hasStroke && /url\(/.test(style.fill) && root.querySelector(`radialGradient[id="${style.fill.match(/#([^")]+)/)[1]}"]`)) {
+      el.remove();
       continue;
     }
     if (opacity < 0.6) {
@@ -216,23 +273,23 @@ async function makePage({ id, svg, minArea, size }) {
 
 const browser = await chromium.launch();
 const page = await browser.newPage();
-const pages = [];
-for (const pal of PALS) {
-  let svg;
-  try {
-    svg = readFileSync(new URL(`${pal.id}-1.svg`, DRAWINGS), 'utf8');
-  } catch {
-    continue;
+for (const book of BOOKS) {
+  const pages = [];
+  mkdirSync(new URL(`../src/${book.out}/`, import.meta.url), { recursive: true });
+  for (const pal of PALS) {
+    let svg;
+    try {
+      svg = readFileSync(new URL(`${pal.id}-${book.form}.svg`, DRAWINGS), 'utf8');
+    } catch {
+      continue;
+    }
+    const id = `${book.prefix}${pal.id}`;
+    if (book.backdrop) svg = svg.replace(/(<svg[^>]*>)/, `$1${backdropFor(id)}`);
+    const made = await page.evaluate(makePage, { id, svg, minArea: book.minArea, thin: book.thin, size: RENDER, dropGlows: Boolean(book.backdrop) });
+    writeFileSync(new URL(`../src/${book.out}/${pal.id}.svg`, import.meta.url), made.svg);
+    pages.push({ id, name: pal.name, animal: pal.species, parts: made.parts.map(({ kind, color }) => (kind === 'stroke' ? { kind, color } : { color })) });
+    console.log(`${id.padEnd(14)} ${String(made.parts.length).padStart(3)} parts`);
   }
-  const made = await page.evaluate(makePage, { id: pal.id, svg, minArea: MIN_AREA, size: RENDER });
-  writeFileSync(new URL(`${pal.id}.svg`, OUT), made.svg);
-  pages.push({
-    id: pal.id,
-    name: pal.name,
-    animal: pal.species,
-    parts: made.parts.map(({ kind, color }) => (kind === 'stroke' ? { kind, color } : { color })),
-  });
-  console.log(`${pal.id.padEnd(10)} ${String(made.parts.length).padStart(2)} parts  ${made.notes.join(' ')}`);
+  writeFileSync(new URL(`../src/${book.list}`, import.meta.url), `${JSON.stringify(pages, null, 1)}\n`);
 }
-writeFileSync(new URL('../src/pages.json', import.meta.url), `${JSON.stringify(pages, null, 1)}\n`);
 await browser.close();

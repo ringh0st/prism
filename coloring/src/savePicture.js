@@ -1,8 +1,8 @@
 /**
- * Makes a picture of a colored page (the drawing on paper with the Pal's name) or of a free drawing (a canvas)
- * and offers it to share or save, for a parent to keep or send to grandma.
+ * Makes a picture of a colored page (the drawing on paper with the Pal's name, and any crayon painted over it,
+ * `paint`) or of a free drawing (a canvas) and offers it to share or save, for a parent to keep or send to grandma.
  */
-export async function savePicture(source, name) {
+export async function savePicture(source, name, paint = null) {
   const size = 1200;
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -21,6 +21,11 @@ export async function savePicture(source, name) {
     image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(copy))}`;
     await image.decode();
     c.drawImage(image, 0, size * 0.15, size, size);
+    if (paint) {
+      c.globalCompositeOperation = 'multiply';
+      c.drawImage(paint, 0, size * 0.15, size, size);
+      c.globalCompositeOperation = 'source-over';
+    }
   }
   await document.fonts?.load('80px "Patrick Hand"').catch(() => {});
   c.fillStyle = '#4a3426';

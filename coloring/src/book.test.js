@@ -3,7 +3,6 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { CRAYONS, RAINBOW, canUndo, cleanPage, colorFor, emptyBook, isPageDone, paintPart, restoreBook, undoOnPage } from './book.js';
 
-const PAGES = JSON.parse(readFileSync(new URL('./pages.json', import.meta.url), 'utf8'));
 const page = { id: 'waffles', parts: [{}, {}, {}] };
 
 test('painting a part and taking it back', () => {
@@ -45,22 +44,29 @@ test('a broken save starts a fresh book', () => {
   assert.deepEqual(restoreBook({ colors: { waffles: { 0: '#fff' } } }).colors.waffles, { 0: '#fff' });
 });
 
-test('every Pal has a page, and every page has parts to color that match its drawing', () => {
-  const files = readdirSync(new URL('./pages/', import.meta.url)).filter((f) => f.endsWith('.svg'));
-  assert.equal(files.length, PAGES.length);
-  assert.ok(PAGES.length >= 48);
-  for (const p of PAGES) {
-    const svg = readFileSync(new URL(`./pages/${p.id}.svg`, import.meta.url), 'utf8');
-    const marked = new Set([...svg.matchAll(/data-r="(\d+)"/g)].map((m) => Number(m[1])));
-    assert.ok(p.parts.length >= 2, `${p.id} has something to color`);
-    assert.deepEqual(
-      [...marked].sort((a, b) => a - b),
-      p.parts.map((_, i) => i),
-      `${p.id}: every part is in the drawing`,
-    );
-    assert.ok(!svg.includes('#00ff00'), `${p.id}: no measuring colors left`);
-  }
-});
+for (const [name, list, folder, prefix] of [
+  ['little', './pages.json', './pages/', ''],
+  ['big', './pages-big.json', './pages-big/', 'big-'],
+]) {
+  test(`${name} book: every Pal has a page, and every page has parts to color that match its drawing`, () => {
+    const pages = JSON.parse(readFileSync(new URL(list, import.meta.url), 'utf8'));
+    const files = readdirSync(new URL(folder, import.meta.url)).filter((f) => f.endsWith('.svg'));
+    assert.equal(files.length, pages.length);
+    assert.ok(pages.length >= 48);
+    for (const p of pages) {
+      assert.ok(p.id.startsWith(prefix), `${p.id} is named for its book`);
+      const svg = readFileSync(new URL(`${folder}${p.id.slice(prefix.length)}.svg`, import.meta.url), 'utf8');
+      const marked = new Set([...svg.matchAll(/data-r="(\d+)"/g)].map((m) => Number(m[1])));
+      assert.ok(p.parts.length >= (name === 'big' ? 20 : 2), `${p.id} has enough to color`);
+      assert.deepEqual(
+        [...marked].sort((a, b) => a - b),
+        p.parts.map((_, i) => i),
+        `${p.id}: every part is in the drawing`,
+      );
+      assert.ok(!svg.includes('#00ff00'), `${p.id}: no measuring colors left`);
+    }
+  });
+}
 
 test('free drawings: strokes add up, the last one comes back off, and a cleared sheet is blank', async () => {
   const { addStroke, clearSketch, isBlank, newSketch, undoStroke } = await import('./sketches.js');

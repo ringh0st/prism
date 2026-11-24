@@ -13,6 +13,7 @@ import Sheet from './components/Sheet.jsx';
 import Sketch from './components/Sketch.jsx';
 import BackButton from './components/BackButton.jsx';
 import { PAGES } from './pages.js';
+import { BOOKS } from './books.js';
 import { CRAYONS, GLITTER, RAINBOW, canUndo, cleanPage, coloredPageIds, colorFor, isPageDone, paintPart, restoreBook, undoOnPage } from './book.js';
 import { DEFAULT_SIZE, addStroke, clearSketch, isBlank, newSketch, undoStroke } from './sketches.js';
 import { deleteSketch, loadSketches, saveSketch } from './sketchStore.js';
@@ -51,20 +52,24 @@ const ICONS = {
 };
 
 /**
- * My Pals Coloring Book, for 3 to 7 (easy to start, with more to find: glitter, stamps, crayon sizes, replays).
+ * My Pals Coloring Book: two books for 3 to 10 (easy to start, with more to find: glitter, stamps, crayon sizes,
+ * replays, and the big book's detailed pages to fill or paint by hand).
  * Places, each with one way back (a picture of where it goes, top left):
- * - the room: two walls, My Drawings and My Pals, and on the desk the coloring book and a blank pad;
+ * - the room: two walls, My Drawings and My Pals, and on the desk the two books and a blank pad;
  * - a wall up close: every picture with its day; a tap opens it again (a drawing replays itself first);
- * - the book: only for choosing, so turning pages never gets in the way of coloring; a tap on a Pal takes it out;
+ * - a book: only for choosing, so turning pages never gets in the way of coloring; a tap on a Pal takes it out;
  * - the sheet: the Pal (or a blank page) big on the desk, with the crayon box. Nothing moves there: tap or slide
- *   a finger to color, or draw and stamp freely on the blank page.
+ *   a finger to color, paint by hand on the big book's pages, or draw and stamp freely on the blank page.
  */
 export default function App() {
   const [book, setBook] = useState(() => restoreBook(store.get('coloring.book', null)));
   const [sketches, setSketches] = useState([]);
-  const [index, setIndex] = useState(() => Math.min(store.get('coloring.page', 0), PAGES.length));
-  const [view, setView] = useState({ name: 'room' }); // room | wall { kind } | book | page { pageId, from } | sketch { id, from, replay }
-  const [tool, setTool] = useState({ kind: 'draw', size: DEFAULT_SIZE, stamp: 'star' }); // room | book | page { pageId, from } | sketch { id, from }
+  const [paints, setPaints] = useState({}); // crayon painted by hand over big-book pages: { pageId: { strokes, updated } }
+  const [bigPages, setBigPages] = useState(null);
+  const [indexes, setIndexes] = useState(() => ({ little: store.get('coloring.page', 0), big: store.get('coloring.page.big', 0) }));
+  const [view, setView] = useState({ name: 'room' }); // room | wall { kind } | book { bookId } | page { pageId, from } | sketch { id, from, replay }
+  const [sketchTool, setSketchTool] = useState({ kind: 'draw', size: DEFAULT_SIZE, stamp: 'star' });
+  const [pageTool, setPageTool] = useState({ kind: 'fill', size: 0 });
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [crayonId, setCrayonId] = useState(() => store.get('coloring.crayon', 'red'));
   const [isSoundOn, setIsSoundOn] = useState(() => store.get('coloring.sound', true));
@@ -77,23 +82,28 @@ export default function App() {
   const taps = useRef(0);
   const svgRef = useRef(null);
   const canvasRef = useRef(null);
+  const paintRef = useRef(null);
+  const actions = useRef({}); // per page, the order of fills and painted lines this visit, so Undo takes back the last
   const bookRef = useRef(book);
   bookRef.current = book;
   const isReduced = useMemo(reducedMotion, []);
 
-  const page = view.name === 'page' ? PAGES.find((p) => p.id === view.pageId) : null;
+  const allPages = useMemo(() => [...PAGES, ...(bigPages ?? [])], [bigPages]);
+  const pagesOf = (bookId) => (bookId === 'big' ? (bigPages ?? []) : PAGES);
+  const page = view.name === 'page' ? allPages.find((p) => p.id === view.pageId) : null;
   const sketch = view.name === 'sketch' ? sketches.find((s) => s.id === view.id) : null;
-  const doneIds = useMemo(() => new Set(PAGES.filter((p) => isPageDone(book, p)).map((p) => p.id)), [book]);
-  const palItems = useMemo(
-    () =>
-      coloredPageIds(book)
-        .map((id) => {
-          const p = PAGES.find((x) => x.id === id);
-          return p && { id: `page-${id}`, page: p, colors: book.colors[id], isDone: doneIds.has(id), at: book.touched[id] ?? 0 };
-        })
-        .filter(Boolean),
-    [book, doneIds],
-  );
+  const doneIds = useMemo(() => new Set(allPages.filter((p) => isPageDone(book, p)).map((p) => p.id)), [book, allPages]);
+  const palItems = useMemo(() => {
+    const ids = new Set([...coloredPageIds(book), ...Object.keys(paints).filter((id) => paints[id].strokes.length)]);
+    return [...ids]
+      .map((id) => {
+        const p = allPages.find((x) => x.id === id);
+        const at = Math.max(book.touched[id] ?? 0, paints[id]?.updated ?? 0);
+        return p && { id: `page-${id}`, page: p, colors: book.colors[id], paint: paints[id]?.strokes, isDone: doneIds.has(id), at };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.at - a.at);
+  }, [book, paints, doneIds, allPages]);
   const drawingItems = useMemo(
     () =>
       sketches
@@ -104,10 +114,20 @@ export default function App() {
   );
 
   useEffect(() => {
-    loadSketches().then((saved) => setSketches((now) => (now.length ? now : saved)));
+    loadSketches().then((saved) => {
+      const kept = {};
+      for (const record of saved) if (record.id.startsWith('paint-')) kept[record.id.slice(6)] = record;
+      setPaints((now) => ({ ...kept, ...now }));
+      setSketches((now) => (now.length ? now : saved.filter((record) => !record.id.startsWith('paint-'))));
+    });
+    // The big book's pages are bigger, so they load on their own once the room is up.
+    import('./bigPages.js').then((module) => setBigPages(module.BIG_PAGES));
   }, []);
   useEffect(() => store.set('coloring.book', book), [book]);
-  useEffect(() => store.set('coloring.page', index), [index]);
+  useEffect(() => {
+    store.set('coloring.page', indexes.little);
+    store.set('coloring.page.big', indexes.big);
+  }, [indexes]);
   useEffect(() => store.set('coloring.crayon', crayonId), [crayonId]);
   useEffect(() => {
     sfx.setOn(isSoundOn);
@@ -125,19 +145,20 @@ export default function App() {
     setHasStarted(true);
   };
 
-  // --- Moving between the room, the book and the sheet ---------------------------------------------------
-  const openBook = () => {
+  // --- Moving between the room, the walls, the books and the sheet ---------------------------------------
+  const openBook = (bookId) => {
+    if (bookId === 'big' && !bigPages) return;
     start();
     sfx.openCover();
     setIsCoverOpen(isReduced);
-    setView({ name: 'book' });
+    setView({ name: 'book', bookId });
     if (!isReduced) setTimeout(() => setIsCoverOpen(true), COVER_MS);
   };
   const openPage = (pageId, from) => {
     start();
     sfx.turn();
-    const i = PAGES.findIndex((p) => p.id === pageId) + 1;
-    if (from === 'book') setIndex(i);
+    const p = allPages.find((x) => x.id === pageId);
+    if (from === 'book') setIndexes((all) => ({ ...all, [p.book]: pagesOf(p.book).indexOf(p) + 1 }));
     setCelebrate(null);
     setView({ name: 'page', pageId, from });
   };
@@ -167,7 +188,7 @@ export default function App() {
     }
     if (view.from === 'book') {
       setIsCoverOpen(true);
-      return setView({ name: 'book' });
+      return setView({ name: 'book', bookId: page.book });
     }
     setPinnedId(`page-${view.pageId}`);
     return setView({ name: 'wall', kind: 'pals' });
@@ -175,9 +196,13 @@ export default function App() {
   const openWallItem = (item) => (item.page ? openPage(item.page.id, 'pals') : openSketch(item.sketch));
 
   const turnTo = useCallback((to) => setRequest({ to, id: performance.now() }), []);
-  const onTurned = useCallback((to) => setIndex(to), []);
+  const onTurned = useCallback((to) => setIndexes((all) => ({ ...all, [view.bookId]: to })), [view.bookId]);
 
-  // --- Coloring a Pal ------------------------------------------------------------------------------------
+  const remember = (pageId, kind) => {
+    actions.current[pageId] = [...(actions.current[pageId] ?? []), kind];
+  };
+
+  // --- Coloring a Pal: filling parts ---------------------------------------------------------------------
   const paint = async (part, x, y) => {
     const svg = svgRef.current;
     if (!page || !svg) return;
@@ -190,6 +215,7 @@ export default function App() {
     );
     if (color === GLITTER) sfx.twinkle();
     navigator.vibrate?.(8);
+    remember(page.id, 'fill');
     await spreadColor(svg, part, color, x, y, isReduced ? 0 : PAINT_SECONDS);
     const next = paintPart(bookRef.current, page.id, part, color);
     bookRef.current = next;
@@ -202,7 +228,14 @@ export default function App() {
     return undefined;
   };
 
-  // --- Free drawing --------------------------------------------------------------------------------------
+  // --- Crayon by hand: on big-book pages, and on blank sheets ------------------------------------------------
+  const setPagePaint = (pageId, change) => {
+    setPaints((all) => {
+      const record = { id: `paint-${pageId}`, strokes: change(all[pageId]?.strokes ?? []), updated: Date.now() };
+      saveSketch(record);
+      return { ...all, [pageId]: record };
+    });
+  };
   const updateSketch = (change) => {
     setSketches((all) =>
       all.map((s) => {
@@ -218,8 +251,8 @@ export default function App() {
     if (color === GLITTER) sfx.twinkle();
     return color;
   };
-  const chooseTool = (next) => {
-    sfx.pick(next.kind === 'stamp' ? 9 : next.size * 2);
+  const chooseTool = (setTool) => (next) => {
+    sfx.pick(next.kind === 'draw' ? next.size * 3 : 9);
     setTool(next);
   };
 
@@ -229,30 +262,39 @@ export default function App() {
     sfx.pick(CRAYONS.findIndex((c) => c.id === id));
     setCrayonId(id);
   };
-  const canTakeBack = page ? canUndo(book, page.id) : Boolean(sketch?.strokes.length);
+  const pagePaint = page ? (paints[page.id]?.strokes ?? []) : [];
+  const canTakeBack = page ? canUndo(book, page.id) || pagePaint.length > 0 : Boolean(sketch?.strokes.length);
   const undo = () => {
     if (page) {
-      const { book: next, part } = undoOnPage(book, page.id);
-      if (part == null) return;
-      setBook(next);
+      const last = actions.current[page.id]?.pop() ?? (pagePaint.length ? 'paint' : 'fill');
+      if (last === 'paint' && pagePaint.length) setPagePaint(page.id, (strokes) => strokes.slice(0, -1));
+      else {
+        const { book: next, part } = undoOnPage(book, page.id);
+        if (part == null) return;
+        setBook(next);
+      }
     } else if (sketch?.strokes.length) updateSketch(undoStroke);
     else return;
     sfx.undo();
   };
   const clean = () => {
     sfx.clean();
-    if (page) setBook(cleanPage(book, page.id));
-    else if (sketch) updateSketch(clearSketch);
+    if (page) {
+      setBook(cleanPage(book, page.id));
+      if (pagePaint.length) setPagePaint(page.id, () => []);
+      actions.current[page.id] = [];
+    } else if (sketch) updateSketch(clearSketch);
     setCelebrate(null);
     setIsCleaning(false);
   };
-  const hasMarks = page ? Boolean(Object.keys(book.colors[page.id] ?? {}).length) : Boolean(sketch?.strokes.length);
-  const share = () => (page ? savePicture(svgRef.current, page.name) : savePicture(canvasRef.current, ''));
+  const hasMarks = page ? Boolean(Object.keys(book.colors[page.id] ?? {}).length || pagePaint.length) : Boolean(sketch?.strokes.length);
+  const share = () => (page ? savePicture(svgRef.current, page.name, pagePaint.length ? paintRef.current : null) : savePicture(canvasRef.current, ''));
 
   // Keyboard: arrows turn the book's pages; Enter or Space on a part of the sheet colors it.
   useEffect(() => {
     const onKey = (event) => {
       if (isCleaning) return;
+      const index = indexes[view.bookId];
       if (view.name === 'book' && event.key === 'ArrowRight') turnTo(index + 1);
       else if (view.name === 'book' && event.key === 'ArrowLeft') turnTo(index - 1);
       else if (page && (event.key === 'Enter' || event.key === ' ') && event.target.dataset?.r != null) {
@@ -266,12 +308,13 @@ export default function App() {
   });
 
   const renderFace = (i, isTop) => {
+    const pages = pagesOf(view.bookId);
     const isOpen = isTop && isCoverOpen;
     if (i === 0)
       return (
-        <Contents pages={PAGES} book={book} doneIds={doneIds} isOpen={isOpen} onOpenPage={(n) => openPage(PAGES[n - 1].id, 'book')} onNext={() => turnTo(1)} />
+        <Contents pages={pages} book={book} doneIds={doneIds} isOpen={isOpen} onOpenPage={(n) => openPage(pages[n - 1].id, 'book')} onNext={() => turnTo(1)} />
       );
-    const p = PAGES[i - 1];
+    const p = pages[i - 1];
     return (
       <PageFace
         page={p}
@@ -280,13 +323,14 @@ export default function App() {
         isDone={doneIds.has(p.id)}
         isOpen={isOpen}
         onColor={() => openPage(p.id, 'book')}
-        onNext={i < PAGES.length ? () => turnTo(i + 1) : null}
+        onNext={i < pages.length ? () => turnTo(i + 1) : null}
         onBack={() => turnTo(i - 1)}
       />
     );
   };
 
   const isOnSheet = view.name === 'page' || view.name === 'sketch';
+  const canPaint = Boolean(page && BOOKS[page.book].canPaint);
   const backTo = { wall: 'room', book: 'room', sketch: 'drawings', page: view.from === 'book' ? 'book' : 'pals' }[view.name];
   const stampColor = crayonId === 'rainbow' ? RAINBOW[0] : crayonId === 'glitter' ? '#f2c14a' : CRAYONS.find((c) => c.id === crayonId)?.color;
   return (
@@ -328,7 +372,14 @@ export default function App() {
       </header>
       <main className="stage">
         {view.name === 'room' && (
-          <Room drawings={drawingItems} pals={palItems} onOpenWall={openWall} onOpenBook={openBook} onNewSketch={() => openSketch(null)} />
+          <Room
+            drawings={drawingItems}
+            pals={palItems}
+            isBigReady={Boolean(bigPages)}
+            onOpenWall={openWall}
+            onOpenBook={openBook}
+            onNewSketch={() => openSketch(null)}
+          />
         )}
         {view.name === 'wall' && (
           <Gallery
@@ -336,13 +387,22 @@ export default function App() {
             items={view.kind === 'drawings' ? drawingItems : palItems}
             pinnedId={pinnedId}
             onOpenItem={openWallItem}
-            onStart={view.kind === 'drawings' ? () => openSketch(null) : openBook}
+            onStart={view.kind === 'drawings' ? () => openSketch(null) : () => openBook('little')}
           />
         )}
         {view.name === 'book' && (
-          <div className="book-frame">
-            <Book index={index} count={PAGES.length + 1} request={request} isReduced={isReduced} onTurned={onTurned} onTap={() => {}} renderFace={renderFace} />
-            {!isCoverOpen && <Cover />}
+          <div className={`book-frame ${view.bookId}`}>
+            <Book
+              key={view.bookId}
+              index={indexes[view.bookId]}
+              count={pagesOf(view.bookId).length + 1}
+              request={request}
+              isReduced={isReduced}
+              onTurned={onTurned}
+              onTap={() => {}}
+              renderFace={renderFace}
+            />
+            {!isCoverOpen && <Cover bookId={view.bookId} />}
             <Spiral />
           </div>
         )}
@@ -355,6 +415,14 @@ export default function App() {
               celebrate={celebrate?.pageId === page.id ? celebrate.id : null}
               svgRef={svgRef}
               onPaint={paint}
+              tool={canPaint ? pageTool : null}
+              paint={pagePaint}
+              pickColor={pickStrokeColor}
+              paintRef={canPaint ? paintRef : null}
+              onPaintLine={(line) => {
+                remember(page.id, 'paint');
+                setPagePaint(page.id, (strokes) => [...strokes, line]);
+              }}
             />
           </div>
         )}
@@ -362,7 +430,7 @@ export default function App() {
           <div className="sheet-frame" key={sketch.id}>
             <Sketch
               sketch={sketch}
-              tool={tool}
+              tool={sketchTool}
               pickColor={pickStrokeColor}
               canvasRef={canvasRef}
               isReplaying={Boolean(view.replay)}
@@ -373,9 +441,10 @@ export default function App() {
         )}
       </main>
       {isOnSheet && (
-        <footer className={`tray ${sketch ? 'with-tools' : ''}`}>
-          {sketch && tool.kind === 'stamp' && <StampRow tool={tool} color={stampColor} onTool={chooseTool} />}
-          {sketch && <ToolRack tool={tool} onTool={chooseTool} />}
+        <footer className={`tray ${sketch || canPaint ? 'with-tools' : ''}`}>
+          {sketch && sketchTool.kind === 'stamp' && <StampRow tool={sketchTool} color={stampColor} onTool={chooseTool(setSketchTool)} />}
+          {sketch && <ToolRack tool={sketchTool} other="stamp" onTool={chooseTool(setSketchTool)} />}
+          {canPaint && <ToolRack tool={pageTool} other="fill" onTool={chooseTool(setPageTool)} />}
           <CrayonBox crayonId={crayonId} onPick={pick} />
           <button className="undo" onClick={undo} disabled={!canTakeBack} aria-label="Take back the last color">
             <Glyph d={ICONS.undo} />

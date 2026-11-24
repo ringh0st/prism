@@ -1,9 +1,8 @@
-import Drawing from './Drawing.jsx';
+import PageThumb from './PageThumb.jsx';
 import SketchThumb from './SketchThumb.jsx';
 import Sticker from './Sticker.jsx';
 import Tape from './Tape.jsx';
-import { BlankPad } from './Room.jsx';
-import { BookPicture } from './BackButton.jsx';
+import { BlankPad, MiniCover } from './Room.jsx';
 import { DrawingsSign, PalsSign } from './Signs.jsx';
 
 const TAPES = ['#f2a67e', '#9fd3c7', '#f4c443', '#f5a8c8', '#a5d046', '#9cc3ef'];
@@ -26,7 +25,7 @@ export default function Gallery({ kind, items, pinnedId, onOpenItem, onStart }) 
       <ul className="wall-grid">
         <li className="start-new">
           <button className="framed new" onClick={onStart} aria-label={isDrawings ? 'Draw something new' : 'Open the coloring book'}>
-            {isDrawings ? <BlankPad /> : <BookPicture />}
+            {isDrawings ? <BlankPad /> : <MiniCover bookId="little" />}
             <span className="plus" aria-hidden="true">
               +
             </span>
@@ -40,7 +39,7 @@ export default function Gallery({ kind, items, pinnedId, onOpenItem, onStart }) 
               aria-label={item.page ? `${item.page.name}, colored on ${dayOf(item.at)}` : `My drawing from ${dayOf(item.at)}`}
             >
               <Tape single color={TAPES[tiltOf(item.id) + 3]} />
-              {item.page ? <Drawing page={item.page} colors={item.colors} /> : <SketchThumb sketch={item.sketch} />}
+              {item.page ? <PageThumb page={item.page} colors={item.colors} paint={item.paint} /> : <SketchThumb sketch={item.sketch} />}
               {item.isDone && <Sticker small />}
             </button>
             <span className="made-on" aria-hidden="true">

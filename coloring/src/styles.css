@@ -1041,7 +1041,7 @@ button {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  gap: 8%;
+  gap: 5%;
   padding: 16px 16px calc(14px + env(safe-area-inset-bottom));
 }
 .desk-item {
@@ -1380,6 +1380,118 @@ button {
 }
 .sheet-paper.stamping {
   cursor: copy;
+}
+
+/* The big book: deep green with gold, and its pages' finer lines. */
+.cover.big .cover-face {
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(10, 40, 25, 0.08) 0 1px, transparent 1px 3px), linear-gradient(160deg, #6fb892, #3f8a64 50%, #2f7352);
+}
+.cover.big .subtitle {
+  color: #3f8a64;
+}
+.cover.big .label {
+  outline-color: #e9c46a;
+}
+.mini-cover.big {
+  width: 112px;
+  height: 148px;
+  background: linear-gradient(160deg, #6fb892, #3f8a64 55%, #2f7352);
+  box-shadow:
+    4px 5px 0 #e4d6bb,
+    6px 8px 0 #2a6447,
+    0 14px 18px -6px rgba(30, 40, 20, 0.5);
+  transform: rotate(3deg);
+  animation-delay: -1.6s;
+}
+.mini-cover.big .mini-label {
+  color: #2f7352;
+  box-shadow: 0 0 0 2px #e9c46a;
+}
+.desk-book:disabled {
+  opacity: 0.6;
+}
+
+/* The Pal and the paint layer share one square, so paint lines up the same everywhere. */
+.art {
+  position: relative;
+  width: min(90cqw, 78cqh);
+  aspect-ratio: 1;
+  margin: auto;
+}
+.art .drawing-holder {
+  position: absolute;
+  inset: 0;
+}
+.art.hop {
+  animation: hop 0.9s var(--ease) 3;
+  transform-origin: 50% 90%;
+}
+.paint-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+.sheet-paper.painting {
+  cursor: crosshair;
+}
+.thumb-art {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  margin: auto 0;
+}
+.thumb-art .drawing-holder {
+  position: absolute;
+  inset: 0;
+}
+.thumb-paint {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: multiply;
+}
+.tool-rack {
+  gap: 5px;
+}
+.tool.size {
+  width: 40px;
+  height: 34px;
+  padding: 4px;
+  border-radius: 12px;
+}
+.tool-rack .tool:first-child {
+  width: 48px;
+  height: 48px;
+}
+
+/* Three things on the desk fit any phone: they shrink with the screen. */
+.desk-row .mini-cover {
+  width: min(31vw, 128px);
+  height: min(39vw, 160px);
+}
+.desk-row .mini-cover.big {
+  width: min(28vw, 112px);
+  height: min(37vw, 148px);
+}
+.desk-row .pad {
+  width: min(27vw, 124px);
+  height: min(34vw, 154px);
+}
+.desk-row .mini-pal {
+  width: 72%;
+}
+.desk-row .mini-label {
+  font-size: min(4.2vw, 17px);
+}
+.book-frame.big .book::before {
+  background: #2f7352;
 }
 
 @media (max-width: 360px) {
