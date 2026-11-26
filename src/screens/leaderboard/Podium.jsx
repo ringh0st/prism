@@ -26,9 +26,10 @@ export default function Podium({ top, onOpen }) {
                 aria-label={t('top.rowLabel', { name: row.nickname, rank, score: row.score })}
               />
             )}
-            <span className={styles.avatar} aria-hidden="true">
+            {/* A winner's Pal stands whole on a little stage (squeezed into a round frame it was cut off or tiny). */}
+            <span className={`${styles.avatar} ${row?.pal ? styles.palAvatar : ''}`} aria-hidden="true">
               {row?.pal ? (
-                <PalArt palId={row.pal} stage={row.palStage} wearing={row.wearing ?? []} size={rank === 1 ? 72 : 58} portrait />
+                <PalArt palId={row.pal} stage={row.palStage} wearing={row.wearing ?? []} size={rank === 1 ? 96 : 80} />
               ) : row ? (
                 animalAvatar(row.nickname)
               ) : (

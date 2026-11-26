@@ -37,6 +37,45 @@
   animation-delay: -1s;
 }
 
+/* A Pal on the podium: whole, standing on a soft spot of light instead of inside a circle */
+.avatar.palAvatar {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.palAvatar::before {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 72%;
+  height: 16px;
+  border-radius: 50%;
+  translate: -50% 0;
+  background: color-mix(in srgb, var(--color-honey) 30%, transparent);
+}
+
+.me .avatar.palAvatar {
+  background: none;
+}
+
+.me .palAvatar::before {
+  background: color-mix(in srgb, var(--color-sage) 40%, transparent);
+}
+
+.palAvatar svg:not(.crown) {
+  position: relative;
+  border-radius: 0;
+}
+
+.palAvatar .crown {
+  top: -10px;
+  z-index: 1;
+}
+
 .crown {
   position: absolute;
   top: -22px;
