@@ -79,6 +79,11 @@ export default function LevelIntro({
   // Picking boosters takes a moment: once one is touched, the card waits for Let's go.
   const [isPicking, setIsPicking] = useState(false);
   const [isSwitchingPal, setIsSwitchingPal] = useState(false);
+  // The Pal list opens below the chip: bring it into view on a short screen.
+  const switcherRef = useRef(null);
+  useEffect(() => {
+    if (isSwitchingPal) switcherRef.current?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
+  }, [isSwitchingPal]);
   useEffect(() => {
     // With boosters to pick, the card waits for Let's go (no rush to choose).
     if (waitsForTap || isPicking || boosters) return undefined;
@@ -173,13 +178,15 @@ export default function LevelIntro({
           />
         )}
         {isSwitchingPal && (
-          <TeamSwitcher
-            compact
-            onSwitched={(palId) => {
-              onPalSwitched(palId);
-              setIsSwitchingPal(false);
-            }}
-          />
+          <div ref={switcherRef} className={styles.switcher}>
+            <TeamSwitcher
+              compact
+              onSwitched={(palId) => {
+                onPalSwitched(palId);
+                setIsSwitchingPal(false);
+              }}
+            />
+          </div>
         )}
         {boosters && (
           <BoosterPicker
