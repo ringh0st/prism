@@ -18,6 +18,7 @@ import FeelToggles from './me/FeelToggles.jsx';
 import BeamStyles from './me/BeamStyles.jsx';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import { areAllLevelsOpen, setAllLevelsOpen } from '../lib/openAllLevels.js';
+import { isNativeApp } from '../lib/platform.js';
 
 function GoogleLogo() {
   return (
@@ -183,7 +184,8 @@ export default function SettingsScreen() {
             {t('me.data.reset')}
           </Button>
           <p className={styles.links}>
-            <a href={HOME_PAGE_URL}>{t('me.data.about')}</a>
+            {/* Not in the iPhone app: the website sells diamonds by card, and Apple doesn't allow pointing buyers there. */}
+            {!isNativeApp && <a href={HOME_PAGE_URL}>{t('me.data.about')}</a>}
             <a href={PRIVACY_URL}>{t('me.data.privacy')}</a>
             <a href={TERMS_URL}>{t('me.data.terms')}</a>
           </p>

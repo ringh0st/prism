@@ -151,13 +151,18 @@ function DiamondsShelf({ onError, onBuying }) {
   const { isSignedIn, refresh } = usePlayer();
   const { user } = useAuth();
   // In the iPhone app the App Store gives each pack's price in the player's own currency.
+  // When the App Store doesn't answer (offline, products not ready), the packs say so and offer a retry
+  // instead of waiting on "…" forever.
   const [applePrices, setApplePrices] = useState(null);
+  const [priceTry, setPriceTry] = useState(0);
   useEffect(() => {
     if (!APPLE_PURCHASES_ENABLED) return;
+    setApplePrices(null);
     fetchApplePrices()
       .then(setApplePrices)
       .catch(() => setApplePrices({}));
-  }, []);
+  }, [priceTry]);
+  const isStoreDown = APPLE_PURCHASES_ENABLED && applePrices !== null && DIAMOND_PACKS.every((pack) => !applePrices[pack.id]);
   const priceOf = (pack) => (APPLE_PURCHASES_ENABLED ? applePrices?.[pack.id] : pack.displayPrice);
   const { t, lang } = useI18n();
   const [busyPack, setBusyPack] = useState(null);
@@ -208,10 +213,20 @@ function DiamondsShelf({ onError, onBuying }) {
             ))}
           </ul>
 
+          {isStoreDown && (
+            <p className={styles.storeDown} role="status">
+              <span>{t('shop.packs.storeDown')}</span>
+              <Button size="sm" variant="secondary" onClick={() => setPriceTry((n) => n + 1)}>
+                {t('shop.packs.retry')}
+              </Button>
+            </p>
+          )}
+
           <p className={styles.legal}>
             <Icon name="shield" size={16} />
             <span>
-              <strong>{t('shop.packs.parent')}</strong> {t('shop.packs.legal')} <a href={TERMS_URL}>{t('shop.packs.terms')}</a>
+              <strong>{t('shop.packs.parent')}</strong> {t(APPLE_PURCHASES_ENABLED ? 'shop.packs.legalApp' : 'shop.packs.legal')}{' '}
+              <a href={TERMS_URL}>{t('shop.packs.terms')}</a>
             </span>
           </p>
         </>

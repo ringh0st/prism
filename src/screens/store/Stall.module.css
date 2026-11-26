@@ -350,6 +350,21 @@ button.goods:active .goodsArt {
   color: var(--text-soft);
 }
 
+.storeDown {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-md, 14px);
+  background: var(--warm-bottom, var(--surface-raised));
+  color: var(--text-strong);
+  font-size: 14px;
+  text-align: center;
+}
+
 .legal > svg {
   flex: none;
   margin-top: 1px;

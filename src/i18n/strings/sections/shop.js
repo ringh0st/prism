@@ -42,6 +42,9 @@ export const en = {
   'shop.packs.opening': 'Opening…',
   'shop.packs.parent': 'Under 18? Ask a parent first.',
   'shop.packs.legal': 'One-time buys, no surprises. Secure checkout.',
+  'shop.packs.legalApp': 'One-time buys, no surprises. Paid through your Apple ID.',
+  'shop.packs.storeDown': 'The App Store isn’t answering right now.',
+  'shop.packs.retry': 'Try again',
   'shop.packs.terms': 'Terms',
   'shop.packs.bonus': '+{bonus} free',
 
@@ -192,6 +195,9 @@ export const he = {
   'shop.packs.opening': 'פותחים…',
   'shop.packs.parent': 'מתחת לגיל 18? שאלו הורה קודם.',
   'shop.packs.legal': 'קנייה חד־פעמית, בלי הפתעות. תשלום מאובטח.',
+  'shop.packs.legalApp': 'קנייה חד־פעמית, בלי הפתעות. התשלום דרך ה-Apple ID שלכם.',
+  'shop.packs.storeDown': 'חנות האפליקציות לא עונה כרגע.',
+  'shop.packs.retry': 'לנסות שוב',
   'shop.packs.terms': 'תנאים',
   'shop.packs.bonus': '\u2066+{bonus}\u2069 מתנה',
 
