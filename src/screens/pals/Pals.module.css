@@ -182,8 +182,10 @@
   background: color-mix(in srgb, var(--color-sage) 26%, var(--surface-raised));
 }
 
-.worn :global(button) {
-  background: var(--surface-raised);
+/* "Take off" and "Wear" stay on one line in the narrow cards */
+.accessory :global(button) {
+  white-space: nowrap;
+  padding-inline: 12px;
 }
 
 .slotGroup {

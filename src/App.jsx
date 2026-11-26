@@ -117,7 +117,7 @@ function Routes() {
     case 'daily': {
       const dateKey = todayKey();
       const level = dailyLevelFor(dateKey);
-      return level ? <PlayScreen key={level.id} level={level} mode="daily" title="Daily puzzle" dateKey={dateKey} /> : <NotFoundScreen />;
+      return level ? <PlayScreen key={level.id} level={level} mode="daily" dateKey={dateKey} /> : <NotFoundScreen />;
     }
     case 'test':
       return playtestLevel ? (

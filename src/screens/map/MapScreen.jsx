@@ -34,6 +34,18 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 import { buildWorldStops, pathThrough, ROW_HEIGHT } from './mapLayout.js';
 import styles from './Map.module.css';
 
+/** Arrow keys on a level of the road move to the next (up/right) or previous (down/left) open level. */
+function moveAlongRoad(event) {
+  const step = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1 }[event.key];
+  if (!step || !event.target.matches('[data-road-node]')) return;
+  const nodes = [...document.querySelectorAll('a[data-road-node]')];
+  const next = nodes[nodes.indexOf(event.target) + step];
+  if (!next) return;
+  event.preventDefault();
+  next.focus();
+  next.scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+
 function WorldSection({ world, levelRefs, progress, currentLevelId, currentNodeRef, onOpenChest }) {
   const stops = useMemo(() => buildWorldStops(levelRefs), [levelRefs]);
   const height = stops.length * ROW_HEIGHT;
@@ -200,7 +212,7 @@ export default function MapScreen() {
         )}
       </header>
 
-      <main className={styles.map}>
+      <main className={styles.map} onKeyDown={moveAlongRoad}>
         {/* First in the page so the keyboard reaches PLAY before the road's levels; it's fixed, so it looks the same. */}
         {currentRef && (
           <a

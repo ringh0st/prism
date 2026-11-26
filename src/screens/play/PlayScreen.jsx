@@ -246,7 +246,8 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
         : mode === 'daily' || mode === 'event'
           ? HELPER_IDS.filter((id) => id !== 'skip')
           : HELPER_IDS;
-  const levelName = mode === 'daily' ? t('play.daily') : mode === 'playtest' ? title : title || levelTitle(lang, level);
+  // The daily puzzle's subtitle already says "Daily puzzle", so its title is the day itself ("Wednesday, 26 November").
+  const levelName = mode === 'daily' ? dailyTitle(dateKey, lang) : mode === 'playtest' ? title : title || levelTitle(lang, level);
   // Built-in levels go by their number on the whole road (1 to 1000).
   const levelLabel = Number.isInteger(level.world) ? String(levelNumber(level.world, level.index)) : level.id;
   // Built-in worlds have their own look (board colors and landscape) and show their name.
@@ -1086,6 +1087,10 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
 }
 
 /** A level. Its targets are Lumi's family (on the flat scenes and in the 3D rooms), so every line and icon talks about saving Lumis, not lighting gems. */
+/** A day's name in the player's language, from a "YYYY-MM-DD" key. */
+const dailyTitle = (dateKey, lang) =>
+  dateKey ? new Intl.DateTimeFormat(lang, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(`${dateKey}T12:00:00`)) : '';
+
 export default function PlayScreen(props) {
   return (
     <RescueWording isOn>

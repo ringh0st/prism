@@ -258,6 +258,14 @@
 
 /* Narrow phones: a smaller Lumi leaves the helpers room to stay readable */
 @media (max-width: 360px) {
+  /* One line each for the place and the level's name, so the helpers below keep their room */
+  .titleBlock > * {
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
   .lumi > div > svg {
     width: 60px;
     height: 66px;

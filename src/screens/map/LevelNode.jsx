@@ -81,7 +81,8 @@ export default function LevelNode({ stop, stars, isUnlocked, isCurrent, hasSurpr
 
   const style = { left: `${x}%`, top: `${y}px` };
   return isUnlocked ? (
-    <a ref={nodeRef} href={`#/play/${ref.id}`} className={className} style={style} aria-label={label}>
+    // The road is one Tab stop (the current level); the arrow keys walk along it (MapScreen's moveAlongRoad).
+    <a ref={nodeRef} href={`#/play/${ref.id}`} className={className} style={style} aria-label={label} tabIndex={isCurrent ? 0 : -1} data-road-node>
       {content}
     </a>
   ) : (

@@ -298,7 +298,7 @@ export const he = {
   'me.reset.text': 'הכוכבים, הניצוצות והרצף במכשיר הזה חוזרים לאפס. ההתקדמות בחשבון (אם התחברתם) לא נמחקת.',
   'me.reset.confirm': 'איפוס',
 
-  'me.guest': 'כניסת אורח',
+  'me.guest': 'משחקים כאורח',
   'me.nickname.onBoard': 'בלוח המובילים בשם',
   'me.nickname.label': 'כינוי:',
   'me.nickname.choose': 'בחרו כינוי',
