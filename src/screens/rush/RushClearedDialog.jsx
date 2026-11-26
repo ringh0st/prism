@@ -10,7 +10,7 @@ import styles from './RushDialogs.module.css';
  * A Light Rush puzzle solved: ★★★ when it cost no spares, the spare moves left (with what changed),
  * milestone sparks, how far along the run is, and on to the next one. `outcome` comes from the route's onSolved.
  */
-export default function RushClearedDialog({ number, par, moves, spareBefore, outcome, onNext, onBack }) {
+export default function RushClearedDialog({ number, par, moves, stars, spareBefore, outcome, onNext, onBack }) {
   const { t } = useI18n();
   const { next, sparksWon, isComplete, isNewBest } = outcome;
   const used = Math.max(0, moves - par);
@@ -23,7 +23,8 @@ export default function RushClearedDialog({ number, par, moves, spareBefore, out
       closesOnBackdrop={false}
     >
       <p className="visually-hidden">{used === 0 ? t('rush.cleared.inPar', { par }) : t('rush.cleared.used', { moves, par, count: used })}</p>
-      {used === 0 && <Stars count={3} size={34} animate className={styles.stars} />}
+      {/* The same stars the meter shows (★★★ when no spare move was needed) */}
+      {stars === 3 && used === 0 && <Stars count={3} size={34} animate className={styles.stars} />}
       <div className={styles.spare} role="img" aria-label={`${next.spare} ${t('rush.cleared.spareLeft')}`}>
         <Icon name="bolt" size={30} />
         <span className={`game-title ${styles.spareCount}`}>{next.spare}</span>

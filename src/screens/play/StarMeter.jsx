@@ -10,7 +10,7 @@ import styles from './StarMeter.module.css';
  * the moment it can't be reached any more (moves so far plus the fewest taps left), never later. `isSimple`
  * (the first levels) leaves the stars out, so there's less to take in.
  */
-export default function StarMeter({ moves, par, limit, starCap, tapsLeft = 0, isSimple = false, spent = 0 }) {
+export default function StarMeter({ moves, par, limit, starCap, tapsLeft = 0, isSimple = false, spent = 0, final = null }) {
   const { t } = useI18n();
   const twoStarLimit = par + Math.ceil((limit - par) / 2);
   // `spent`: moves flying off as sparks in the win's light finale (the counter counts down with them).
@@ -19,7 +19,8 @@ export default function StarMeter({ moves, par, limit, starCap, tapsLeft = 0, is
   const tone = left <= 1 ? styles.danger : left <= Math.ceil(limit * 0.34) ? styles.warn : styles.good;
   // The best you can still get: your moves so far plus the fewest taps that can finish it.
   const finish = moves + (tapsLeft ?? 0);
-  const stars = Math.min(starCap, finish <= par ? 3 : finish <= twoStarLimit ? 2 : 1);
+  // Once solved, the meter shows the stars the result gives (`final`), so the two can never disagree.
+  const stars = final ?? Math.min(starCap, finish <= par ? 3 : finish <= twoStarLimit ? 2 : 1);
   // A star slipping out of reach is a moment too: a soft falling sound (not on a restart).
   const shown = useRef(stars);
   useEffect(() => {

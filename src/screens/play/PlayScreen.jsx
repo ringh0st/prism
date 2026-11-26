@@ -666,11 +666,11 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
     const onKeyDown = (event) => {
       if (event.target.closest?.('[role="dialog"]') || event.metaKey || event.ctrlKey || event.altKey || showIntro) return;
       if (event.key === 'r' || event.key === 'R') restart();
-      if (event.key === 'h' || event.key === 'H') requestHelper('hint');
+      if ((event.key === 'h' || event.key === 'H') && offeredHelpers.includes('hint')) requestHelper('hint');
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [restart, requestHelper, showIntro]);
+  }, [restart, requestHelper, showIntro, offeredHelpers]);
 
   /** Spotlights for this level: each new piece where it sits on the board, then any first-time tips. */
   const buildTour = () => {
@@ -868,7 +868,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
 
       {/* First steps show no meter at all (one lone target in an empty bar looked broken). */}
       <section className={styles.status} aria-label={t('play.status')} data-tour="meter" hidden={isFirstSteps}>
-        {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} spent={finaleSpent} />}
+        {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} spent={finaleSpent} final={trace.isSolved && solvedStars ? solvedStars : null} />}
         <ul className={styles.gems} aria-label={t('play.gemsLit', { n: trace.litGems.size, total: gems.length })}>
           {gems.map(({ tile, i, coat }) => (
             <li key={i} className={trace.litGems.has(i) ? styles.gemOn : styles.gemOff} data-gem-slot={i}>
@@ -1009,6 +1009,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
           number={rush.number}
           par={level.par}
           moves={result.moves}
+          stars={result.stars}
           spareBefore={result.rush.spareBefore}
           outcome={result.rush}
           onNext={rush.onNext}
