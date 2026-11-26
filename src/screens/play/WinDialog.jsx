@@ -28,6 +28,7 @@ import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './WinDialog.module.css';
 import { palName } from '../../i18n/palText.js';
 import { useCountUp } from '../../hooks/useCountUp.js';
+import { useFeature } from '../../hooks/useFeature.js';
 
 /** The headline's translation key. */
 export function headlineFor({ stars, isSkipped, completesWorld, isFirstToday, milestone }, difficulty, isRescue) {
@@ -88,6 +89,9 @@ export default function WinDialog({
 }) {
   const { isSignedIn, progress } = usePlayer();
   const { t, lang } = useI18n();
+  // Win gifts and sharing open a little later in the game (unlocks.js), not on the first wins.
+  const hasWinGifts = useFeature('winGifts');
+  const hasSharing = useFeature('sharing');
   const partner = palById(progress.pal.id);
   const {
     stars,
@@ -238,7 +242,7 @@ export default function WinDialog({
       {/* The extras pop in one by one once the stars and sparks have landed, so the result reads first. */}
       <div className={styles.extras} style={{ '--extras-at': `${rewardsAt + 700}ms` }}>
         {partner && result.newRecords?.length > 0 && <PalRecordNote partner={partner} records={result.newRecords} />}
-        {!isSkipped && showWinGifts && <WinGiftLadder />}
+        {!isSkipped && showWinGifts && hasWinGifts && <WinGiftLadder />}
         {partner && !isSkipped && (
           <div className={`${styles.evolved} ${palGrewTo ? styles.grew : ''}`}>
             {/* Your partner cheers along: a happy bounce, and a big jump for the big moments. */}
@@ -297,11 +301,11 @@ export default function WinDialog({
             ))}
           </div>
         )}
-        {(shareMessage || challenge || (replay && !isSkipped)) && (
+        {(shareMessage || (hasSharing && (challenge || (replay && !isSkipped)))) && (
           <div className={styles.shareRow}>
             {shareMessage && <ShareResult text={shareMessage} />}
-            {challenge && <ChallengeShare {...challenge} label={t('win.challenge')} />}
-            {replay && !isSkipped && <ReplayShare replay={{ ...replay, stars, moves }} />}
+            {challenge && hasSharing && <ChallengeShare {...challenge} label={t('win.challenge')} />}
+            {replay && hasSharing && !isSkipped && <ReplayShare replay={{ ...replay, stars, moves }} />}
           </div>
         )}
         {completesWorld && !isSignedIn && (

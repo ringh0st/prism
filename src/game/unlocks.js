@@ -3,13 +3,18 @@
  * (first testers: "I don't understand it", "what do the Glowbugs do?"). Counted in solved built-in levels.
  * Each one is explained in one line on the map the moment it opens (`says`), and nothing about it shows before.
  * Others follow their own rules and fit in between: the first Pal at 5 (then its presents), boosters and weekend
- * events after World 1 (20), Light Rush after World 3 (60).
+ * events after World 1 (20), Light Rush after World 3 (60). The gift Pal (Rumble) and the gold Legendary box wait a
+ * little too, so the first friend isn't followed by two Legendary Pals in a row (pre-release check).
  */
 export const FEATURES = [
   { id: 'gift', after: 3, says: true },
   { id: 'daily', after: 6, says: true },
+  { id: 'winGifts', after: 8, says: true },
   { id: 'missions', after: 10, says: true },
+  { id: 'giftPals', after: 12 },
   { id: 'install', after: 14 },
+  { id: 'sharing', after: 15 },
+  { id: 'legendary', after: 16, says: true },
   { id: 'treats', after: 20, says: true },
   { id: 'quests', after: 25, says: true },
   { id: 'luckyPal', after: 30 },

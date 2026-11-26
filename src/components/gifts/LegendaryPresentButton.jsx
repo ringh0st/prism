@@ -4,6 +4,7 @@ import { usePlayer } from '../../state/PlayerContext.jsx';
 import { LEGENDARY_EVERY_LEVELS, legendaryPresentsWaiting } from '../../game/gifts.js';
 import { palById } from '../../game/pals.js';
 import { todayKey } from '../../game/daily.js';
+import { useFeature } from '../../hooks/useFeature.js';
 import { useI18n } from '../../i18n/I18nContext.jsx';
 import styles from './LegendaryPresentButton.module.css';
 
@@ -17,7 +18,8 @@ export default function LegendaryPresentButton() {
   const { t } = useI18n();
   const [opening, setOpening] = useState(0);
   const [hasPalGift, setHasPalGift] = useState(false);
-  if (!palById(progress.pal.id)) return null;
+  const isOpen = useFeature('legendary');
+  if (!palById(progress.pal.id) || !isOpen) return null;
   const { count, palGift } = legendaryPresentsWaiting(progress, todayKey());
   // The one-time Pal gift opens first and greets the player by their own name.
   const greeting = progress.nickname ? t('legendary.palGift', { name: progress.nickname }) : t('legendary.palGiftAnon');

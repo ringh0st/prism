@@ -61,6 +61,8 @@ import { chestId, chestRewardFor } from '../game/surprises.js';
 import { recordPalFeats } from '../game/palRecords.js';
 import { nextWinStreak } from '../game/winStreak.js';
 import { milestoneReached, solvedLevelCount } from '../game/milestones.js';
+import { isFeatureOpen } from '../game/unlocks.js';
+import { areAllLevelsOpen } from '../lib/openAllLevels.js';
 import { accountHasGame, hasGuestSave, saveForAccount, saveSummary } from '../game/guestSave.js';
 import { claimCalendarGiftLocally, claimWinGiftLocally, openLegendaryPresentLocally, openPresentLocally, recordDailyWin } from '../game/gifts.js';
 import { nicknameProblem } from '../game/nicknames.js';
@@ -177,7 +179,9 @@ export function PlayerProvider({ children }) {
 
   /** Gift Pals every player gets (GIFT_PALS), each shown with the same reveal as a Lucky Pal. */
   const openGiftPals = useCallback(async () => {
-    if (!giftPalsWaiting(progressRef.current).length) return;
+    // Not right after the first friend: one new thing at a time (FEATURES 'giftPals').
+    const isOpen = areAllLevelsOpen() || isFeatureOpen('giftPals', solvedLevelCount(progressRef.current));
+    if (!isOpen || !giftPalsWaiting(progressRef.current).length) return;
     let given;
     if (!userId) {
       const claimed = claimGiftPalsLocally(progressRef.current);
@@ -192,10 +196,10 @@ export function PlayerProvider({ children }) {
     if (given.length) setLuckyGifts((queue) => [...queue, ...given.map((palId) => ({ palId, sparks: 0, isGift: true }))]);
   }, [userId, setProgress, applyServerState]);
 
-  // Guests get gift Pals once they have a first Pal (accounts get them in the sync below).
+  // Gift Pals come once there's a first Pal and a few more levels are solved (accounts also check at each sync).
   useEffect(() => {
-    if (!userId && progress.pal.id) openGiftPals();
-  }, [userId, progress.pal.id, openGiftPals]);
+    if (progress.pal.id) openGiftPals();
+  }, [userId, progress.pal.id, progress.levels, openGiftPals]);
 
   useEffect(() => {
     writeJson(SETTINGS_KEY, settings);

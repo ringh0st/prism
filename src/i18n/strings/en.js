@@ -71,6 +71,8 @@ export const en = {
   'map.extra.install': 'Get app',
   'map.new.gift': 'New! A gift for you every day',
   'map.new.daily': 'New! One special puzzle every day',
+  'map.new.winGifts': 'New! Win 1, 3 and 6 different levels in a day for little gifts',
+  'map.new.legendary': 'New! Every Sunday your Pal brings a gold Legendary box',
   'map.new.missions': 'New! Three little goals every day, for sparks',
   'map.new.treats': 'New! Your Pal finds treats when you win. Feed it on the Pals screen!',
   'map.new.quests': 'New! Your Pal has three wishes this week. Grant them for sparks',
