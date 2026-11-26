@@ -180,3 +180,17 @@
 .join {
   justify-self: center;
 }
+
+/* The board couldn't load (offline): a worried Lumi, the reason and a retry. */
+.offline {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  text-align: center;
+  color: var(--text-soft);
+}
+
+.offline p {
+  margin: 0;
+}

@@ -350,6 +350,17 @@ button.goods:active .goodsArt {
   color: var(--text-soft);
 }
 
+.noneToday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
 .storeDown {
   display: flex;
   flex-wrap: wrap;

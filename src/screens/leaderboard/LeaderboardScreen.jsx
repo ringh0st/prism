@@ -44,7 +44,7 @@ export default function LeaderboardScreen() {
   const { user } = useAuth();
   // Reload when the player's progress changes, so their own score is fresh; the last board shows meanwhile.
   const solvedCount = Object.keys(progress.levels).length;
-  const { board, error: loadError } = useWeeklyBoard({ owner: user?.id ?? 'guest', refreshKey: `${isSignedIn}:${solvedCount}:${progress.pal.id}` });
+  const { board, error: loadError, retry } = useWeeklyBoard({ owner: user?.id ?? 'guest', refreshKey: `${isSignedIn}:${solvedCount}:${progress.pal.id}` });
   const error = loadError ? errorText(t, loadError.message) : '';
 
   // Your own rows always show the Pal you're playing with right now, even before the board reloads.
@@ -103,7 +103,15 @@ export default function LeaderboardScreen() {
             </a>
           )}
         </div>
-        {error && <p className={styles.empty}>{error}</p>}
+        {error && !board && (
+          <div className={styles.offline} role="status">
+            <Lumi mood="worried" size={64} />
+            <p>{error}</p>
+            <Button size="sm" variant="secondary" onClick={retry}>
+              {t('top.retry')}
+            </Button>
+          </div>
+        )}
         {!board && !error && <BoardSkeleton label={t('top.loading')} />}
         {board && <Podium top={top} onOpen={setOpenRow} />}
 
