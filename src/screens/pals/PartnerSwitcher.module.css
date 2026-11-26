@@ -11,8 +11,9 @@
   background:
     radial-gradient(ellipse 45% 75% at 24% 50%, color-mix(in srgb, var(--color-honey) 24%, transparent), transparent 70%), var(--surface-raised);
   box-shadow: var(--shadow-md);
-  /* Grown-up forms (capes, staffs, wings) stay inside the card */
+  /* Grown-up forms (capes, staffs, wings) stay inside the card at the sides; a tall hat may peek over the top */
   overflow: hidden;
+  overflow: clip visible;
 }
 
 /* The stage: a soft pool of light and a little ground shadow, no frame */
@@ -26,7 +27,8 @@
 }
 
 .pal {
-  width: 92%;
+  /* A little room above the head, so tall hats (wizard, crown) on a big Baby form aren't cut by the card's edge */
+  width: 84%;
   padding: 0;
   border: 0;
   border-radius: 24px;
@@ -94,7 +96,18 @@
   color: var(--text-strong);
   background: var(--surface-raised);
   box-shadow: var(--shadow-md);
-  animation: pop 300ms var(--ease-pop) both;
+  /* Said, then out of the way, so the trick (twirl, hop…) shows on the whole Pal */
+  animation:
+    pop 300ms var(--ease-pop) both,
+    saidAndGone 400ms ease 2.6s forwards;
+  pointer-events: none;
+}
+
+@keyframes saidAndGone {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 @keyframes pop {
@@ -272,9 +285,12 @@
   .wave,
   .hearts span,
   .hop,
-  .twirl,
-  .bubble {
+  .twirl {
     animation: none;
+  }
+
+  .bubble {
+    animation: saidAndGone 1ms linear 2.6s forwards;
   }
 }
 

@@ -122,7 +122,7 @@ function LockedWorld({ world, stars }) {
 }
 
 /** The picture on each feature's "New!" note. */
-const NEW_ICONS = { gift: 'gift', daily: 'calendar', missions: 'check', treats: 'heart', quests: 'star', glowbugs: 'heart', stickers: 'star' };
+const NEW_ICONS = { gift: 'gift', daily: 'calendar', winGifts: 'trophy', legendary: 'gift', missions: 'check', treats: 'heart', quests: 'star', glowbugs: 'heart', stickers: 'star' };
 
 /** The HUD's see-through lower edge, in px: the road may show under it. */
 const HUD_FADE = 26;

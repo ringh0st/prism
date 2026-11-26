@@ -184,6 +184,9 @@ const BRIM = [HAT[0], HAT[1] + 6];
 /** Hats sit this much deeper than the head's top, brim on the forehead with the ears beside (owner's reference). */
 const HAT_DEPTH = 4;
 
+/** Pals whose chin sits lower than the shared neck (y≈70): their scarves, capes and medals sit this much lower. */
+const NECK_DROP = { jade: 5 };
+
 /**
  * A hat fitted to this drawing (palOutfitFit.json, measured by `npm run pals:fit`): widened to the forehead and
  * lowered onto heads that sit lower than the shared head top, scaled around the brim so it stays on the head.
@@ -209,6 +212,7 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
   if (!picture) return null;
   const fit = PAL_FIT[`${palId}-${stageIndex + 1}`] ?? 1;
   const outline = `pal-item-${useId().replaceAll(':', '')}`;
+  const neck = NECK + (NECK_DROP[palId] ?? 0);
   return (
     <svg
       className={`${alive ? styles.alive : ''} ${className}`}
@@ -228,18 +232,18 @@ export default function PalArt({ palId, stage = 0, wearing = [], size = 64, port
         <g className={styles.body}>
           <g filter={`url(#${outline})`}>
             {wearing.filter(isCloak).map((id) => (
-              <Cloak key={id} id={id} part="back" neck={NECK} />
+              <Cloak key={id} id={id} part="back" neck={neck} />
             ))}
           </g>
           <image href={picture} x="0" y="0" width="100" height="100" />
           <g filter={`url(#${outline})`}>
             {[...wearing].sort(bySlotOrder).map((id) => {
-              if (isCloak(id)) return <Cloak key={id} id={id} part="front" neck={NECK} />;
-              // Hats are fitted to this drawing's head; neck pieces and gear stay on the shared stage.
+              if (isCloak(id)) return <Cloak key={id} id={id} part="front" neck={neck} />;
+              // Hats are fitted to this drawing's head; neck pieces and gear stay on the shared stage (NECK_DROP aside).
               const isHat = accessoryById(id)?.slot === 'head';
               return (
                 <g key={id} transform={isHat ? hatFit(`${palId}-${stageIndex + 1}`) : undefined}>
-                  <Accessory id={id} hat={HAT} neck={NECK} />
+                  <Accessory id={id} hat={HAT} neck={neck} />
                 </g>
               );
             })}
