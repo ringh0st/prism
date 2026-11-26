@@ -160,17 +160,19 @@ function BeachHut({ joins, seed }) {
 /** Forest: a clump of trees in different greens. */
 function Trees({ joins, seed }) {
   const box = wallBox(joins);
-  const leafy = ['#7fbf6a', '#8ccb78', '#6aae5c'];
+  // Deep greens with an ink outline, so a wall of trees stands out from the pale grass tiles (pre-release check).
+  const leafy = ['#2f7543', '#3a8350', '#2a6a3c'];
   return (
     <g>
-      <rect x={box.x} y={box.y} width={box.w} height={box.h} rx={joins ? 8 : 22} fill="#3f7a4a" />
-      <circle cx="30" cy="34" r="20" fill={leafy[seed % 3]} />
-      <circle cx="68" cy="30" r="17" fill={leafy[(seed + 1) % 3]} />
-      <circle cx="62" cy="68" r="21" fill={leafy[(seed + 2) % 3]} />
-      <path d="M28 88 12 88 28 54 44 88Z" fill="#2f6b45" />
-      <path d="M28 70 16 70 28 46 40 70Z" fill="#37794e" />
-      <circle cx="24" cy="28" r="5" fill="#fff" opacity="0.2" />
-      <circle cx="58" cy="60" r="6" fill="#fff" opacity="0.18" />
+      <rect x={box.x} y={box.y} width={box.w} height={box.h} rx={joins ? 8 : 22} fill="#1f4a2b" />
+      <circle cx="30" cy="34" r="20" fill={leafy[seed % 3]} stroke={INK} strokeWidth="2" />
+      <circle cx="68" cy="30" r="17" fill={leafy[(seed + 1) % 3]} stroke={INK} strokeWidth="2" />
+      <circle cx="62" cy="68" r="21" fill={leafy[(seed + 2) % 3]} stroke={INK} strokeWidth="2" />
+      <path d="M28 88 12 88 28 54 44 88Z" fill="#1d5733" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      <path d="M28 70 16 70 28 46 40 70Z" fill="#256640" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      <circle cx="24" cy="27" r="6" fill="#fff" opacity="0.22" />
+      <circle cx="63" cy="24" r="4" fill="#fff" opacity="0.2" />
+      <circle cx="56" cy="60" r="6" fill="#fff" opacity="0.18" />
     </g>
   );
 }
@@ -627,10 +629,11 @@ export const FLAT_SCENES = {
       '--surface-cell': '#bfe0a2',
       '--surface-cell-alt': '#aad38c',
       '--surface-locked': '#e3dcc6',
-      '--mirror-top': '#fffdf6',
-      '--mirror-bottom': '#dcd0b8',
-      '--mirror-edge': '#2f5a3a',
-      '--pivot-fill': 'rgba(255,253,246,0.45)',
+      // Warm coral mirrors: pale ones faded into the grass (pre-release check).
+      '--mirror-top': '#ffd2bb',
+      '--mirror-bottom': '#e58a66',
+      '--mirror-edge': '#6e2f1c',
+      '--pivot-fill': 'rgba(110,47,28,0.18)',
     },
     Wall: Trees,
     Lamp: Campfire,

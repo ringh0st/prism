@@ -133,9 +133,12 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
   // switched on the level card); none in the first steps.
   const [palHelp, setPalHelp] = useState(() => (powersWorkIn(mode) && !isFirstStepsLevel(level, mode) ? partnerPower(progress) : null));
   const palPowerAmount = (powerId) => (palHelp?.id === powerId ? palHelp.amount : 0);
-  // Worlds 1–2: the first Hint in each level is free (beginners shouldn't run out of help); a hint Pal adds more.
-  const freeHints = (mode === 'level' && level.world <= KEEP_GOING_WORLDS ? 1 : 0) + palPowerAmount('hint');
-  const hasFreeHint = puzzle.usedHelpers.filter((id) => id === 'hint').length < freeHints;
+  // Worlds 1–2: the first Hint in each level is free and keeps ★★★ in reach (beginners shouldn't run out of help,
+  // and "Free" must not quietly cost a star). A hint Pal adds more free hints, which cap at ★★ like any hint.
+  const beginnerHints = mode === 'level' && level.world <= KEEP_GOING_WORLDS ? 1 : 0;
+  const hintsUsed = puzzle.usedHelpers.filter((id) => id === 'hint').length + puzzle.freeHints;
+  const isBeginnerHint = hintsUsed < beginnerHints;
+  const hasFreeHint = hintsUsed < beginnerHints + palPowerAmount('hint');
   const { trace, moves } = puzzle;
   const [result, setResult] = useState(null);
   const [solvedStars, setSolvedStars] = useState(0);
@@ -622,16 +625,17 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
         setLumi({ mood: 'worried', line: errorText(t, error.message) });
         return;
       }
-      puzzle.applyHelper(helperId);
+      const costsNoStars = helperId === 'hint' && isBeginnerHint;
+      puzzle.applyHelper(helperId, { costsNoStars });
       sfx.helper();
       // Say plainly what a helper costs: the best result left for this try.
       if (helperId !== 'skip') {
-        const best = Math.min(starCap, HELPERS[helperId].starCap);
+        const best = costsNoStars ? starCap : Math.min(starCap, HELPERS[helperId].starCap);
         setLumi({ mood: 'excited', line: t(`lumi.helper.${helperId}`, { stars: '★'.repeat(best) }) });
       }
       if (helperId === 'skip') completeLevel({ isSkipped: true });
     },
-    [mode, consumeHelper, puzzle, completeLevel, starCap],
+    [mode, consumeHelper, puzzle, completeLevel, starCap, isBeginnerHint, hasFreeHint],
   );
 
   const requestHelper = useCallback(
@@ -824,7 +828,19 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
       <header className={styles.header}>
         <Button as="a" href={backHref} variant="secondary" icon="back" label={t('play.backTo', { place: backName })} />
         <div className={styles.titleBlock}>
-          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+          {subtitle && (
+            // One line: a long place name shortens ("Radiant Ru… · Level 263"), the level's number always shows.
+            <p className={styles.subtitle}>
+              {subtitle.includes(' · ') ? (
+                <>
+                  <span className={styles.subtitlePlace}>{subtitle.slice(0, subtitle.lastIndexOf(' · '))}</span>
+                  <span className={styles.subtitleRest}>{subtitle.slice(subtitle.lastIndexOf(' · '))}</span>
+                </>
+              ) : (
+                <span className={styles.subtitlePlace}>{subtitle}</span>
+              )}
+            </p>
+          )}
           <ScreenTitle as="h1" size="sm" tone={modifier === 'boss' ? 'boss' : 'calm'}>
             {levelName}
           </ScreenTitle>
@@ -850,7 +866,8 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
         </span>
       </header>
 
-      <section className={styles.status} aria-label={t('play.status')} data-tour="meter">
+      {/* First steps show no meter at all (one lone target in an empty bar looked broken). */}
+      <section className={styles.status} aria-label={t('play.status')} data-tour="meter" hidden={isFirstSteps}>
         {!isFirstSteps && <StarMeter moves={moves} par={level.par} limit={moveLimit} starCap={starCap} tapsLeft={minTapsLeft} spent={finaleSpent} />}
         <ul className={styles.gems} aria-label={t('play.gemsLit', { n: trace.litGems.size, total: gems.length })}>
           {gems.map(({ tile, i, coat }) => (

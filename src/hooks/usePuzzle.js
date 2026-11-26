@@ -15,6 +15,8 @@ const initialState = (level) => {
     taps: [],
     undos: 0,
     usedHelpers: [],
+    // Hints given for free that cost no stars (a beginner's first hint), kept apart from usedHelpers.
+    freeHints: 0,
     hintTile: null,
     ghostSegments: null,
     headStartTile: null,
@@ -161,11 +163,13 @@ export function usePuzzle(level) {
 
   /**
    * Apply a helper's effect to the board. Skip is handled by the screen.
+   * `costsNoStars` (a beginner's free hint) gives the help without lowering the best result.
    * @returns true if the helper did something
    */
   const applyHelper = useCallback(
-    (helperId) => {
-      const markUsed = (s, patch = {}) => ({ ...s, ...patch, usedHelpers: [...s.usedHelpers, helperId] });
+    (helperId, { costsNoStars = false } = {}) => {
+      const markUsed = (s, patch = {}) =>
+        costsNoStars ? { ...s, ...patch, freeHints: s.freeHints + 1 } : { ...s, ...patch, usedHelpers: [...s.usedHelpers, helperId] };
       if (helperId === 'skip') {
         setState((s) => markUsed(s));
         return true;

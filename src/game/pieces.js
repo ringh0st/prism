@@ -152,7 +152,7 @@ const LEVEL_HAS = {
 export const PIECE_FIRST_LEVEL = {
   basics: 'w1-01',
   wall: 'w1-04',
-  locked: 'w1-10',
+  locked: 'w1-11',
   splitter: 'w2-01',
   color: 'w3-01',
   shade: 'w4-01',

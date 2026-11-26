@@ -383,9 +383,34 @@
   }
 }
 
-/* A scene keeps its own floor on disco levels (the light still drifts through colors) */
+/* A scene keeps its own floor on disco levels; soft party lights drift over it instead (slow, no flashes) */
 .scene.disco .plate {
   animation: none;
+}
+
+.scene.disco::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(255, 120, 180, 0.38), transparent 28%),
+    radial-gradient(circle at 75% 30%, rgba(255, 200, 80, 0.36), transparent 26%),
+    radial-gradient(circle at 35% 75%, rgba(90, 210, 180, 0.34), transparent 28%),
+    radial-gradient(circle at 80% 80%, rgba(255, 150, 110, 0.36), transparent 26%);
+  background-size: 170% 170%;
+  animation: partyLights 9s ease-in-out infinite alternate;
+}
+
+@keyframes partyLights {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 100% 100%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -670,6 +695,8 @@
 .night {
   --surface-board: #2b1d17;
   --surface-cell: #3a2a21;
+  /* One even dark floor: the world's lighter checker color made a harsh dark-and-mint board */
+  --surface-cell-alt: #33251d;
   --surface-cell-edge: #1d130f;
   background:
     radial-gradient(circle at 15% 20%, #fff 0 1px, transparent 2px), radial-gradient(circle at 70% 12%, #fff 0 1px, transparent 2px),
@@ -688,6 +715,7 @@
 @media (prefers-reduced-motion: reduce) {
   .disco .beams,
   .disco .plate,
+  .scene.disco::before,
   .board.solved {
     animation: none;
   }

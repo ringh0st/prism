@@ -253,13 +253,13 @@ export function generatorPresetFor(world, index) {
   const recipe = recipeFor(world, index);
   const flavored = (base) => (recipe ? { ...recipePreset(recipe, base, { world, index, spike }), recipe } : base);
 
-  // World 1 after the tutorial: walls (from 1-4), then fixed mirrors from level 10.
+  // World 1 after the tutorial: walls (from 1-4), then fixed mirrors from level 11 (a normal level, not the Hard 1-10).
   if (world === 1) {
     return flavored({
       ...preset,
       walls: index < 4 ? 0 : preset.walls,
-      lockedRatio: index < 10 ? 0 : index === 10 ? 0.5 : 0.1,
-      mustHave: index === 10 ? 'locked' : null,
+      lockedRatio: index < 11 ? 0 : index === 11 ? 0.5 : 0.1,
+      mustHave: index === 11 ? 'locked' : null,
     });
   }
 

@@ -93,7 +93,8 @@ function lightRing(element, color = '#F0C14E') {
  * `onLand` runs when it arrives. Without motion, the target just bounces.
  */
 export function flyToCounter(fromElement, toElement, color = '#F0C14E', onLand = null) {
-  if (!fromElement || !toElement) return;
+  // No target on screen (the counter is hidden during first steps): nothing flies.
+  if (!fromElement || !toElement || !toElement.getClientRects().length) return;
   const bump = () =>
     toElement.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.45)' }, { transform: 'scale(1)' }], {
       duration: 380,

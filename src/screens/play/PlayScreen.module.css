@@ -35,12 +35,31 @@
 }
 
 .subtitle {
+  display: flex;
+  max-width: 100%;
+  min-width: 0;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 12px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  white-space: nowrap;
   color: var(--text-soft);
+}
+
+.subtitlePlace {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.subtitleRest {
+  flex: none;
+  white-space: pre;
+}
+
+.status[hidden] {
+  display: none;
 }
 
 .status {
