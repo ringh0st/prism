@@ -49,13 +49,19 @@ export default function Spotlight({ target, title, text = '', art = null, step =
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [target, onNext]);
 
-  const isBubbleAbove = hole && window.innerHeight - (hole.top + hole.height) < BUBBLE_ROOM;
+  // Below the highlight if it fits, else above; a highlight as big as the screen (the eclipse chip's whole board)
+  // leaves room on neither side, so the bubble sits over the bottom of the screen without a pointer.
+  const roomBelow = hole ? window.innerHeight - (hole.top + hole.height) : 0;
+  const isBubbleAbove = hole && roomBelow < BUBBLE_ROOM && hole.top >= BUBBLE_ROOM;
+  const isBubbleInside = hole && roomBelow < BUBBLE_ROOM && !isBubbleAbove;
   const bubblePosition = !hole
     ? { top: '50%', transform: 'translateY(-50%)' }
-    : isBubbleAbove
-      ? { bottom: window.innerHeight - hole.top + POINTER_ROOM }
-      : { top: hole.top + hole.height + POINTER_ROOM };
-  const pointerPosition = hole && {
+    : isBubbleInside
+      ? { bottom: 16 }
+      : isBubbleAbove
+        ? { bottom: window.innerHeight - hole.top + POINTER_ROOM }
+        : { top: hole.top + hole.height + POINTER_ROOM };
+  const pointerPosition = hole && !isBubbleInside && {
     left: hole.left + hole.width / 2,
     ...(isBubbleAbove ? { bottom: window.innerHeight - hole.top + 2 } : { top: hole.top + hole.height + 2 }),
   };
@@ -67,7 +73,7 @@ export default function Spotlight({ target, title, text = '', art = null, step =
       ) : (
         <div className={styles.dim} />
       )}
-      {hole && (
+      {pointerPosition && (
         <span className={`${styles.pointer} ${isBubbleAbove ? styles.pointDown : ''}`} style={pointerPosition} aria-hidden="true">
           <svg viewBox="0 0 24 16" width="28" height="19">
             <path d="M12 2 22 14H2Z" fill="var(--color-honey)" stroke="var(--reward-ledge)" strokeWidth="2" strokeLinejoin="round" />

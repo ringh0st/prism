@@ -894,8 +894,11 @@
 /* Moves until the next eclipse, in the board's corner */
 .eclipseChip {
   position: absolute;
-  top: -4px;
-  inset-inline-end: -4px;
+  /* On the board's top rim, not over a square: it used to hide the Lumi in the top-right corner */
+  top: 0;
+  inset-inline-end: 10px;
+  translate: 0 -62%; /* not transform: the pulse below animates transform */
+  z-index: 4;
   display: inline-flex;
   align-items: center;
   gap: 3px;
