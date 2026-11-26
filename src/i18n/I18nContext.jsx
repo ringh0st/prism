@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo } from 'react';
 import { usePlayer } from '../state/PlayerContext.jsx';
-import { detectLanguage, directionOf, pickLine, translate } from './translate.js';
+import { detectLanguage, directionOf, isOffered, pickLine, translate } from './translate.js';
 import { rescueWording } from './rescueWording.js';
 
 const I18nContext = createContext(null);
@@ -11,7 +11,7 @@ const I18nContext = createContext(null);
  */
 export function I18nProvider({ children }) {
   const { settings } = usePlayer();
-  const lang = settings.language ?? detectLanguage();
+  const lang = isOffered(settings.language) ? settings.language : detectLanguage();
   const dir = directionOf(lang);
 
   useEffect(() => {

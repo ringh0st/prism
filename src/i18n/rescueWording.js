@@ -1,6 +1,6 @@
 /**
  * In themed worlds the targets are Lumi's family, not gems: the same lines, with the gem words swapped for Lumis.
- * Pure text rules per language (English, Spanish, Hebrew); anything else passes through.
+ * Pure text rules per language (English and Hebrew); anything else passes through.
  */
 const RULES = {
   en: [
@@ -8,12 +8,6 @@ const RULES = {
     [/\bGem\b/g, 'Lumi'],
     [/\bgems\b/g, 'Lumis'],
     [/\bgem\b/g, 'Lumi'],
-  ],
-  es: [
-    [/\bGemas\b/g, 'Lumis'],
-    [/\bGema\b/g, 'Lumi'],
-    [/\bgemas\b/g, 'Lumis'],
-    [/\bgema\b/g, 'Lumi'],
   ],
   he: [
     ['אבני החן', 'הלומים'],

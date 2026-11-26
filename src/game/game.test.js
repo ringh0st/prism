@@ -1192,7 +1192,6 @@ test('level names never repeat within a built-in world', async () => {
 
 test('translations: every language uses the same keys and placeholders as English', async () => {
   const { en } = await import('../i18n/strings/en.js');
-  const { es } = await import('../i18n/strings/es.js');
   const { he } = await import('../i18n/strings/he.js');
   // Keys for game content (pieces, flavors, helpers…) only exist in translations: English lives in the game modules.
   const CONTENT =
@@ -1206,10 +1205,7 @@ test('translations: every language uses the same keys and placeholders as Englis
           .filter((n) => n !== 'count')
           .sort()
       : [];
-  for (const [name, dict] of [
-    ['es', es],
-    ['he', he],
-  ]) {
+  for (const [name, dict] of [['he', he]]) {
     for (const [key, value] of Object.entries(dict)) {
       if (CONTENT.test(key)) continue;
       assert.ok(enBases.has(base(key)), `${name}: "${key}" is not an English key`);
@@ -1226,13 +1222,13 @@ test('translations: every language uses the same keys and placeholders as Englis
 test('translations: plurals, placeholders, English fallback and the device language', async () => {
   const { translate, detectLanguage } = await import('../i18n/translate.js');
   assert.equal(translate('en', 'win.solvedIn', { count: 1 }), 'Solved in 1 move');
-  assert.equal(translate('es', 'win.solvedIn', { count: 3 }), 'Resuelto en 3 movimientos');
+  assert.equal(translate('es', 'win.solvedIn', { count: 3 }), 'Solved in 3 moves', 'a language no longer offered falls back to English');
   assert.equal(translate('he', 'win.solvedIn', { count: 1 }), 'עברתם במהלך אחד');
   assert.equal(translate('he', 'win.solvedIn', { count: 2 }), 'עברתם ב-2 מהלכים');
   assert.equal(translate('he', 'no.such.key', {}, 'fallback'), 'fallback');
   assert.equal(detectLanguage(['he-IL']), 'he');
   assert.equal(detectLanguage(['iw']), 'he');
-  assert.equal(detectLanguage(['es-MX', 'en']), 'es');
+  assert.equal(detectLanguage(['es-MX', 'en']), 'en', 'Spanish is not offered for now');
   assert.equal(detectLanguage(['fr-FR']), 'en');
 });
 

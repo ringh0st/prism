@@ -1,5 +1,4 @@
 import { en } from './strings/en.js';
-import { es } from './strings/es.js';
 import { he } from './strings/he.js';
 
 /*
@@ -9,11 +8,10 @@ import { he } from './strings/he.js';
  */
 export const LANGUAGES = [
   { id: 'en', name: 'English', dir: 'ltr' },
-  { id: 'es', name: 'Español', dir: 'ltr' },
   { id: 'he', name: 'עברית', dir: 'rtl' },
 ];
 
-const DICTIONARIES = { en, es, he };
+const DICTIONARIES = { en, he };
 
 /** The language to start in: the device's own if we have it, else English. */
 export function detectLanguage(preferred = typeof navigator === 'undefined' ? [] : (navigator.languages ?? [navigator.language])) {
@@ -24,6 +22,9 @@ export function detectLanguage(preferred = typeof navigator === 'undefined' ? []
   }
   return 'en';
 }
+
+/** A language that is no longer offered (Spanish was taken out before the app release) falls back to the device's. */
+export const isOffered = (lang) => LANGUAGES.some((language) => language.id === lang);
 
 export const directionOf = (lang) => LANGUAGES.find((language) => language.id === lang)?.dir ?? 'ltr';
 
