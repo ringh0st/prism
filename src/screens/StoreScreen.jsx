@@ -13,7 +13,9 @@ import HelpTip from '../components/game/HelpTip.jsx';
 import SignInNote from './store/SignInNote.jsx';
 import BuysLeft from './store/BuysLeft.jsx';
 import { usePlayer } from '../state/PlayerContext.jsx';
-import { DAILY_SPARK_PURCHASE_LIMIT, DIAMOND_PACKS, DIAMOND_REWARDS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS, toolFor } from '../game/catalog.js';
+import { BOOSTERS, DAILY_SPARK_PURCHASE_LIMIT, DIAMOND_PACKS, DIAMOND_REWARDS, INVENTORY_CAP, STORE_ITEMS, WEEKLY_REWARDS, areBoostersOpen, toolFor } from '../game/catalog.js';
+import { solvedLevelCount } from '../game/pals.js';
+import { areAllLevelsOpen } from '../lib/openAllLevels.js';
 import { sparkPurchasesLeft } from '../game/progress.js';
 import { todayKey } from '../game/daily.js';
 import { startDiamondCheckout } from '../lib/economyApi.js';
@@ -41,6 +43,8 @@ const weeklyDiamonds = WEEKLY_REWARDS.filter((reward) => reward.diamonds > 0).ma
 
 function HelpersShelf({ buyProps, onInfo }) {
   const { progress } = usePlayer();
+  // Boosters join the shelf when they can first be used (World 2), like everything else that opens later.
+  const boostersOpen = areAllLevelsOpen() || areBoostersOpen(solvedLevelCount(progress.levels));
   const { t, lang } = useI18n();
   return (
     <>
@@ -53,7 +57,7 @@ function HelpersShelf({ buyProps, onInfo }) {
         </HelpTip>
       </div>
       <ul className={styles.shelf}>
-        {helperItems.map((item) => {
+        {helperItems.filter((item) => boostersOpen || !BOOSTERS[item.grants.helper]).map((item) => {
           const helper = toolFor(item.grants.helper);
           const { name, description } = helperText(lang, helper.id);
           const owned = progress.helpers[helper.id] ?? 0;

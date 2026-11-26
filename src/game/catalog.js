@@ -74,6 +74,9 @@ export const BOOSTERS = {
 export const BOOSTER_IDS = Object.keys(BOOSTERS);
 /** Boosters open from this world on. */
 export const BOOSTERS_FROM_WORLD = 2;
+/** Boosters are offered (Shop, presents) once World 1's 20 levels are solved, when they can first be used. */
+export const BOOSTERS_AFTER_SOLVED = (BOOSTERS_FROM_WORLD - 1) * 20;
+export const areBoostersOpen = (solvedCount) => solvedCount >= BOOSTERS_AFTER_SOLVED;
 
 /** A helper or a booster by id. */
 export const toolFor = (id) => HELPERS[id] ?? BOOSTERS[id] ?? null;

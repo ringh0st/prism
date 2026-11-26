@@ -190,8 +190,11 @@ begin
         and not (split_part(i, ':', 1) = 'decor' and split_part(i, ':', 2) = any (v_profile.grove_items))
       order by random() limit 1;
   elsif v_roll < 45 then
+    -- Boosters only once they can be used (World 2, after the 20 levels of World 1; BOOSTERS_FROM_WORLD).
     select h into v_helper from unnest(array['hint', 'lens', 'autoturn', 'spareMoves', 'steadyHand', 'headStart']) as h
       where coalesce((v_profile.helpers ->> h)::integer, 0) < 5
+        and (h in ('hint', 'lens', 'autoturn') or (select count(*) from public.progress
+          where user_id = p_user and stars > 0 and level_id ~ '^w[0-9]+-[0-9]{2}$') >= 20)
       order by random() limit 1;
   end if;
 

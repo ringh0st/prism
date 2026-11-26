@@ -1,7 +1,7 @@
 import { EconomyError } from './progress.js';
-import { INVENTORY_CAP } from './catalog.js';
+import { BOOSTERS, INVENTORY_CAP, areBoostersOpen } from './catalog.js';
 import { THEME_DECOR, THEME_OUTFITS } from './themes.js';
-import { PALS, rarityOf } from './pals.js';
+import { PALS, rarityOf, solvedLevelCount } from './pals.js';
 
 /*
  * Gifts: the 7-day gift calendar and the partner Pal's presents. Every gift here is free and earned by playing;
@@ -135,7 +135,10 @@ export function drawPresent(progress, { rarityRoll = Math.random(), roll = Math.
   const rarity = presentRarityFor(rarityRoll);
   const sparksBag = PRESENT_ODDS[1].sparks;
   const items = PRESENT_ITEMS.filter((item) => !ownsItem(progress, item));
-  const helpers = PRESENT_HELPERS.filter((id) => (progress.helpers[id] ?? 0) < INVENTORY_CAP);
+  const boostersOpen = areBoostersOpen(solvedLevelCount(progress.levels));
+  const helpers = PRESENT_HELPERS.filter(
+    (id) => (progress.helpers[id] ?? 0) < INVENTORY_CAP && (boostersOpen || !BOOSTERS[id]),
+  );
   const score = roll * 100;
   let surprise;
   if (rarity.sureItem || score >= PRESENT_ODDS[0].chance + PRESENT_ODDS[1].chance) {
@@ -163,7 +166,6 @@ export function openPresentLocally(progress, rolls) {
 
 /** Every Sunday, and every 100 solved levels, the partner Pal brings a present that is always Legendary. */
 export const LEGENDARY_EVERY_LEVELS = 100;
-const solvedLevelCount = (levels) => Object.entries(levels).filter(([id, entry]) => /^w\d+-\d{2}$/.test(id) && entry.stars > 0).length;
 
 /** Is this day ("YYYY-MM-DD", the player's own date) a Sunday? */
 export const isSunday = (dateKey) => new Date(`${dateKey}T12:00:00`).getDay() === 0;
