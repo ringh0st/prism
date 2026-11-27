@@ -34,6 +34,14 @@
   animation: slam 600ms var(--ease-pop);
 }
 
+.back {
+  position: absolute;
+  top: 10px;
+  inset-inline-start: 10px;
+  z-index: 1;
+  transform: scale(0.8);
+}
+
 .subtitle {
   font-family: var(--font-display);
   font-weight: 600;

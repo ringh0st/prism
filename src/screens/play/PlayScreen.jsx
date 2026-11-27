@@ -744,6 +744,10 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
     return () => music.stop();
   }, [isMusicPlaying, world?.theme]);
 
+  // The boosters picked on the card, read when Let's go is tapped (the callback below is kept between renders,
+  // so it must not hold an old copy: from World 4 the picks were lost and nothing was spent or given).
+  const boostersRef = useRef(boosters);
+  boostersRef.current = boosters;
   const dismissIntro = useCallback(() => {
     sfx.unlock();
     sfx.levelStart();
@@ -759,7 +763,7 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
       setLumi({ mood: 'happy', line: flavor.goal });
       sfx.lumiTalk();
     }
-    boosters.start().then((used) => {
+    boostersRef.current.start().then((used) => {
       if (!used.length) return;
       if (streak >= 3) sfx.streak();
       else sfx.helper();
@@ -948,6 +952,8 @@ function PlayScreenBody({ level, mode = 'level', title, backHref = '#/', nextLev
       {showIntro && (
         <LevelIntro
           level={level}
+          backHref={backHref}
+          backLabel={t('play.backTo', { place: backName })}
           title={levelName}
           subtitle={subtitle}
           modifier={modifier}

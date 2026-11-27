@@ -72,6 +72,8 @@ export default function LevelIntro({
   canSwitchPal = false,
   onPalSwitched,
   onDone,
+  backHref = null,
+  backLabel = '',
 }) {
   // A Hard or Extra Hard level always says so, even when it's also a night or disco level (difficulty first).
   const moods = [level.difficulty, modifier].filter((id) => MOODS[id]);
@@ -119,6 +121,8 @@ export default function LevelIntro({
     // Clicking anywhere also starts; the button is the keyboard and screen-reader path.
     <div className={styles.overlay} onClick={onDone} onKeyDown={keepTabOnCard} role="presentation">
       <div ref={cardRef} className={`${styles.card} ${mood ? styles[mood] : ''}`} onClick={(event) => event.stopPropagation()} role="presentation">
+        {/* The way back without playing (a wrong level opened): the card covers the header's Back */}
+        {backHref && !waitsForTap && <Button as="a" href={backHref} variant="secondary" icon="back" label={backLabel} className={styles.back} />}
         {moods.length > 0 && (
           <span className={styles.medallions} aria-hidden="true">
             {moods.map((id) => (
