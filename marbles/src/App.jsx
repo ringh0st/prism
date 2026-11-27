@@ -99,10 +99,10 @@ export default function App() {
     store.set('marbles.sound', soundOn);
   }, [soundOn]);
 
-  /** A line at the top of the yard, and the "+1" that flies up from the bag that scored. */
-  const say = (text, gain = null) => {
+  /** A line at the top of the yard, and the "+1" (or "−1") that flies up from each bag that changed. */
+  const say = (text, gains = []) => {
     clearTimeout(noteTimer.current);
-    setNote({ text, gain, id: performance.now() });
+    setNote({ text, gains, id: performance.now() });
     noteTimer.current = setTimeout(() => setNote(null), 3200);
   };
 
@@ -224,7 +224,7 @@ export default function App() {
       return;
     }
     const told = tellShot(result, game.last.side, names, game.mode);
-    say(result.again && !challenge ? `${told.head} Bonus shot!` : told.head, told.gain);
+    say(result.again && !challenge ? `${told.head} Bonus shot!` : told.head, told.gains);
   };
 
   if (phase === 'splash') {
@@ -443,11 +443,11 @@ export default function App() {
         </b>
         <AimHint side={side} />
       </span>
-      {note?.gain?.side === side && (
-        <span className={`gain ${note.gain.text.startsWith('+') ? '' : 'minus'}`} key={note.id} aria-hidden="true">
-          {note.gain.text}
+      {note?.gains?.filter((gain) => gain.side === side).map((gain, i) => (
+        <span className={`gain ${gain.text.startsWith('+') ? '' : 'minus'}`} key={`${note.id}-${i}`} aria-hidden="true">
+          {gain.text}
         </span>
-      )}
+      ))}
       <span className="pips" aria-label={`${game.bag[side]} of ${toWin}`}>
         {Array.from({ length: toWin }, (_, i) => (
           <i key={i} className={i < game.bag[side] ? 'on' : ''} />

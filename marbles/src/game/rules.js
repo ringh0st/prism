@@ -184,6 +184,8 @@ export function judge(game, side, events) {
   const foeShooter = world.marbles.find((m) => m.id === other(side));
   let won = 0;
   let foul = null;
+  // A marble really given back for a foul in the Mor (not when the bag is empty or the same shot sank one).
+  let gaveBack = 0;
   let knocked = false;
   let lost = 0;
   let gold = false;
@@ -225,7 +227,10 @@ export function judge(game, side, events) {
       Object.assign(s, { sunk: false, x: HOME[who].x, y: HOME[who].y, vx: 0, vy: 0 });
       if (who === side) foul = 'mor';
     }
-    if (foul && game.bag[side] > 0 && won === 0) game.bag[side]--;
+    if (foul && game.bag[side] > 0 && won === 0) {
+      game.bag[side]--;
+      gaveBack = 1;
+    }
   } else if (mode === 'chase') {
     const hit = events.some((e) => e.type === 'clack' && [e.a, e.b].includes(side) && [e.a, e.b].includes(other(side)));
     // A wild shot that sends your own shooter into the kerb without a hit is "out": the other side takes a marble.
@@ -249,14 +254,14 @@ export function judge(game, side, events) {
     if (game.bag.you >= game.challenge.need) game.winner = 'you';
     else if (game.shots >= game.challenge.shots) game.winner = 'foe';
     game.last = { side, won, lost, foul, again: false };
-    return { events, won, lost, foul, gold, again: false, hits: events.filter((e) => e.type === 'clack').length };
+    return { events, won, lost, foul, gaveBack, gold, again: false, hits: events.filter((e) => e.type === 'clack').length };
   }
   // A good shot earns one more, not a run of them; reaching the target ends the turn too.
   const keeps = again && game.run < BONUS_SHOTS && game.bag[side] < MODES[mode].toWin;
   if (keeps) game.run++;
   else endTurn(game);
   game.last = { side, won, lost, foul, again: keeps, knocked };
-  return { events, won, lost, foul, gold, again: keeps, knocked, hits: events.filter((e) => e.type === 'clack').length };
+  return { events, won, lost, foul, gaveBack, gold, again: keeps, knocked, hits: events.filter((e) => e.type === 'clack').length };
 }
 
 /**

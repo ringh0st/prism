@@ -34,6 +34,8 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
   gameRef.current = game;
   const side = game.turn;
   const canShoot = !game.winner && (net ? side === net.side : !(cpuLevel && side === 'foe'));
+  // The calls' row keeps its place for the whole game (hidden on the other side's turn), so the yard keeps its size.
+  const showsCalls = !game.winner;
   const barRef = useRef(null);
   const netRef = useRef(net);
   netRef.current = net;
@@ -228,8 +230,8 @@ export default function Yard({ game, cpuLevel = null, net = null, onChange }) {
         </div>
       )}
       <canvas ref={canvasRef} onPointerDown={onDown} onPointerMove={aimFrom} onPointerUp={onUp} onPointerCancel={onUp} />
-      {canShoot && !live.current.moving && (
-        <div className="calls" role="group" aria-label="Calls">
+      {showsCalls && (
+        <div className={`calls ${canShoot && !live.current.moving ? '' : 'idle'}`} role="group" aria-label="Calls">
           <button onClick={sweep} disabled={calls.bakol < 1 || game.world.stones.length === 0}>
             <b>Sweep!</b>
             <small>clear the pebbles · {calls.bakol}</small>

@@ -24,7 +24,24 @@ test('a miss scores nothing', () => {
   assert.deepEqual(tellShot({ won: 0 }, 'you', names, 'ring'), {
     head: 'Missed.',
     gain: null,
+    gains: [],
   });
+});
+test('a shot that wins and loses marbles tells both, each on its own bag', () => {
+  const told = tellShot({ won: 2, lost: 1 }, 'foe', names, 'ring');
+  assert.match(told.head, /Computer knocked out 2 marbles!/);
+  assert.match(told.head, /its own marble, so it goes to you/);
+  assert.deepEqual(told.gains, [
+    { side: 'foe', text: '+2' },
+    { side: 'you', text: '+1' },
+  ]);
+});
+test('says "its own", never the name twice', () => {
+  assert.doesNotMatch(tellShot({ won: 0, lost: 1 }, 'foe', names, 'ring').head, /Computer’s own|Computer's own/);
+});
+test('a Mor foul only takes a marble when one was really given back', () => {
+  assert.deepEqual(tellShot({ won: 0, foul: 'mor', gaveBack: 0 }, 'you', names, 'hole').gains, []);
+  assert.deepEqual(tellShot({ won: 0, foul: 'mor', gaveBack: 1 }, 'you', names, 'hole').gains, [{ side: 'you', text: '−1' }]);
 });
 
 const game = (extra) => ({
